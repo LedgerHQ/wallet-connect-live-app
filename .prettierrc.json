@@ -1,0 +1,22 @@
+{
+	"semi": false,
+	"singleQuote": true,
+	"useTabs": true,
+	"tabWidth": 4,
+	"trailingComma": "all",
+	"arrowParens": "always",
+	"overrides": [
+		{
+			"files": "*.css",
+			"options": {
+				"parser": "css"
+			}
+		},
+		{
+			"files": "*.md",
+			"options": {
+				"tabWidth": 1
+			}
+		}
+	]
+}

@@ -1,0 +1,9 @@
+{
+  "buy" : "구매",
+  "sell" : "판매",
+  "continue" : "계속",
+  "back" : "뒤로",
+  "add_account" : "계정 추가",
+  "choose_asset" : "자산 선택",
+  "choose_account" : "계정 선택"
+}

@@ -1,0 +1,31 @@
+{
+	"plugins": ["@typescript-eslint", "testing-library"],
+	"extends": [
+		"next/core-web-vitals",
+		"plugin:@typescript-eslint/recommended",
+		"prettier"
+	],
+	"rules": {
+		"@typescript-eslint/no-unused-vars": [
+			"warn",
+			{
+				"argsIgnorePattern": "^_",
+				"varsIgnorePattern": "^_",
+				"caughtErrorsIgnorePattern": "^_"
+			}
+		],
+		"@typescript-eslint/no-explicit-any": "error",
+		"prefer-const": "error",
+		"react-hooks/exhaustive-deps": "off"
+	},
+	"overrides": [
+		// Only uses Testing Library lint rules in test files
+		{
+			"files": [
+				"**/__tests__/**/*.[jt]s?(x)",
+				"**/?(*.)+(spec|test).[jt]s?(x)"
+			],
+			"extends": ["plugin:testing-library/react"]
+		}
+	]
+}

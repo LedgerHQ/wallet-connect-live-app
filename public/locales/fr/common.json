@@ -1,0 +1,9 @@
+{
+  "buy" : "Acheter",
+  "sell" : "Vendre",
+  "continue" : "Continuer",
+  "back" : "Retour",
+  "add_account" : "Ajouter un compte",
+  "choose_asset" : "Choisir un actif",
+  "choose_account" : "Choisir un compte"
+}

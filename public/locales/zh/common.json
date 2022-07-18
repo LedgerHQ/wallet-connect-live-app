@@ -1,0 +1,9 @@
+{
+  "buy" : "买入",
+  "sell" : "卖出",
+  "continue" : "继续",
+  "back" : "返回",
+  "add_account" : "添加账户",
+  "choose_asset" : "选择资产",
+  "choose_account" : "选择账户"
+}
