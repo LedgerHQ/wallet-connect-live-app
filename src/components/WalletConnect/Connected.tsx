@@ -1,6 +1,7 @@
 import styled from 'styled-components'
-import { Box, Button, Text } from '@ledgerhq/react-ui'
+import { Flex, Button, Text } from '@ledgerhq/react-ui'
 import { QuitRegular, RedelegateRegular } from '@ledgerhq/react-ui/assets/icons'
+import { Account } from '@ledgerhq/live-app-sdk'
 
 const ConnectedContainer = styled.div`
 	display: flex;
@@ -11,29 +12,35 @@ const ConnectedContainer = styled.div`
 export type ConnectedProps = {
 	onDisconnect: () => void
 	onSwitchAccount: () => void
+	account: Account
 }
 
-export function Connected({ onDisconnect, onSwitchAccount }: ConnectedProps) {
+export function Connected({ onDisconnect, onSwitchAccount, account }: ConnectedProps) {
 	return (
 			<ConnectedContainer>
-				<Box mt="32px">
-					<Button
-						variant="shade"
-						Icon={RedelegateRegular}
-						onClick={onSwitchAccount}
-					>
-						<Text>Switch account</Text>
-					</Button>
-					<Button
-						ml="24px"
+				<Text variant="bodyLineHeight">
+					Current Account: {account.name}
+				</Text>
+				<Flex mt={8} flexDirection="row" flexWrap="wrap-reverse" justifyContent="center">
+				<Button
 						outline
-						variant="error"
+						variant="main"
+						m={3}
 						Icon={QuitRegular}
 						onClick={onDisconnect}
 					>
 						<Text>Disconnect</Text>
 					</Button>
-				</Box>
+					<Button
+						outline
+						variant="main"
+						m={3}
+						Icon={RedelegateRegular}
+						onClick={onSwitchAccount}
+					>
+						<Text>Switch account</Text>
+					</Button>
+				</Flex>
 			</ConnectedContainer>
 	)
 }

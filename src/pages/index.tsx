@@ -8,6 +8,7 @@ import { getDefaultLanguage } from '@/helpers/generic'
 import { Main, Container, MainContainer } from '@/styles/styles'
 import { WalletConnect } from '@/components/WalletConnect'
 import { NetworkConfig } from '@/types/types'
+import { SDKProvider } from 'src/shared/SDKProvider'
 
 export const getServerSideProps: GetServerSideProps = async ({
 	query,
@@ -25,11 +26,13 @@ export const getServerSideProps: GetServerSideProps = async ({
 const Index: NextPage = () => {
 	const router = useRouter()
 
-	const { params: rawParams } = router.query
+	const { params: rawParams, uri: rawURI } = router.query
 
 	const params =
 		rawParams && typeof rawParams === 'string' ? JSON.parse(rawParams) : {}
 	const networkConfigs: NetworkConfig[] = params.networks
+
+	const uri = rawURI && typeof rawURI === 'string' ? rawURI : undefined
 
 	const [isMounted, setMounted] = useState<boolean>(false)
 
@@ -46,7 +49,18 @@ const Index: NextPage = () => {
 					content="Ledger Wallet Connect"
 				/>
 			</Head>
-			{isMounted ? <WalletConnect networks={networkConfigs} /> : null}
+			{isMounted ? (
+				<SDKProvider>
+					{(platformSDK, accounts) => (
+						<WalletConnect
+							networks={networkConfigs}
+							initialURI={uri}
+							platformSDK={platformSDK}
+							accounts={accounts}
+						/>
+					)}
+				</SDKProvider>
+			) : null}
 		</Container>
 	)
 }

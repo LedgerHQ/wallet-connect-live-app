@@ -1,11 +1,8 @@
 import { NetworkConfig } from '@/types/types'
 import { Text } from '@ledgerhq/react-ui'
 import GlitchText from '@ledgerhq/react-ui/components/animations/GlitchText'
+import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
 
-import LedgerLivePlarformSDK, {
-	Account,
-	WindowMessageTransport,
-} from '@ledgerhq/live-app-sdk'
 import WalletConnectClient from '@walletconnect/client'
 import { IWalletConnectSession, IJsonRpcRequest } from '@walletconnect/types'
 import Image from 'next/image'
@@ -70,8 +67,8 @@ const StatusIcon = styled.div<{ pulse: boolean }>`
 
 	background: ${({ theme }) => theme.colors.neutral.c100};
 	border-radius: 50%;
-	height: 100px;
-	width: 100px;
+	height: 80px;
+	width: 80px;
 
 	box-shadow: 0 0 0 0 rgba(255, 255, 255, 1);
 	transform: scale(1);
@@ -112,34 +109,46 @@ const BannerContainer = styled(TransitionGroup)`
 
 type WalletConnectState = {
 	session: IWalletConnectSession | null
-	accounts: Account[]
 	timedOut: boolean
 	selectedAccount?: Account
 }
 
-const initialState: WalletConnectState = {
-	session: null,
-	accounts: [],
-	timedOut: false,
+const getInitialState = (accounts: Account[], initialAccountId?: string): WalletConnectState => {
+	const savedAccountId = localStorage.getItem('accountId')
+
+	const initialAccount = initialAccountId ? accounts.find(account => account.id === initialAccountId) : undefined
+	const savedAccount = savedAccountId ? accounts.find(account => account.id === savedAccountId) : undefined
+	const defaultAccount = accounts.length > 0 ? accounts [0] : undefined
+
+	const selectedAccount = initialAccount || savedAccount || defaultAccount;
+	return {
+		session: null,
+		timedOut: false,
+		selectedAccount,
+	}
 }
 
 export type WalletConnectProps = {
 	initialAccountId?: string
+	initialURI?: string
 	networks: NetworkConfig[]
+	platformSDK: LedgerLivePlarformSDK
+	accounts: Account[]
 }
 
 export function WalletConnect({
 	initialAccountId,
+	initialURI,
 	networks = [],
+	platformSDK,
+	accounts,
 }: WalletConnectProps) {
-	const platformSDKRef = useRef<LedgerLivePlarformSDK>(
-		new LedgerLivePlarformSDK(new WindowMessageTransport()),
-	)
-
-	const selectedAccountRef = useRef<Account>()
+	const selectedAccountRef = useRef<Account | undefined>(accounts[0])
 	const clientInstanceRef = useRef<WalletConnectClient>()
 
-	const [state, setState] = useState<WalletConnectState>(initialState)
+	const [state, setState] = useState<WalletConnectState>(getInitialState(accounts, initialAccountId))
+
+	console.log(state)
 
 	const { session, selectedAccount, timedOut } = state
 
@@ -148,6 +157,8 @@ export function WalletConnect({
 		const clientInstance = clientInstanceRef.current
 
 		if (clientInstance && clientInstance.connected && selectedAccount) {
+			localStorage.setItem('accountId', selectedAccount.id);
+
 			const networkConfig = networks.find(
 				(networkConfig) =>
 					networkConfig.currency === selectedAccount.currency,
@@ -166,8 +177,15 @@ export function WalletConnect({
 	}, [selectedAccount])
 
 	const createClient = useCallback(
-		(params: { uri: string } | { session: IWalletConnectSession }) => {
-			const clientInstance = new WalletConnectClient(params)
+		async (params: { uri?: string; session?: IWalletConnectSession }): Promise<void> => {
+			const { uri, session } = params
+			if (!uri && !session) {
+				throw new Error(
+					'Need either uri or session to be provided to createClient',
+				)
+			}
+
+			const clientInstance = new WalletConnectClient({ uri, session })
 
 			// synchronize WC state with react and trigger necessary rerenders
 			const syncSessionWithReactState = () => {
@@ -178,20 +196,6 @@ export function WalletConnect({
 						...clientInstance.session,
 					},
 				}))
-			}
-
-			// a client is already connected
-			if (clientInstance.connected && selectedAccountRef.current) {
-				console.log('ALREADY CONNECTED')
-				const networkConfig = networks.find(
-					(networkConfig) =>
-						networkConfig.currency ===
-						selectedAccountRef.current?.currency,
-				) as NetworkConfig
-				clientInstance.updateSession({
-					chainId: networkConfig.chainId,
-					accounts: [selectedAccountRef.current.address],
-				})
 			}
 
 			clientInstance.on('session_request', (error, payload) => {
@@ -212,6 +216,10 @@ export function WalletConnect({
 					'session',
 					JSON.stringify(clientInstance.session),
 				)
+
+				if (uri) {
+					localStorage.setItem("sessionURI", uri);
+				}
 			})
 
 			clientInstance.on('disconnect', () => {
@@ -224,6 +232,7 @@ export function WalletConnect({
 				})
 				clientInstanceRef.current = undefined
 				localStorage.removeItem('session')
+				localStorage.removeItem('sessionURI')
 			})
 
 			clientInstance.on('error', (error) => {
@@ -233,7 +242,6 @@ export function WalletConnect({
 			clientInstance.on(
 				'call_request',
 				async (error, payload: IJsonRpcRequest) => {
-					const platformSDK = platformSDKRef.current
 					console.log('call_request', { error, payload })
 					if (error) {
 					}
@@ -243,7 +251,7 @@ export function WalletConnect({
 							const ethTX = payload.params[0]
 							console.log('eth_sendTransaction', {
 								ethTX,
-								selectedAccount,
+								selectedAccount: selectedAccountRef.current,
 							})
 							if (
 								selectedAccountRef.current &&
@@ -288,35 +296,41 @@ export function WalletConnect({
 			// saving the client instance ref for further usage
 			clientInstanceRef.current = clientInstance
 			syncSessionWithReactState()
+
+			console.log('COND=', {
+				first: clientInstance.connected,
+				second: selectedAccountRef.current,
+			})
+
+			// a client is already connected
+			if (clientInstance.connected && selectedAccountRef.current) {
+				// if a uri was provided, then the user probably want to connect to another dapp, we disconnect the previous one
+				if (uri) {
+					console.log("killing session")
+					await clientInstance.killSession();
+					return createClient({ uri });
+				}
+
+				const networkConfig = networks.find(
+					(networkConfig) =>
+						networkConfig.currency ===
+						selectedAccountRef.current?.currency,
+				) as NetworkConfig
+				clientInstance.updateSession({
+					chainId: networkConfig.chainId,
+					accounts: [selectedAccountRef.current.address],
+				})
+			}
 		},
 		[],
 	)
 
 	useEffect(() => {
-		// connecting to the platform API
-		const platformSDK = platformSDKRef.current
-		platformSDK.connect()
-
-		// we get all crypto user accounts using the SDK
-		platformSDK.listAccounts().then((accounts) => {
-			const enabledCurrencies = networks.map(
-				(networkConfig) => networkConfig.currency,
-			)
-
-			// filter all accounts matching allowed currencies
-			const filteredAccounts = accounts.filter((account: Account) =>
-				enabledCurrencies.includes(account.currency),
-			)
-
-			const selectedAccount =
-				filteredAccounts.length > 0 ? filteredAccounts[0] : undefined
-			setState((oldState) => ({
-				...oldState,
-				accounts: filteredAccounts,
-				selectedAccount,
-			}))
-		})
-
+		const sessionURI = localStorage.getItem('sessionURI')
+		if (initialURI && initialURI !== sessionURI) {
+			createClient({ uri: initialURI })
+			return;
+		}
 		// restoring WC session if one is to be found in local storage
 		const rawSession = localStorage.getItem('session')
 		if (rawSession) {
@@ -353,10 +367,9 @@ export function WalletConnect({
 			(networkConfig) => networkConfig.currency,
 		)
 		try {
-			const newSelectedAccount =
-				await platformSDKRef.current.requestAccount({
-					currencies: enabledCurrencies,
-				})
+			const newSelectedAccount = await platformSDK.requestAccount({
+				currencies: enabledCurrencies,
+			})
 
 			setState((oldState) => ({
 				...oldState,
@@ -397,32 +410,34 @@ export function WalletConnect({
 				) : null}
 			</BannerContainer>
 			<WalletConnectInnerContainer>
-				{session ? (
+				{session && selectedAccount ? (
 					<>
 						{session.peerMeta ? (
 							<>
 								<StatusIcon pulse={session.connected}>
 									<Image
-										width="75px"
-										height="75px"
+										width="55px"
+										height="55px"
 										src="/icons/walletconnect-logo.svg"
 										alt="walletconnect-logo"
 									/>
 								</StatusIcon>
-								<Text variant="h4" mt="32px" textAlign="center">
+								<Text variant="h4" mt={8} textAlign="center">
 									<GlitchText
-										text={
-											session.connected
-												? `connected to [${session.peerMeta.name}]`
-												: `[${session.peerMeta.name}] is trying to connect`
-										}
+									duration={2000}
+									delay={0}
+									text={
+										session.connected
+											? `connected to [${session.peerMeta.name}]`
+											: `[${session.peerMeta.name}] is trying to connect`
+									}
 									/>
 								</Text>
 								{session.peerMeta.description ? (
 									<Text
 										variant="paragraphLineHeight"
-										mt="12px"
-										color="neutral.c90"
+										mt={5}
+										color="neutral.c70"
 										textAlign="center"
 									>
 										{session.peerMeta.description}
@@ -435,6 +450,7 @@ export function WalletConnect({
 										timeout={200}
 									>
 										<Connected
+											account={selectedAccount}
 											onDisconnect={handleDisconnect}
 											onSwitchAccount={
 												handleSwitchAccount
