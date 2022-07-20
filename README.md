@@ -1,16 +1,29 @@
 # Wallet Connect Live App
 
-[![Deploy to Vercel](https://github.com/LedgerHQ/wallet-connect-live-app/actions/workflows/deploy.yml/badge.svg)](https://github.com/LedgerHQ/wallet-connect-live-app/actions/workflows/deploy.yml)
-
 This is a web application that uses [Next.js](https://nextjs.org/)
 and is intended to be integrated within ledger products, enabling users to seamlessly connect to dapps supporting the walletconnect wallet adapter.
+
+## Hosting
+This live app is currently hosted at https://wc.apps.ledger.com
 
 ## Inputs
 Behavior of the live app can be influenced by navigating to it with the following query parameters:
 
-initialAccountId - account id that should be selected at startup
-uri - WalletConnect URI the live app will attempt to connect to at startup.
+- `initialAccountId`: Defines the account selected by default.
+- `uri`: Defines the WalletConnect URI the live app will attempt to connect to at startup.
 
+## Params
+This live app need parameters to be defined in the manifest file
+```json
+"params": {
+      "networks": [
+        {
+          "currency": "ethereum", // currency id
+          "chainId": 1 // evm network chain id
+        }
+      ]
+    }
+```
 ## Getting Started
 
 First, you should install dependencies
