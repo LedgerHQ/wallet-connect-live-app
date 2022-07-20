@@ -157,31 +157,30 @@ export function WalletConnect({
 		getInitialState(accounts, initialAccountId),
 	)
 
-	console.log(state)
-
 	const { session, selectedAccount, timedOut } = state
 
 	useEffect(() => {
 		selectedAccountRef.current = selectedAccount
 		const clientInstance = clientInstanceRef.current
 
-		if (clientInstance && clientInstance.connected && selectedAccount) {
+		if (selectedAccount) {
 			localStorage.setItem('accountId', selectedAccount.id)
-
-			const networkConfig = networks.find(
-				(networkConfig) =>
-					networkConfig.currency === selectedAccount.currency,
-			) as NetworkConfig
-			clientInstance.updateSession({
-				chainId: networkConfig.chainId,
-				accounts: [selectedAccount.address],
-			})
-			setState((oldState) => ({
-				...oldState,
-				session: {
-					...clientInstance.session,
-				},
-			}))
+			if (clientInstance && clientInstance.connected) {
+				const networkConfig = networks.find(
+					(networkConfig) =>
+						networkConfig.currency === selectedAccount.currency,
+				) as NetworkConfig
+				clientInstance.updateSession({
+					chainId: networkConfig.chainId,
+					accounts: [selectedAccount.address],
+				})
+				setState((oldState) => ({
+					...oldState,
+					session: {
+						...clientInstance.session,
+					},
+				}))
+			}
 		}
 	}, [selectedAccount])
 
@@ -309,16 +308,10 @@ export function WalletConnect({
 			clientInstanceRef.current = clientInstance
 			syncSessionWithReactState()
 
-			console.log('COND=', {
-				first: clientInstance.connected,
-				second: selectedAccountRef.current,
-			})
-
 			// a client is already connected
 			if (clientInstance.connected && selectedAccountRef.current) {
 				// if a uri was provided, then the user probably want to connect to another dapp, we disconnect the previous one
 				if (uri) {
-					console.log('killing session')
 					await clientInstance.killSession()
 					return createClient({ uri })
 				}
