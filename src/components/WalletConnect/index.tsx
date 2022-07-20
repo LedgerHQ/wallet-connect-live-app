@@ -113,14 +113,21 @@ type WalletConnectState = {
 	selectedAccount?: Account
 }
 
-const getInitialState = (accounts: Account[], initialAccountId?: string): WalletConnectState => {
+const getInitialState = (
+	accounts: Account[],
+	initialAccountId?: string,
+): WalletConnectState => {
 	const savedAccountId = localStorage.getItem('accountId')
 
-	const initialAccount = initialAccountId ? accounts.find(account => account.id === initialAccountId) : undefined
-	const savedAccount = savedAccountId ? accounts.find(account => account.id === savedAccountId) : undefined
-	const defaultAccount = accounts.length > 0 ? accounts [0] : undefined
+	const initialAccount = initialAccountId
+		? accounts.find((account) => account.id === initialAccountId)
+		: undefined
+	const savedAccount = savedAccountId
+		? accounts.find((account) => account.id === savedAccountId)
+		: undefined
+	const defaultAccount = accounts.length > 0 ? accounts[0] : undefined
 
-	const selectedAccount = initialAccount || savedAccount || defaultAccount;
+	const selectedAccount = initialAccount || savedAccount || defaultAccount
 	return {
 		session: null,
 		timedOut: false,
@@ -146,7 +153,9 @@ export function WalletConnect({
 	const selectedAccountRef = useRef<Account | undefined>(accounts[0])
 	const clientInstanceRef = useRef<WalletConnectClient>()
 
-	const [state, setState] = useState<WalletConnectState>(getInitialState(accounts, initialAccountId))
+	const [state, setState] = useState<WalletConnectState>(
+		getInitialState(accounts, initialAccountId),
+	)
 
 	console.log(state)
 
@@ -157,7 +166,7 @@ export function WalletConnect({
 		const clientInstance = clientInstanceRef.current
 
 		if (clientInstance && clientInstance.connected && selectedAccount) {
-			localStorage.setItem('accountId', selectedAccount.id);
+			localStorage.setItem('accountId', selectedAccount.id)
 
 			const networkConfig = networks.find(
 				(networkConfig) =>
@@ -177,7 +186,10 @@ export function WalletConnect({
 	}, [selectedAccount])
 
 	const createClient = useCallback(
-		async (params: { uri?: string; session?: IWalletConnectSession }): Promise<void> => {
+		async (params: {
+			uri?: string
+			session?: IWalletConnectSession
+		}): Promise<void> => {
 			const { uri, session } = params
 			if (!uri && !session) {
 				throw new Error(
@@ -218,7 +230,7 @@ export function WalletConnect({
 				)
 
 				if (uri) {
-					localStorage.setItem("sessionURI", uri);
+					localStorage.setItem('sessionURI', uri)
 				}
 			})
 
@@ -306,9 +318,9 @@ export function WalletConnect({
 			if (clientInstance.connected && selectedAccountRef.current) {
 				// if a uri was provided, then the user probably want to connect to another dapp, we disconnect the previous one
 				if (uri) {
-					console.log("killing session")
-					await clientInstance.killSession();
-					return createClient({ uri });
+					console.log('killing session')
+					await clientInstance.killSession()
+					return createClient({ uri })
 				}
 
 				const networkConfig = networks.find(
@@ -329,7 +341,7 @@ export function WalletConnect({
 		const sessionURI = localStorage.getItem('sessionURI')
 		if (initialURI && initialURI !== sessionURI) {
 			createClient({ uri: initialURI })
-			return;
+			return
 		}
 		// restoring WC session if one is to be found in local storage
 		const rawSession = localStorage.getItem('session')
@@ -424,13 +436,13 @@ export function WalletConnect({
 								</StatusIcon>
 								<Text variant="h4" mt={8} textAlign="center">
 									<GlitchText
-									duration={2000}
-									delay={0}
-									text={
-										session.connected
-											? `connected to [${session.peerMeta.name}]`
-											: `[${session.peerMeta.name}] is trying to connect`
-									}
+										duration={2000}
+										delay={0}
+										text={
+											session.connected
+												? `connected to [${session.peerMeta.name}]`
+												: `[${session.peerMeta.name}] is trying to connect`
+										}
 									/>
 								</Text>
 								{session.peerMeta.description ? (
@@ -443,7 +455,6 @@ export function WalletConnect({
 										{session.peerMeta.description}
 									</Text>
 								) : null}
-
 								{session.connected ? (
 									<CSSTransition
 										classNames="fade"

@@ -9,6 +9,7 @@ import { Main, Container, MainContainer } from '@/styles/styles'
 import { WalletConnect } from '@/components/WalletConnect'
 import { NetworkConfig } from '@/types/types'
 import { SDKProvider } from 'src/shared/SDKProvider'
+import { Flex } from '@ledgerhq/react-ui'
 
 export const getServerSideProps: GetServerSideProps = async ({
 	query,
@@ -26,13 +27,14 @@ export const getServerSideProps: GetServerSideProps = async ({
 const Index: NextPage = () => {
 	const router = useRouter()
 
-	const { params: rawParams, uri: rawURI } = router.query
+	const { params: rawParams, uri: rawURI, initialAccountId: rawInitialAccountId } = router.query
 
 	const params =
 		rawParams && typeof rawParams === 'string' ? JSON.parse(rawParams) : {}
 	const networkConfigs: NetworkConfig[] = params.networks
 
 	const uri = rawURI && typeof rawURI === 'string' ? rawURI : undefined
+	const initialAccountId = rawInitialAccountId && typeof rawInitialAccountId === 'string' ? rawInitialAccountId : undefined
 
 	const [isMounted, setMounted] = useState<boolean>(false)
 
@@ -50,14 +52,20 @@ const Index: NextPage = () => {
 				/>
 			</Head>
 			{isMounted ? (
-				<SDKProvider>
-					{(platformSDK, accounts) => (
+				<SDKProvider networks={networkConfigs}
+				>
+					{(platformSDK, accounts) => accounts.length > 0 ? (
 						<WalletConnect
+							initialAccountId={initialAccountId}
 							networks={networkConfigs}
 							initialURI={uri}
 							platformSDK={platformSDK}
 							accounts={accounts}
 						/>
+					) : (
+						<Flex>
+							You need 
+						</Flex>
 					)}
 				</SDKProvider>
 			) : null}
