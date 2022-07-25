@@ -31,6 +31,22 @@ const QrCodeButton = styled.button`
 	}
 `
 
+const ViewFinderContainer = styled.div`
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: black;
+	opacity: 0.7;
+	z-index: 1;
+  	clip-path: polygon(0% 0%, 0% 100%, 25% 100%, 25% 25%, 75% 25%, 75% 75%, 25% 75%, 25% 100%, 100% 100%, 100% 0%);  
+`
+
+function ViewFinder() {
+	return <ViewFinderContainer>lol</ViewFinderContainer>
+}
+
 export type DisconnectedProps = {
 	onConnect: (uri: string) => void
 }
@@ -61,7 +77,7 @@ export function Disconnected({ onConnect }: DisconnectedProps) {
 	const handleQrCodeScan: OnResultFunction = useCallback((result, error) => {
 		if (!!result) {
 			console.log(result)
-			
+
 			setScanner(false)
 			try {
 				const uri = new URL(result.toString())
@@ -70,18 +86,22 @@ export function Disconnected({ onConnect }: DisconnectedProps) {
 				console.log('invalid uri: ', error)
 				setErrorValue('Invalid URI')
 			}
-
 		}
-	}, []);
+	}, [])
 
 	return (
 		<DisconnectedContainer>
 			{scanner ? (
 				<QrReader
 					onResult={handleQrCodeScan}
-					constraints={{ facingMode: 'user' }}
+					constraints={{ facingMode: 'environment' }}
+					ViewFinder={ViewFinder}
+					videoStyle={{ objectFit: 'cover' }}
 					containerStyle={{
-						width: "100%",
+						width: '100%',
+						maxWidth: '600px',
+						borderRadius: '8px',
+						margin: '6px',
 					}}
 				/>
 			) : (
