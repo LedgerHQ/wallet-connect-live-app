@@ -487,6 +487,7 @@ export function WalletConnect({
 				) : (
 					<CSSTransition classNames="fade" timeout={200}>
 						<Disconnected
+							mode={initialMode}
 							onConnect={(uri) => {
 								createClient({ uri })
 							}}
