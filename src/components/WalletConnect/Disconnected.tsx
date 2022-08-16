@@ -2,7 +2,8 @@ import styled from 'styled-components'
 import { Input, Button, Text, Flex } from '@ledgerhq/react-ui'
 import { useCallback, useState } from 'react'
 import { QrCodeMedium } from '@ledgerhq/react-ui/assets/icons'
-import { OnResultFunction, QrReader } from 'react-qr-reader'
+import { QRScanner } from './QRScanner'
+import { InputMode } from '@/types/types'
 
 const DisconnectedContainer = styled.div`
 	display: flex;
@@ -11,6 +12,7 @@ const DisconnectedContainer = styled.div`
 	justify-content: center;
 	height: 100%;
 	width: 100%;
+	position: relative;
 `
 
 const QrCodeButton = styled.button`
@@ -31,30 +33,27 @@ const QrCodeButton = styled.button`
 	}
 `
 
-const ViewFinderContainer = styled.div`
+const BottomContainer = styled.div`
 	position: absolute;
-	top: 0;
+	bottom: 40px;
 	left: 0;
 	right: 0;
-	bottom: 0;
-	background: black;
-	opacity: 0.7;
 	z-index: 1;
-  	clip-path: polygon(0% 0%, 0% 100%, 25% 100%, 25% 25%, 75% 25%, 75% 75%, 25% 75%, 25% 100%, 100% 100%, 100% 0%);  
+	display: flex;
+	padding: 0px 16px;
+	align-items: center;
+	justify-content: center;
 `
-
-function ViewFinder() {
-	return <ViewFinderContainer>lol</ViewFinderContainer>
-}
 
 export type DisconnectedProps = {
 	onConnect: (uri: string) => void
+	mode?: InputMode
 }
 
-export function Disconnected({ onConnect }: DisconnectedProps) {
-	const [inputValue, setInputValue] = useState<string>('')
-	const [errorValue, setErrorValue] = useState<string | undefined>(undefined)
-	const [scanner, setScanner] = useState(false)
+export function Disconnected({ onConnect, mode }: DisconnectedProps) {
+	const [inputValue, setInputValue] = useState<string>("");
+	const [errorValue, setErrorValue] = useState<string | undefined>(undefined);
+	const [scanner, setScanner] = useState(mode === "scan");
 
 	const handleConnect = useCallback(() => {
 		if (!inputValue) {
@@ -74,36 +73,10 @@ export function Disconnected({ onConnect }: DisconnectedProps) {
 		setScanner(true)
 	}, [])
 
-	const handleQrCodeScan: OnResultFunction = useCallback((result, error) => {
-		if (!!result) {
-			console.log(result)
-
-			setScanner(false)
-			try {
-				const uri = new URL(result.toString())
-				onConnect(uri.toString())
-			} catch (error) {
-				console.log('invalid uri: ', error)
-				setErrorValue('Invalid URI')
-			}
-		}
-	}, [])
-
 	return (
 		<DisconnectedContainer>
 			{scanner ? (
-				<QrReader
-					onResult={handleQrCodeScan}
-					constraints={{ facingMode: 'environment' }}
-					ViewFinder={ViewFinder}
-					videoStyle={{ objectFit: 'cover' }}
-					containerStyle={{
-						width: '100%',
-						maxWidth: '600px',
-						borderRadius: '8px',
-						margin: '6px',
-					}}
-				/>
+				<QRScanner onQRScan={onConnect} />
 			) : (
 				<>
 					<Input
@@ -127,6 +100,20 @@ export function Disconnected({ onConnect }: DisconnectedProps) {
 					</Button>
 				</>
 			)}
+			<BottomContainer>
+				<Flex>
+					<Button
+						variant="shade"
+						outline
+						m={3}
+						onClick={() => {
+							setScanner(!scanner)
+						}}
+					>
+						<Text>{`Switch to ${scanner ? "Text" : "Scanner"}`}</Text>
+					</Button>
+				</Flex>
+			</BottomContainer>
 		</DisconnectedContainer>
 	)
 }

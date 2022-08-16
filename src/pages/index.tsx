@@ -27,7 +27,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 const Index: NextPage = () => {
 	const router = useRouter()
 
-	const { params: rawParams, uri: rawURI, initialAccountId: rawInitialAccountId } = router.query
+	const { params: rawParams, uri: rawURI, initialAccountId: rawInitialAccountId, mode: rawInitialMode } = router.query
 
 	const params =
 		rawParams && typeof rawParams === 'string' ? JSON.parse(rawParams) : {}
@@ -35,6 +35,7 @@ const Index: NextPage = () => {
 
 	const uri = rawURI && typeof rawURI === 'string' ? rawURI : undefined
 	const initialAccountId = rawInitialAccountId && typeof rawInitialAccountId === 'string' ? rawInitialAccountId : undefined
+	const initialMode = rawInitialMode === 'scan' || rawInitialMode === 'text' ? rawInitialMode : undefined
 
 	const [isMounted, setMounted] = useState<boolean>(false)
 
@@ -56,6 +57,7 @@ const Index: NextPage = () => {
 				>
 					{(platformSDK, accounts) => accounts.length > 0 ? (
 						<WalletConnect
+							initialMode={initialMode}
 							initialAccountId={initialAccountId}
 							networks={networkConfigs}
 							initialURI={uri}
