@@ -2,12 +2,11 @@ import styled from 'styled-components'
 import { device } from './breakpoints'
 
 export const Container = styled.div`
-	height: 100vh;
-	width: 100vw;
+	height: 100%;
+	width: 100%;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
-	padding: 12px;
 `
 
 export const Main = styled.main`

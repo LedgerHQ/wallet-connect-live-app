@@ -1,4 +1,4 @@
-import { NetworkConfig } from '@/types/types'
+import { InputMode, NetworkConfig } from '@/types/types'
 import { Text } from '@ledgerhq/react-ui'
 import GlitchText from '@ledgerhq/react-ui/components/animations/GlitchText'
 import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
@@ -92,11 +92,12 @@ const WalletConnectInnerContainer = styled(TransitionGroup)`
 `
 
 const BannerContainer = styled(TransitionGroup)`
-	z-index: 1;
+	z-index: 2;
 	position: absolute;
 	top: 0;
 	left: 0;
 	right: 0;
+	padding: 12px;
 
 	> div {
 		margin-top: 12px;
@@ -136,6 +137,7 @@ const getInitialState = (
 }
 
 export type WalletConnectProps = {
+	initialMode?: InputMode
 	initialAccountId?: string
 	initialURI?: string
 	networks: NetworkConfig[]
@@ -144,6 +146,7 @@ export type WalletConnectProps = {
 }
 
 export function WalletConnect({
+	initialMode,
 	initialAccountId,
 	initialURI,
 	networks = [],
