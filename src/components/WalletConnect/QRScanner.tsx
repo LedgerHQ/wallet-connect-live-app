@@ -63,30 +63,31 @@ export function QRScanner({ onQRScan }: QRScannerProps) {
 	const videoRef = useRef(null)
 
 	useLayoutEffect(() => {
-		const codeReader = new BrowserQRCodeReader()
-		let controls: IScannerControls | null = null
+		const codeReader = new BrowserQRCodeReader(undefined, { delayBetweenScanAttempts: 500 })
+		let controlsRef: IScannerControls | null = null
 
-		BrowserQRCodeReader.listVideoInputDevices().then(
-			async (videoInputDevices) => {
-				const selectedDeviceId = videoInputDevices[0].deviceId
-				if (!videoRef.current) {
-					return
-				}
-				controls = await codeReader.decodeFromVideoDevice(
-					selectedDeviceId,
-					videoRef.current,
-					(result?: Result) => {
-						if (result) {
-							onQRScan(result.toString())
-						}
-					},
-				)
-			},
-		)
+        if (!videoRef.current) {
+            return
+        }
+        codeReader.decodeFromConstraints(
+            {
+                video: {
+                    facingMode: "environment"
+                }
+            },
+            videoRef.current,
+            (result?: Result) => {
+                if (result) {
+                    onQRScan(result.toString())
+                }
+            },
+        ).then(controls => {
+            controlsRef = controls
+        })
 
 		return () => {
-			if (controls) {
-				controls.stop()
+			if (controlsRef) {
+				controlsRef.stop()
 			}
 		}
 	}, [])
