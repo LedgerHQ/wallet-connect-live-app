@@ -32,7 +32,7 @@ const QRScannerOverlay = styled.div`
 	bottom: 0;
 	background: black;
 	opacity: 0.7;
-	z-index: 1;
+	z-index: 2;
 	clip-path: polygon(
 		0% 0%,
 		0% 100%,
@@ -52,7 +52,7 @@ const TopContainer = styled.div`
 	top: 50px;
 	left: 0;
 	right: 0;
-	z-index: 1;
+	z-index: 2;
 	display: flex;
 	padding: 0px 16px;
 	align-items: center;
@@ -94,6 +94,7 @@ export function QRScanner({ onQRScan }: QRScannerProps) {
 
 	return (
 		<QRScannerContainer>
+			<QRScannerVideoElement ref={videoRef} />
 			<QRScannerOverlay />
 			<TopContainer>
 				<Flex>
@@ -102,7 +103,6 @@ export function QRScanner({ onQRScan }: QRScannerProps) {
 					</Text>
 				</Flex>
 			</TopContainer>
-			<QRScannerVideoElement ref={videoRef} />
 		</QRScannerContainer>
 	)
 }
