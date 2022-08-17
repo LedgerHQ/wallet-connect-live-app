@@ -16,6 +16,7 @@ const QRScannerContainer = styled.div`
 
 const QRScannerVideoElement = styled.video`
 	object-fit: cover;
+    object-position: center center;
 	width: 100%;
 	height: 100%;
 `
