@@ -1,11 +1,11 @@
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect } from 'react'
 import type { GetServerSideProps, NextPage } from 'next'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { getDefaultLanguage } from '@/helpers/generic'
 
-import { Main, Container, MainContainer } from '@/styles/styles'
+import { Container } from '@/styles/styles'
 import { WalletConnect } from '@/components/WalletConnect'
 import { NetworkConfig } from '@/types/types'
 import { SDKProvider } from 'src/shared/SDKProvider'

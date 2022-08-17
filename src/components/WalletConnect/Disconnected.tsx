@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import { Input, Button, Text, Flex } from '@ledgerhq/react-ui'
-import { useCallback, useState } from 'react'
-import { QrCodeMedium } from '@ledgerhq/react-ui/assets/icons'
+import { useCallback, useEffect, useState } from 'react'
+import { PasteMedium } from '@ledgerhq/react-ui/assets/icons'
 import { QRScanner } from './QRScanner'
 import { InputMode } from '@/types/types'
 
@@ -45,15 +45,29 @@ const BottomContainer = styled.div`
 	justify-content: center;
 `
 
+const TopContainer = styled.div`
+	position: absolute;
+	top: 50px;
+	left: 0;
+	right: 0;
+	z-index: 2;
+	display: flex;
+	padding: 0px 16px;
+	align-items: center;
+	justify-content: center;
+`
+
 export type DisconnectedProps = {
 	onConnect: (uri: string) => void
 	mode?: InputMode
 }
 
+let previouslyPasted = ''
+
 export function Disconnected({ onConnect, mode }: DisconnectedProps) {
-	const [inputValue, setInputValue] = useState<string>("");
-	const [errorValue, setErrorValue] = useState<string | undefined>(undefined);
-	const [scanner, setScanner] = useState(mode === "scan");
+	const [inputValue, setInputValue] = useState<string>('')
+	const [errorValue, setErrorValue] = useState<string | undefined>(undefined)
+	const [scanner, setScanner] = useState(mode === 'scan')
 
 	const handleConnect = useCallback(() => {
 		if (!inputValue) {
@@ -69,8 +83,33 @@ export function Disconnected({ onConnect, mode }: DisconnectedProps) {
 		}
 	}, [onConnect, inputValue])
 
-	const handleQrCodeClick = useCallback(() => {
-		setScanner(true)
+	useEffect(() => {
+		const interval = setInterval(async () => {
+			try {
+				const text = await navigator.clipboard.readText()
+				if (text !== previouslyPasted) {
+					previouslyPasted = text
+					const url = new URL(text)
+
+					if (url.protocol === 'wc:') {
+						onConnect(url.toString())
+					}
+				}
+			} catch (err) {
+				console.error(err)
+			}
+		}, 500)
+
+		return () => clearInterval(interval)
+	}, [])
+
+	const handlePasteClick = useCallback(async () => {
+		try {
+			const text = await navigator.clipboard.readText()
+			setInputValue(text)
+		} catch (err) {
+			console.error(err)
+		}
 	}, [])
 
 	return (
@@ -89,8 +128,8 @@ export function Disconnected({ onConnect, mode }: DisconnectedProps) {
 								justifyContent={'center'}
 								pr={'8px'}
 							>
-								<QrCodeButton onClick={handleQrCodeClick}>
-									<QrCodeMedium size="20px" />
+								<QrCodeButton onClick={handlePasteClick}>
+									<PasteMedium size="20px" />
 								</QrCodeButton>
 							</Flex>
 						}
@@ -100,6 +139,15 @@ export function Disconnected({ onConnect, mode }: DisconnectedProps) {
 					</Button>
 				</>
 			)}
+			<TopContainer>
+				<Flex>
+					<Text variant="h4" textAlign="center">
+					{`${
+							scanner ? 'Scan a QRCode' : 'Copy an URI'
+						} to connect`}
+					</Text>
+				</Flex>
+			</TopContainer>
 			<BottomContainer>
 				<Flex>
 					<Button
@@ -110,7 +158,9 @@ export function Disconnected({ onConnect, mode }: DisconnectedProps) {
 							setScanner(!scanner)
 						}}
 					>
-						<Text>{`Switch to ${scanner ? "Text" : "Scanner"}`}</Text>
+						<Text>{`Switch to ${
+							scanner ? 'Text' : 'Scanner'
+						}`}</Text>
 					</Button>
 				</Flex>
 			</BottomContainer>

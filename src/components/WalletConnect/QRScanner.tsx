@@ -48,18 +48,6 @@ const QRScannerOverlay = styled.div`
 	);
 `
 
-const TopContainer = styled.div`
-	position: absolute;
-	top: 50px;
-	left: 0;
-	right: 0;
-	z-index: 2;
-	display: flex;
-	padding: 0px 16px;
-	align-items: center;
-	justify-content: center;
-`
-
 export function QRScanner({ onQRScan }: QRScannerProps) {
 	const videoRef = useRef(null)
 
@@ -97,13 +85,6 @@ export function QRScanner({ onQRScan }: QRScannerProps) {
 		<QRScannerContainer>
 			<QRScannerVideoElement ref={videoRef} />
 			<QRScannerOverlay />
-			<TopContainer>
-				<Flex>
-					<Text variant="h4" textAlign="center">
-						Scan a QR Code to connect
-					</Text>
-				</Flex>
-			</TopContainer>
 		</QRScannerContainer>
 	)
 }
