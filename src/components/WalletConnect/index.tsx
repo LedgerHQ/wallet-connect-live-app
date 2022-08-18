@@ -10,6 +10,7 @@ import { useCallback, useState, useRef, useEffect } from 'react'
 import styled, { css, keyframes } from 'styled-components'
 import { convertEthToLiveTX } from '@/helpers/converters'
 import { compareETHAddresses } from '@/helpers/generic'
+import { stripHexPrefix } from '@/utils/currencyFormatter/helpers'
 import { InfoConnectionAlert } from '../alerts/InfoConnection'
 import { CSSTransition, TransitionGroup } from 'react-transition-group'
 import { PendingConnection } from './PendingConnection'
@@ -301,6 +302,47 @@ export function WalletConnect({
 										},
 									})
 								}
+							}
+						}
+						// https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_sign
+						// https://docs.walletconnect.com/json-rpc-api-methods/ethereum
+						// Discussion about the diff between eth_sign and personal_sign:
+						// https://github.com/WalletConnect/walletconnect-docs/issues/32#issuecomment-644697172
+						case 'personal_sign': {
+							if (
+								selectedAccountRef.current &&
+								compareETHAddresses(
+									selectedAccountRef.current.address,
+									payload.params[1],
+								)
+							) {
+								try {
+									const message = stripHexPrefix(
+										payload.params[0],
+									)
+
+									const signedMessage =
+										await platformSDK.signMessage(
+											selectedAccountRef.current.id,
+											Buffer.from(message, "hex"),
+										)
+									clientInstance.approveRequest({
+										id: payload.id,
+										jsonrpc: '2.0',
+										result: signedMessage,
+									})
+								} catch (error) {
+									clientInstance.rejectRequest({
+										id: payload.id,
+										jsonrpc: '2.0',
+										error: {
+											code: 3,
+											message:
+												'Personal message signed declined',
+										},
+									})
+								}
+								break
 							}
 						}
 					}

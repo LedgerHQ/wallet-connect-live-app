@@ -14,7 +14,7 @@
 		"pre-commit": "$(yarn bin prettier) --write . && $(yarn bin next) lint && $(yarn bin jest)"
 	},
 	"dependencies": {
-		"@ledgerhq/live-app-sdk": "0.6.1",
+		"@ledgerhq/live-app-sdk": "0.8.1",
 		"@ledgerhq/react-ui": "^0.7.6",
 		"@segment/snippet": "^4.15.3",
 		"@walletconnect/client": "^1.7.8",
