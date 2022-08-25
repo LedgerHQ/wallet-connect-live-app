@@ -1,9 +1,11 @@
-import styled from 'styled-components'
+import { Account } from '@ledgerhq/live-app-sdk'
 import { Button, Flex, Text } from '@ledgerhq/react-ui'
 import {
 	CheckAloneRegular,
 	CloseRegular,
+	RedelegateRegular
 } from '@ledgerhq/react-ui/assets/icons'
+import styled from 'styled-components'
 
 const PendingRequestContainer = styled.div`
 	display: flex;
@@ -14,9 +16,11 @@ const PendingRequestContainer = styled.div`
 export type PendingRequestProps = {
 	onAccept: () => void
 	onDecline: () => void
+	onSwitchAccount: () => void
+	account: Account
 }
 
-export function PendingRequest({ onAccept, onDecline }: PendingRequestProps) {
+export function PendingRequest({ onAccept, onDecline, onSwitchAccount, account }: PendingRequestProps) {
 	return (
 		<PendingRequestContainer>
 			<Flex
@@ -42,6 +46,25 @@ export function PendingRequest({ onAccept, onDecline }: PendingRequestProps) {
 					onClick={onDecline}
 				>
 					<Text>Decline</Text>
+				</Button>
+			</Flex>
+			<Flex
+				mt={8}
+				flexDirection="column"
+				flexWrap="wrap-reverse"
+				justifyContent="center"
+			>
+				<Text marginBottom={4} variant="bodyLineHeight">
+					Saved Account: {account.name}
+				</Text>
+				<Button
+					outline
+					variant="main"
+					m={3}
+					Icon={RedelegateRegular}
+					onClick={onSwitchAccount}
+				>
+					<Text>Switch account</Text>
 				</Button>
 			</Flex>
 		</PendingRequestContainer>

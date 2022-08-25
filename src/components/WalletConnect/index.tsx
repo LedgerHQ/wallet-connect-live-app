@@ -1,23 +1,23 @@
 import { InputMode, NetworkConfig } from '@/types/types'
+import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
 import { Text } from '@ledgerhq/react-ui'
 import GlitchText from '@ledgerhq/react-ui/components/animations/GlitchText'
-import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
 
-import WalletConnectClient from '@walletconnect/client'
-import { IWalletConnectSession, IJsonRpcRequest } from '@walletconnect/types'
-import Image from 'next/image'
-import { useCallback, useState, useRef, useEffect } from 'react'
-import styled, { css, keyframes } from 'styled-components'
 import { convertEthToLiveTX } from '@/helpers/converters'
 import { compareETHAddresses } from '@/helpers/generic'
 import { stripHexPrefix } from '@/utils/currencyFormatter/helpers'
-import { InfoConnectionAlert } from '../alerts/InfoConnection'
+import WalletConnectClient from '@walletconnect/client'
+import { IJsonRpcRequest, IWalletConnectSession } from '@walletconnect/types'
+import Image from 'next/image'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { CSSTransition, TransitionGroup } from 'react-transition-group'
-import { PendingConnection } from './PendingConnection'
+import styled, { css, keyframes } from 'styled-components'
 import { TimedOutAlert } from '../alerts/ErrorTimedOut'
-import { PendingRequest } from './PendingRequest'
+import { InfoConnectionAlert } from '../alerts/InfoConnection'
 import { Connected } from './Connected'
 import { Disconnected } from './Disconnected'
+import { PendingConnection } from './PendingConnection'
+import { PendingRequest } from './PendingRequest'
 
 const pulseAnimationLight = keyframes`
 	0% {
@@ -154,34 +154,35 @@ export function WalletConnect({
 	platformSDK,
 	accounts,
 }: WalletConnectProps) {
-	const selectedAccountRef = useRef<Account | undefined>(accounts[0])
-	const clientInstanceRef = useRef<WalletConnectClient>()
+	const selectedAccountRef = useRef<Account>()
+	const wcRef = useRef<WalletConnectClient>()
 
-	const [state, setState] = useState<WalletConnectState>(
-		getInitialState(accounts, initialAccountId),
-	)
-
-	const { session, selectedAccount, timedOut } = state
+	const [{ session, selectedAccount, timedOut }, setState] =
+		useState<WalletConnectState>(
+			getInitialState(accounts, initialAccountId),
+		)
 
 	useEffect(() => {
 		selectedAccountRef.current = selectedAccount
-		const clientInstance = clientInstanceRef.current
+		const wc = wcRef.current
 
 		if (selectedAccount) {
 			localStorage.setItem('accountId', selectedAccount.id)
-			if (clientInstance && clientInstance.connected) {
+			if (wc && wc.connected) {
 				const networkConfig = networks.find(
 					(networkConfig) =>
 						networkConfig.currency === selectedAccount.currency,
-				) as NetworkConfig
-				clientInstance.updateSession({
-					chainId: networkConfig.chainId,
-					accounts: [selectedAccount.address],
-				})
+				)
+				if (networkConfig) {
+					wc.updateSession({
+						chainId: networkConfig.chainId,
+						accounts: [selectedAccount.address],
+					})
+				}
 				setState((oldState) => ({
 					...oldState,
 					session: {
-						...clientInstance.session,
+						...wc.session,
 					},
 				}))
 			}
@@ -193,6 +194,9 @@ export function WalletConnect({
 			uri?: string
 			session?: IWalletConnectSession
 		}): Promise<void> => {
+			if (wcRef.current) {
+				await wcRef.current.killSession()
+			}
 			const { uri, session } = params
 			if (!uri && !session) {
 				throw new Error(
@@ -200,7 +204,7 @@ export function WalletConnect({
 				)
 			}
 
-			const clientInstance = new WalletConnectClient({ uri, session })
+			const wc = new WalletConnectClient({ uri, session })
 
 			// synchronize WC state with react and trigger necessary rerenders
 			const syncSessionWithReactState = () => {
@@ -208,12 +212,12 @@ export function WalletConnect({
 					...oldState,
 					timedOut: false,
 					session: {
-						...clientInstance.session,
+						...wc.session,
 					},
 				}))
 			}
 
-			clientInstance.on('session_request', (error, payload) => {
+			wc.on('session_request', (error, payload) => {
 				console.log('session_request', {
 					error,
 					payload,
@@ -225,19 +229,16 @@ export function WalletConnect({
 				syncSessionWithReactState()
 			})
 
-			clientInstance.on('connect', () => {
+			wc.on('connect', () => {
 				syncSessionWithReactState()
-				localStorage.setItem(
-					'session',
-					JSON.stringify(clientInstance.session),
-				)
+				localStorage.setItem('session', JSON.stringify(wc.session))
 
 				if (uri) {
 					localStorage.setItem('sessionURI', uri)
 				}
 			})
 
-			clientInstance.on('disconnect', () => {
+			wc.on('disconnect', () => {
 				// cleaning everything and reverting to initial state
 				setState((oldState) => {
 					return {
@@ -245,119 +246,116 @@ export function WalletConnect({
 						session: null,
 					}
 				})
-				clientInstanceRef.current = undefined
+				wcRef.current = undefined
 				localStorage.removeItem('session')
 				localStorage.removeItem('sessionURI')
 			})
 
-			clientInstance.on('error', (error) => {
+			wc.on('error', (error) => {
 				console.log('error', { error })
 			})
 
-			clientInstance.on(
-				'call_request',
-				async (error, payload: IJsonRpcRequest) => {
-					console.log('call_request', { error, payload })
-					if (error) {
-					}
+			wc.on('call_request', async (error, payload: IJsonRpcRequest) => {
+				console.log('call_request', { error, payload })
+				if (error) {
+				}
 
-					switch (payload.method) {
-						case 'eth_sendTransaction': {
-							const ethTX = payload.params[0]
-							console.log('eth_sendTransaction', {
-								ethTX,
-								selectedAccount: selectedAccountRef.current,
-							})
-							if (
-								selectedAccountRef.current &&
-								compareETHAddresses(
-									selectedAccountRef.current.address,
-									ethTX.from,
-								)
-							) {
-								try {
-									const liveTX = convertEthToLiveTX(ethTX)
-									const signedTransaction =
-										await platformSDK.signTransaction(
-											selectedAccountRef.current.id,
-											liveTX,
-										)
-									const hash =
-										await platformSDK.broadcastSignedTransaction(
-											selectedAccountRef.current.id,
-											signedTransaction,
-										)
-									clientInstance.approveRequest({
-										id: payload.id,
-										jsonrpc: '2.0',
-										result: hash,
-									})
-								} catch (error) {
-									clientInstance.rejectRequest({
-										id: payload.id,
-										jsonrpc: '2.0',
-										error: {
-											code: 3,
-											message: 'Transaction declined',
-										},
-									})
-								}
-							}
-						}
-						// https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_sign
-						// https://docs.walletconnect.com/json-rpc-api-methods/ethereum
-						// Discussion about the diff between eth_sign and personal_sign:
-						// https://github.com/WalletConnect/walletconnect-docs/issues/32#issuecomment-644697172
-						case 'personal_sign': {
-							if (
-								selectedAccountRef.current &&
-								compareETHAddresses(
-									selectedAccountRef.current.address,
-									payload.params[1],
-								)
-							) {
-								try {
-									const message = stripHexPrefix(
-										payload.params[0],
+				switch (payload.method) {
+					case 'eth_sendTransaction': {
+						const ethTX = payload.params[0]
+						console.log('eth_sendTransaction', {
+							ethTX,
+							selectedAccount: selectedAccountRef.current,
+						})
+						if (
+							selectedAccountRef.current &&
+							compareETHAddresses(
+								selectedAccountRef.current.address,
+								ethTX.from,
+							)
+						) {
+							try {
+								const liveTX = convertEthToLiveTX(ethTX)
+								const signedTransaction =
+									await platformSDK.signTransaction(
+										selectedAccountRef.current.id,
+										liveTX,
 									)
-
-									const signedMessage =
-										await platformSDK.signMessage(
-											selectedAccountRef.current.id,
-											Buffer.from(message, "hex"),
-										)
-									clientInstance.approveRequest({
-										id: payload.id,
-										jsonrpc: '2.0',
-										result: signedMessage,
-									})
-								} catch (error) {
-									clientInstance.rejectRequest({
-										id: payload.id,
-										jsonrpc: '2.0',
-										error: {
-											code: 3,
-											message:
-												'Personal message signed declined',
-										},
-									})
-								}
-								break
+								const hash =
+									await platformSDK.broadcastSignedTransaction(
+										selectedAccountRef.current.id,
+										signedTransaction,
+									)
+								wc.approveRequest({
+									id: payload.id,
+									jsonrpc: '2.0',
+									result: hash,
+								})
+							} catch (error) {
+								wc.rejectRequest({
+									id: payload.id,
+									jsonrpc: '2.0',
+									error: {
+										code: 3,
+										message: 'Transaction declined',
+									},
+								})
 							}
 						}
 					}
-				},
-			)
+					// https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_sign
+					// https://docs.walletconnect.com/json-rpc-api-methods/ethereum
+					// Discussion about the diff between eth_sign and personal_sign:
+					// https://github.com/WalletConnect/walletconnect-docs/issues/32#issuecomment-644697172
+					case 'personal_sign': {
+						if (
+							selectedAccountRef.current &&
+							compareETHAddresses(
+								selectedAccountRef.current.address,
+								payload.params[1],
+							)
+						) {
+							try {
+								const message = stripHexPrefix(
+									payload.params[0],
+								)
+
+								const signedMessage =
+									await platformSDK.signMessage(
+										selectedAccountRef.current.id,
+										Buffer.from(message, 'hex'),
+									)
+								wc.approveRequest({
+									id: payload.id,
+									jsonrpc: '2.0',
+									result: signedMessage,
+								})
+							} catch (error) {
+								wc.rejectRequest({
+									id: payload.id,
+									jsonrpc: '2.0',
+									error: {
+										code: 3,
+										message:
+											'Personal message signed declined',
+									},
+								})
+							}
+							break
+						}
+					}
+				}
+			})
 
 			// saving the client instance ref for further usage
-			clientInstanceRef.current = clientInstance
+			wcRef.current = wc
 			syncSessionWithReactState()
 
 			// a client is already connected
-			if (clientInstance.connected && selectedAccountRef.current) {
+			if (wc.connected && selectedAccountRef.current) {
 				// if a uri was provided, then the user probably want to connect to another dapp, we disconnect the previous one
 				if (uri) {
-					await clientInstance.killSession()
+					await wc.killSession()
 					return createClient({ uri })
 				}
 
@@ -365,11 +363,13 @@ export function WalletConnect({
 					(networkConfig) =>
 						networkConfig.currency ===
 						selectedAccountRef.current?.currency,
-				) as NetworkConfig
-				clientInstance.updateSession({
-					chainId: networkConfig.chainId,
-					accounts: [selectedAccountRef.current.address],
-				})
+				)
+				if (networkConfig) {
+					wc.updateSession({
+						chainId: networkConfig.chainId,
+						accounts: [selectedAccountRef.current.address],
+					})
+				}
 			}
 		},
 		[],
@@ -390,25 +390,31 @@ export function WalletConnect({
 	}, [])
 
 	const handleAccept = useCallback(() => {
-		if (clientInstanceRef.current && selectedAccountRef.current) {
-			clientInstanceRef.current.approveSession({
-				chainId: 1,
-				accounts: [selectedAccountRef.current.address],
-			})
+		const account = selectedAccountRef.current
+		if (wcRef.current && account) {
+			const networkConfig = networks.find(
+				(networkConfig) => networkConfig.currency === account.currency,
+			)
+			if (networkConfig) {
+				wcRef.current.approveSession({
+					chainId: networkConfig.chainId,
+					accounts: [account.address],
+				})
+			}
 		}
 	}, [])
 
 	const handleDecline = useCallback(() => {
-		if (clientInstanceRef.current) {
-			clientInstanceRef.current.rejectSession({
+		if (wcRef.current) {
+			wcRef.current.rejectSession({
 				message: 'DECLINED_BY_USER',
 			})
 		}
 	}, [])
 
 	const handleDisconnect = useCallback(() => {
-		if (clientInstanceRef.current) {
-			clientInstanceRef.current.killSession()
+		if (wcRef.current) {
+			wcRef.current.killSession()
 		}
 	}, [])
 
@@ -443,6 +449,10 @@ export function WalletConnect({
 			...oldState,
 			session: null,
 		}))
+	}, [])
+
+	const handleConnect = useCallback((uri: string) => {
+		createClient({ uri })
 	}, [])
 
 	return (
@@ -512,8 +522,12 @@ export function WalletConnect({
 										timeout={200}
 									>
 										<PendingRequest
+											account={selectedAccount}
 											onAccept={handleAccept}
 											onDecline={handleDecline}
+											onSwitchAccount={
+												handleSwitchAccount
+											}
 										/>
 									</CSSTransition>
 								)}
@@ -528,12 +542,7 @@ export function WalletConnect({
 					</>
 				) : (
 					<CSSTransition classNames="fade" timeout={200}>
-						<Disconnected
-							mode={initialMode}
-							onConnect={(uri) => {
-								createClient({ uri })
-							}}
-						/>
+						<Disconnected mode={initialMode} onConnect={handleConnect} />
 					</CSSTransition>
 				)}
 			</WalletConnectInnerContainer>
