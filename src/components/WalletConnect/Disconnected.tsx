@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { PasteMedium } from '@ledgerhq/react-ui/assets/icons'
 import { QRScanner } from './QRScanner'
 import { InputMode } from '@/types/types'
+import { useTranslation } from 'next-i18next'
 
 const DisconnectedContainer = styled.div`
 	display: flex;
@@ -65,20 +66,21 @@ export type DisconnectedProps = {
 let previouslyPasted = ''
 
 export function Disconnected({ onConnect, mode }: DisconnectedProps) {
+	const { t } = useTranslation()
 	const [inputValue, setInputValue] = useState<string>('')
 	const [errorValue, setErrorValue] = useState<string | undefined>(undefined)
 	const [scanner, setScanner] = useState(mode === 'scan')
 
 	const handleConnect = useCallback(() => {
 		if (!inputValue) {
-			setErrorValue('No input value')
+			setErrorValue(t('error.noInput'))
 		} else {
 			try {
 				const uri = new URL(inputValue)
 				onConnect(uri.toString())
 			} catch (error) {
 				console.log('invalid uri: ', error)
-				setErrorValue('Invalid URI')
+				setErrorValue(t('error.invalidUri'))
 			}
 		}
 	}, [onConnect, inputValue])
@@ -135,16 +137,16 @@ export function Disconnected({ onConnect, mode }: DisconnectedProps) {
 						}
 					/>
 					<Button mt={5} onClick={handleConnect}>
-						<Text>Connect</Text>
+						<Text>{t('connect.cta')}</Text>
 					</Button>
 				</>
 			)}
 			<TopContainer>
 				<Flex>
 					<Text variant="h4" textAlign="center">
-					{`${
-							scanner ? 'Scan a QRCode' : 'Copy an URI'
-						} to connect`}
+						{scanner
+							? t('connect.scanQRCode')
+							: t('connect.copyURI')}
 					</Text>
 				</Flex>
 			</TopContainer>
@@ -158,9 +160,11 @@ export function Disconnected({ onConnect, mode }: DisconnectedProps) {
 							setScanner(!scanner)
 						}}
 					>
-						<Text>{`Switch to ${
-							scanner ? 'Text' : 'Scanner'
-						}`}</Text>
+						<Text>
+							{scanner
+								? t('connect.switchToText')
+								: t('connect.switchToScanner')}
+						</Text>
 					</Button>
 				</Flex>
 			</BottomContainer>
