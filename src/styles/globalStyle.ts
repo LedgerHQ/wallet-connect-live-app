@@ -8,6 +8,10 @@ const GlobalStyle = createGlobalStyle`
         background-color: ${({ theme }) => theme.colors.background.main};
     }
 
+    * {
+        -webkit-tap-highlight-color: transparent;
+    }
+
     #__next {
         width: 100vw;
         height: 100vh;
