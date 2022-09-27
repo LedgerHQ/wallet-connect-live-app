@@ -19,7 +19,6 @@ export const getServerSideProps: GetServerSideProps = async ({
 	props: {
 		...(await serverSideTranslations(
 			getDefaultLanguage('en', locales, query.lang as string, locale),
-			['common'],
 		)),
 	},
 })
