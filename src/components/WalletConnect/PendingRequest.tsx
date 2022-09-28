@@ -3,9 +3,10 @@ import { Button, Flex, Text } from '@ledgerhq/react-ui'
 import {
 	CheckAloneRegular,
 	CloseRegular,
-	RedelegateRegular
+	RedelegateRegular,
 } from '@ledgerhq/react-ui/assets/icons'
 import styled from 'styled-components'
+import { useTranslation } from 'next-i18next'
 
 const PendingRequestContainer = styled.div`
 	display: flex;
@@ -20,7 +21,14 @@ export type PendingRequestProps = {
 	account: Account
 }
 
-export function PendingRequest({ onAccept, onDecline, onSwitchAccount, account }: PendingRequestProps) {
+export function PendingRequest({
+	onAccept,
+	onDecline,
+	onSwitchAccount,
+	account,
+}: PendingRequestProps) {
+	const { t } = useTranslation()
+
 	return (
 		<PendingRequestContainer>
 			<Flex
@@ -36,7 +44,7 @@ export function PendingRequest({ onAccept, onDecline, onSwitchAccount, account }
 					outline
 					onClick={onAccept}
 				>
-					<Text>Accept</Text>
+					<Text>{t('connect.accept')}</Text>
 				</Button>
 				<Button
 					m={3}
@@ -45,7 +53,7 @@ export function PendingRequest({ onAccept, onDecline, onSwitchAccount, account }
 					outline
 					onClick={onDecline}
 				>
-					<Text>Decline</Text>
+					<Text>{t('connect.decline')}</Text>
 				</Button>
 			</Flex>
 			<Flex
@@ -55,7 +63,7 @@ export function PendingRequest({ onAccept, onDecline, onSwitchAccount, account }
 				justifyContent="center"
 			>
 				<Text marginBottom={4} variant="bodyLineHeight">
-					Saved Account: {account.name}
+					{t('account.saved', { account: account.name })}
 				</Text>
 				<Button
 					outline
@@ -64,7 +72,7 @@ export function PendingRequest({ onAccept, onDecline, onSwitchAccount, account }
 					Icon={RedelegateRegular}
 					onClick={onSwitchAccount}
 				>
-					<Text>Switch account</Text>
+					<Text>{t('account.switch')}</Text>
 				</Button>
 			</Flex>
 		</PendingRequestContainer>

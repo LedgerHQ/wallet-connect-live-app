@@ -10,6 +10,7 @@ import { WalletConnect } from '@/components/WalletConnect'
 import { NetworkConfig } from '@/types/types'
 import { SDKProvider } from 'src/shared/SDKProvider'
 import { Flex } from '@ledgerhq/react-ui'
+import { useTranslation } from 'next-i18next'
 
 export const getServerSideProps: GetServerSideProps = async ({
 	query,
@@ -19,7 +20,6 @@ export const getServerSideProps: GetServerSideProps = async ({
 	props: {
 		...(await serverSideTranslations(
 			getDefaultLanguage('en', locales, query.lang as string, locale),
-			['common'],
 		)),
 	},
 })
@@ -27,17 +27,30 @@ export const getServerSideProps: GetServerSideProps = async ({
 const Index: NextPage = () => {
 	const router = useRouter()
 
-	const { params: rawParams, uri: rawURI, initialAccountId: rawInitialAccountId, mode: rawInitialMode } = router.query
+	const {
+		params: rawParams,
+		uri: rawURI,
+		initialAccountId: rawInitialAccountId,
+		mode: rawInitialMode,
+	} = router.query
 
 	const params =
 		rawParams && typeof rawParams === 'string' ? JSON.parse(rawParams) : {}
 	const networkConfigs: NetworkConfig[] = params.networks
 
 	const uri = rawURI && typeof rawURI === 'string' ? rawURI : undefined
-	const initialAccountId = rawInitialAccountId && typeof rawInitialAccountId === 'string' ? rawInitialAccountId : undefined
-	const initialMode = rawInitialMode === 'scan' || rawInitialMode === 'text' ? rawInitialMode : undefined
+	const initialAccountId =
+		rawInitialAccountId && typeof rawInitialAccountId === 'string'
+			? rawInitialAccountId
+			: undefined
+	const initialMode =
+		rawInitialMode === 'scan' || rawInitialMode === 'text'
+			? rawInitialMode
+			: undefined
 
 	const [isMounted, setMounted] = useState<boolean>(false)
+
+	const { t } = useTranslation()
 
 	useEffect(() => {
 		setMounted(true)
@@ -53,22 +66,21 @@ const Index: NextPage = () => {
 				/>
 			</Head>
 			{isMounted ? (
-				<SDKProvider networks={networkConfigs}
-				>
-					{(platformSDK, accounts) => accounts.length > 0 ? (
-						<WalletConnect
-							initialMode={initialMode}
-							initialAccountId={initialAccountId}
-							networks={networkConfigs}
-							initialURI={uri}
-							platformSDK={platformSDK}
-							accounts={accounts}
-						/>
-					) : (
-						<Flex>
-							You need 
-						</Flex>
-					)}
+				<SDKProvider networks={networkConfigs}>
+					{(platformSDK, accounts) =>
+						accounts.length > 0 ? (
+							<WalletConnect
+								initialMode={initialMode}
+								initialAccountId={initialAccountId}
+								networks={networkConfigs}
+								initialURI={uri}
+								platformSDK={platformSDK}
+								accounts={accounts}
+							/>
+						) : (
+							<Flex>{t('account.needed')}</Flex>
+						)
+					}
 				</SDKProvider>
 			) : null}
 		</Container>

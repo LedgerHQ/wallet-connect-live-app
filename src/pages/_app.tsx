@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import Head from 'next/head'
-// import { appWithTranslation } from 'next-i18next'
+import { appWithTranslation } from 'next-i18next'
 import type { AppProps } from 'next/app'
 import { StyleProvider } from '@ledgerhq/react-ui'
 import { ThemeNames } from '@ledgerhq/react-ui/styles'
@@ -29,4 +29,4 @@ function MyApp({ Component, pageProps }: AppProps) {
 	)
 }
 
-export default MyApp
+export default appWithTranslation(MyApp)

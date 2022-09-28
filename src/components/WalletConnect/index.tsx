@@ -9,6 +9,7 @@ import { stripHexPrefix } from '@/utils/currencyFormatter/helpers'
 import WalletConnectClient from '@walletconnect/client'
 import { IJsonRpcRequest, IWalletConnectSession } from '@walletconnect/types'
 import Image from 'next/image'
+import { useTranslation } from 'next-i18next'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { CSSTransition, TransitionGroup } from 'react-transition-group'
 import styled, { css, keyframes } from 'styled-components'
@@ -375,6 +376,8 @@ export function WalletConnect({
 		[],
 	)
 
+	const { t } = useTranslation()
+
 	useEffect(() => {
 		const sessionURI = localStorage.getItem('sessionURI')
 		if (initialURI && initialURI !== sessionURI) {
@@ -488,8 +491,16 @@ export function WalletConnect({
 										delay={0}
 										text={
 											session.connected
-												? `connected to [${session.peerMeta.name}]`
-												: `[${session.peerMeta.name}] is trying to connect`
+												? t('session.connected', {
+														appName:
+															session.peerMeta
+																.name,
+												  })
+												: t('session.connecting', {
+														appName:
+															session.peerMeta
+																.name,
+												  })
 										}
 									/>
 								</Text>
@@ -542,7 +553,10 @@ export function WalletConnect({
 					</>
 				) : (
 					<CSSTransition classNames="fade" timeout={200}>
-						<Disconnected mode={initialMode} onConnect={handleConnect} />
+						<Disconnected
+							mode={initialMode}
+							onConnect={handleConnect}
+						/>
 					</CSSTransition>
 				)}
 			</WalletConnectInnerContainer>

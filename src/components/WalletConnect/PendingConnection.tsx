@@ -2,6 +2,7 @@ import styled from 'styled-components'
 import { CSSTransition } from 'react-transition-group'
 import { Button, ProgressLoader, Text } from '@ledgerhq/react-ui'
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'next-i18next'
 
 const PendingConnectionContainer = styled.div`
 	display: flex;
@@ -32,6 +33,7 @@ export function PendingConnection({
 }: PendingConnectionProps) {
 	const initialTime = useRef(Date.now())
 	const [elapsedTime, setElapsedTime] = useState(0)
+	const { t } = useTranslation()
 
 	console.log({ elapsedTime })
 
@@ -57,7 +59,9 @@ export function PendingConnection({
 		>
 			<PendingConnectionContainer>
 				<TimeoutContainer>
-				<Text mr="12px" variant="h4">Waiting for DApp</Text>
+					<Text mr="12px" variant="h4">
+						{t('connect.waiting')}
+					</Text>
 					<ProgressLoader
 						radius={18}
 						progress={(elapsedTime / timeout) * 100}
@@ -66,9 +70,7 @@ export function PendingConnection({
 					/>
 				</TimeoutContainer>
 				<Button mt="12px" variant="error" outline onClick={onCancel}>
-					<Text>
-					Cancel
-					</Text>
+					<Text>{t('connect.cancel')}</Text>
 				</Button>
 			</PendingConnectionContainer>
 		</CSSTransition>

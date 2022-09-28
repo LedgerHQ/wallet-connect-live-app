@@ -1,9 +1,32 @@
 {
-	"buy": "Buy",
-	"sell": "Sell",
-	"continue": "Continue",
-	"back": "Back",
-	"add_account": "Add Account",
-	"choose_asset": "Choose Asset",
-	"choose_account": "Choose Account"
+	"error": {
+		"timeout": "No connection request received in the allowed time.\nTry refreshing the DApp webpage and try again.",
+		"noInput": "No input value",
+		"invalidUri": "Invalid URI"
+	},
+	"info": {
+		"connection": "Leaving this page will not disconnect you from <0>{{appName}}</0>,\nbut will prevent any further interaction with this wallet."
+	},
+	"account": {
+		"current": "Current Account: <0>{{account}}</0>",
+		"disconnect": "Disconnect",
+		"switch": "Switch account",
+		"saved": "Saved Account: <0>{{account}}</0>",
+		"needed": "You need at least one available account"
+	},
+	"connect": {
+		"cta": "Connect",
+		"scanQRCode": "Scan a QRCode to connect",
+		"copyURI": "Copy an URI to connect",
+		"switchToText": "Switch to Text",
+		"switchToScanner": "Switch to Scanner",
+		"waiting": "Waiting for DApp",
+		"cancel": "Cancel",
+		"accept": "Accept",
+		"decline": "Decline"
+	},
+	"session": {
+		"connected": "connected to [<0>{{appName}}</0>]",
+		"connecting": "[<0>{{appName}}</0>] is trying to connect"
+	}
 }
