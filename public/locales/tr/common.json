@@ -1,9 +1,32 @@
 {
-  "buy" : "Satın Al",
-  "sell" : "Sat",
-  "continue" : "Devam",
-  "back" : "Geri",
-  "add_account" : "Hesap ekle",
-  "choose_asset" : "Choose Asset",
-  "choose_account" : "Choose Account"
+  "error" : {
+    "timeout" : "Verilen süre içerisinde hiç bağlantı talebi alınmadı.\nDApp internet sayfasını yenileyerek tekrar deneyin.",
+    "noInput" : "Değer girilmedi",
+    "invalidUri" : "Geçersiz URI"
+  },
+  "info" : {
+    "connection" : "Bu sayfadan ayrıldığınızda <0>{{appName}}</0> bağlantınız kesilmeyecek\nama bu cüzdan ile başka herhangi bir etkileşime giremeyeceksiniz."
+  },
+  "account" : {
+    "current" : "Mevcut Hesap: <0>{{account}}</0>",
+    "disconnect" : "Bağlantıyı Kes",
+    "switch" : "Hesabı değiştir",
+    "saved" : "Kaydedilen Hesap: <0>{{account}}</0>",
+    "needed" : "En az bir mevcut hesabınız olmalı"
+  },
+  "connect" : {
+    "cta" : "Bağlan",
+    "scanQRCode" : "Bağlanmak için bir QR kodunu tarayın",
+    "copyURI" : "Bağlanmak için bir URI kopyalayın",
+    "switchToText" : "Metne Geç",
+    "switchToScanner" : "Tarayıcıya Geç",
+    "waiting" : "DApp bekleniyor",
+    "cancel" : "İptal et",
+    "accept" : "Kabul et",
+    "decline" : "Reddet"
+  },
+  "session" : {
+    "connected" : "[<0>{{appName}}</0>] bağlantısı kuruldu",
+    "connecting" : "[<0>{{appName}}</0>] bağlanmaya çalışıyor"
+  }
 }
