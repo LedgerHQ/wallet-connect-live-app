@@ -1,9 +1,32 @@
 {
-  "buy" : "买入",
-  "sell" : "卖出",
-  "continue" : "继续",
-  "back" : "返回",
-  "add_account" : "添加账户",
-  "choose_asset" : "选择资产",
-  "choose_account" : "选择账户"
+  "error" : {
+    "timeout" : "允许的时间内未收到连接请求。\n请尝试刷新去中心化应用程序网页后重试。",
+    "noInput" : "无输入值",
+    "invalidUri" : "URI 无效"
+  },
+  "info" : {
+    "connection" : "退出此页面不会与 <0>{{appName}}</0> 断开连接，\n但将无法再与此钱包互动。"
+  },
+  "account" : {
+    "current" : "当前账户：<0>{{account}}</0>",
+    "disconnect" : "断开连接",
+    "switch" : "切换账户",
+    "saved" : "已保存账户：<0>{{account}}</0>",
+    "needed" : "您需要至少一个可用账户"
+  },
+  "connect" : {
+    "cta" : "连接",
+    "scanQRCode" : "扫二维码进行连接",
+    "copyURI" : "复制 URI 进行连接",
+    "switchToText" : "切换到文本",
+    "switchToScanner" : "切换到扫描工具",
+    "waiting" : "正在等待去中心化应用程序",
+    "cancel" : "取消",
+    "accept" : "接受",
+    "decline" : "拒绝"
+  },
+  "session" : {
+    "connected" : "已连接到 [<0>{{appName}}</0>]",
+    "connecting" : "[<0>{{appName}}</0>] 正在尝试连接"
+  }
 }
