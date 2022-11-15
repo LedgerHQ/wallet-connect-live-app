@@ -124,26 +124,34 @@ export function Disconnected({ onConnect, mode }: DisconnectedProps) {
 						value={inputValue}
 						onChange={setInputValue}
 						error={errorValue}
+						data-test="input-uri"
 						renderRight={
 							<Flex
 								alignItems={'center'}
 								justifyContent={'center'}
 								pr={'8px'}
 							>
-								<QrCodeButton onClick={handlePasteClick}>
+								<QrCodeButton
+									onClick={handlePasteClick}
+									data-test="copy-button"
+								>
 									<PasteMedium size="20px" />
 								</QrCodeButton>
 							</Flex>
 						}
 					/>
-					<Button mt={5} onClick={handleConnect}>
+					<Button
+						mt={5}
+						onClick={handleConnect}
+						data-test="connect-button"
+					>
 						<Text>{t('connect.cta')}</Text>
 					</Button>
 				</>
 			)}
 			<TopContainer>
 				<Flex>
-					<Text variant="h4" textAlign="center">
+					<Text variant="h4" textAlign="center" data-test="title">
 						{scanner
 							? t('connect.scanQRCode')
 							: t('connect.copyURI')}
