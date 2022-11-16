@@ -1,4 +1,4 @@
-import { hasToLocaleStringSupport } from './constants'
+import { hasToLocaleStringSupport } from './constants';
 
 /**
  * Get formatted currency string
@@ -11,7 +11,7 @@ export const getFormattedCurrency = (
 	const toLocaleStringsMock: Record<string, string> = {
 		en: '10,000.2',
 		es: '10.000,2',
-		fr: '10 000,2',
+		fr: '10 000,2',
 		ja: '10,000.2',
 		ko: '10,000.2',
 		ru: '10 000,2',
