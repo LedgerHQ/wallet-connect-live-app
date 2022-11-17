@@ -134,7 +134,6 @@ export function Disconnected({ onConnect, mode }: DisconnectedProps) {
 		} catch (error) {
 			// bad urls are just ignored
 			if (error instanceof TypeError) {
-				console.log("bad url: ", error, rawURI)
 				return;
 			}
 			throw error;
