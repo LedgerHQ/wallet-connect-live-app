@@ -5,13 +5,13 @@
 		"invalidUri": "Invalid URI"
 	},
 	"info": {
-		"connection": "Leaving this page will not disconnect you from <0>{{appName}}</0>,\nbut will prevent any further interaction with this wallet."
+		"connection": "Leaving this page will not disconnect you from {{appName}},\nbut will prevent any further interaction with this wallet."
 	},
 	"account": {
-		"current": "Current Account: <0>{{account}}</0>",
+		"current": "Current Account: {{account}}",
 		"disconnect": "Disconnect",
 		"switch": "Switch account",
-		"saved": "Saved Account: <0>{{account}}</0>",
+		"saved": "Saved Account: {{account}}",
 		"needed": "You need at least one available account"
 	},
 	"connect": {
@@ -26,7 +26,7 @@
 		"decline": "Decline"
 	},
 	"session": {
-		"connected": "connected to [<0>{{appName}}</0>]",
-		"connecting": "[<0>{{appName}}</0>] is trying to connect"
+		"connected": "connected to [{{appName}}]",
+		"connecting": "[{{appName}}] is trying to connect"
 	}
 }
