@@ -8,8 +8,8 @@ import { compareETHAddresses } from '@/helpers/generic'
 import { stripHexPrefix } from '@/utils/currencyFormatter/helpers'
 import WalletConnectClient from '@walletconnect/client'
 import { IJsonRpcRequest, IWalletConnectSession } from '@walletconnect/types'
-import Image from 'next/image'
 import { useTranslation } from 'next-i18next'
+import Image from 'next/image'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { CSSTransition, TransitionGroup } from 'react-transition-group'
 import styled, { css, keyframes } from 'styled-components'
@@ -345,8 +345,7 @@ export function WalletConnect({
 							break
 						}
 					}
-					case 'eth_sign':
-					case 'eth_signTypedData': {
+					case 'eth_sign': {
 						if (
 							selectedAccountRef.current &&
 							compareETHAddresses(
@@ -363,6 +362,43 @@ export function WalletConnect({
 									await platformSDK.signMessage(
 										selectedAccountRef.current.id,
 										Buffer.from(message, 'hex'),
+									)
+								wc.approveRequest({
+									id: payload.id,
+									jsonrpc: '2.0',
+									result: signedMessage,
+								})
+							} catch (error) {
+								wc.rejectRequest({
+									id: payload.id,
+									jsonrpc: '2.0',
+									error: {
+										code: 3,
+										message:
+											'Message signed declined',
+									},
+								})
+							}
+							break
+						}
+					}
+					case 'eth_signTypedData': {
+						if (
+							selectedAccountRef.current &&
+							compareETHAddresses(
+								selectedAccountRef.current.address,
+								payload.params[0],
+							)
+						) {
+							try {
+								const message = stripHexPrefix(
+									payload.params[1],
+								)
+
+								const signedMessage =
+									await platformSDK.signMessage(
+										selectedAccountRef.current.id,
+										Buffer.from(message),
 									)
 								wc.approveRequest({
 									id: payload.id,
