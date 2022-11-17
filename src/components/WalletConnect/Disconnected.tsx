@@ -95,7 +95,7 @@ export function Disconnected({ onConnect, mode }: DisconnectedProps) {
 
 					if (url.protocol === 'wc:') {
 						onConnect(url.toString())
-					} else if (url.protocol === 'ledgerlive:' && url.pathname === "/wc") {
+					} else if (url.protocol === 'ledgerlive:' && url.host === "wc") {
 						const uriParam = url.searchParams.get("uri");
 						if (uriParam) {
 							const wcURL = new URL(uriParam);
