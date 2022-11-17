@@ -91,19 +91,7 @@ export function Disconnected({ onConnect, mode }: DisconnectedProps) {
 				const text = await navigator.clipboard.readText()
 				if (text !== previouslyPasted) {
 					previouslyPasted = text
-					const url = new URL(text)
-
-					if (url.protocol === 'wc:') {
-						onConnect(url.toString())
-					} else if (url.protocol === 'ledgerlive:' && url.pathname === "//wc") {
-						const uriParam = url.searchParams.get("uri");
-						if (uriParam) {
-							const wcURL = new URL(uriParam);
-							if (wcURL.protocol === "wc:") {
-								onConnect(wcURL.toString())
-							}
-						}
-					}
+					tryConnect(text)
 				}
 			} catch (err) {
 				console.error(err)
@@ -122,10 +110,41 @@ export function Disconnected({ onConnect, mode }: DisconnectedProps) {
 		}
 	}, [])
 
+	const tryConnect = useCallback((rawURI: string) => {
+		try {
+			const url = new URL(rawURI)
+
+			switch (url.protocol) {
+				// handle usual wallet connect URIs
+				case 'wc:': {
+					onConnect(url.toString())
+					break
+				}
+
+				// handle Ledger Live specific URIs
+				case 'ledgerlive:': {
+					const uriParam = url.searchParams.get('uri')
+
+					if (url.pathname === '//wc' && uriParam) {
+						tryConnect(uriParam)
+					}
+					break
+				}
+			}
+		} catch (error) {
+			// bad urls are just ignored
+			if (error instanceof TypeError) {
+				console.log("bad url: ", error, rawURI)
+				return;
+			}
+			throw error;
+		}
+	}, [onConnect])
+
 	return (
 		<DisconnectedContainer>
 			{scanner ? (
-				<QRScanner onQRScan={onConnect} />
+				<QRScanner onQRScan={tryConnect} />
 			) : (
 				<>
 					<Input
