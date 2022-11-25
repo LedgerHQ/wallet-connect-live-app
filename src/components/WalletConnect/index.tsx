@@ -94,7 +94,7 @@ const WalletConnectInnerContainer = styled(TransitionGroup)`
 `
 
 const BannerContainer = styled(TransitionGroup)`
-	z-index: 2;
+	z-index: 99;
 	position: absolute;
 	top: 0;
 	left: 0;
