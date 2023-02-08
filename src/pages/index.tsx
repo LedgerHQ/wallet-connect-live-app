@@ -6,7 +6,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { getDefaultLanguage } from '@/helpers/generic'
 
 import { Container } from '@/styles/styles'
-import { WalletConnect } from '@/components/WalletConnect'
+import WalletConnect from '@/components/WalletConnect'
 import { NetworkConfig } from '@/types/types'
 import { SDKProvider } from 'src/shared/SDKProvider'
 import { Flex } from '@ledgerhq/react-ui'
