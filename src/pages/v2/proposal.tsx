@@ -21,7 +21,7 @@ const WalletConnectInnerContainer = styled(TransitionGroup)`
 	align-items: center;
 	width: 50%;
 	height: 50%;
-	background: ${({ theme }) => theme.colors.primary.c80};
+	background: ${({ theme }) => theme.colors.neutral.c20};
 `
 
 export type WalletConnectProps = {
