@@ -11,6 +11,9 @@ const nextConfig = {
 	eslint: {
 		dirs: ['src'],
 	},
+	images: {
+		domains: ['avatars.githubusercontent.com'],
+	},
 }
 
 module.exports = withBundleAnalyzer(nextConfig)
