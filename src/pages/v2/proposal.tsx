@@ -1,4 +1,4 @@
-import { Flex, Text, Icons, Box } from '@ledgerhq/react-ui'
+import { Flex, Text, Box, CryptoIcon } from '@ledgerhq/react-ui'
 import styled, { useTheme } from 'styled-components'
 import useNavigation from '@/components/WalletConnect/v2/hooks/useNavigation'
 import { Proposal } from '@/types/types'
@@ -12,6 +12,7 @@ import { Logo } from '@/components/WalletConnect/v2/components/LedgerLiveLogo'
 import Image from 'next/image'
 import { SelectableRow } from '@/components/WalletConnect/v2/components/SelectableRow'
 import { useCallback, useState } from 'react'
+import { space } from '@ledgerhq/react-ui/styles/theme'
 
 const WalletConnectContainer = styled.div`
 	display: flex;
@@ -138,7 +139,7 @@ export default function SessionProposal() {
 									style={{
 										marginBottom:
 											index !== value.chains.length - 1
-												? 3
+												? space[3]
 												: 0,
 									}}
 								>
@@ -152,7 +153,11 @@ export default function SessionProposal() {
 											handleClick(formatChainName(chain))
 										}
 										LeftIcon={
-											<Icons.ActivityMedium color="primary.c70" />
+											<CryptoIcon
+												name="ETH"
+												circleIcon
+												size={24}
+											/>
 										}
 									/>
 								</li>
