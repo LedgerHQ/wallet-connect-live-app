@@ -54,6 +54,7 @@ const ListChains = styled.ul`
 `
 
 const List = styled.ul``
+
 const Header = styled(Flex)`
 	flex-direction: column;
 	justify-content: center;
@@ -67,7 +68,7 @@ export default function SessionProposal() {
 	const proposal = JSON.parse(router.query.data as string) as Proposal
 	const proposer = proposal.params.proposer
 	const getChains = (proposal: Proposal) =>
-		Object.entries(proposal.params.requiredNamespaces)
+		Object.values(proposal.params.requiredNamespaces)
 
 	const [selectedAccounts, setSelectedAccounts] = useState<string[]>([])
 
@@ -125,45 +126,53 @@ export default function SessionProposal() {
 			</Header>
 
 			<ListChains>
-				{getChains(proposal).map(([key, value]) => (
-					<Box key={key} mb={6}>
-						<Box mb={6}>
-							<Text variant="subtitle" color={colors.neutral.c70}>
-								{key}
-							</Text>
-						</Box>
-						<List>
-							{value.chains.map((chain, index) => (
-								<li
-									key={chain}
-									style={{
-										marginBottom:
-											index !== value.chains.length - 1
-												? space[3]
-												: 0,
-									}}
-								>
-									<SelectableRow
-										title={formatChainName(chain)}
-										subtitle={formatChainName(chain)}
-										isSelected={selectedAccounts.includes(
-											formatChainName(chain),
-										)}
-										onSelect={() =>
-											handleClick(formatChainName(chain))
-										}
-										LeftIcon={
-											<CryptoIcon
-												name="ETH"
-												circleIcon
-												size={24}
-											/>
-										}
-									/>
-								</li>
-							))}
-						</List>
-					</Box>
+				{getChains(proposal).map((value) => (
+					<>
+						{value.chains.map((chain, index) => (
+							<Box key={chain} mb={6}>
+								<Box mb={6}>
+									<Text
+										variant="subtitle"
+										color={colors.neutral.c70}
+									>
+										{formatChainName(chain)}
+									</Text>
+								</Box>
+								<List>
+									<li
+										key={chain}
+										style={{
+											marginBottom:
+												index !==
+												value.chains.length - 1
+													? space[3]
+													: 0,
+										}}
+									>
+										<SelectableRow
+											title={formatChainName(chain)}
+											subtitle={formatChainName(chain)}
+											isSelected={selectedAccounts.includes(
+												formatChainName(chain),
+											)}
+											onSelect={() =>
+												handleClick(
+													formatChainName(chain),
+												)
+											}
+											LeftIcon={
+												<CryptoIcon
+													name="ETH"
+													circleIcon
+													size={24}
+												/>
+											}
+										/>
+									</li>
+								</List>
+							</Box>
+						))}
+					</>
 				))}
 			</ListChains>
 		</WalletConnectContainer>
