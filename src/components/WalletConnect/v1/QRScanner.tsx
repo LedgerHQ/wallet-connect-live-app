@@ -2,7 +2,6 @@ import styled from 'styled-components'
 import { BrowserQRCodeReader, IScannerControls } from '@zxing/browser'
 import { useLayoutEffect, useRef } from 'react'
 import { Result } from '@zxing/library'
-import { Flex, Text } from '@ledgerhq/react-ui'
 
 const QRScannerContainer = styled.div`
 	width: 100%;
