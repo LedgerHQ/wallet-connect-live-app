@@ -32,6 +32,18 @@
 	"sessionProposal": {
 		"connectTo": "Connect to {{name}}",
 		"connect": "Connect",
-		"reject": "Reject"
+		"reject": "Reject",
+		"close": "Close",
+		"notSupported": "The following blockhain is not supported",
+		"notSupported_plural": "The following blockhains are not supported",
+		"info": "This app will be able to: ",
+		"infoBullet": {
+			"0": "Check your account balance and activity",
+			"1": "Request approvals for transactions"
+		},
+		"error":{
+			"title":"Sorry, we don’t support this blockchain yet.",
+			"desc":"We currently support Ethereum, Polygon and the Binance Smart Chain. Please stay tuned as we add new ones."
+		}
 	}
 }

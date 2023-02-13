@@ -18,10 +18,11 @@ export type WalletConnectProps = {
 export default function WalletConnect({
 	initialURI,
 	initialMode,
+	accounts,
 	...rest
 }: WalletConnectProps) {
 	const sessionURI = useMemo(() => {
-		return localStorage.getItem('sessionURI') ?? undefined;
+		return localStorage.getItem('sessionURI') ?? undefined
 	}, [])
 	const [uri, setUri] = useState<string | undefined>(
 		initialURI && initialURI !== sessionURI ? initialURI : sessionURI,
@@ -36,8 +37,16 @@ export default function WalletConnect({
 	}
 
 	if (uri?.includes('@1?')) {
-		return <WalletConnectV1 initialURI={uri} setUri={setUri} {...rest} />
+		return (
+			<WalletConnectV1
+				initialURI={uri}
+				setUri={setUri}
+				accounts={accounts}
+				{...rest}
+			/>
+		)
 	} else {
+		localStorage.setItem('accounts', JSON.stringify(accounts))
 		return <WalletConnectV2 initialURI={uri} setUri={setUri} {...rest} />
 	}
 }

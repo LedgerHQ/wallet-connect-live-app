@@ -6,7 +6,7 @@ type Props = {
 	subtitle: string
 	LeftIcon: React.ReactNode
 	isSelected: boolean
-	onSelect: () => void
+	onSelect?: () => void
 }
 
 const Row = styled(Flex)`
@@ -15,7 +15,6 @@ const Row = styled(Flex)`
 	height: 60px;
 	padding-left: 12px;
 	padding-right: 12px;
-	cursor: pointer;
 `
 
 export function SelectableRow({
@@ -26,7 +25,13 @@ export function SelectableRow({
 	onSelect,
 }: Props) {
 	return (
-		<Row justifyContent="space-between" onClick={onSelect}>
+		<Row
+			justifyContent="space-between"
+			onClick={onSelect}
+			style={{
+				cursor: onSelect ? 'pointer' : 'default',
+			}}
+		>
 			<Flex
 				flexDirection="row"
 				justifyContent="space-between"
@@ -52,8 +57,13 @@ export function SelectableRow({
 					</Text>
 				</Flex>
 			</Flex>
-
-			<Checkbox isChecked={isSelected} name={''} onChange={onSelect} />
+			{onSelect && (
+				<Checkbox
+					isChecked={isSelected}
+					name={''}
+					onChange={onSelect}
+				/>
+			)}
 		</Row>
 	)
 }
