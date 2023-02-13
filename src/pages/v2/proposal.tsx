@@ -2,21 +2,18 @@ import { Flex, Text, Box, CryptoIcon, Button } from '@ledgerhq/react-ui'
 import styled, { useTheme } from 'styled-components'
 import useNavigation from '@/components/WalletConnect/v2/hooks/useNavigation'
 import { Proposal } from '@/types/types'
-import {
-	formatChainName,
-	formatUrl,
-} from '@/components/WalletConnect/v2/utils/HelperUtil'
+import { formatUrl } from '@/components/WalletConnect/v2/utils/HelperUtil'
 import { useTranslation } from 'next-i18next'
 import LogoContainer from '@/components/WalletConnect/v2/components/LogoContainers/LedgerLogoContainer'
 import Image from 'next/image'
 import { SelectableRow } from '@/components/WalletConnect/v2/components/SelectableRow'
-import { useCallback, useEffect, useMemo, useState } from 'react'
 import { space } from '@ledgerhq/react-ui/styles/theme'
-import { Account } from '@ledgerhq/live-app-sdk'
 import { ErrorIcon } from '@/components/WalletConnect/v2/icons/ErrorIcon'
 import { Logo } from '@/components/WalletConnect/v2/icons/LedgerLiveLogo'
 import { InfoSessionProposal } from '@/components/WalletConnect/v2/components/SessionProposal/InfoSessionProposal'
 import { NoBlockchainSupported } from '@/components/WalletConnect/v2/components/SessionProposal/NoBlockchain'
+import { useProposal } from '@/components/WalletConnect/v2/hooks/useProposal'
+import { useMemo } from 'react'
 
 const WalletConnectContainer = styled.div`
 	display: flex;
@@ -74,75 +71,32 @@ const ButtonsContainer = styled(Flex)`
 	padding-right: 160px;
 `
 
-const SUPPORTED_CHAINS = ['ethereum', 'bsc', 'polygon']
-
-const getChains = (proposal: Proposal) =>
-	Object.values(proposal.params.requiredNamespaces)
-
 export default function SessionProposal() {
 	const { colors } = useTheme()
 	const { router } = useNavigation()
 	const { t } = useTranslation()
-	const [accounts, setAccounts] = useState<Account[]>([])
-	const [selectedAccounts, setSelectedAccounts] = useState<string[]>([])
-
 	const proposal = JSON.parse(router.query.data as string) as Proposal
-	const proposer = proposal.params.proposer
+	const {
+		handleClick,
+		handleClose,
+		approveSession,
+		rejectSession,
+		formatAccountsByChain,
+		accounts,
+		selectedAccounts,
+		proposer,
+	} = useProposal({ proposal })
 
-	useEffect(() => {
-		const accs = localStorage.getItem('accounts') ?? ''
-		const parsedAccounts = (JSON.parse(accs) as Account[]) ?? []
-		setAccounts(parsedAccounts)
-	}, [])
-
-	const handleClick = useCallback(
-		(account: string) => {
-			console.log(account)
-			if (selectedAccounts.includes(account)) {
-				setSelectedAccounts(
-					selectedAccounts.filter((s) => s !== account),
-				)
-			} else {
-				setSelectedAccounts([...selectedAccounts, account])
-			}
-		},
-		[selectedAccounts],
+	const accountsByChain = useMemo(
+		() => formatAccountsByChain(proposal, accounts),
+		[proposal, accounts],
 	)
-
-	const handleClose = useCallback(() => {
-		router.push('/')
-	}, [])
-
-	const formatAccountsByChain = () => {
-		const families = getChains(proposal)
-
-		const chainsRequested = Object.values(families)
-			.map((f) => f.chains)
-			.reduce((value, acc) => acc.concat(value), [])
-
-		const mappedChains = chainsRequested.map((chain) => {
-			const formatedChain = formatChainName(chain).toLowerCase()
-
-			return {
-				chain: formatedChain,
-				isSupported: SUPPORTED_CHAINS.includes(formatedChain),
-				accounts: accounts.filter(
-					(acc) => acc.currency === formatedChain,
-				),
-			}
-		})
-
-		return mappedChains
-	}
-
-	const accountsByChain = useMemo(() => formatAccountsByChain(), [proposal])
 	const notSupportedChains = accountsByChain.filter(
 		(entry) => !entry.isSupported,
 	)
 	const noChainsSupported =
 		accountsByChain.filter((entry) => !entry.isSupported).length ===
 		accountsByChain.length
-
 	return (
 		<WalletConnectContainer>
 			{noChainsSupported ? (
@@ -284,7 +238,12 @@ export default function SessionProposal() {
 					</ListChains>
 
 					<ButtonsContainer>
-						<Button variant="shade" flex={0.9} mr={6}>
+						<Button
+							variant="shade"
+							flex={0.9}
+							mr={6}
+							onClick={rejectSession}
+						>
 							<Text
 								variant="body"
 								fontWeight="semiBold"
@@ -294,7 +253,12 @@ export default function SessionProposal() {
 							</Text>
 						</Button>
 
-						<Button variant="main" flex={0.9}>
+						<Button
+							variant="main"
+							flex={0.9}
+							onClick={approveSession}
+							disabled={selectedAccounts.length === 0}
+						>
 							<Text
 								variant="body"
 								fontWeight="semiBold"
