@@ -17,6 +17,8 @@ import { useMemo } from 'react'
 import { PartialBlockchainSupported } from '@/components/WalletConnect/v2/components/SessionProposal/PartialBlockchainSupported'
 import { AddAccountPlaceholder } from '@/components/WalletConnect/v2/components/SessionProposal/AddAccountPlaceholder'
 
+export { getServerSideProps } from '../../lib/serverProps'
+
 const WalletConnectContainer = styled.div`
 	display: flex;
 	flex-direction: column;

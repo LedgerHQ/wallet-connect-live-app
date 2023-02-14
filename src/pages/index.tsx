@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react'
-import type { GetServerSideProps, NextPage } from 'next'
+import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { getDefaultLanguage } from '@/helpers/generic'
 
 import { Container } from '@/styles/styles'
 import WalletConnect from '@/components/WalletConnect'
@@ -12,17 +10,7 @@ import { SDKProvider } from 'src/shared/SDKProvider'
 import { Flex } from '@ledgerhq/react-ui'
 import { useTranslation } from 'next-i18next'
 
-export const getServerSideProps: GetServerSideProps = async ({
-	query,
-	locale,
-	locales,
-}) => ({
-	props: {
-		...(await serverSideTranslations(
-			getDefaultLanguage('en', locales, query.lang as string, locale),
-		)),
-	},
-})
+export { getServerSideProps } from '../lib/serverProps'
 
 const Index: NextPage = () => {
 	const router = useRouter()

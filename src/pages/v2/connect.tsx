@@ -1,6 +1,7 @@
 import { web3wallet } from '@/components/WalletConnect/v2/utils/WalletConnectUtil'
 import { Text } from '@ledgerhq/react-ui'
 import styled from 'styled-components'
+export { getServerSideProps } from '../../lib/serverProps'
 
 const WalletConnectContainer = styled.div`
 	display: flex;

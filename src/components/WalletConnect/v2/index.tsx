@@ -8,7 +8,6 @@ import { PasteMedium } from '@ledgerhq/react-ui/assets/icons'
 import useInitialization from './hooks/useInitialization'
 import useWalletConnectEventsManager from './hooks/useWalletConnectEventsManager'
 import { pair } from './utils/WalletConnectUtil'
-import { useLedgerLive } from './hooks/useLedgerLive'
 import { NetworkConfig } from '@/types/types'
 
 const WalletConnectContainer = styled.div`
