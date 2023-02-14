@@ -3,7 +3,7 @@ import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
 import { useMemo, useState } from 'react'
 import { CSSTransition } from 'react-transition-group'
 import { WalletConnectV1 } from './v1'
-import { Disconnected } from './v1/Disconnected'
+import { Disconnected } from './Disconnected'
 import { WalletConnectV2 } from './v2'
 
 export type WalletConnectProps = {

@@ -56,17 +56,14 @@ export type WalletConnectProps = {
 	// setUri: Dispatch<SetStateAction<string | undefined>>
 }
 
-export function WalletConnectV2({
-	platformSDK,
-	accounts,
-}: WalletConnectProps) {
+export function WalletConnectV2({ platformSDK, accounts }: WalletConnectProps) {
 	const initialized = useInitialization()
 	useWalletConnectEventsManager(initialized)
 
 	const { t } = useTranslation()
 	const [inputValue, setInputValue] = useState<string>('')
 	const [errorValue, setErrorValue] = useState<string | undefined>(undefined)
-	
+
 	const handleConnect = useCallback(async () => {
 		if (!inputValue) {
 			setErrorValue(t('error.noInput'))
@@ -74,11 +71,11 @@ export function WalletConnectV2({
 			try {
 				const uri = new URL(inputValue)
 				await pair({ uri: uri.toString() })
-			  } catch (error: unknown) {
+			} catch (error: unknown) {
 				setErrorValue(t('error.invalidUri'))
-			  } finally {
+			} finally {
 				setInputValue('')
-			  }
+			}
 		}
 	}, [inputValue])
 
@@ -98,32 +95,32 @@ export function WalletConnectV2({
 					WALLET CONNECT V2
 				</Text>
 				<Input
-						value={inputValue}
-						onChange={setInputValue}
-						error={errorValue}
-						data-test="input-uri"
-						renderRight={
-							<Flex
-								alignItems={'center'}
-								justifyContent={'center'}
-								pr={'8px'}
+					value={inputValue}
+					onChange={setInputValue}
+					error={errorValue}
+					data-test="input-uri"
+					renderRight={
+						<Flex
+							alignItems={'center'}
+							justifyContent={'center'}
+							pr={'8px'}
+						>
+							<PasteButton
+								onClick={handlePasteClick}
+								data-test="copy-button"
 							>
-								<PasteButton
-									onClick={handlePasteClick}
-									data-test="copy-button"
-								>
-									<PasteMedium size="20px" />
-								</PasteButton>
-							</Flex>
-						}
-					/>
-					<Button
-						mt={5}
-						onClick={handleConnect}
-						data-test="connect-button"
-					>
-						<Text>{t('connect.cta')}</Text>
-					</Button>
+								<PasteMedium size="20px" />
+							</PasteButton>
+						</Flex>
+					}
+				/>
+				<Button
+					mt={5}
+					onClick={handleConnect}
+					data-test="connect-button"
+				>
+					<Text>{t('connect.cta')}</Text>
+				</Button>
 			</WalletConnectInnerContainer>
 		</WalletConnectContainer>
 	)
