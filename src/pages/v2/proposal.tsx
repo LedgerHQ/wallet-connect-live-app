@@ -14,6 +14,8 @@ import { InfoSessionProposal } from '@/components/WalletConnect/v2/components/Se
 import { NoBlockchainSupported } from '@/components/WalletConnect/v2/components/SessionProposal/NoBlockchain'
 import { useProposal } from '@/components/WalletConnect/v2/hooks/useProposal'
 import { useMemo } from 'react'
+import { PartialBlockchainSupported } from '@/components/WalletConnect/v2/components/SessionProposal/PartialBlockchainSupported'
+import { AddAccountPlaceholder } from '@/components/WalletConnect/v2/components/SessionProposal/AddAccountPlaceholder'
 
 const WalletConnectContainer = styled.div`
 	display: flex;
@@ -28,7 +30,7 @@ const WalletConnectContainer = styled.div`
 const DAppContainer = styled(Flex).attrs(
 	(p: { size: number; borderColor: string; backgroundColor: string }) => ({
 		position: 'absolute',
-		right: '-50px',
+		right: '-55px',
 		alignItems: 'center',
 		justifyContent: 'center',
 		heigth: p.size,
@@ -85,6 +87,7 @@ export default function SessionProposal() {
 		accounts,
 		selectedAccounts,
 		proposer,
+		addNewAccount,
 	} = useProposal({ proposal })
 
 	const accountsByChain = useMemo(
@@ -97,11 +100,21 @@ export default function SessionProposal() {
 	const noChainsSupported =
 		accountsByChain.filter((entry) => !entry.isSupported).length ===
 		accountsByChain.length
+
+	const PartialChainsSupported =
+		!!accountsByChain.find((entry) => !entry.isSupported) &&
+		!!accountsByChain.find((entry) => entry.isSupported)
+
+	const allChainsSupported =
+		accountsByChain.filter((entry) => entry.isSupported).length ===
+		accountsByChain.length
+
 	return (
 		<WalletConnectContainer>
-			{noChainsSupported ? (
+			{noChainsSupported || PartialChainsSupported ? (
 				<>
-					<NoBlockchainSupported />
+					{noChainsSupported && <NoBlockchainSupported />}
+					{PartialChainsSupported && <PartialBlockchainSupported />}
 					<ButtonsContainer>
 						<Button variant="main" flex={1} onClick={handleClose}>
 							<Text
@@ -114,12 +127,14 @@ export default function SessionProposal() {
 						</Button>
 					</ButtonsContainer>
 				</>
-			) : (
+			) : null}
+
+			{allChainsSupported ? (
 				<>
 					<Header mt={12} mb={10}>
 						<Container>
 							<LogoContainer>
-								<Logo size={22} />
+								<Logo size={30} />
 							</LogoContainer>
 
 							<DAppContainer borderColor={colors.background.main}>
@@ -159,11 +174,7 @@ export default function SessionProposal() {
 
 					<ListChains>
 						{accountsByChain
-							.filter(
-								(entry) =>
-									entry.isSupported &&
-									entry.accounts.length > 0,
-							)
+							.filter((entry) => entry.isSupported)
 							.map((entry) => {
 								return (
 									<Box key={entry.chain} mb={6}>
@@ -175,46 +186,62 @@ export default function SessionProposal() {
 												{entry.chain}
 											</Text>
 										</Box>
-										<List>
-											{entry.accounts.map(
-												(account, index: number) => (
-													<li
-														key={account.id}
-														style={{
-															marginBottom:
-																index !==
-																entry.accounts
-																	.length -
-																	1
-																	? space[3]
-																	: 0,
-														}}
-													>
-														<SelectableRow
-															title={account.name}
-															subtitle={
-																account.address
-															}
-															isSelected={selectedAccounts.includes(
-																account.address,
-															)}
-															onSelect={() =>
-																handleClick(
+										{entry.accounts.length > 0 ? (
+											<List>
+												{entry.accounts.map(
+													(
+														account,
+														index: number,
+													) => (
+														<li
+															key={account.id}
+															style={{
+																marginBottom:
+																	index !==
+																	entry
+																		.accounts
+																		.length -
+																		1
+																		? space[3]
+																		: 0,
+															}}
+														>
+															<SelectableRow
+																title={
+																	account.name
+																}
+																subtitle={
+																	account.address
+																}
+																isSelected={selectedAccounts.includes(
 																	account.address,
-																)
-															}
-															LeftIcon={
-																<CryptoIcon
-																	name="ETH"
-																	circleIcon
-																	size={24}
-																/>
-															}
-														/>
-													</li>
-												),
-											)}
-										</List>
+																)}
+																onSelect={() =>
+																	handleClick(
+																		account.address,
+																	)
+																}
+																LeftIcon={
+																	<CryptoIcon
+																		name="ETH"
+																		circleIcon
+																		size={
+																			24
+																		}
+																	/>
+																}
+															/>
+														</li>
+													),
+												)}
+											</List>
+										) : (
+											<AddAccountPlaceholder
+												onClick={() =>
+													addNewAccount(entry.chain)
+												}
+											/>
+										)}
 									</Box>
 								)
 							})}
@@ -269,7 +296,7 @@ export default function SessionProposal() {
 						</Button>
 					</ButtonsContainer>
 				</>
-			)}
+			) : null}
 		</WalletConnectContainer>
 	)
 }

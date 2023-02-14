@@ -1,3 +1,4 @@
+import { web3wallet } from '@/components/WalletConnect/v2/utils/WalletConnectUtil'
 import { Text } from '@ledgerhq/react-ui'
 import styled from 'styled-components'
 
@@ -15,7 +16,15 @@ const WalletConnectContainer = styled.div`
 export default function Connect() {
 	return (
 		<WalletConnectContainer>
-			<Text variant="h1">Connected</Text>
+			<>
+				<Text variant="h1" mb={4}>
+					Connected
+				</Text>
+				<Text>
+					Active Sessions :{' '}
+					{Object.keys(web3wallet.getActiveSessions()).length}
+				</Text>
+			</>
 		</WalletConnectContainer>
 	)
 }

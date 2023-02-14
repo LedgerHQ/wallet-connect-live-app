@@ -7,12 +7,11 @@ import { EIP155_SIGNING_METHODS } from '../data/EIP155Data'
 import { formatChainName } from '../utils/HelperUtil'
 import { web3wallet } from '../utils/WalletConnectUtil'
 import useNavigation from './useNavigation'
+import { accounts, networks, platformSDK } from './useLedgerLive'
 
 type Props = {
 	proposal: Proposal
 }
-
-const SUPPORTED_CHAINS = ['ethereum', 'bsc', 'polygon']
 
 const getNamespace = (chain: string) => {
 	switch (chain) {
@@ -29,15 +28,13 @@ const getNamespace = (chain: string) => {
 export function useProposal({ proposal }: Props) {
 	const { navigate, routes } = useNavigation()
 
-	const [accounts, setAccounts] = useState<Account[]>([])
+	const [accountsLocal, setAccounts] = useState<Account[]>([])
 	const [selectedAccounts, setSelectedAccounts] = useState<string[]>([])
 
 	const proposer = proposal.params.proposer
 
 	useEffect(() => {
-		const accs = localStorage.getItem('accounts') ?? ''
-		const parsedAccounts = (JSON.parse(accs) as Account[]) ?? []
-		setAccounts(parsedAccounts)
+		setAccounts(accounts)
 	}, [])
 
 	const handleClick = useCallback(
@@ -72,7 +69,9 @@ export function useProposal({ proposal }: Props) {
 
 			return {
 				chain: formatedChain,
-				isSupported: SUPPORTED_CHAINS.includes(formatedChain),
+				isSupported: networks
+					.map((n) => n.currency)
+					.includes(formatedChain),
 				accounts: accounts.filter(
 					(acc) => acc.currency === formatedChain,
 				),
@@ -85,7 +84,7 @@ export function useProposal({ proposal }: Props) {
 	const createNamespaces = (): Record<string, SessionTypes.BaseNamespace> => {
 		const accountsByChain = formatAccountsByChain(
 			proposal,
-			accounts,
+			accountsLocal,
 		).filter((a) => a.accounts.length > 0 && a.isSupported)
 		const hasETH = accountsByChain.find((acc) => acc.chain === 'ethereum')
 		const hasPolygon = accountsByChain.find(
@@ -137,12 +136,25 @@ export function useProposal({ proposal }: Props) {
 		await web3wallet.rejectSession({
 			id: proposal.id,
 			reason: {
-				code: 1,
+				code: 5000,
 				message: 'USER_REJECTED_METHODS',
 			},
 		})
 		navigate(routes.reject)
 	}, [])
+
+	const addNewAccount = useCallback(async (currency: string) => {
+		try {
+			const newAccount = await platformSDK.requestAccount({
+				currencies: [currency],
+			})
+
+			setAccounts([...accountsLocal, newAccount])
+		} catch (error) {
+			console.log('request account canceled by user')
+		}
+	}, [])
+
 	return {
 		approveSession,
 		rejectSession,
@@ -152,5 +164,6 @@ export function useProposal({ proposal }: Props) {
 		accounts,
 		selectedAccounts,
 		formatAccountsByChain,
+		addNewAccount,
 	}
 }
