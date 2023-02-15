@@ -44,7 +44,6 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 		async (
 			requestEvent: SignClientTypes.EventArguments['session_request'],
 		) => {
-			console.log('session_request', requestEvent)
 			const { topic, params, id } = requestEvent
 			const { request } = params
 
