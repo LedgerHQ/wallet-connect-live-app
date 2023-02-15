@@ -11,10 +11,9 @@ import { space } from '@ledgerhq/react-ui/styles/theme'
 import { ErrorIcon } from '@/components/WalletConnect/v2/icons/ErrorIcon'
 import { Logo } from '@/components/WalletConnect/v2/icons/LedgerLiveLogo'
 import { InfoSessionProposal } from '@/components/WalletConnect/v2/components/SessionProposal/InfoSessionProposal'
-import { NoBlockchainSupported } from '@/components/WalletConnect/v2/components/SessionProposal/NoBlockchain'
+import { ErrorBlockchainSupport } from '@/components/WalletConnect/v2/components/SessionProposal/ErrorBlockchainSupport'
 import { useProposal } from '@/components/WalletConnect/v2/hooks/useProposal'
 import { useMemo } from 'react'
-import { PartialBlockchainSupported } from '@/components/WalletConnect/v2/components/SessionProposal/PartialBlockchainSupported'
 import { AddAccountPlaceholder } from '@/components/WalletConnect/v2/components/SessionProposal/AddAccountPlaceholder'
 
 export { getServerSideProps } from '../../lib/serverProps'
@@ -115,8 +114,7 @@ export default function SessionProposal() {
 		<WalletConnectContainer>
 			{noChainsSupported || PartialChainsSupported ? (
 				<>
-					{noChainsSupported && <NoBlockchainSupported />}
-					{PartialChainsSupported && <PartialBlockchainSupported />}
+					<ErrorBlockchainSupport appName={proposer.metadata.name} />
 					<ButtonsContainer>
 						<Button variant="main" flex={1} onClick={handleClose}>
 							<Text

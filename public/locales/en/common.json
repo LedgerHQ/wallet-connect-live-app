@@ -42,12 +42,8 @@
 			"1": "Request approvals for transactions"
 		},
 		"error":{
-			"title":"Sorry, we don’t support this blockchain yet.",
-			"desc":"We currently support Ethereum, Polygon and the Binance Smart Chain. Please stay tuned as we add new ones."
-		},
-		"warning":{
-			"title":"Sorry, part of your requested blockchains are not supported",
-			"desc":"We only support Ethereum, Polygon and the Binance Smart Chain for the moment. Please stay tuned as we add new ones."
+			"title":"{{appName}} requested to connect to chains we don’t support yet",
+			"desc":"We currently support Ethereum, Polygon and the Binance Smart Chain. We are adding new ones gradually."
 		},
 		"addAccount": "Add account"
 	}

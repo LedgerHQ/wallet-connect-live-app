@@ -12,7 +12,11 @@ const LogoContainer = styled(Flex)`
 	width: 50px;
 `
 
-export function NoBlockchainSupported() {
+type Props = {
+	appName: string
+}
+
+export function ErrorBlockchainSupport({ appName }: Props) {
 	const { t } = useTranslation()
 	return (
 		<Flex
@@ -25,7 +29,7 @@ export function NoBlockchainSupported() {
 				<CloseMedium size={32} color="background.main" />
 			</LogoContainer>
 			<Text variant="h4" fontWeight="medium" color="neutral.c100" mt={6}>
-				{t('sessionProposal.error.title')}
+				{t('sessionProposal.error.title', { appName })}
 			</Text>
 			<Text
 				variant="bodyLineHeight"
