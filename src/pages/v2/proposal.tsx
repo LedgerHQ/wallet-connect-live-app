@@ -14,7 +14,6 @@ import {
 	RowType,
 } from '@/components/WalletConnect/v2/components/GenericRow'
 import { space } from '@ledgerhq/react-ui/styles/theme'
-import { ErrorIcon } from '@/components/WalletConnect/v2/icons/ErrorIcon'
 import { Logo } from '@/components/WalletConnect/v2/icons/LedgerLiveLogo'
 import { InfoSessionProposal } from '@/components/WalletConnect/v2/components/SessionProposal/InfoSessionProposal'
 import { ErrorBlockchainSupport } from '@/components/WalletConnect/v2/components/SessionProposal/ErrorBlockchainSupport'
@@ -83,9 +82,7 @@ export default function SessionProposal() {
 		() => formatAccountsByChain(proposal, accounts),
 		[proposal, accounts],
 	)
-	const notSupportedChains = accountsByChain.filter(
-		(entry) => !entry.isSupported,
-	)
+
 	const noChainsSupported =
 		accountsByChain.filter((entry) => !entry.isSupported).length ===
 		accountsByChain.length
@@ -97,6 +94,12 @@ export default function SessionProposal() {
 	const allChainsSupported =
 		accountsByChain.filter((entry) => entry.isSupported).length ===
 		accountsByChain.length
+
+	const eachChainHasOneAccount =
+		accountsByChain.filter((acc) => acc.accounts.length > 0).length ===
+		accountsByChain.length
+
+	const disabled = selectedAccounts.length === 0 || !eachChainHasOneAccount
 
 	return (
 		<WalletConnectContainer>
@@ -247,19 +250,6 @@ export default function SessionProposal() {
 								)
 							})}
 
-						{notSupportedChains.length > 0 ? (
-							<GenericRow
-								title={t('sessionProposal.notSupported', {
-									count: notSupportedChains.length,
-								})}
-								subtitle={notSupportedChains
-									.map((elem) => elem.chain)
-									.join(', ')}
-								rowType={RowType.Default}
-								LeftIcon={<ErrorIcon />}
-							/>
-						) : null}
-
 						<Box mt={6}>
 							<InfoSessionProposal />
 						</Box>
@@ -285,7 +275,7 @@ export default function SessionProposal() {
 							variant="main"
 							flex={0.9}
 							onClick={approveSession}
-							disabled={selectedAccounts.length === 0}
+							disabled={disabled}
 						>
 							<Text
 								variant="body"

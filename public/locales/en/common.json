@@ -49,6 +49,11 @@
 	},
 	"sessions":{
 		"disconnectAll": "Disconnect All",
+		"modal": {
+			"title":"You are about to disconnect all your sessions",
+			"continue": "Continue",
+			"cancel": "Cancel"
+		},
 		"detail":{
 			"title": "Session details",
 			"connected": "Connected",

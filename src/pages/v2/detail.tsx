@@ -40,9 +40,9 @@ export default function SessionDetail() {
 		([key]) => key === JSON.parse(String(router.query?.data)),
 	)?.[1]
 
-	const handleDelete = useCallback(() => {
+	const handleDelete = useCallback(async () => {
 		if (!session) return
-		web3wallet.disconnectSession({
+		await web3wallet.disconnectSession({
 			topic: session.topic,
 			reason: {
 				code: 3,
