@@ -22,7 +22,7 @@ export default function Connect() {
 	)
 	useEffect(() => {
 		setSessions(Object.entries(web3wallet.getActiveSessions()))
-	}, [web3wallet.getActiveSessions()])
+	}, [])
 
 	const goToDetailSession = useCallback((topic: string) => {
 		navigate(routes.sessionDetails, topic)
@@ -34,11 +34,12 @@ export default function Connect() {
 				flexDirection="column"
 				alignItems="center"
 				justifyContent="center"
+				mb={4}
 			>
 				<Text variant="h1" mb={4} flex={1}>
 					Connected
 				</Text>
-				<Text mb={4}>Active Sessions : {sessions.length}</Text>
+				<Text>Active Sessions : {sessions.length}</Text>
 			</Flex>
 			<List>
 				{sessions.map(([key, value]) => (
