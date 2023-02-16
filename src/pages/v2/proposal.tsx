@@ -15,6 +15,7 @@ import { ErrorBlockchainSupport } from '@/components/WalletConnect/v2/components
 import { useProposal } from '@/components/WalletConnect/v2/hooks/useProposal'
 import { useMemo } from 'react'
 import { AddAccountPlaceholder } from '@/components/WalletConnect/v2/components/SessionProposal/AddAccountPlaceholder'
+import { WalletConnectMedium } from '@ledgerhq/react-ui/assets/icons'
 
 export { getServerSideProps } from '../../lib/serverProps'
 
@@ -132,30 +133,38 @@ export default function SessionProposal() {
 			{allChainsSupported ? (
 				<>
 					<Header mt={12} mb={10}>
-						<Container>
-							<LogoContainer>
-								<Logo size={30} />
-							</LogoContainer>
-
-							<DAppContainer borderColor={colors.background.main}>
+						{proposer.metadata.icons.length > 0 ? (
+							<Container>
 								<LogoContainer>
-									{proposer.metadata.icons.length > 0 ? (
-										<Image
-											src={proposer.metadata.icons[0]}
-											alt="Picture of the proposer"
-											width={60}
-											style={{
-												borderRadius: '50%',
-												borderLeft: '3px solid red',
-											}}
-											height={60}
-										/>
-									) : (
-										<div></div>
-									)}
+									<Logo size={30} />
 								</LogoContainer>
-							</DAppContainer>
-						</Container>
+
+								<DAppContainer
+									borderColor={colors.background.main}
+								>
+									<LogoContainer>
+										{proposer.metadata.icons.length > 0 ? (
+											<Image
+												src={proposer.metadata.icons[0]}
+												alt="Picture of the proposer"
+												width={60}
+												style={{
+													borderRadius: '50%',
+													borderLeft: '3px solid red',
+												}}
+												height={60}
+											/>
+										) : (
+											<div></div>
+										)}
+									</LogoContainer>
+								</DAppContainer>
+							</Container>
+						) : (
+							<LogoContainer>
+								<WalletConnectMedium size={30} />
+							</LogoContainer>
+						)}
 
 						<Text variant="h4" mt={3} mb={2} uppercase={false}>
 							{t('sessionProposal.connectTo', {
