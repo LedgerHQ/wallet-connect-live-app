@@ -10,7 +10,7 @@ type Props = {
 }
 
 const CustomPopin = styled(Popin)`
-	height: 450px;
+	height: 300px;
 	border-radius: 16px;
 	padding: 32px;
 	position: relative;
