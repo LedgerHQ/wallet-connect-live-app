@@ -1,3 +1,5 @@
+import { Account } from '@ledgerhq/live-app-sdk'
+
 export const getDefaultLanguage = (
 	fallbackLang: string,
 	locales?: string[],
@@ -9,4 +11,8 @@ export const getDefaultLanguage = (
 	return fallbackLang
 }
 
-export const compareETHAddresses = (addr1: string, addr2: string) => addr1.toLowerCase() === addr2.toLowerCase()
+export const compareETHAddresses = (addr1: string, addr2: string) =>
+	addr1.toLowerCase() === addr2.toLowerCase()
+
+export const hasETHAddress = (account: Account[], addr: string) =>
+	account.find((a) => a.address.toLowerCase() === addr.toLowerCase())

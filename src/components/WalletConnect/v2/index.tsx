@@ -9,6 +9,7 @@ import useInitialization from './hooks/useInitialization'
 import useWalletConnectEventsManager from './hooks/useWalletConnectEventsManager'
 import { pair } from './utils/WalletConnectUtil'
 import { Connect } from '../Connect'
+import { NetworkConfig } from '@/types/types'
 
 const WalletConnectContainer = styled.div`
 	display: flex;
@@ -32,9 +33,9 @@ const WalletConnectInnerContainer = styled(TransitionGroup)`
 `
 
 export type WalletConnectProps = {
-	// initialAccountId?: string
-	// initialURI?: string
-	// networks: NetworkConfig[]
+	initialAccountId?: string
+	initialURI?: string
+	networks: NetworkConfig[]
 	platformSDK: LedgerLivePlarformSDK
 	accounts: Account[]
 	initialMode?: InputMode
@@ -52,23 +53,27 @@ export function WalletConnectV2({
 
 	const { t } = useTranslation()
 
-	const [, setErrorValue] = useState<string | undefined>(undefined)
+	const [inputValue, setInputValue] = useState<string>('')
+	const [errorValue, setErrorValue] = useState<string | undefined>(undefined)
 
-	const handleConnect = useCallback(async (inputValue: string) => {
-		if (!inputValue) {
-			setErrorValue(t('error.noInput'))
-		} else {
-			try {
-				setUri(inputValue)
-				const uri = new URL(inputValue)
-				await pair({ uri: uri.toString() })
-			} catch (error: unknown) {
-				setErrorValue(t('error.invalidUri'))
-			} finally {
-				setUri('')
+	const handleConnect = useCallback(
+		async (inputValue: string) => {
+			if (!inputValue) {
+				setErrorValue(t('error.noInput'))
+			} else {
+				try {
+					setUri(inputValue)
+					const uri = new URL(inputValue)
+					await pair({ uri: uri.toString() })
+				} catch (error: unknown) {
+					setErrorValue(t('error.invalidUri'))
+				} finally {
+					setUri('')
+				}
 			}
-		}
-	}, [])
+		},
+		[inputValue],
+	)
 
 	const TABS = useMemo(
 		() => [

@@ -1,7 +1,6 @@
 import { NetworkConfig } from '@/types/types'
 import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
-import { Text } from '@ledgerhq/react-ui'
-import GlitchText from '@ledgerhq/react-ui/components/animations/GlitchText'
+import { Text, GlitchText } from '@ledgerhq/react-ui'
 
 import { convertEthToLiveTX } from '@/helpers/converters'
 import { compareETHAddresses } from '@/helpers/generic'
