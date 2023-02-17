@@ -2,13 +2,18 @@ import { Flex, Text, Box, CryptoIcon, Button } from '@ledgerhq/react-ui'
 import styled, { useTheme } from 'styled-components'
 import useNavigation from '@/components/WalletConnect/v2/hooks/useNavigation'
 import { Proposal } from '@/types/types'
-import { formatUrl } from '@/components/WalletConnect/v2/utils/HelperUtil'
+import {
+	formatUrl,
+	getTicker,
+} from '@/components/WalletConnect/v2/utils/HelperUtil'
 import { useTranslation } from 'next-i18next'
 import LogoContainer from '@/components/WalletConnect/v2/components/LogoContainers/LedgerLogoContainer'
 import Image from 'next/image'
-import { SelectableRow } from '@/components/WalletConnect/v2/components/SelectableRow'
+import {
+	GenericRow,
+	RowType,
+} from '@/components/WalletConnect/v2/components/GenericRow'
 import { space } from '@ledgerhq/react-ui/styles/theme'
-import { ErrorIcon } from '@/components/WalletConnect/v2/icons/ErrorIcon'
 import { Logo } from '@/components/WalletConnect/v2/icons/LedgerLiveLogo'
 import { InfoSessionProposal } from '@/components/WalletConnect/v2/components/SessionProposal/InfoSessionProposal'
 import { ErrorBlockchainSupport } from '@/components/WalletConnect/v2/components/SessionProposal/ErrorBlockchainSupport'
@@ -16,18 +21,13 @@ import { useProposal } from '@/components/WalletConnect/v2/hooks/useProposal'
 import { useMemo } from 'react'
 import { AddAccountPlaceholder } from '@/components/WalletConnect/v2/components/SessionProposal/AddAccountPlaceholder'
 import { WalletConnectMedium } from '@ledgerhq/react-ui/assets/icons'
+import {
+	ButtonsContainer,
+	List,
+	WalletConnectContainer,
+} from '@/components/WalletConnect/v2/components/Containers/util'
 
 export { getServerSideProps } from '../../lib/serverProps'
-
-const WalletConnectContainer = styled.div`
-	display: flex;
-	flex-direction: column;
-	position: relative;
-	width: 100%;
-	height: 100%;
-	user-select: none;
-	background: ${({ theme }) => theme.colors.background.main};
-`
 
 const DAppContainer = styled(Flex).attrs(
 	(p: { size: number; borderColor: string; backgroundColor: string }) => ({
@@ -53,26 +53,12 @@ const Container = styled(Flex).attrs((p: { size: number }) => ({
 	left: '-25px',
 }))<{ size: number }>``
 
-const ListChains = styled.ul`
-	padding-left: 160px;
-	padding-right: 160px;
-`
-
-const List = styled.ul``
+const ListChains = styled.ul``
 
 const Header = styled(Flex)`
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-`
-
-const ButtonsContainer = styled(Flex)`
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-	height: 80px;
-	padding-left: 160px;
-	padding-right: 160px;
 `
 
 export default function SessionProposal() {
@@ -96,9 +82,7 @@ export default function SessionProposal() {
 		() => formatAccountsByChain(proposal, accounts),
 		[proposal, accounts],
 	)
-	const notSupportedChains = accountsByChain.filter(
-		(entry) => !entry.isSupported,
-	)
+
 	const noChainsSupported =
 		accountsByChain.filter((entry) => !entry.isSupported).length ===
 		accountsByChain.length
@@ -110,6 +94,12 @@ export default function SessionProposal() {
 	const allChainsSupported =
 		accountsByChain.filter((entry) => entry.isSupported).length ===
 		accountsByChain.length
+
+	const eachChainHasOneAccount =
+		accountsByChain.filter((acc) => acc.accounts.length > 0).length ===
+		accountsByChain.length
+
+	const disabled = selectedAccounts.length === 0 || !eachChainHasOneAccount
 
 	return (
 		<WalletConnectContainer>
@@ -215,7 +205,7 @@ export default function SessionProposal() {
 																		: 0,
 															}}
 														>
-															<SelectableRow
+															<GenericRow
 																title={
 																	account.name
 																}
@@ -225,19 +215,24 @@ export default function SessionProposal() {
 																isSelected={selectedAccounts.includes(
 																	account.address,
 																)}
-																onSelect={() =>
+																onClick={() =>
 																	handleClick(
 																		account.address,
 																	)
 																}
 																LeftIcon={
 																	<CryptoIcon
-																		name="ETH"
+																		name={getTicker(
+																			entry.chain,
+																		)}
 																		circleIcon
 																		size={
 																			24
 																		}
 																	/>
+																}
+																rowType={
+																	RowType.Select
 																}
 															/>
 														</li>
@@ -254,19 +249,6 @@ export default function SessionProposal() {
 									</Box>
 								)
 							})}
-
-						{notSupportedChains.length > 0 ? (
-							<SelectableRow
-								title={t('sessionProposal.notSupported', {
-									count: notSupportedChains.length,
-								})}
-								subtitle={notSupportedChains
-									.map((elem) => elem.chain)
-									.join(', ')}
-								isSelected={false}
-								LeftIcon={<ErrorIcon />}
-							/>
-						) : null}
 
 						<Box mt={6}>
 							<InfoSessionProposal />
@@ -293,7 +275,7 @@ export default function SessionProposal() {
 							variant="main"
 							flex={0.9}
 							onClick={approveSession}
-							disabled={selectedAccounts.length === 0}
+							disabled={disabled}
 						>
 							<Text
 								variant="body"

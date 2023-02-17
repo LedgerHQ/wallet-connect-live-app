@@ -1,31 +1,141 @@
+import {
+	GenericRow,
+	RowType,
+} from '@/components/WalletConnect/v2/components/GenericRow'
+import { formatUrl } from '@/components/WalletConnect/v2/utils/HelperUtil'
 import { web3wallet } from '@/components/WalletConnect/v2/utils/WalletConnectUtil'
-import { Text } from '@ledgerhq/react-ui'
-import styled from 'styled-components'
+import { Box, Button, Flex, Text } from '@ledgerhq/react-ui'
+import { useCallback, useMemo } from 'react'
+import Image from 'next/image'
+import useNavigation from '@/components/WalletConnect/v2/hooks/useNavigation'
+import {
+	ButtonsContainer,
+	List,
+	WalletConnectContainer,
+} from '@/components/WalletConnect/v2/components/Containers/util'
+import { useTranslation } from 'next-i18next'
+import { WalletConnectPopin } from '@/components/WalletConnect/v2/components/Popin/WalletConnectPopin'
+import useWalletConnectPopin from '@/components/WalletConnect/v2/hooks/useWalletConnectPopin'
 export { getServerSideProps } from '../../lib/serverProps'
 
-const WalletConnectContainer = styled.div`
-	display: flex;
-	flex-direction: column;
-	position: relative;
-	align-items: center;
-	justify-content: center;
-	width: 100%;
-	height: 100%;
-	user-select: none;
-	background: ${({ theme }) => theme.colors.background.main};
-`
 export default function Connect() {
+	const { t } = useTranslation()
+	const { navigate, routes } = useNavigation()
+	const { openModal, closeModal, isModalOpen } = useWalletConnectPopin()
+
+	const sessions = useMemo(
+		() => Object.entries(web3wallet.getActiveSessions()),
+		[web3wallet.getActiveSessions()],
+	)
+
+	const goToDetailSession = useCallback((topic: string) => {
+		navigate(routes.sessionDetails, topic)
+	}, [])
+
+	const disconnect = useCallback(() => {
+		sessions.forEach(async ([, value]) => {
+			await web3wallet.disconnectSession({
+				topic: value.topic,
+				reason: {
+					code: 3,
+					message: 'Disconnect Session',
+				},
+			})
+		})
+
+		closeModal()
+	}, [])
+
 	return (
 		<WalletConnectContainer>
-			<>
-				<Text variant="h1" mb={4}>
+			<Flex
+				flexDirection="column"
+				alignItems="center"
+				justifyContent="center"
+				mb={4}
+			>
+				<Text variant="h1" mb={4} flex={1}>
 					Connected
 				</Text>
-				<Text>
-					Active Sessions :{' '}
-					{Object.keys(web3wallet.getActiveSessions()).length}
-				</Text>
-			</>
+				<Text>Active Sessions : {sessions.length}</Text>
+			</Flex>
+			<List>
+				{sessions.map(([key, value]) => (
+					<Box key={key} mt={3}>
+						<GenericRow
+							key={key}
+							title={value.peer.metadata.name}
+							subtitle={formatUrl(value.peer.metadata.url)}
+							LeftIcon={
+								<Image
+									src={value.peer.metadata.icons[0]}
+									alt="Picture of the proposer"
+									width={32}
+									style={{
+										borderRadius: '8px',
+									}}
+									height={32}
+								/>
+							}
+							rowType={RowType.Detail}
+							onClick={() => goToDetailSession(value.topic)}
+						/>
+					</Box>
+				))}
+			</List>
+
+			{sessions.length > 0 && (
+				<ButtonsContainer mt={4}>
+					<Button variant="shade" flex={1} onClick={openModal}>
+						<Text
+							variant="body"
+							fontWeight="semiBold"
+							color="neutral.c100"
+						>
+							{t('sessions.disconnectAll')}
+						</Text>
+					</Button>
+				</ButtonsContainer>
+			)}
+
+			<WalletConnectPopin isOpen={isModalOpen} onClose={closeModal}>
+				<Flex flexDirection="column">
+					<Text variant="h4" color="neutral.c100" mb={10}>
+						{t('sessions.modal.title')}
+					</Text>
+
+					<Text variant="bodyLineHeight" color="neutral.c70" mb={10}>
+						{t('sessions.modal.desc')}
+					</Text>
+
+					<ButtonsContainer>
+						<Button
+							variant="shade"
+							flex={0.9}
+							mr={6}
+							onClick={closeModal}
+						>
+							<Text
+								variant="body"
+								fontWeight="semiBold"
+								color="neutral.c100"
+							>
+								{t('sessions.modal.reject')}
+							</Text>
+						</Button>
+
+						<Button variant="main" flex={0.9} onClick={disconnect}>
+							<Text
+								variant="body"
+								fontWeight="semiBold"
+								color="neutral.c00"
+							>
+								{t('sessions.modal.continue')}
+							</Text>
+						</Button>
+					</ButtonsContainer>
+				</Flex>
+			</WalletConnectPopin>
 		</WalletConnectContainer>
 	)
 }

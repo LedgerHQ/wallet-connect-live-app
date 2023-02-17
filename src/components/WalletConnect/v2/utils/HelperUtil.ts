@@ -98,8 +98,23 @@ export function formatChainName(chainId: string) {
 }
 
 /**
- * Formats chainId to its name
+ * Formats url to to remove protocol
  */
 export function formatUrl(url: string) {
 	return url.split('//')[1]
+}
+
+/**
+ * Formats chainId to its name
+ */
+export function getTicker(chain: string) {
+	switch (chain) {
+		case 'ethereum':
+		default:
+			return 'ETH'
+		case 'polygon':
+			return 'MATIC'
+		case 'bsc':
+			return 'BNB'
+	}
 }

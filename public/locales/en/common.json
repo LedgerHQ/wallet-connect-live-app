@@ -46,5 +46,20 @@
 			"desc":"We currently support Ethereum, Polygon and the Binance Smart Chain. We are adding new ones gradually."
 		},
 		"addAccount": "Add account"
+	},
+	"sessions":{
+		"disconnectAll": "Disconnect All",
+		"modal": {
+			"title": "Do you really want to disconnect all your sessions?",
+			"desc": "You will need to re-connect to be able to interact with all the apps you were connected to.",
+			"continue": "Disconnect",
+			"reject": "Reject"
+		},
+		"detail":{
+			"title": "Session details",
+			"connected": "Connected",
+			"expires": "Expires",
+			"disconnect": "Disconnect"
+		}
 	}
 }

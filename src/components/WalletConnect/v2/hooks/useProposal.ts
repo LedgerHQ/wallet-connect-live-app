@@ -1,6 +1,7 @@
 import { Proposal } from '@/types/types'
 import { Account } from '@ledgerhq/live-app-sdk'
 import { SessionTypes } from '@walletconnect/types'
+
 import router from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import { EIP155_SIGNING_METHODS } from '../data/EIP155Data'
@@ -29,6 +30,7 @@ export function useProposal({ proposal }: Props) {
 	const { navigate, routes } = useNavigation()
 
 	const [accountsLocal, setAccounts] = useState<Account[]>([])
+
 	const [selectedAccounts, setSelectedAccounts] = useState<string[]>([])
 
 	const proposer = proposal.params.proposer
@@ -125,11 +127,16 @@ export function useProposal({ proposal }: Props) {
 	}
 
 	const approveSession = useCallback(async () => {
-		await web3wallet.approveSession({
-			id: proposal.id,
-			namespaces: createNamespaces(),
-		})
-		navigate(routes.connect)
+		web3wallet
+			.approveSession({
+				id: proposal.id,
+				namespaces: createNamespaces(),
+			})
+			.then(() => navigate(routes.connect))
+			.catch((error) => {
+				console.log(error)
+				navigate(routes.reject, error)
+			})
 	}, [proposal])
 
 	const rejectSession = useCallback(async () => {

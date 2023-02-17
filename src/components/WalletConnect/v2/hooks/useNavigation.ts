@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 
 enum routes {
 	sessionProposal = '/v2/proposal',
-	sessionDetails = '/v2/sessionDetails',
+	sessionDetails = '/v2/detail',
 	reject = '/v2/reject',
 	connect = '/v2/connect',
 }
