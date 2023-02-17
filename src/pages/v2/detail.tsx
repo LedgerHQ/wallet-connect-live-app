@@ -94,13 +94,15 @@ export default function SessionDetail() {
 
 	return (
 		<WalletConnectContainer>
-			<Link
-				href={routes.connect}
-				style={{
-					cursor: 'pointer',
-				}}
-			>
-				<Text variant="body" mb={8} color="neutral.c100">
+			<Link href={routes.connect}>
+				<Text
+					variant="body"
+					mb={8}
+					color="neutral.c100"
+					style={{
+						cursor: 'pointer',
+					}}
+				>
 					Back
 				</Text>
 			</Link>

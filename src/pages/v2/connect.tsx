@@ -5,8 +5,7 @@ import {
 import { formatUrl } from '@/components/WalletConnect/v2/utils/HelperUtil'
 import { web3wallet } from '@/components/WalletConnect/v2/utils/WalletConnectUtil'
 import { Box, Button, Flex, Text } from '@ledgerhq/react-ui'
-import { SessionTypes } from '@walletconnect/types'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import Image from 'next/image'
 import useNavigation from '@/components/WalletConnect/v2/hooks/useNavigation'
 import {
@@ -24,13 +23,10 @@ export default function Connect() {
 	const { navigate, routes } = useNavigation()
 	const { openModal, closeModal, isModalOpen } = useWalletConnectPopin()
 
-	const [sessions, setSessions] = useState<[string, SessionTypes.Struct][]>(
-		[],
+	const sessions = useMemo(
+		() => Object.entries(web3wallet.getActiveSessions()),
+		[web3wallet.getActiveSessions()],
 	)
-
-	useEffect(() => {
-		setSessions(Object.entries(web3wallet.getActiveSessions()))
-	}, [])
 
 	const goToDetailSession = useCallback((topic: string) => {
 		navigate(routes.sessionDetails, topic)
@@ -47,7 +43,6 @@ export default function Connect() {
 			})
 		})
 
-		setSessions([])
 		closeModal()
 	}, [])
 
@@ -103,14 +98,15 @@ export default function Connect() {
 				</ButtonsContainer>
 			)}
 
-			<WalletConnectPopin isOpen={isModalOpen}>
-				<Flex
-					flexDirection="column"
-					justifyContent="center"
-					alignItems="center"
-					flex={1}
-				>
-					<Text variant="h4">{t('sessions.modal.title')}</Text>
+			<WalletConnectPopin isOpen={isModalOpen} onClose={closeModal}>
+				<Flex flexDirection="column">
+					<Text variant="h4" color="neutral.c100" mb={10}>
+						{t('sessions.modal.title')}
+					</Text>
+
+					<Text variant="bodyLineHeight" color="neutral.c70" mb={10}>
+						{t('sessions.modal.desc')}
+					</Text>
 
 					<ButtonsContainer>
 						<Button
@@ -124,7 +120,7 @@ export default function Connect() {
 								fontWeight="semiBold"
 								color="neutral.c100"
 							>
-								{t('sessions.modal.cancel')}
+								{t('sessions.modal.reject')}
 							</Text>
 						</Button>
 

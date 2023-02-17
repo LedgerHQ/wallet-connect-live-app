@@ -50,9 +50,10 @@
 	"sessions":{
 		"disconnectAll": "Disconnect All",
 		"modal": {
-			"title":"You are about to disconnect all your sessions",
-			"continue": "Continue",
-			"cancel": "Cancel"
+			"title": "Do you really want to disconnect all your sessions?",
+			"desc": "You will need to re-connect to be able to interact with all the apps you were connected to.",
+			"continue": "Disconnect",
+			"reject": "Reject"
 		},
 		"detail":{
 			"title": "Session details",

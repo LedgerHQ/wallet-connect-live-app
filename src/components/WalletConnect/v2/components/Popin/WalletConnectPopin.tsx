@@ -1,15 +1,46 @@
-import { Popin } from '@ledgerhq/react-ui'
+import { Flex, Popin } from '@ledgerhq/react-ui'
+import { CloseMedium } from '@ledgerhq/react-ui/assets/icons'
 import React from 'react'
+import styled from 'styled-components'
 
 type Props = {
 	isOpen: boolean
 	children: React.ReactNode
+	onClose: () => void
 }
 
-export function WalletConnectPopin({ isOpen, children }: Props) {
+const CustomPopin = styled(Popin)`
+	height: 450px;
+	border-radius: 16px;
+	padding: 32px;
+	position: relative;
+	background-color: ${(props) => props.theme.colors.background.drawer};
+	align-items: center;
+	justify-content: center;
+`
+
+const CloseButton = styled(Flex)`
+	height: 32px;
+	width: 32px;
+	align-items: center;
+	justify-content: center;
+	position: absolute;
+	right: 16px;
+	top: 8px;
+	border-radius: 50px;
+	cursor: pointer;
+	background-color: ${(props) => props.theme.colors.neutral.c30};
+	&:hover {
+		opacity: 0.7;
+	}
+`
+export function WalletConnectPopin({ isOpen, children, onClose }: Props) {
 	return (
-		<Popin height="450px" isOpen={isOpen}>
+		<CustomPopin isOpen={isOpen}>
+			<CloseButton onClick={onClose}>
+				<CloseMedium size={16} color="neutral.c100" />
+			</CloseButton>
 			{children}
-		</Popin>
+		</CustomPopin>
 	)
 }
