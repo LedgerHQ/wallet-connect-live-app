@@ -15,7 +15,7 @@
 	},
 	"dependencies": {
 		"@ledgerhq/live-app-sdk": "0.8.1",
-		"@ledgerhq/react-ui": "^0.7.6",
+		"@ledgerhq/react-ui": "^0.10.4",
 		"@segment/snippet": "^4.15.3",
 		"@walletconnect/client": "^1.7.8",
 		"@walletconnect/core": "^2.4.0",

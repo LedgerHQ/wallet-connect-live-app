@@ -1,6 +1,38 @@
 export type NetworkConfig = {
-	chainId: number;
-	currency: string;
+	chainId: number
+	currency: string
 }
 
-export type InputMode = "scan" | "text"
+export type InputMode = 'scan' | 'text'
+
+export type Family = {
+	methods: string[]
+	chains: string[]
+	events: string[]
+}
+export type Families = {
+	[key: string]: Family
+}
+export type Relay = {
+	protocol: string
+}
+export type Proposer = {
+	publicKey: string
+	metadata: {
+		description: string
+		url: string
+		icons: string[]
+		name: string
+	}
+}
+export type Proposal = {
+	id: number
+	params: {
+		id: number
+		pairingTopic: string
+		expiry: number
+		requiredNamespaces: Families
+		relays: Relay[]
+		proposer: Proposer
+	}
+}

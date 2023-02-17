@@ -28,5 +28,38 @@
 	"session": {
 		"connected": "connected to [{{appName}}]",
 		"connecting": "[{{appName}}] is trying to connect"
+	},
+	"sessionProposal": {
+		"connectTo": "Connect to {{name}}",
+		"connect": "Connect",
+		"reject": "Reject",
+		"close": "Close",
+		"notSupported": "The following blockhain is not supported",
+		"notSupported_plural": "The following blockhains are not supported",
+		"info": "This app will be able to: ",
+		"infoBullet": {
+			"0": "Check your account balance and activity",
+			"1": "Request approvals for transactions"
+		},
+		"error":{
+			"title":"{{appName}} requested to connect to chains we don’t support yet",
+			"desc":"We currently support Ethereum, Polygon and the Binance Smart Chain. We are adding new ones gradually."
+		},
+		"addAccount": "Add account"
+	},
+	"sessions":{
+		"disconnectAll": "Disconnect All",
+		"modal": {
+			"title": "Do you really want to disconnect all your sessions?",
+			"desc": "You will need to re-connect to be able to interact with all the apps you were connected to.",
+			"continue": "Disconnect",
+			"reject": "Reject"
+		},
+		"detail":{
+			"title": "Session details",
+			"connected": "Connected",
+			"expires": "Expires",
+			"disconnect": "Disconnect"
+		}
 	}
 }
