@@ -3,7 +3,7 @@ import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
 import { useMemo, useState } from 'react'
 import { CSSTransition } from 'react-transition-group'
 import { WalletConnectV1 } from './v1'
-import { Disconnected } from './Disconnected'
+import { Connect } from './Connect'
 import { WalletConnectV2 } from './v2'
 
 export type WalletConnectProps = {
@@ -21,7 +21,7 @@ export default function WalletConnect({
 	...rest
 }: WalletConnectProps) {
 	const sessionURI = useMemo(() => {
-		return localStorage.getItem('sessionURI') ?? undefined;
+		return localStorage.getItem('sessionURI') ?? undefined
 	}, [])
 	const [uri, setUri] = useState<string | undefined>(
 		initialURI && initialURI !== sessionURI ? initialURI : sessionURI,
@@ -30,7 +30,7 @@ export default function WalletConnect({
 	if (!uri) {
 		return (
 			<CSSTransition classNames="fade" timeout={200}>
-				<Disconnected mode={initialMode} onConnect={setUri} />
+				<Connect mode={initialMode} onConnect={setUri} />
 			</CSSTransition>
 		)
 	}
@@ -38,6 +38,13 @@ export default function WalletConnect({
 	if (uri?.includes('@1?')) {
 		return <WalletConnectV1 initialURI={uri} setUri={setUri} {...rest} />
 	} else {
-		return <WalletConnectV2 initialURI={uri} setUri={setUri} {...rest} />
+		return (
+			<WalletConnectV2
+				initialMode={initialMode}
+				// initialURI={uri}
+				setUri={setUri}
+				{...rest}
+			/>
+		)
 	}
 }

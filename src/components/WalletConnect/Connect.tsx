@@ -6,7 +6,7 @@ import { QRScanner } from './QRScanner'
 import { InputMode } from '@/types/types'
 import { useTranslation } from 'next-i18next'
 
-const DisconnectedContainer = styled.div`
+const ConnectContainer = styled.div`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -58,14 +58,14 @@ const TopContainer = styled.div`
 	justify-content: center;
 `
 
-export type DisconnectedProps = {
+export type ConnectProps = {
 	onConnect: (uri: string) => void
 	mode?: InputMode
 }
 
 let previouslyPasted = ''
 
-export function Disconnected({ onConnect, mode }: DisconnectedProps) {
+export function Connect({ onConnect, mode }: ConnectProps) {
 	const { t } = useTranslation()
 	const [inputValue, setInputValue] = useState<string>('')
 	const [errorValue, setErrorValue] = useState<string | undefined>(undefined)
@@ -110,38 +110,41 @@ export function Disconnected({ onConnect, mode }: DisconnectedProps) {
 		}
 	}, [])
 
-	const tryConnect = useCallback((rawURI: string) => {
-		try {
-			const url = new URL(rawURI)
+	const tryConnect = useCallback(
+		(rawURI: string) => {
+			try {
+				const url = new URL(rawURI)
 
-			switch (url.protocol) {
-				// handle usual wallet connect URIs
-				case 'wc:': {
-					onConnect(url.toString())
-					break
-				}
-
-				// handle Ledger Live specific URIs
-				case 'ledgerlive:': {
-					const uriParam = url.searchParams.get('uri')
-
-					if (url.pathname === '//wc' && uriParam) {
-						tryConnect(uriParam)
+				switch (url.protocol) {
+					// handle usual wallet connect URIs
+					case 'wc:': {
+						onConnect(url.toString())
+						break
 					}
-					break
+
+					// handle Ledger Live specific URIs
+					case 'ledgerlive:': {
+						const uriParam = url.searchParams.get('uri')
+
+						if (url.pathname === '//wc' && uriParam) {
+							tryConnect(uriParam)
+						}
+						break
+					}
 				}
+			} catch (error) {
+				// bad urls are just ignored
+				if (error instanceof TypeError) {
+					return
+				}
+				throw error
 			}
-		} catch (error) {
-			// bad urls are just ignored
-			if (error instanceof TypeError) {
-				return;
-			}
-			throw error;
-		}
-	}, [onConnect])
+		},
+		[onConnect],
+	)
 
 	return (
-		<DisconnectedContainer>
+		<ConnectContainer>
 			{scanner ? (
 				<QRScanner onQRScan={tryConnect} />
 			) : (
@@ -202,6 +205,6 @@ export function Disconnected({ onConnect, mode }: DisconnectedProps) {
 					</Button>
 				</Flex>
 			</BottomContainer>
-		</DisconnectedContainer>
+		</ConnectContainer>
 	)
 }

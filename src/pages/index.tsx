@@ -5,7 +5,7 @@ import Head from 'next/head'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { getDefaultLanguage } from '@/helpers/generic'
 
-import { Container } from '@/styles/styles'
+import { Container, MainContainer } from '@/styles/styles'
 import WalletConnect from '@/components/WalletConnect'
 import { NetworkConfig } from '@/types/types'
 import { SDKProvider } from 'src/shared/SDKProvider'
@@ -69,14 +69,16 @@ const Index: NextPage = () => {
 				<SDKProvider networks={networkConfigs}>
 					{(platformSDK, accounts) =>
 						accounts.length > 0 ? (
-							<WalletConnect
-								initialMode={initialMode}
-								initialAccountId={initialAccountId}
-								networks={networkConfigs}
-								initialURI={uri}
-								platformSDK={platformSDK}
-								accounts={accounts}
-							/>
+							<MainContainer>
+								<WalletConnect
+									initialMode={initialMode}
+									initialAccountId={initialAccountId}
+									networks={networkConfigs}
+									initialURI={uri}
+									platformSDK={platformSDK}
+									accounts={accounts}
+								/>
+							</MainContainer>
 						) : (
 							<Flex>{t('account.needed')}</Flex>
 						)

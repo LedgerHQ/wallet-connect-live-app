@@ -7,10 +7,7 @@ import { convertEthToLiveTX } from '@/helpers/converters'
 import { compareETHAddresses } from '@/helpers/generic'
 import { stripHexPrefix } from '@/utils/currencyFormatter/helpers'
 import WalletConnectClient from '@walletconnect/client'
-import {
-	IJsonRpcRequest,
-	IWalletConnectSession,
-} from '@walletconnect/types'
+import { IJsonRpcRequest, IWalletConnectSession } from '@walletconnect/types'
 import { useTranslation } from 'next-i18next'
 import Image from 'next/image'
 import {
@@ -559,12 +556,12 @@ export function WalletConnectV1({
 										delay={0}
 										text={
 											session.connected
-												? t('session.connected', {
+												? t('sessions.connected', {
 														appName:
 															session.peerMeta
 																.name,
 												  })
-												: t('session.connecting', {
+												: t('sessions.connecting', {
 														appName:
 															session.peerMeta
 																.name,

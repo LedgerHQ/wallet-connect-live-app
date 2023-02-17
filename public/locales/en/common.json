@@ -15,6 +15,7 @@
 		"needed": "You need at least one available account"
 	},
 	"connect": {
+		"title": "Connect",
 		"cta": "Connect",
 		"scanQRCode": "Scan a QRCode to connect",
 		"copyURI": "Copy an URI to connect",
@@ -25,7 +26,8 @@
 		"accept": "Accept",
 		"decline": "Decline"
 	},
-	"session": {
+	"sessions": {
+		"title": "Sessions",
 		"connected": "connected to [{{appName}}]",
 		"connecting": "[{{appName}}] is trying to connect"
 	}
