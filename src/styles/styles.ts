@@ -47,6 +47,10 @@ export const ResponsiveContainer = styled.div`
 	width: 100%;
 	min-height: 100%;
 
+	@media ${device.mobile} {
+		margin-left: 16px;
+		margin-right: 16px;
+	}
 	@media ${device.tablet} {
 		max-width: 465px;
 	}

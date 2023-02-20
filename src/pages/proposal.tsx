@@ -25,7 +25,6 @@ import { WalletConnectMedium } from '@ledgerhq/react-ui/assets/icons'
 import {
 	ButtonsContainer,
 	List,
-	WalletConnectContainer,
 } from '@/components/WalletConnect/v2/components/Containers/util'
 import { ResponsiveContainer } from '@/styles/styles'
 
