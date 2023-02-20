@@ -49,8 +49,6 @@ const Index: NextPage = () => {
 		setMounted(true)
 	}, [])
 
-	console.log('NETWORKS', networkConfigs)
-
 	return (
 		<Container>
 			<Head>

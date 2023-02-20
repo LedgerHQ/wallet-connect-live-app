@@ -18,9 +18,10 @@ import useWalletConnectPopin from '@/components/WalletConnect/v2/hooks/useWallet
 
 export type SessionsProps = {
 	sessions: any
+	goToConnect: () => void
 }
 
-export default function Sessions({ sessions }: SessionsProps) {
+export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 	const { t } = useTranslation()
 	const { navigate, routes } = useNavigation()
 	const { openModal, closeModal, isModalOpen } = useWalletConnectPopin()
@@ -42,6 +43,45 @@ export default function Sessions({ sessions }: SessionsProps) {
 
 		closeModal()
 	}, [])
+
+	if (!sessions || !sessions.length || sessions.length === 0) {
+		return (
+			<Flex
+				flexDirection="column"
+				width="100%"
+				height="100%"
+				alignItems="center"
+				justifyContent="center"
+				my={6}
+			>
+				<Text variant="h2" fontWeight="medium">
+					{t('sessions.emptyState.title')}
+				</Text>
+				<Text
+					variant="bodyLineHeight"
+					fontWeight="medium"
+					color="neutral.c80"
+					mt={6}
+				>
+					{t('sessions.emptyState.desc')}
+				</Text>
+				<Button
+					variant="main"
+					size="large"
+					mt={10}
+					onClick={goToConnect}
+				>
+					<Text
+						variant="body"
+						fontWeight="semiBold"
+						color="neutral.c00"
+					>
+						{t('sessions.emptyState.goToConnect')}
+					</Text>
+				</Button>
+			</Flex>
+		)
+	}
 
 	return (
 		<Flex flexDirection="column" width="100%" height="100%" mt={6}>
@@ -70,19 +110,17 @@ export default function Sessions({ sessions }: SessionsProps) {
 				))}
 			</List>
 
-			{sessions.length > 0 && (
-				<ButtonsContainer mt={4}>
-					<Button variant="shade" flex={1} onClick={openModal}>
-						<Text
-							variant="body"
-							fontWeight="semiBold"
-							color="neutral.c100"
-						>
-							{t('sessions.disconnectAll')}
-						</Text>
-					</Button>
-				</ButtonsContainer>
-			)}
+			<ButtonsContainer mt={4}>
+				<Button variant="shade" flex={1} onClick={openModal}>
+					<Text
+						variant="body"
+						fontWeight="semiBold"
+						color="neutral.c100"
+					>
+						{t('sessions.disconnectAll')}
+					</Text>
+				</Button>
+			</ButtonsContainer>
 
 			<WalletConnectPopin isOpen={isModalOpen} onClose={closeModal}>
 				<Flex flexDirection="column">
@@ -106,7 +144,7 @@ export default function Sessions({ sessions }: SessionsProps) {
 								fontWeight="semiBold"
 								color="neutral.c100"
 							>
-								{t('sessions.modal.reject')}
+								{t('sessions.modal.cancel')}
 							</Text>
 						</Button>
 

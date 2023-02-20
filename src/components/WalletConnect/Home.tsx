@@ -21,6 +21,7 @@ const WalletConnectContainer = styled.div`
 	height: 100%;
 	user-select: none;
 	background: ${({ theme }) => theme.colors.background.main};
+	padding-top: ${(p) => p.theme.space[5]}px;
 `
 
 const WalletConnectInnerContainer = styled(TransitionGroup)`
@@ -54,6 +55,9 @@ export default function Home({
 
 	const { t } = useTranslation()
 
+	const CONNECT_TAB_INDEX = 0
+	const SESSIONS_TAB_INDEX = 1
+	const [activeTabIndex, setActiveTabIndex] = useState(CONNECT_TAB_INDEX)
 	const [inputValue, setInputValue] = useState<string>('')
 	const [errorValue, setErrorValue] = useState<string | undefined>(undefined)
 
@@ -82,10 +86,19 @@ export default function Home({
 		[inputValue],
 	)
 
+	// Those two functions are not working for now. The Tabs component doesn't currently allow to set the active tab
+	const goToConnect = useCallback(() => {
+		setActiveTabIndex(CONNECT_TAB_INDEX)
+	}, [])
+
+	const goToSessions = useCallback(() => {
+		setActiveTabIndex(SESSIONS_TAB_INDEX)
+	}, [])
+
 	const TABS = useMemo(
 		() => [
 			{
-				index: 0,
+				index: CONNECT_TAB_INDEX,
 				title: t('connect.title'),
 				Component: (
 					<WalletConnectInnerContainer>
@@ -99,13 +112,16 @@ export default function Home({
 				),
 			},
 			{
-				index: 1,
+				index: SESSIONS_TAB_INDEX,
 				title: t('sessions.title'),
 				badge: sessions?.length || undefined,
 				Component: (
 					<WalletConnectInnerContainer>
 						<ResponsiveContainer>
-							<Sessions sessions={sessions} />
+							<Sessions
+								sessions={sessions}
+								goToConnect={goToConnect}
+							/>
 						</ResponsiveContainer>
 					</WalletConnectInnerContainer>
 				),
@@ -116,7 +132,13 @@ export default function Home({
 
 	return (
 		<WalletConnectContainer>
-			{initialized ? <Tabs tabs={TABS} /> : null}
+			{initialized ? (
+				<Tabs
+					tabs={TABS}
+					activeIndex={activeTabIndex}
+					onTabChange={setActiveTabIndex}
+				/>
+			) : null}
 		</WalletConnectContainer>
 	)
 }

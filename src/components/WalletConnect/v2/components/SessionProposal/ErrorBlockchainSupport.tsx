@@ -28,7 +28,13 @@ export function ErrorBlockchainSupport({ appName }: Props) {
 			<LogoContainer>
 				<CloseMedium size={32} color="background.main" />
 			</LogoContainer>
-			<Text variant="h4" fontWeight="medium" color="neutral.c100" mt={6}>
+			<Text
+				variant="h4"
+				fontWeight="medium"
+				color="neutral.c100"
+				mt={6}
+				textAlign="center"
+			>
 				{t('sessionProposal.error.title', { appName })}
 			</Text>
 			<Text
@@ -36,6 +42,7 @@ export function ErrorBlockchainSupport({ appName }: Props) {
 				fontWeight="medium"
 				color="neutral.c80"
 				mt={3}
+				textAlign="center"
 			>
 				{t('sessionProposal.error.desc')}
 			</Text>

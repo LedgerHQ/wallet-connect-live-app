@@ -53,14 +53,19 @@
 			"title": "Do you really want to disconnect all your sessions?",
 			"desc": "You will need to re-connect to be able to interact with all the apps you were connected to.",
 			"continue": "Disconnect",
-			"reject": "Reject"
+			"cancel": "Cancel"
 		},
-		"detail":{
+		"detail": {
 			"title": "Session details",
 			"accounts": "Accounts",
 			"connected": "Connected",
 			"expires": "Expires",
 			"disconnect": "Disconnect"
+		},
+		"emptyState": {
+			"title": "No active session, yet",
+			"desc": "Get started by connecting to an app.",
+			"goToConnect": "Connect"
 		}
 	}
 }

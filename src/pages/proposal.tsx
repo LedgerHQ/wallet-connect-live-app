@@ -316,7 +316,11 @@ export default function SessionProposal() {
 									<Text
 										variant="body"
 										fontWeight="semiBold"
-										color="neutral.c00"
+										color={
+											disabled
+												? 'neutral.c50'
+												: 'neutral.c00'
+										}
 									>
 										{t('sessionProposal.connect')}
 									</Text>
