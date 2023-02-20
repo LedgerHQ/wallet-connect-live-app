@@ -18,6 +18,7 @@ const ButtonsContainer = styled(Flex)`
 	justify-content: space-between;
 	align-items: center;
 	height: 80px;
+	width: 100%;
 `
 
 const Row = styled(Flex)``

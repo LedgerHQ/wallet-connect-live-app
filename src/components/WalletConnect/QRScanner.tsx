@@ -15,7 +15,7 @@ const QRScannerContainer = styled.div`
 
 const QRScannerVideoElement = styled.video`
 	object-fit: cover;
-    object-position: center center;
+	object-position: center center;
 	width: 100%;
 	height: 100%;
 `
@@ -24,54 +24,35 @@ type QRScannerProps = {
 	onQRScan: (data: string) => void
 }
 
-const QRScannerOverlay = styled.div`
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	background: black;
-	opacity: 0.7;
-	z-index: 2;
-	clip-path: polygon(
-		0% 0%,
-		0% 100%,
-		20% 100%,
-		20% 20%,
-		80% 20%,
-		80% 80%,
-		20% 80%,
-		20% 100%,
-		100% 100%,
-		100% 0%
-	);
-`
-
 export function QRScanner({ onQRScan }: QRScannerProps) {
 	const videoRef = useRef(null)
 
 	useLayoutEffect(() => {
-		const codeReader = new BrowserQRCodeReader(undefined, { delayBetweenScanAttempts: 500 })
+		const codeReader = new BrowserQRCodeReader(undefined, {
+			delayBetweenScanAttempts: 500,
+		})
 		let controlsRef: IScannerControls | null = null
 
-        if (!videoRef.current) {
-            return
-        }
-        codeReader.decodeFromConstraints(
-            {
-                video: {
-                    facingMode: "environment"
-                }
-            },
-            videoRef.current,
-            (result?: Result) => {
-                if (result) {
-                    onQRScan(result.toString())
-                }
-            },
-        ).then(controls => {
-            controlsRef = controls
-        })
+		if (!videoRef.current) {
+			return
+		}
+		codeReader
+			.decodeFromConstraints(
+				{
+					video: {
+						facingMode: 'environment',
+					},
+				},
+				videoRef.current,
+				(result?: Result) => {
+					if (result) {
+						onQRScan(result.toString())
+					}
+				},
+			)
+			.then((controls) => {
+				controlsRef = controls
+			})
 
 		return () => {
 			if (controlsRef) {
@@ -83,7 +64,6 @@ export function QRScanner({ onQRScan }: QRScannerProps) {
 	return (
 		<QRScannerContainer>
 			<QRScannerVideoElement ref={videoRef} />
-			<QRScannerOverlay />
 		</QRScannerContainer>
 	)
 }

@@ -5,31 +5,32 @@ import styled from 'styled-components'
 import { TransitionGroup } from 'react-transition-group'
 import { useTranslation } from 'next-i18next'
 import { Tabs } from '@ledgerhq/react-ui'
-import useInitialization from './hooks/useInitialization'
-import useWalletConnectEventsManager from './hooks/useWalletConnectEventsManager'
-import { pair } from './utils/WalletConnectUtil'
-import { Connect } from '../Connect'
+import useInitialization from './v2/hooks/useInitialization'
+import useWalletConnectEventsManager from './v2/hooks/useWalletConnectEventsManager'
+import { pair } from './v2/utils/WalletConnectUtil'
+import { Connect } from './Connect'
 import { NetworkConfig } from '@/types/types'
+import { ResponsiveContainer } from '@/styles/styles'
+import Sessions from './Sessions'
+import { web3wallet } from '@/components/WalletConnect/v2/utils/WalletConnectUtil'
 
 const WalletConnectContainer = styled.div`
 	display: flex;
 	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	position: relative;
 	width: 100%;
 	height: 100%;
 	user-select: none;
+	background: ${({ theme }) => theme.colors.background.main};
 `
 
 const WalletConnectInnerContainer = styled(TransitionGroup)`
 	display: flex;
 	flex-direction: column;
-	justify-content: center;
 	align-items: center;
+	justify-content: center;
 	width: 100%;
 	height: 100%;
-	background: ${({ theme }) => theme.colors.neutral.c20};
+	background: ${({ theme }) => theme.colors.background.main};
 `
 
 export type WalletConnectProps = {
@@ -42,7 +43,7 @@ export type WalletConnectProps = {
 	setUri: Dispatch<SetStateAction<string | undefined>>
 }
 
-export function WalletConnectV2({
+export default function Home({
 	platformSDK,
 	accounts,
 	initialMode,
@@ -55,6 +56,12 @@ export function WalletConnectV2({
 
 	const [inputValue, setInputValue] = useState<string>('')
 	const [errorValue, setErrorValue] = useState<string | undefined>(undefined)
+
+	const sessions = useMemo(
+		() =>
+			web3wallet ? Object.entries(web3wallet.getActiveSessions()) : [],
+		[web3wallet],
+	)
 
 	const handleConnect = useCallback(
 		async (inputValue: string) => {
@@ -82,24 +89,25 @@ export function WalletConnectV2({
 				title: t('connect.title'),
 				Component: (
 					<WalletConnectInnerContainer>
-						<Connect mode={initialMode} onConnect={handleConnect} />
+						<ResponsiveContainer>
+							<Connect
+								mode={initialMode}
+								onConnect={handleConnect}
+							/>
+						</ResponsiveContainer>
 					</WalletConnectInnerContainer>
 				),
 			},
 			{
 				index: 1,
 				title: t('sessions.title'),
-				badge: 2,
+				badge: sessions?.length || undefined,
 				Component: (
-					<div
-						style={{
-							width: '100%',
-							height: '100%',
-							backgroundColor: '#00f',
-						}}
-					>
-						This is the sessions component
-					</div>
+					<WalletConnectInnerContainer>
+						<ResponsiveContainer>
+							<Sessions sessions={sessions} />
+						</ResponsiveContainer>
+					</WalletConnectInnerContainer>
 				),
 			},
 		],
@@ -108,15 +116,7 @@ export function WalletConnectV2({
 
 	return (
 		<WalletConnectContainer>
-			<div
-				style={{
-					width: '100%',
-					height: '100%',
-					backgroundColor: '#f00',
-				}}
-			>
-				<Tabs tabs={TABS} />
-			</div>
+			{initialized ? <Tabs tabs={TABS} /> : null}
 		</WalletConnectContainer>
 	)
 }

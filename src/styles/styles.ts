@@ -1,3 +1,4 @@
+import { Flex } from '@ledgerhq/react-ui'
 import styled from 'styled-components'
 import { device } from './breakpoints'
 
@@ -38,14 +39,13 @@ export const Main = styled.main`
 	}
 `
 
-export const MainContainer = styled.div`
+export const ResponsiveContainer = styled.div`
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
 	width: 100%;
 	min-height: 100%;
-	margin: 0 auto;
 
 	@media ${device.tablet} {
 		max-width: 380px;

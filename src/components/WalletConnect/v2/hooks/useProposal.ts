@@ -132,7 +132,7 @@ export function useProposal({ proposal }: Props) {
 				id: proposal.id,
 				namespaces: createNamespaces(),
 			})
-			.then(() => navigate(routes.connect))
+			.then(() => navigate(routes.home))
 			.catch((error) => {
 				console.log(error)
 				navigate(routes.reject, error)

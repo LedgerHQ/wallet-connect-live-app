@@ -1,7 +1,8 @@
 import useNavigation from '@/components/WalletConnect/v2/hooks/useNavigation'
 import { Text } from '@ledgerhq/react-ui'
 import styled from 'styled-components'
-export { getServerSideProps } from '../../lib/serverProps'
+
+export { getServerSideProps } from '../lib/serverProps'
 
 const WalletConnectContainer = styled.div`
 	display: flex;

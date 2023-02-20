@@ -3,14 +3,14 @@ import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 
-import { Container, MainContainer } from '@/styles/styles'
+import { Container } from '@/styles/styles'
 import WalletConnect from '@/components/WalletConnect'
 import { NetworkConfig } from '@/types/types'
 import { SDKProvider } from 'src/shared/SDKProvider'
-import { Flex } from '@ledgerhq/react-ui'
-import { useTranslation } from 'next-i18next'
 
 export { getServerSideProps } from '../lib/serverProps'
+
+let initialParams: any
 
 const Index: NextPage = () => {
 	const router = useRouter()
@@ -22,8 +22,15 @@ const Index: NextPage = () => {
 		mode: rawInitialMode,
 	} = router.query
 
+	if (!initialParams) {
+		initialParams = rawParams
+	}
 	const params =
-		rawParams && typeof rawParams === 'string' ? JSON.parse(rawParams) : {}
+		rawParams && typeof rawParams === 'string'
+			? JSON.parse(rawParams)
+			: initialParams
+			? JSON.parse(initialParams)
+			: {}
 	const networkConfigs: NetworkConfig[] = params.networks
 
 	const uri = rawURI && typeof rawURI === 'string' ? rawURI : undefined
@@ -38,11 +45,11 @@ const Index: NextPage = () => {
 
 	const [isMounted, setMounted] = useState<boolean>(false)
 
-	const { t } = useTranslation()
-
 	useEffect(() => {
 		setMounted(true)
 	}, [])
+
+	console.log('NETWORKS', networkConfigs)
 
 	return (
 		<Container>
@@ -55,22 +62,16 @@ const Index: NextPage = () => {
 			</Head>
 			{isMounted ? (
 				<SDKProvider networks={networkConfigs}>
-					{(platformSDK, accounts) =>
-						accounts.length > 0 ? (
-							<MainContainer>
-								<WalletConnect
-									initialMode={initialMode}
-									initialAccountId={initialAccountId}
-									networks={networkConfigs}
-									initialURI={uri}
-									platformSDK={platformSDK}
-									accounts={accounts}
-								/>
-							</MainContainer>
-						) : (
-							<Flex>{t('account.needed')}</Flex>
-						)
-					}
+					{(platformSDK, accounts) => (
+						<WalletConnect
+							initialMode={initialMode}
+							initialAccountId={initialAccountId}
+							networks={networkConfigs}
+							initialURI={uri}
+							platformSDK={platformSDK}
+							accounts={accounts}
+						/>
+					)}
 				</SDKProvider>
 			) : null}
 		</Container>

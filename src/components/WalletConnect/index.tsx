@@ -1,10 +1,7 @@
 import { InputMode, NetworkConfig } from '@/types/types'
 import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
 import { useMemo, useState } from 'react'
-import { CSSTransition } from 'react-transition-group'
-import { WalletConnectV1 } from './v1'
-import { Connect } from './Connect'
-import { WalletConnectV2 } from './v2'
+import Home from './Home'
 import { useLedgerLive } from './v2/hooks/useLedgerLive'
 
 export type WalletConnectProps = {
@@ -32,36 +29,16 @@ export default function WalletConnect({
 	)
 	useLedgerLive(platformSDK, accounts, networks)
 
-	if (!uri) {
-		return (
-			<CSSTransition classNames="fade" timeout={200}>
-				<Connect mode={initialMode} onConnect={setUri} />
-			</CSSTransition>
-		)
-	}
-
-	if (uri?.includes('@1?')) {
-		return (
-			<WalletConnectV1
-				networks={networks}
-				initialURI={uri}
-				setUri={setUri}
-				accounts={accounts}
-				{...rest}
-				platformSDK={platformSDK}
-			/>
-		)
-	} else {
-		return (
-			<WalletConnectV2
-				initialMode={initialMode}
-				setUri={setUri}
-				networks={networks}
-				platformSDK={platformSDK}
-				accounts={accounts}
-				initialURI={uri}
-				{...rest}
-			/>
-		)
-	}
+	// if (uri?.includes('@1?'))
+	return (
+		<Home
+			initialMode={initialMode}
+			setUri={setUri}
+			networks={networks}
+			platformSDK={platformSDK}
+			accounts={accounts}
+			initialURI={uri}
+			{...rest}
+		/>
+	)
 }

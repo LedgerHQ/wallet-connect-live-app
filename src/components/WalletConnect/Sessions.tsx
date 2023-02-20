@@ -5,28 +5,25 @@ import {
 import { formatUrl } from '@/components/WalletConnect/v2/utils/HelperUtil'
 import { web3wallet } from '@/components/WalletConnect/v2/utils/WalletConnectUtil'
 import { Box, Button, Flex, Text } from '@ledgerhq/react-ui'
-import { useCallback, useMemo } from 'react'
+import { useCallback } from 'react'
 import Image from 'next/image'
 import useNavigation from '@/components/WalletConnect/v2/hooks/useNavigation'
 import {
 	ButtonsContainer,
 	List,
-	WalletConnectContainer,
 } from '@/components/WalletConnect/v2/components/Containers/util'
 import { useTranslation } from 'next-i18next'
 import { WalletConnectPopin } from '@/components/WalletConnect/v2/components/Popin/WalletConnectPopin'
 import useWalletConnectPopin from '@/components/WalletConnect/v2/hooks/useWalletConnectPopin'
-export { getServerSideProps } from '../../lib/serverProps'
 
-export default function Connect() {
+export type SessionsProps = {
+	sessions: any
+}
+
+export default function Sessions({ sessions }: SessionsProps) {
 	const { t } = useTranslation()
 	const { navigate, routes } = useNavigation()
 	const { openModal, closeModal, isModalOpen } = useWalletConnectPopin()
-
-	const sessions = useMemo(
-		() => Object.entries(web3wallet.getActiveSessions()),
-		[web3wallet.getActiveSessions()],
-	)
 
 	const goToDetailSession = useCallback((topic: string) => {
 		navigate(routes.sessionDetails, topic)
@@ -47,18 +44,7 @@ export default function Connect() {
 	}, [])
 
 	return (
-		<WalletConnectContainer>
-			<Flex
-				flexDirection="column"
-				alignItems="center"
-				justifyContent="center"
-				mb={4}
-			>
-				<Text variant="h1" mb={4} flex={1}>
-					Connected
-				</Text>
-				<Text>Active Sessions : {sessions.length}</Text>
-			</Flex>
+		<Flex flexDirection="column" width="100%" height="100%" mt={6}>
 			<List>
 				{sessions.map(([key, value]) => (
 					<Box key={key} mt={3}>
@@ -136,6 +122,6 @@ export default function Connect() {
 					</ButtonsContainer>
 				</Flex>
 			</WalletConnectPopin>
-		</WalletConnectContainer>
+		</Flex>
 	)
 }

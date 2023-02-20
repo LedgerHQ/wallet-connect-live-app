@@ -17,7 +17,9 @@
 	"connect": {
 		"title": "Connect",
 		"cta": "Connect",
-		"scanQRCode": "Scan a QRCode to connect",
+		"scanQRCode": "Scan QR code",
+		"useWalletConnectUrl": "Or use a WalletConnect URL",
+		"pasteUrl": "Paste URL",
 		"copyURI": "Copy an URI to connect",
 		"switchToText": "Switch to Text",
 		"switchToScanner": "Switch to Scanner",
@@ -25,11 +27,6 @@
 		"cancel": "Cancel",
 		"accept": "Accept",
 		"decline": "Decline"
-	},
-	"sessions": {
-		"title": "Sessions",
-		"connected": "connected to [{{appName}}]",
-		"connecting": "[{{appName}}] is trying to connect"
 	},
 	"sessionProposal": {
 		"connectTo": "Connect to {{name}}",
@@ -49,7 +46,8 @@
 		},
 		"addAccount": "Add account"
 	},
-	"sessions":{
+	"sessions": {
+		"title": "Sessions",
 		"disconnectAll": "Disconnect All",
 		"modal": {
 			"title": "Do you really want to disconnect all your sessions?",
@@ -59,6 +57,7 @@
 		},
 		"detail":{
 			"title": "Session details",
+			"accounts": "Accounts",
 			"connected": "Connected",
 			"expires": "Expires",
 			"disconnect": "Disconnect"
