@@ -48,10 +48,10 @@ export const ResponsiveContainer = styled.div`
 	min-height: 100%;
 
 	@media ${device.tablet} {
-		max-width: 380px;
+		max-width: 465px;
 	}
 	@media ${device.desktop} {
-		max-width: 425px;
+		max-width: 465px;
 	}
 `
 

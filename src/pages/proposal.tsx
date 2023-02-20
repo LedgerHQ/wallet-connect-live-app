@@ -5,6 +5,7 @@ import { Proposal } from '@/types/types'
 import {
 	formatUrl,
 	getTicker,
+	truncate,
 } from '@/components/WalletConnect/v2/utils/HelperUtil'
 import { useTranslation } from 'next-i18next'
 import LogoContainer from '@/components/WalletConnect/v2/components/LogoContainers/LedgerLogoContainer'
@@ -242,9 +243,10 @@ export default function SessionProposal() {
 																		title={
 																			account.name
 																		}
-																		subtitle={
-																			account.address
-																		}
+																		subtitle={truncate(
+																			account.address,
+																			30,
+																		)}
 																		isSelected={selectedAccounts.includes(
 																			account.address,
 																		)}

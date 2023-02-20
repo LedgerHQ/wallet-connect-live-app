@@ -2,6 +2,7 @@ import {
 	formatChainName,
 	formatUrl,
 	getTicker,
+	truncate,
 } from '@/components/WalletConnect/v2/utils/HelperUtil'
 import { web3wallet } from '@/components/WalletConnect/v2/utils/WalletConnectUtil'
 import { Box, Button, CryptoIcon, Flex, Text } from '@ledgerhq/react-ui'
@@ -104,6 +105,8 @@ export default function SessionDetail() {
 		>
 			<ResponsiveContainer>
 				<Flex
+					width="100%"
+					height="100%"
 					flex={1}
 					flexDirection="column"
 					alignItems="center"
@@ -241,9 +244,10 @@ export default function SessionDetail() {
 													>
 														<GenericRow
 															title={account.name}
-															subtitle={
-																account.address
-															}
+															subtitle={truncate(
+																account.address,
+																30,
+															)}
 															LeftIcon={
 																<CryptoIcon
 																	name={getTicker(
