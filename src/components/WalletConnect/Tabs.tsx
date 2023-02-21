@@ -76,6 +76,7 @@ const HeaderElement = forwardRef<HTMLDivElement, HeaderElementProps>(
 		)
 	},
 )
+HeaderElement.displayName = 'HeaderElement'
 
 const HeaderBottomBar = styled.div<HeaderBottomBarProps>`
 	position: relative;
@@ -124,7 +125,12 @@ export default function Tabs({
 
 	return (
 		<>
-			<Flex flexDirection="column" justifyContent="center" width="100%">
+			<Flex
+				flexDirection="column"
+				justifyContent="center"
+				width="100%"
+				height={56}
+			>
 				<Flex flex={1} width="100%" alignItems="center">
 					{tabs.map((tab, i) => (
 						<HeaderElement
