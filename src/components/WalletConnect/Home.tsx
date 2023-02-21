@@ -115,7 +115,7 @@ export default function Home({
 			{
 				index: SESSIONS_TAB_INDEX,
 				title: t('sessions.title'),
-				badge: sessions?.length || 12,
+				badge: sessions?.length || undefined,
 				Component: (
 					<WalletConnectInnerContainer>
 						<ResponsiveContainer>
