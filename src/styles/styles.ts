@@ -1,4 +1,3 @@
-import { Flex } from '@ledgerhq/react-ui'
 import styled from 'styled-components'
 import { device } from './breakpoints'
 

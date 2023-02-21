@@ -1,12 +1,5 @@
 import { InputMode } from '@/types/types'
-import {
-	useCallback,
-	useState,
-	Dispatch,
-	SetStateAction,
-	useMemo,
-	useEffect,
-} from 'react'
+import { useCallback, useState, Dispatch, SetStateAction, useMemo } from 'react'
 import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
 import styled from 'styled-components'
 import { TransitionGroup } from 'react-transition-group'
@@ -57,8 +50,9 @@ const SESSIONS_TAB_INDEX = 1
 
 export default function Home({
 	platformSDK,
-	accounts,
 	initialMode,
+	accounts,
+	networks,
 	setUri,
 }: WalletConnectProps) {
 	const initialized = useInitialization()

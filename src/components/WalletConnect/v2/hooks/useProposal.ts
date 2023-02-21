@@ -3,13 +3,15 @@ import { Account } from '@ledgerhq/live-app-sdk'
 import { SessionTypes } from '@walletconnect/types'
 
 import router from 'next/router'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { EIP155_SIGNING_METHODS } from '../data/EIP155Data'
 import { formatChainName } from '../utils/HelperUtil'
 import { web3wallet } from '../utils/WalletConnectUtil'
 import useNavigation from './useNavigation'
-import { accounts, networks, platformSDK } from './useLedgerLive'
+import { platformSDK } from './useLedgerLive'
 import { sessionSelector, useSessionsStore } from 'src/store/Sessions.store'
+import { accountSelector, useAccountsStore } from 'src/store/Accounts.store'
+import { useAppStore, appSelector } from 'src/store/App.store'
 
 type Props = {
 	proposal: Proposal
@@ -29,17 +31,14 @@ const getNamespace = (chain: string) => {
 
 export function useProposal({ proposal }: Props) {
 	const { navigate, routes } = useNavigation()
+	const networks = useAppStore(appSelector.selectNetworks)
 	const addSession = useSessionsStore(sessionSelector.addSession)
-
-	const [accountsLocal, setAccounts] = useState<Account[]>([])
+	const accounts = useAccountsStore(accountSelector.selectAccounts)
+	const addAccount = useAccountsStore(accountSelector.addAccount)
 
 	const [selectedAccounts, setSelectedAccounts] = useState<string[]>([])
 
 	const proposer = proposal.params.proposer
-
-	useEffect(() => {
-		setAccounts(accounts)
-	}, [])
 
 	const handleClick = useCallback(
 		(account: string) => {
@@ -88,7 +87,7 @@ export function useProposal({ proposal }: Props) {
 	const createNamespaces = (): Record<string, SessionTypes.BaseNamespace> => {
 		const accountsByChain = formatAccountsByChain(
 			proposal,
-			accountsLocal,
+			accounts,
 		).filter((a) => a.accounts.length > 0 && a.isSupported)
 		const hasETH = accountsByChain.find((acc) => acc.chain === 'ethereum')
 		const hasPolygon = accountsByChain.find(
@@ -160,8 +159,7 @@ export function useProposal({ proposal }: Props) {
 			const newAccount = await platformSDK.requestAccount({
 				currencies: [currency],
 			})
-
-			setAccounts([...accountsLocal, newAccount])
+			addAccount(newAccount)
 		} catch (error) {
 			console.log('request account canceled by user')
 		}

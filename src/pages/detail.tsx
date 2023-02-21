@@ -14,7 +14,6 @@ import { useTranslation } from 'next-i18next'
 import useNavigation from '@/components/WalletConnect/v2/hooks/useNavigation'
 import Link from 'next/link'
 import { Account } from '@ledgerhq/live-app-sdk'
-import { accounts } from '@/components/WalletConnect/v2/hooks/useLedgerLive'
 import {
 	GenericRow,
 	RowType,
@@ -27,6 +26,7 @@ import {
 } from '@/components/WalletConnect/v2/components/Containers/util'
 import { ResponsiveContainer } from '@/styles/styles'
 import { sessionSelector, useSessionsStore } from 'src/store/Sessions.store'
+import { useAccountsStore, accountSelector } from 'src/store/Accounts.store'
 
 export { getServerSideProps } from '../lib/serverProps'
 
@@ -40,6 +40,7 @@ export default function SessionDetail() {
 	const { t } = useTranslation()
 	const { router, routes, navigate } = useNavigation()
 
+	const accounts = useAccountsStore(accountSelector.selectAccounts)
 	const sessions = useSessionsStore(sessionSelector.selectSessions)
 	const removeSession = useSessionsStore(sessionSelector.removeSession)
 

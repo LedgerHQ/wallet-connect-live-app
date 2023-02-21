@@ -31,7 +31,7 @@ const Index: NextPage = () => {
 			: initialParams
 			? JSON.parse(initialParams)
 			: {}
-	const networkConfigs: NetworkConfig[] = params.networks
+	const networkConfigs: NetworkConfig[] = params.networks ?? []
 
 	const uri = rawURI && typeof rawURI === 'string' ? rawURI : undefined
 	const initialAccountId =

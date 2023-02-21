@@ -28,8 +28,8 @@ const useAccountsStore = create<AccountsState>()(
 const accountSelector = {
 	selectAccounts: (state: AccountsState): Account[] => state.accounts,
 	addAccounts: (state: AccountsState) => state.addAccounts,
+	addAccount: (state: AccountsState) => state.addAccount,
 	clearAccounts: (state: AccountsState) => state.clearAccounts,
 }
 
 export { useAccountsStore, accountSelector }
-export type { Account }
