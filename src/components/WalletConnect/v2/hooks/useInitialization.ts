@@ -18,11 +18,7 @@ export default function useInitialization() {
 			clearSessions()
 			await createWeb3Wallet(relayerRegionURL)
 
-			addSessions(
-				Object.entries(web3wallet.getActiveSessions()).map(
-					([, value]) => value,
-				),
-			)
+			addSessions(Object.values(web3wallet.getActiveSessions()))
 
 			setInitialized(true)
 		} catch (err: unknown) {
