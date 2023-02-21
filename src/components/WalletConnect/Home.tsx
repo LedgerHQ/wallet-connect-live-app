@@ -4,7 +4,6 @@ import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
 import styled from 'styled-components'
 import { TransitionGroup } from 'react-transition-group'
 import { useTranslation } from 'next-i18next'
-import { Tabs } from '@ledgerhq/react-ui'
 import useInitialization from './v2/hooks/useInitialization'
 import useWalletConnectEventsManager from './v2/hooks/useWalletConnectEventsManager'
 import { pair } from './v2/utils/WalletConnectUtil'
@@ -12,7 +11,9 @@ import { Connect } from './Connect'
 import { NetworkConfig } from '@/types/types'
 import { ResponsiveContainer } from '@/styles/styles'
 import Sessions from './Sessions'
+import Tabs from './Tabs'
 import { web3wallet } from '@/components/WalletConnect/v2/utils/WalletConnectUtil'
+import { Flex } from '@ledgerhq/react-ui'
 
 const WalletConnectContainer = styled.div`
 	display: flex;
@@ -114,7 +115,7 @@ export default function Home({
 			{
 				index: SESSIONS_TAB_INDEX,
 				title: t('sessions.title'),
-				badge: sessions?.length || undefined,
+				badge: sessions?.length || 12,
 				Component: (
 					<WalletConnectInnerContainer>
 						<ResponsiveContainer>
@@ -135,9 +136,18 @@ export default function Home({
 			{initialized ? (
 				<Tabs
 					tabs={TABS}
-					activeIndex={activeTabIndex}
-					onTabChange={setActiveTabIndex}
-				/>
+					activeTabIndex={activeTabIndex}
+					setActiveTabIndex={setActiveTabIndex}
+				>
+					<Flex
+						flex={1}
+						width="100%"
+						height="100%"
+						bg="background.main"
+					>
+						{TABS[activeTabIndex].Component}
+					</Flex>
+				</Tabs>
 			) : null}
 		</WalletConnectContainer>
 	)
