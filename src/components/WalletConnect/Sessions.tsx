@@ -3,7 +3,6 @@ import {
 	RowType,
 } from '@/components/WalletConnect/v2/components/GenericRow'
 import { formatUrl } from '@/components/WalletConnect/v2/utils/HelperUtil'
-import { web3wallet } from '@/components/WalletConnect/v2/utils/WalletConnectUtil'
 import { Box, Button, Flex, Text } from '@ledgerhq/react-ui'
 import { useCallback } from 'react'
 import Image from 'next/image'
@@ -15,9 +14,15 @@ import {
 import { useTranslation } from 'next-i18next'
 import { WalletConnectPopin } from '@/components/WalletConnect/v2/components/Popin/WalletConnectPopin'
 import useWalletConnectPopin from '@/components/WalletConnect/v2/hooks/useWalletConnectPopin'
+import {
+	Session,
+	sessionSelector,
+	useSessionsStore,
+} from 'src/store/Sessions.store'
+import { web3wallet } from './v2/utils/WalletConnectUtil'
 
 export type SessionsProps = {
-	sessions: any
+	sessions: Session[]
 	goToConnect: () => void
 }
 
@@ -25,22 +30,22 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 	const { t } = useTranslation()
 	const { navigate, routes } = useNavigation()
 	const { openModal, closeModal, isModalOpen } = useWalletConnectPopin()
-
+	const clearSessions = useSessionsStore(sessionSelector.clearSessions)
 	const goToDetailSession = useCallback((topic: string) => {
 		navigate(routes.sessionDetails, topic)
 	}, [])
 
 	const disconnect = useCallback(() => {
-		sessions.forEach(async ([, value]) => {
+		sessions.forEach(async (session) => {
 			await web3wallet.disconnectSession({
-				topic: value.topic,
+				topic: session.topic,
 				reason: {
 					code: 3,
 					message: 'Disconnect Session',
 				},
 			})
 		})
-
+		clearSessions()
 		closeModal()
 	}, [])
 
@@ -86,15 +91,15 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 	return (
 		<Flex flexDirection="column" width="100%" height="100%" mt={6}>
 			<List>
-				{sessions.map(([key, value]) => (
-					<Box key={key} mt={3}>
+				{sessions.map((session) => (
+					<Box key={session.topic} mt={3}>
 						<GenericRow
-							key={key}
-							title={value.peer.metadata.name}
-							subtitle={formatUrl(value.peer.metadata.url)}
+							key={session.topic}
+							title={session.peer.metadata.name}
+							subtitle={formatUrl(session.peer.metadata.url)}
 							LeftIcon={
 								<Image
-									src={value.peer.metadata.icons[0]}
+									src={session.peer.metadata.icons[0]}
 									alt="Picture of the proposer"
 									width={32}
 									style={{
@@ -104,7 +109,7 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 								/>
 							}
 							rowType={RowType.Detail}
-							onClick={() => goToDetailSession(value.topic)}
+							onClick={() => goToDetailSession(session.topic)}
 						/>
 					</Box>
 				))}

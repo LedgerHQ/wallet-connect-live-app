@@ -27,7 +27,6 @@ import {
 	List,
 } from '@/components/WalletConnect/v2/components/Containers/util'
 import { ResponsiveContainer } from '@/styles/styles'
-
 export { getServerSideProps } from '../lib/serverProps'
 
 const DAppContainer = styled(Flex).attrs(
@@ -66,6 +65,7 @@ export default function SessionProposal() {
 	const { colors } = useTheme()
 	const { router } = useNavigation()
 	const { t } = useTranslation()
+
 	const proposal = JSON.parse(router.query.data as string) as Proposal
 	const {
 		handleClick,

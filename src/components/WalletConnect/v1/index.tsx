@@ -1,4 +1,3 @@
-import { NetworkConfig } from '@/types/types'
 import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
 import { Text, GlitchText } from '@ledgerhq/react-ui'
 
@@ -24,6 +23,7 @@ import { InfoConnectionAlert } from '../../alerts/InfoConnection'
 import { Connected } from './Connected'
 import { PendingConnection } from './PendingConnection'
 import { PendingRequest } from './PendingRequest'
+import { useAppStore, appSelector } from 'src/store/App.store'
 
 const pulseAnimationLight = keyframes`
 	0% {
@@ -138,7 +138,6 @@ const getInitialState = (
 export type WalletConnectProps = {
 	initialAccountId?: string
 	initialURI?: string
-	networks: NetworkConfig[]
 	platformSDK: LedgerLivePlarformSDK
 	accounts: Account[]
 	setUri: Dispatch<SetStateAction<string | undefined>>
@@ -147,13 +146,13 @@ export type WalletConnectProps = {
 export function WalletConnectV1({
 	initialAccountId,
 	initialURI,
-	networks = [],
 	platformSDK,
 	accounts,
 	setUri,
 }: WalletConnectProps) {
 	const selectedAccountRef = useRef<Account>()
 	const wcRef = useRef<WalletConnectClient>()
+	const networks = useAppStore(appSelector.selectNetworks)
 
 	const [{ session, selectedAccount, timedOut }, setState] =
 		useState<WalletConnectState>(

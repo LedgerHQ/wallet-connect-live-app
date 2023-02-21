@@ -7,8 +7,9 @@ import { Web3WalletTypes } from '@walletconnect/web3wallet'
 import useNavigation from '../hooks/useNavigation'
 import { hasETHAddress } from '@/helpers/generic'
 import { stripHexPrefix } from '@/utils/currencyFormatter/helpers'
-import { accounts, platformSDK } from './useLedgerLive'
+import { platformSDK } from './useLedgerLive'
 import { convertEthToLiveTX } from '@/helpers/converters'
+import { accountSelector, useAccountsStore } from 'src/store/Accounts.store'
 
 enum Errors {
 	userDecline = 'User rejected',
@@ -18,7 +19,7 @@ enum Errors {
 
 export default function useWalletConnectEventsManager(initialized: boolean) {
 	const { navigate, routes } = useNavigation()
-
+	const accounts = useAccountsStore(accountSelector.selectAccounts)
 	/******************************************************************************
 	 * 1. Open session proposal modal for confirmation / rejection
 	 *****************************************************************************/
