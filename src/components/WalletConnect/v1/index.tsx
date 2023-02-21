@@ -555,12 +555,12 @@ export function WalletConnectV1({
 										delay={0}
 										text={
 											session.connected
-												? t('session.connected', {
+												? t('sessions.connected', {
 														appName:
 															session.peerMeta
 																.name,
 												  })
-												: t('session.connecting', {
+												: t('sessions.connecting', {
 														appName:
 															session.peerMeta
 																.name,

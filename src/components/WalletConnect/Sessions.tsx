@@ -5,28 +5,26 @@ import {
 import { formatUrl } from '@/components/WalletConnect/v2/utils/HelperUtil'
 import { web3wallet } from '@/components/WalletConnect/v2/utils/WalletConnectUtil'
 import { Box, Button, Flex, Text } from '@ledgerhq/react-ui'
-import { useCallback, useMemo } from 'react'
+import { useCallback } from 'react'
 import Image from 'next/image'
 import useNavigation from '@/components/WalletConnect/v2/hooks/useNavigation'
 import {
 	ButtonsContainer,
 	List,
-	WalletConnectContainer,
 } from '@/components/WalletConnect/v2/components/Containers/util'
 import { useTranslation } from 'next-i18next'
 import { WalletConnectPopin } from '@/components/WalletConnect/v2/components/Popin/WalletConnectPopin'
 import useWalletConnectPopin from '@/components/WalletConnect/v2/hooks/useWalletConnectPopin'
-export { getServerSideProps } from '../../lib/serverProps'
 
-export default function Connect() {
+export type SessionsProps = {
+	sessions: any
+	goToConnect: () => void
+}
+
+export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 	const { t } = useTranslation()
 	const { navigate, routes } = useNavigation()
 	const { openModal, closeModal, isModalOpen } = useWalletConnectPopin()
-
-	const sessions = useMemo(
-		() => Object.entries(web3wallet.getActiveSessions()),
-		[web3wallet.getActiveSessions()],
-	)
 
 	const goToDetailSession = useCallback((topic: string) => {
 		navigate(routes.sessionDetails, topic)
@@ -46,19 +44,47 @@ export default function Connect() {
 		closeModal()
 	}, [])
 
-	return (
-		<WalletConnectContainer>
+	if (!sessions || !sessions.length || sessions.length === 0) {
+		return (
 			<Flex
 				flexDirection="column"
+				width="100%"
+				height="100%"
 				alignItems="center"
 				justifyContent="center"
-				mb={4}
+				my={6}
 			>
-				<Text variant="h1" mb={4} flex={1}>
-					Connected
+				<Text variant="h2" fontWeight="medium">
+					{t('sessions.emptyState.title')}
 				</Text>
-				<Text>Active Sessions : {sessions.length}</Text>
+				<Text
+					variant="bodyLineHeight"
+					fontWeight="medium"
+					color="neutral.c80"
+					mt={6}
+				>
+					{t('sessions.emptyState.desc')}
+				</Text>
+				<Button
+					variant="main"
+					size="large"
+					mt={10}
+					onClick={goToConnect}
+				>
+					<Text
+						variant="body"
+						fontWeight="semiBold"
+						color="neutral.c00"
+					>
+						{t('sessions.emptyState.goToConnect')}
+					</Text>
+				</Button>
 			</Flex>
+		)
+	}
+
+	return (
+		<Flex flexDirection="column" width="100%" height="100%" mt={6}>
 			<List>
 				{sessions.map(([key, value]) => (
 					<Box key={key} mt={3}>
@@ -84,19 +110,17 @@ export default function Connect() {
 				))}
 			</List>
 
-			{sessions.length > 0 && (
-				<ButtonsContainer mt={4}>
-					<Button variant="shade" flex={1} onClick={openModal}>
-						<Text
-							variant="body"
-							fontWeight="semiBold"
-							color="neutral.c100"
-						>
-							{t('sessions.disconnectAll')}
-						</Text>
-					</Button>
-				</ButtonsContainer>
-			)}
+			<ButtonsContainer mt={4}>
+				<Button variant="shade" flex={1} onClick={openModal}>
+					<Text
+						variant="body"
+						fontWeight="semiBold"
+						color="neutral.c100"
+					>
+						{t('sessions.disconnectAll')}
+					</Text>
+				</Button>
+			</ButtonsContainer>
 
 			<WalletConnectPopin isOpen={isModalOpen} onClose={closeModal}>
 				<Flex flexDirection="column">
@@ -120,7 +144,7 @@ export default function Connect() {
 								fontWeight="semiBold"
 								color="neutral.c100"
 							>
-								{t('sessions.modal.reject')}
+								{t('sessions.modal.cancel')}
 							</Text>
 						</Button>
 
@@ -136,6 +160,6 @@ export default function Connect() {
 					</ButtonsContainer>
 				</Flex>
 			</WalletConnectPopin>
-		</WalletConnectContainer>
+		</Flex>
 	)
 }

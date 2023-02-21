@@ -936,10 +936,15 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
-"@ledgerhq/icons-ui@^0.2.5":
-  version "0.2.7"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/icons-ui/-/icons-ui-0.2.7.tgz#632efc5d0e87c0443fc1f8696a2118a83832fca0"
-  integrity sha512-qc5pYZMWGaNZz1YPJHTQCm0ePBsJNnZgEg+WkpGJs3dDQXI5OWSUM0mEVguS7JdiR0galyVbHxdJkCytawjEuw==
+"@ledgerhq/crypto-icons-ui@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/crypto-icons-ui/-/crypto-icons-ui-0.2.1.tgz#8915a5b486f6da3f0b9d62089e39e79a8f754b44"
+  integrity sha512-zM2zhJgdHCjpvkq1tHWXoPjUysurpT3M0qeEBHzAIoHMu5hY48UIajiM9H8yZvktvtadwh0bwYYSC4K5mt+tqA==
+
+"@ledgerhq/icons-ui@^0.3.4":
+  version "0.3.4"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/icons-ui/-/icons-ui-0.3.4.tgz#8af36e08de9c8501be4589e738d279720162f68e"
+  integrity sha512-3mhOCUzKFweuqjqHNJhrEx/OLEDKNhpSP0Vrf6r9eq+HNR7hhVsPOVoJSZNww2fzqCUU1L9hdJW3ICEFr5w/8Q==
 
 "@ledgerhq/live-app-sdk@0.8.1":
   version "0.8.1"
@@ -949,14 +954,15 @@
     bignumber.js "^9.0.2"
     json-rpc-2.0 "^1.1.0"
 
-"@ledgerhq/react-ui@^0.7.6":
-  version "0.7.8"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/react-ui/-/react-ui-0.7.8.tgz#0569a3bfeab4e337f5c597c36ffd600ea1ca94bf"
-  integrity sha512-mP7LZ+WrZtqV1wmno6M8J2yULpCv2CM9Or7aRPTLem7BJ3kpyOpuxKyOpOD4ta2PCJg2xrGhgG8bLUNw6cSdNw==
+"@ledgerhq/react-ui@^0.10.4":
+  version "0.10.5"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/react-ui/-/react-ui-0.10.5.tgz#d03e67cbde37f7ff7fc5cc964bc817619d720081"
+  integrity sha512-yAR49bdmnGQg1DZgnoZXX7zRG2VtVEQ/sDI2BzhTmmRbxbwvRtBR4aULJ7KS7aZp3bKcAK84DhMMSq6drpp6Sg==
   dependencies:
     "@floating-ui/react-dom" "^0.4.0"
-    "@ledgerhq/icons-ui" "^0.2.5"
-    "@ledgerhq/ui-shared" "^0.1.9"
+    "@ledgerhq/crypto-icons-ui" "^0.2.1"
+    "@ledgerhq/icons-ui" "^0.3.4"
+    "@ledgerhq/ui-shared" "^0.1.10"
     "@tippyjs/react" "^4.2.6"
     "@types/color" "^3.0.2"
     "@types/react" "~17.0.37"
@@ -976,7 +982,7 @@
     react-window "^1.8.6"
     styled-system "^5.1.5"
 
-"@ledgerhq/ui-shared@^0.1.9":
+"@ledgerhq/ui-shared@^0.1.10":
   version "0.1.10"
   resolved "https://registry.yarnpkg.com/@ledgerhq/ui-shared/-/ui-shared-0.1.10.tgz#702263ea33d7385f86a5cc714dbf3c35fe96af7a"
   integrity sha512-QDqNB6c9f4KUV6x5mfQ36r8T5Kd6ud2UBg/G6VtZsWK9MEolXHj1REscL5i2ssSk96bDOrwTZG13xdSXxaV7IA==
