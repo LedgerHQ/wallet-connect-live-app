@@ -1,5 +1,12 @@
 import { InputMode } from '@/types/types'
-import { useCallback, useState, Dispatch, SetStateAction, useMemo } from 'react'
+import {
+	useCallback,
+	useState,
+	Dispatch,
+	SetStateAction,
+	useMemo,
+	useEffect,
+} from 'react'
 import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
 import styled from 'styled-components'
 import { TransitionGroup } from 'react-transition-group'
@@ -12,8 +19,8 @@ import { NetworkConfig } from '@/types/types'
 import { ResponsiveContainer } from '@/styles/styles'
 import Sessions from './Sessions'
 import Tabs from './Tabs'
-import { web3wallet } from '@/components/WalletConnect/v2/utils/WalletConnectUtil'
 import { Flex } from '@ledgerhq/react-ui'
+import { sessionSelector, useSessionsStore } from 'src/store/Sessions.store'
 
 const WalletConnectContainer = styled.div`
 	display: flex;
@@ -45,6 +52,9 @@ export type WalletConnectProps = {
 	setUri: Dispatch<SetStateAction<string | undefined>>
 }
 
+const CONNECT_TAB_INDEX = 0
+const SESSIONS_TAB_INDEX = 1
+
 export default function Home({
 	platformSDK,
 	accounts,
@@ -54,19 +64,13 @@ export default function Home({
 	const initialized = useInitialization()
 	useWalletConnectEventsManager(initialized)
 
+	const sessions = useSessionsStore(sessionSelector.selectSessions)
+
 	const { t } = useTranslation()
 
-	const CONNECT_TAB_INDEX = 0
-	const SESSIONS_TAB_INDEX = 1
 	const [activeTabIndex, setActiveTabIndex] = useState(CONNECT_TAB_INDEX)
 	const [inputValue, setInputValue] = useState<string>('')
 	const [errorValue, setErrorValue] = useState<string | undefined>(undefined)
-
-	const sessions = useMemo(
-		() =>
-			web3wallet ? Object.entries(web3wallet.getActiveSessions()) : [],
-		[web3wallet],
-	)
 
 	const handleConnect = useCallback(
 		async (inputValue: string) => {
@@ -128,7 +132,7 @@ export default function Home({
 				),
 			},
 		],
-		[t],
+		[t, sessions],
 	)
 
 	return (

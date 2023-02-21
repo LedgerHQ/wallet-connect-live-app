@@ -26,6 +26,7 @@ import {
 	Row,
 } from '@/components/WalletConnect/v2/components/Containers/util'
 import { ResponsiveContainer } from '@/styles/styles'
+import { sessionSelector, useSessionsStore } from 'src/store/Sessions.store'
 
 export { getServerSideProps } from '../lib/serverProps'
 
@@ -37,11 +38,14 @@ const DetailContainer = styled(Flex)`
 `
 export default function SessionDetail() {
 	const { t } = useTranslation()
-	const { router, routes } = useNavigation()
+	const { router, routes, navigate } = useNavigation()
 
-	const session = Object.entries(web3wallet.getActiveSessions()).find(
-		([key]) => key === JSON.parse(String(router.query?.data)),
-	)?.[1]
+	const sessions = useSessionsStore(sessionSelector.selectSessions)
+	const removeSession = useSessionsStore(sessionSelector.removeSession)
+
+	const session = sessions.find(
+		(elem) => elem.topic === JSON.parse(String(router.query?.data)),
+	)
 
 	const handleDelete = useCallback(async () => {
 		if (!session) return
@@ -52,6 +56,8 @@ export default function SessionDetail() {
 				message: 'Disconnect Session',
 			},
 		})
+		removeSession(session.topic)
+		navigate(routes.home)
 	}, [session])
 
 	const metadata = session?.peer.metadata

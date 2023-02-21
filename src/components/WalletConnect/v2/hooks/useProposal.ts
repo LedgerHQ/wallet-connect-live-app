@@ -9,6 +9,7 @@ import { formatChainName } from '../utils/HelperUtil'
 import { web3wallet } from '../utils/WalletConnectUtil'
 import useNavigation from './useNavigation'
 import { accounts, networks, platformSDK } from './useLedgerLive'
+import { sessionSelector, useSessionsStore } from 'src/store/Sessions.store'
 
 type Props = {
 	proposal: Proposal
@@ -28,6 +29,7 @@ const getNamespace = (chain: string) => {
 
 export function useProposal({ proposal }: Props) {
 	const { navigate, routes } = useNavigation()
+	const addSession = useSessionsStore(sessionSelector.addSession)
 
 	const [accountsLocal, setAccounts] = useState<Account[]>([])
 
@@ -132,7 +134,10 @@ export function useProposal({ proposal }: Props) {
 				id: proposal.id,
 				namespaces: createNamespaces(),
 			})
-			.then(() => navigate(routes.home))
+			.then((res) => {
+				addSession(res)
+				navigate(routes.home)
+			})
 			.catch((error) => {
 				console.log(error)
 				navigate(routes.reject, error)

@@ -1,7 +1,6 @@
 import { Flex, Text, Checkbox } from '@ledgerhq/react-ui'
 import { ChevronRightMedium } from '@ledgerhq/react-ui/assets/icons'
 import styled from 'styled-components'
-import { truncate } from '../utils/HelperUtil'
 
 type Props = {
 	title: string
