@@ -151,7 +151,7 @@ export function useProposal({ proposal }: Props) {
 				message: 'USER_REJECTED_METHODS',
 			},
 		})
-		navigate(routes.reject)
+		navigate(routes.home)
 	}, [])
 
 	const addNewAccount = useCallback(async (currency: string) => {
