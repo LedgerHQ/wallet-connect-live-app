@@ -125,7 +125,12 @@ export function Connect({ onConnect, mode }: ConnectProps) {
 	)
 
 	return (
-		<Flex flexDirection="column" width="100%" height="100%">
+		<Flex
+			flexDirection="column"
+			width="100%"
+			height="100%"
+			justifyContent="space-between"
+		>
 			<Flex justifyContent="center" width="100%" my={14}>
 				<QRScannerContainer>
 					{scanner ? (
