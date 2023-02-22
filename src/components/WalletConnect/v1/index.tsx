@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
 import { Text } from '@ledgerhq/react-ui'
 
@@ -5,7 +6,6 @@ import { convertEthToLiveTX } from '@/helpers/converters'
 import { compareETHAddresses } from '@/helpers/generic'
 import { stripHexPrefix } from '@/utils/currencyFormatter/helpers'
 import WalletConnectClient from '@walletconnect/client'
-import { IJsonRpcRequest, IWalletConnectSession } from '@walletconnect/types'
 import { useTranslation } from 'next-i18next'
 import Image from 'next/image'
 import {
@@ -108,7 +108,7 @@ const BannerContainer = styled(TransitionGroup)`
 `
 
 type WalletConnectState = {
-	session: IWalletConnectSession | null
+	session: any | null
 	timedOut: boolean
 	selectedAccount?: Account
 }
@@ -202,10 +202,7 @@ export function WalletConnectV1({
 	}, [])
 
 	const createClient = useCallback(
-		async (params: {
-			uri?: string
-			session?: IWalletConnectSession
-		}): Promise<void> => {
+		async (params: { uri?: string; session?: any }): Promise<void> => {
 			if (wcRef.current) {
 				await wcRef.current.killSession()
 			}
@@ -258,7 +255,7 @@ export function WalletConnectV1({
 				console.log('error', { error })
 			})
 
-			wc.on('call_request', async (error, payload: IJsonRpcRequest) => {
+			wc.on('call_request', async (error, payload: any) => {
 				console.log('call_request', { error, payload })
 				if (error) {
 				}

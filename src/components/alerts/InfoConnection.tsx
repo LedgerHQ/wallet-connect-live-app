@@ -1,9 +1,9 @@
-import { IClientMeta } from '@walletconnect/types'
 import { Alert, Text } from '@ledgerhq/react-ui'
 import { useTranslation } from 'next-i18next'
 
 type InfoConnectionAlertProps = {
-	peerMeta: IClientMeta
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	peerMeta: any
 }
 
 export function InfoConnectionAlert({ peerMeta }: InfoConnectionAlertProps) {

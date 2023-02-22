@@ -10,6 +10,7 @@ import { SDKProvider } from 'src/shared/SDKProvider'
 
 export { getServerSideProps } from '../lib/serverProps'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let initialParams: any
 
 const Index: NextPage = () => {
