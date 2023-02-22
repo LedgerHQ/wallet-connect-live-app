@@ -1,5 +1,5 @@
 import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
-import { Text, GlitchText } from '@ledgerhq/react-ui'
+import { Text } from '@ledgerhq/react-ui'
 
 import { convertEthToLiveTX } from '@/helpers/converters'
 import { compareETHAddresses } from '@/helpers/generic'
@@ -549,23 +549,13 @@ export function WalletConnectV1({
 									/>
 								</StatusIcon>
 								<Text variant="h4" mt={8} textAlign="center">
-									<GlitchText
-										duration={2000}
-										delay={0}
-										text={
-											session.connected
-												? t('sessions.connected', {
-														appName:
-															session.peerMeta
-																.name,
-												  })
-												: t('sessions.connecting', {
-														appName:
-															session.peerMeta
-																.name,
-												  })
-										}
-									/>
+									{session.connected
+										? t('sessions.connected', {
+												appName: session.peerMeta.name,
+										  })
+										: t('sessions.connecting', {
+												appName: session.peerMeta.name,
+										  })}
 								</Text>
 								{session.peerMeta.description ? (
 									<Text
