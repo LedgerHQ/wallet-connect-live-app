@@ -7,7 +7,7 @@ import {
 import { web3wallet } from '@/components/WalletConnect/v2/utils/WalletConnectUtil'
 import { Box, Button, CryptoIcon, Flex, Text } from '@ledgerhq/react-ui'
 import { ArrowLeftMedium } from '@ledgerhq/react-ui/assets/icons'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import styled from 'styled-components'
 import Image from 'next/image'
 import { useTranslation } from 'next-i18next'
@@ -43,10 +43,19 @@ export default function SessionDetail() {
 	const accounts = useAccountsStore(accountSelector.selectAccounts)
 	const sessions = useSessionsStore(sessionSelector.selectSessions)
 	const removeSession = useSessionsStore(sessionSelector.removeSession)
-
-	const session = sessions.find(
-		(elem) => elem.topic === JSON.parse(String(router.query?.data)),
+	const setLastSessionVisited = useSessionsStore(
+		sessionSelector.setLastSessionVisited,
 	)
+
+	const session = useSessionsStore(sessionSelector.selectLastSession)
+	useEffect(() => {
+		if (!!router.query.data) {
+			const session = sessions.find(
+				(elem) => elem.topic === JSON.parse(String(router.query?.data)),
+			)
+			setLastSessionVisited(session || null)
+		}
+	}, [router.query])
 
 	const handleDelete = useCallback(async () => {
 		if (!session) return
