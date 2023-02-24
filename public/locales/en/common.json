@@ -36,9 +36,12 @@
 		"notSupported": "The following blockhain is not supported",
 		"notSupported_plural": "The following blockhains are not supported",
 		"info": "This app will be able to: ",
+		"info2": "This app is able to: ",
+		"info3": "If you connect: ",
 		"infoBullet": {
 			"0": "Check your account balance and activity",
-			"1": "Request approvals for transactions"
+			"1": "Request approvals for transactions",
+			"2": "You will be disconnected from {{dAppName}}"
 		},
 		"error":{
 			"title":"{{appName}} requested to connect to chains we don’t support yet",
@@ -57,6 +60,7 @@
 		},
 		"detail": {
 			"title": "Session details",
+			"account": "Account",
 			"accounts": "Accounts",
 			"connected": "Connected",
 			"expires": "Expires",
@@ -66,6 +70,7 @@
 			"title": "No active session, yet",
 			"desc": "Get started by connecting to an app.",
 			"goToConnect": "Connect"
-		}
+		},
+		"switch": "Switch"
 	}
 }

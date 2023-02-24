@@ -6,7 +6,7 @@ import { TransitionGroup } from 'react-transition-group'
 import { useTranslation } from 'next-i18next'
 import useInitialization from './v2/hooks/useInitialization'
 import useWalletConnectEventsManager from './v2/hooks/useWalletConnectEventsManager'
-import { pair } from './v2/utils/WalletConnectUtil'
+import { startProposal } from './v2/utils/WalletConnectUtil'
 import { Connect } from './Connect'
 import { NetworkConfig } from '@/types/types'
 import { ResponsiveContainer } from '@/styles/styles'
@@ -14,6 +14,8 @@ import Sessions from './Sessions'
 import Tabs from './Tabs'
 import { Flex } from '@ledgerhq/react-ui'
 import { sessionSelector, useSessionsStore } from 'src/store/Sessions.store'
+import useNavigation from './v2/hooks/useNavigation'
+import { walletConnectV1Logic } from './v2/hooks/useWalletConnectV1Logic'
 
 const WalletConnectContainer = styled.div`
 	display: flex;
@@ -45,9 +47,6 @@ export type WalletConnectProps = {
 	setUri: Dispatch<SetStateAction<string | undefined>>
 }
 
-const CONNECT_TAB_INDEX = 0
-const SESSIONS_TAB_INDEX = 1
-
 export default function Home({
 	platformSDK,
 	initialMode,
@@ -55,14 +54,20 @@ export default function Home({
 	networks,
 	setUri,
 }: WalletConnectProps) {
+	const { router, tabsIndexes } = useNavigation()
+	const routerQueryData = router?.query?.data
+	const initialTab = routerQueryData
+		? JSON.parse(String(routerQueryData))?.tab
+		: tabsIndexes.connect
 	const initialized = useInitialization()
 	useWalletConnectEventsManager(initialized)
 
+	const v1Session = walletConnectV1Logic.session
 	const sessions = useSessionsStore(sessionSelector.selectSessions)
 
 	const { t } = useTranslation()
 
-	const [activeTabIndex, setActiveTabIndex] = useState(CONNECT_TAB_INDEX)
+	const [activeTabIndex, setActiveTabIndex] = useState(initialTab)
 	const [inputValue, setInputValue] = useState<string>('')
 	const [errorValue, setErrorValue] = useState<string | undefined>(undefined)
 
@@ -74,7 +79,7 @@ export default function Home({
 				try {
 					setUri(inputValue)
 					const uri = new URL(inputValue)
-					await pair({ uri: uri.toString() })
+					await startProposal(uri.toString())
 				} catch (error: unknown) {
 					setErrorValue(t('error.invalidUri'))
 				} finally {
@@ -85,19 +90,14 @@ export default function Home({
 		[inputValue],
 	)
 
-	// Those two functions are not working for now. The Tabs component doesn't currently allow to set the active tab
 	const goToConnect = useCallback(() => {
-		setActiveTabIndex(CONNECT_TAB_INDEX)
-	}, [])
-
-	const goToSessions = useCallback(() => {
-		setActiveTabIndex(SESSIONS_TAB_INDEX)
+		setActiveTabIndex(tabsIndexes.connect)
 	}, [])
 
 	const TABS = useMemo(
 		() => [
 			{
-				index: CONNECT_TAB_INDEX,
+				index: tabsIndexes.connect,
 				title: t('connect.title'),
 				Component: (
 					<WalletConnectInnerContainer>
@@ -111,9 +111,12 @@ export default function Home({
 				),
 			},
 			{
-				index: SESSIONS_TAB_INDEX,
+				index: tabsIndexes.sessions,
 				title: t('sessions.title'),
-				badge: sessions?.length || undefined,
+				badge:
+					sessions?.length || v1Session
+						? (sessions.length || 0) + (v1Session ? 1 : 0)
+						: undefined,
 				Component: (
 					<WalletConnectInnerContainer>
 						<ResponsiveContainer>

@@ -119,6 +119,7 @@ export default function SessionProposal() {
 						<ButtonsContainer>
 							<Button
 								variant="main"
+								size="large"
 								flex={1}
 								onClick={handleClose}
 							>
@@ -136,6 +137,7 @@ export default function SessionProposal() {
 
 				{allChainsSupported ? (
 					<Flex
+						width="100%"
 						flex={1}
 						justifyContent="space-between"
 						flexDirection="column"
@@ -295,6 +297,7 @@ export default function SessionProposal() {
 							<ButtonsContainer>
 								<Button
 									variant="shade"
+									size="large"
 									flex={0.9}
 									mr={6}
 									onClick={rejectSession}
@@ -310,6 +313,7 @@ export default function SessionProposal() {
 
 								<Button
 									variant="main"
+									size="large"
 									flex={0.9}
 									onClick={approveSession}
 									disabled={disabled}

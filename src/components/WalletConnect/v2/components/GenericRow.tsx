@@ -6,6 +6,7 @@ type Props = {
 	title: string
 	subtitle: string
 	LeftIcon: React.ReactNode
+	rightElement?: React.ReactNode
 	isSelected?: boolean
 	onClick?: () => void
 	rowType: RowType
@@ -27,6 +28,7 @@ const Row = styled(Flex)`
 
 export function GenericRow({
 	LeftIcon,
+	rightElement,
 	title,
 	subtitle,
 	isSelected = false,
@@ -61,18 +63,25 @@ export function GenericRow({
 						variant="small"
 						fontWeight="medium"
 						color="neutral.c70"
-						mt={1}
+						mt={2}
 					>
 						{subtitle}
 					</Text>
 				</Flex>
 			</Flex>
-			{rowType === RowType.Select && onClick && (
-				<Checkbox isChecked={isSelected} name={''} onChange={onClick} />
-			)}
-			{rowType === RowType.Detail && (
-				<ChevronRightMedium size={24} color="neutral.c80" />
-			)}
+			<Flex alignItems="center">
+				{rightElement || null}
+				{rowType === RowType.Select && onClick && (
+					<Checkbox
+						isChecked={isSelected}
+						name={''}
+						onChange={onClick}
+					/>
+				)}
+				{rowType === RowType.Detail && (
+					<ChevronRightMedium size={24} color="neutral.c70" />
+				)}
+			</Flex>
 		</Row>
 	)
 }

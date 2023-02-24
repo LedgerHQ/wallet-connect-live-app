@@ -12,7 +12,7 @@ const nextConfig = {
 		dirs: ['src'],
 	},
 	images: {
-		domains: ['avatars.githubusercontent.com'],
+		domains: ['avatars.githubusercontent.com', 'example.walletconnect.org'],
 	},
 }
 
