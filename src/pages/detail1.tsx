@@ -1,33 +1,27 @@
 import {
-	formatChainName,
 	formatUrl,
 	getTicker,
 	truncate,
 } from '@/components/WalletConnect/v2/utils/HelperUtil'
-import { web3wallet } from '@/components/WalletConnect/v2/utils/WalletConnectUtil'
 import { Box, Button, CryptoIcon, Flex, Text } from '@ledgerhq/react-ui'
 import { ArrowLeftMedium } from '@ledgerhq/react-ui/assets/icons'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback } from 'react'
 import styled from 'styled-components'
 import Image from 'next/image'
 import { useTranslation } from 'next-i18next'
 import useNavigation from '@/components/WalletConnect/v2/hooks/useNavigation'
 import Link from 'next/link'
-import { Account } from '@ledgerhq/live-app-sdk'
 import {
 	GenericRow,
 	RowType,
 } from '@/components/WalletConnect/v2/components/GenericRow'
 import { InfoSessionProposal } from '@/components/WalletConnect/v2/components/SessionProposal/InfoSessionProposal'
-import { space } from '@ledgerhq/react-ui/styles/theme'
 import {
 	ButtonsContainer,
-	List,
 	Row,
 } from '@/components/WalletConnect/v2/components/Containers/util'
 import { ResponsiveContainer } from '@/styles/styles'
-import { sessionSelector, useSessionsStore } from 'src/store/Sessions.store'
-import { useAccountsStore, accountSelector } from 'src/store/Accounts.store'
+import { walletConnectV1Logic } from '@/components/WalletConnect/v2/hooks/useWalletConnectV1Logic'
 
 export { getServerSideProps } from '../lib/serverProps'
 
@@ -37,94 +31,36 @@ const DetailContainer = styled(Flex)`
 	padding: 12px;
 	flex-direction: column;
 `
-export default function SessionDetail() {
-	const [hydrated, setHydrated] = useState(false)
-	const { t } = useTranslation()
-	const { router, routes, navigate, tabsIndexes } = useNavigation()
 
-	const accounts = useAccountsStore(accountSelector.selectAccounts)
-	const sessions = useSessionsStore(sessionSelector.selectSessions)
-	const removeSession = useSessionsStore(sessionSelector.removeSession)
-	const setLastSessionVisited = useSessionsStore(
-		sessionSelector.setLastSessionVisited,
-	)
-	const session = useSessionsStore(sessionSelector.selectLastSession)
+const V1Container = styled.div`
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: ${(p) => `1px solid ${p.theme.colors.neutral.c70}`};
+	border-radius: ${(p) => p.theme.space[2]}px;
+	padding: ${(p) => p.theme.space[2]}px;
+`
+
+export default function SessionDetail() {
+	const { t } = useTranslation()
+	const { routes, navigate, tabsIndexes } = useNavigation()
+
+	const session = walletConnectV1Logic.session
+	const account = walletConnectV1Logic.selectedAccount
 
 	const navigateToSessionsHomeTab = useCallback(() => {
 		navigate(routes.home, { tab: tabsIndexes.sessions })
 	}, [routes, tabsIndexes])
 
-	useEffect(() => {
-		// This forces a rerender, so the component is rendered
-		// the second time but not the first
-		setHydrated(true)
-	}, [])
-
-	useEffect(() => {
-		if (!!router.query.data) {
-			const session = sessions.find(
-				(elem) => elem.topic === JSON.parse(String(router.query?.data)),
-			)
-			setLastSessionVisited(session || null)
-		}
-	}, [router.query])
-
 	const handleDelete = useCallback(async () => {
 		if (!session) return
-		web3wallet
-			.disconnectSession({
-				topic: session.topic,
-				reason: {
-					code: 3,
-					message: 'Disconnect Session',
-				},
-			})
-			.catch((er) => console.error(er))
-			.finally(() => {
-				removeSession(session.topic)
-				navigateToSessionsHomeTab()
-			})
+		walletConnectV1Logic.handleDisconnect()
+		navigateToSessionsHomeTab()
 	}, [session])
 
-	const metadata = session?.peer.metadata
-	const fullAddresses = !session
-		? []
-		: Object.entries(session.namespaces).reduce(
-				(acc, elem) => acc.concat(elem[1].accounts),
-				[] as string[],
-		  )
+	const metadata = session?.peerMeta
 
-	const getAccountsFromAddresses = (addresses: string[]) => {
-		const accountsByChain = new Map<string, Account[]>()
-
-		addresses.forEach((addr) => {
-			const addrSplitted = addr.split(':')
-
-			const formatedChain = formatChainName(
-				`${addrSplitted[0]}:${addrSplitted[1]}`,
-			).toLowerCase()
-
-			const existingEntry = accountsByChain.get(formatedChain)
-
-			const account = accounts.find((a) => a.address === addrSplitted[2])
-
-			if (account) {
-				accountsByChain.set(
-					formatedChain,
-					existingEntry ? [...existingEntry, account] : [account],
-				)
-			}
-		})
-		return accountsByChain
-	}
-
-	const sessionAccounts = useMemo(
-		() => getAccountsFromAddresses(fullAddresses),
-		[fullAddresses, accounts],
-	)
-
-	if (!hydrated || !session) {
-		// Returns null on first render, so the client and server match
+	if (!session) {
 		return null
 	}
 
@@ -197,6 +133,17 @@ export default function SessionDetail() {
 										</Text>
 									</Flex>
 								</Flex>
+								<Flex>
+									<V1Container>
+										<Text
+											variant="tiny"
+											fontWeight="semiBold"
+											color="neutral.c70"
+										>
+											WalletConnect v1
+										</Text>
+									</V1Container>
+								</Flex>
 							</Row>
 
 							<Row
@@ -217,6 +164,7 @@ export default function SessionDetail() {
 									fontWeight="medium"
 									color="neutral.c70"
 								>
+									{/* TODO : Save date of connection instead of displaying the current date */}
 									{new Date().toDateString()}
 								</Text>
 							</Row>
@@ -243,65 +191,34 @@ export default function SessionDetail() {
 							</Row>
 						</DetailContainer>
 						<Text variant="h4" mt={8} mb={6} color="neutral.c100">
-							{t('sessions.detail.accounts')}
+							{t('sessions.detail.account')}
 						</Text>
-						{Array.from(sessionAccounts).map(
-							([chain, accounts]) => {
-								return (
-									<Box key={chain} mb={6} flex={1}>
-										<Box mb={6}>
-											<Text
-												variant="subtitle"
-												color="neutral.c70"
-											>
-												{chain}
-											</Text>
-										</Box>
-
-										<List>
-											{accounts.map(
-												(
-													account: Account,
-													index: number,
-												) => (
-													<li
-														key={account.id}
-														style={{
-															marginBottom:
-																index !==
-																accounts.length -
-																	1
-																	? space[3]
-																	: 0,
-														}}
-													>
-														<GenericRow
-															title={account.name}
-															subtitle={truncate(
-																account.address,
-																30,
-															)}
-															LeftIcon={
-																<CryptoIcon
-																	name={getTicker(
-																		chain,
-																	)}
-																	circleIcon
-																	size={24}
-																/>
-															}
-															rowType={
-																RowType.Default
-															}
-														/>
-													</li>
-												),
-											)}
-										</List>
-									</Box>
-								)
-							},
-						)}
+						<Box key={account.currency} mb={6} flex={1}>
+							<GenericRow
+								title={account.name}
+								subtitle={truncate(account.address, 30)}
+								onClick={
+									walletConnectV1Logic.handleSwitchAccount
+								}
+								LeftIcon={
+									<CryptoIcon
+										name={getTicker(account.currency)}
+										circleIcon
+										size={24}
+									/>
+								}
+								rightElement={
+									<Text
+										variant="small"
+										fontWeight="medium"
+										color="neutral.c70"
+									>
+										{t('sessions.switch')}
+									</Text>
+								}
+								rowType={RowType.Detail}
+							/>
+						</Box>
 						<Box mt={6}>
 							<InfoSessionProposal isInSessionDetails />
 						</Box>

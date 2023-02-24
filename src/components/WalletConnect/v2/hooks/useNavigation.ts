@@ -1,10 +1,18 @@
 import { useRouter } from 'next/router'
 
+enum tabsIndexes {
+	connect = 0,
+	sessions = 1,
+}
+
 enum routes {
 	home = '/',
 	sessionProposal = '/proposal',
 	sessionDetails = '/detail',
-	reject = '/reject',
+
+	// Routes specific to Wallet Connect V1
+	sessionDetailsV1 = '/detail1',
+	sessionProposalV1 = '/proposal1',
 }
 
 export default function useNavigation() {
@@ -18,6 +26,7 @@ export default function useNavigation() {
 	}
 
 	return {
+		tabsIndexes,
 		routes,
 		navigate,
 		router,

@@ -20,22 +20,43 @@ import {
 	useSessionsStore,
 } from 'src/store/Sessions.store'
 import { web3wallet } from './v2/utils/WalletConnectUtil'
+import { walletConnectV1Logic } from './v2/hooks/useWalletConnectV1Logic'
+import styled from 'styled-components'
 
 export type SessionsProps = {
 	sessions: Session[]
 	goToConnect: () => void
 }
 
+const V1Container = styled.div`
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: ${(p) => `1px solid ${p.theme.colors.neutral.c70}`};
+	border-radius: ${(p) => p.theme.space[2]}px;
+	padding: ${(p) => p.theme.space[2]}px;
+`
+
 export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 	const { t } = useTranslation()
 	const { navigate, routes } = useNavigation()
 	const { openModal, closeModal, isModalOpen } = useWalletConnectPopin()
 	const clearSessions = useSessionsStore(sessionSelector.clearSessions)
-	const goToDetailSession = useCallback((topic: string) => {
-		navigate(routes.sessionDetails, topic)
+	const goToDetailSession = useCallback((topic: string, isV1?: boolean) => {
+		if (isV1) {
+			navigate(routes.sessionDetailsV1)
+		} else {
+			navigate(routes.sessionDetails, topic)
+		}
 	}, [])
 
+	const v1Session = walletConnectV1Logic.session
+
 	const disconnect = useCallback(async () => {
+		if (v1Session) {
+			walletConnectV1Logic.handleDisconnect()
+			walletConnectV1Logic.cleanup()
+		}
 		await Promise.all(
 			sessions.map((session) =>
 				web3wallet.disconnectSession({
@@ -54,7 +75,10 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 			})
 	}, [sessions])
 
-	if (!sessions || !sessions.length || sessions.length === 0) {
+	if (
+		(!sessions || !sessions.length || sessions.length === 0) &&
+		!v1Session
+	) {
 		return (
 			<Flex
 				flexDirection="column"
@@ -96,6 +120,44 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 	return (
 		<Flex flexDirection="column" width="100%" height="100%" mt={6}>
 			<List>
+				{v1Session ? (
+					<Box key={v1Session.handshakeTopic} mt={3}>
+						<GenericRow
+							key={v1Session.handshakeTopic}
+							title={v1Session.peerMeta.name}
+							subtitle={formatUrl(v1Session.peerMeta.url)}
+							LeftIcon={
+								<Image
+									src={v1Session.peerMeta.icons[0]}
+									alt="Picture of the proposer"
+									width={32}
+									style={{
+										borderRadius: '8px',
+									}}
+									height={32}
+								/>
+							}
+							rowType={RowType.Detail}
+							rightElement={
+								<V1Container>
+									<Text
+										variant="tiny"
+										fontWeight="semiBold"
+										color="neutral.c70"
+									>
+										WalletConnect v1
+									</Text>
+								</V1Container>
+							}
+							onClick={() =>
+								goToDetailSession(
+									v1Session.handshakeTopic,
+									true,
+								)
+							}
+						/>
+					</Box>
+				) : null}
 				{sessions.map((session) => (
 					<Box key={session.topic} mt={3}>
 						<GenericRow

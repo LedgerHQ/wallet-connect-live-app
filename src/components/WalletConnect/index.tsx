@@ -6,6 +6,7 @@ import { appSelector, useAppStore } from 'src/store/App.store'
 import { sessionSelector, useSessionsStore } from 'src/store/Sessions.store'
 import Home from './Home'
 import { useLedgerLive } from './v2/hooks/useLedgerLive'
+import useWalletConnectV1Logic from './v2/hooks/useWalletConnectV1Logic'
 
 export type WalletConnectProps = {
 	initialMode?: InputMode
@@ -22,6 +23,7 @@ export default function WalletConnect({
 	accounts,
 	platformSDK,
 	networks,
+	initialAccountId,
 	...rest
 }: WalletConnectProps) {
 	const sessionURI = useMemo(() => {
@@ -50,8 +52,14 @@ export default function WalletConnect({
 	}, [platformSDK])
 
 	useLedgerLive(platformSDK)
+	useWalletConnectV1Logic({
+		initialAccountId,
+		initialURI,
+		platformSDK,
+		accounts,
+		setUri,
+	})
 
-	// if (uri?.includes('@1?'))
 	return (
 		<Home
 			initialMode={initialMode}

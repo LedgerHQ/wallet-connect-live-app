@@ -30,7 +30,7 @@ const getNamespace = (chain: string) => {
 }
 
 export function useProposal({ proposal }: Props) {
-	const { navigate, routes } = useNavigation()
+	const { navigate, routes, tabsIndexes } = useNavigation()
 	const networks = useAppStore(appSelector.selectNetworks)
 	const addSession = useSessionsStore(sessionSelector.addSession)
 	const accounts = useAccountsStore(accountSelector.selectAccounts)
@@ -135,11 +135,12 @@ export function useProposal({ proposal }: Props) {
 			})
 			.then((res) => {
 				addSession(res)
-				navigate(routes.home)
+				navigate(routes.home, { tab: tabsIndexes.sessions })
 			})
 			.catch((error) => {
 				console.log(error)
-				navigate(routes.reject, error)
+				// TODO : display error toast
+				navigate(routes.home, { tab: tabsIndexes.connect })
 			})
 	}, [proposal])
 

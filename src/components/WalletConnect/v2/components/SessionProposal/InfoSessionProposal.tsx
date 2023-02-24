@@ -5,7 +5,13 @@ import styled from 'styled-components'
 
 const Row = styled(Flex)``
 
-export function InfoSessionProposal() {
+type InfoSessionProposalProps = {
+	isInSessionDetails?: boolean
+}
+
+export function InfoSessionProposal({
+	isInSessionDetails,
+}: InfoSessionProposalProps) {
 	const { t } = useTranslation()
 	return (
 		<Flex flexDirection="column">
@@ -15,11 +21,13 @@ export function InfoSessionProposal() {
 				color="neutral.c70"
 				mb={6}
 			>
-				{t('sessionProposal.info')}
+				{isInSessionDetails
+					? t('sessionProposal.info2')
+					: t('sessionProposal.info')}
 			</Text>
 
 			{[0, 1].map((e) => (
-				<Row mt={3} key={e}>
+				<Row mt={3} key={e} alignItems="center">
 					<CheckAloneMedium size={16} color="success.c80" />
 
 					<Text
