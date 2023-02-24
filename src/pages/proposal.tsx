@@ -163,8 +163,7 @@ export default function SessionProposal() {
 														width={60}
 														style={{
 															borderRadius: '50%',
-															borderLeft:
-																'3px solid red',
+															borderLeft: `3px solid ${colors.background.main}`,
 														}}
 														height={60}
 													/>
