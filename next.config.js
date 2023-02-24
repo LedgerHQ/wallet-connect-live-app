@@ -12,7 +12,12 @@ const nextConfig = {
 		dirs: ['src'],
 	},
 	images: {
-		domains: ['avatars.githubusercontent.com', 'example.walletconnect.org'],
+		remotePatterns: [
+			{
+				protocol: 'https',
+				hostname: '**',
+			},
+		],
 	},
 }
 

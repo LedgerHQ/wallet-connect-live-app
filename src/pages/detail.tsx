@@ -71,15 +71,19 @@ export default function SessionDetail() {
 
 	const handleDelete = useCallback(async () => {
 		if (!session) return
-		await web3wallet.disconnectSession({
-			topic: session.topic,
-			reason: {
-				code: 3,
-				message: 'Disconnect Session',
-			},
-		})
-		removeSession(session.topic)
-		navigateToSessionsHomeTab()
+		web3wallet
+			.disconnectSession({
+				topic: session.topic,
+				reason: {
+					code: 3,
+					message: 'Disconnect Session',
+				},
+			})
+			.catch((er) => console.error(er))
+			.finally(() => {
+				removeSession(session.topic)
+				navigateToSessionsHomeTab()
+			})
 	}, [session])
 
 	const metadata = session?.peer.metadata

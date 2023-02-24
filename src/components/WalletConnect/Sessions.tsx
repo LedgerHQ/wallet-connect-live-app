@@ -52,23 +52,28 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 
 	const v1Session = walletConnectV1Logic.session
 
-	const disconnect = useCallback(() => {
+	const disconnect = useCallback(async () => {
 		if (v1Session) {
 			walletConnectV1Logic.handleDisconnect()
 			walletConnectV1Logic.cleanup()
 		}
-		sessions.forEach(async (session) => {
-			await web3wallet.disconnectSession({
-				topic: session.topic,
-				reason: {
-					code: 3,
-					message: 'Disconnect Session',
-				},
+		await Promise.all(
+			sessions.map((session) =>
+				web3wallet.disconnectSession({
+					topic: session.topic,
+					reason: {
+						code: 3,
+						message: 'Disconnect Session',
+					},
+				}),
+			),
+		)
+			.catch((err) => console.error(err))
+			.finally(() => {
+				clearSessions()
+				closeModal()
 			})
-		})
-		clearSessions()
-		closeModal()
-	}, [])
+	}, [sessions])
 
 	if (
 		(!sessions || !sessions.length || sessions.length === 0) &&
