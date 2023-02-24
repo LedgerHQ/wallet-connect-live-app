@@ -35,19 +35,24 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 		navigate(routes.sessionDetails, topic)
 	}, [])
 
-	const disconnect = useCallback(() => {
-		sessions.forEach(async (session) => {
-			await web3wallet.disconnectSession({
-				topic: session.topic,
-				reason: {
-					code: 3,
-					message: 'Disconnect Session',
-				},
+	const disconnect = useCallback(async () => {
+		await Promise.all(
+			sessions.map((session) =>
+				web3wallet.disconnectSession({
+					topic: session.topic,
+					reason: {
+						code: 3,
+						message: 'Disconnect Session',
+					},
+				}),
+			),
+		)
+			.catch((err) => console.error(err))
+			.finally(() => {
+				clearSessions()
+				closeModal()
 			})
-		})
-		clearSessions()
-		closeModal()
-	}, [])
+	}, [sessions])
 
 	if (!sessions || !sessions.length || sessions.length === 0) {
 		return (
