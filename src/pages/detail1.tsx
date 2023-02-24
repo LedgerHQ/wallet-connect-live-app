@@ -168,27 +168,6 @@ export default function SessionDetail() {
 									{new Date().toDateString()}
 								</Text>
 							</Row>
-							<Row
-								mt={6}
-								justifyContent="space-between"
-								alignItems="center"
-							>
-								<Text
-									variant="small"
-									fontWeight="medium"
-									color="neutral.c100"
-								>
-									{t('sessions.detail.expires')}
-								</Text>
-
-								<Text
-									variant="small"
-									fontWeight="medium"
-									color="neutral.c70"
-								>
-									{new Date(session.expiry).toDateString()}
-								</Text>
-							</Row>
 						</DetailContainer>
 						<Text variant="h4" mt={8} mb={6} color="neutral.c100">
 							{t('sessions.detail.account')}

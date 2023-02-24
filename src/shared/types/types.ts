@@ -9,6 +9,7 @@ export type Family = {
 	methods: string[]
 	chains: string[]
 	events: string[]
+	required?: boolean
 }
 export type Families = {
 	[key: string]: Family
@@ -32,6 +33,7 @@ export type Proposal = {
 		pairingTopic: string
 		expiry: number
 		requiredNamespaces: Families
+		optionalNamespaces?: Families
 		relays: Relay[]
 		proposer: Proposer
 	}
