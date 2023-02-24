@@ -4,8 +4,6 @@ import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
 import styled from 'styled-components'
 import { TransitionGroup } from 'react-transition-group'
 import { useTranslation } from 'next-i18next'
-import useInitialization from './v2/hooks/useInitialization'
-import useWalletConnectEventsManager from './v2/hooks/useWalletConnectEventsManager'
 import { startProposal } from './v2/utils/WalletConnectUtil'
 import { Connect } from './Connect'
 import { NetworkConfig } from '@/types/types'
@@ -16,6 +14,7 @@ import { Flex } from '@ledgerhq/react-ui'
 import { sessionSelector, useSessionsStore } from 'src/store/Sessions.store'
 import useNavigation from './v2/hooks/useNavigation'
 import { walletConnectV1Logic } from './v2/hooks/useWalletConnectV1Logic'
+import useHydratation from './v2/hooks/useHydratation'
 
 const WalletConnectContainer = styled.div`
 	display: flex;
@@ -47,20 +46,13 @@ export type WalletConnectProps = {
 	setUri: Dispatch<SetStateAction<string | undefined>>
 }
 
-export default function Home({
-	platformSDK,
-	initialMode,
-	accounts,
-	networks,
-	setUri,
-}: WalletConnectProps) {
+export default function Home({ initialMode, setUri }: WalletConnectProps) {
+	const { initialized } = useHydratation()
 	const { router, tabsIndexes } = useNavigation()
 	const routerQueryData = router?.query?.data
 	const initialTab = routerQueryData
 		? JSON.parse(String(routerQueryData))?.tab
 		: tabsIndexes.connect
-	const initialized = useInitialization()
-	useWalletConnectEventsManager(initialized)
 
 	const v1Session = walletConnectV1Logic.session
 	const sessions = useSessionsStore(sessionSelector.selectSessions)
