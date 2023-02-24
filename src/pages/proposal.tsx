@@ -84,23 +84,22 @@ export default function SessionProposal() {
 		[proposal, accounts],
 	)
 
+	const requiredChains = accountsByChain.filter((entry) => entry.isRequired)
+
 	const noChainsSupported =
 		accountsByChain.filter((entry) => !entry.isSupported).length ===
 		accountsByChain.length
 
-	const PartialChainsSupported =
-		!!accountsByChain.find((entry) => !entry.isSupported) &&
-		!!accountsByChain.find((entry) => entry.isSupported)
+	const everyRequiredChainsSupported = requiredChains.every(
+		(entry) => entry.isSupported,
+	)
 
-	const allChainsSupported =
-		accountsByChain.filter((entry) => entry.isSupported).length ===
-		accountsByChain.length
+	const eachRequiredChainHasOneAccount = requiredChains.every(
+		(entry) => entry.accounts.length > 0,
+	)
 
-	const eachChainHasOneAccount =
-		accountsByChain.filter((acc) => acc.accounts.length > 0).length ===
-		accountsByChain.length
-
-	const disabled = selectedAccounts.length === 0 || !eachChainHasOneAccount
+	const disabled =
+		selectedAccounts.length === 0 || !eachRequiredChainHasOneAccount
 
 	return (
 		<Flex
@@ -111,7 +110,7 @@ export default function SessionProposal() {
 			height="100%"
 		>
 			<ResponsiveContainer>
-				{noChainsSupported || PartialChainsSupported ? (
+				{noChainsSupported || !everyRequiredChainsSupported ? (
 					<>
 						<ErrorBlockchainSupport
 							appName={proposer.metadata.name}
@@ -133,9 +132,7 @@ export default function SessionProposal() {
 							</Button>
 						</ButtonsContainer>
 					</>
-				) : null}
-
-				{allChainsSupported ? (
+				) : (
 					<Flex
 						width="100%"
 						flex={1}
@@ -215,6 +212,14 @@ export default function SessionProposal() {
 														}
 													>
 														{entry.chain}
+														{entry.isRequired ? (
+															<Text
+																color="error.c80"
+																ml={1}
+															>
+																*
+															</Text>
+														) : null}
 													</Text>
 												</Box>
 												{entry.accounts.length > 0 ? (
@@ -332,7 +337,7 @@ export default function SessionProposal() {
 							</ButtonsContainer>
 						</Flex>
 					</Flex>
-				) : null}
+				)}
 			</ResponsiveContainer>
 		</Flex>
 	)

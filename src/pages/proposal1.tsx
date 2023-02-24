@@ -14,11 +14,8 @@ import {
 	GenericRow,
 	RowType,
 } from '@/components/WalletConnect/v2/components/GenericRow'
-import { space } from '@ledgerhq/react-ui/styles/theme'
 import { Logo } from '@/components/WalletConnect/v2/icons/LedgerLiveLogo'
 import { InfoSessionProposal } from '@/components/WalletConnect/v2/components/SessionProposal/InfoSessionProposal'
-import { useProposal } from '@/components/WalletConnect/v2/hooks/useProposal'
-import { useMemo } from 'react'
 import {
 	WalletConnectMedium,
 	WarningMedium,

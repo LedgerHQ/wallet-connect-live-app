@@ -29,35 +29,35 @@ async function pair(uri: string) {
 }
 
 export async function startProposal(uri: string) {
-	if (walletConnectV1Logic.isV1(uri)) {
-		try {
-			const url = new URL(uri)
+	try {
+		const url = new URL(uri)
 
-			switch (url.protocol) {
-				// handle usual wallet connect URIs
-				case 'wc:': {
+		switch (url.protocol) {
+			// handle usual wallet connect URIs
+			case 'wc:': {
+				if (walletConnectV1Logic.isV1(uri)) {
 					walletConnectV1Logic.createClient({ uri: url.toString() })
-					break
+				} else {
+					await pair(uri)
 				}
+				break
+			}
 
-				// handle Ledger Live specific URIs
-				case 'ledgerlive:': {
-					const uriParam = url.searchParams.get('uri')
+			// handle Ledger Live specific URIs
+			case 'ledgerlive:': {
+				const uriParam = url.searchParams.get('uri')
 
-					if (url.pathname === '//wc' && uriParam) {
-						await startProposal(uriParam)
-					}
-					break
+				if (url.pathname === '//wc' && uriParam) {
+					await startProposal(uriParam)
 				}
+				break
 			}
-		} catch (error) {
-			// bad urls are just ignored
-			if (error instanceof TypeError) {
-				return
-			}
-			throw error
 		}
-	} else {
-		await pair(uri)
+	} catch (error) {
+		// bad urls are just ignored
+		if (error instanceof TypeError) {
+			return
+		}
+		throw error
 	}
 }

@@ -57,17 +57,27 @@ export function useProposal({ proposal }: Props) {
 		router.push('/')
 	}, [])
 
-	const getChains = (proposal: Proposal) =>
-		Object.values(proposal.params.requiredNamespaces)
+	const getChains = (proposal: Proposal) => {
+		const requiredNamespaces = Object.values(
+			proposal.params.requiredNamespaces,
+		).map((namespace) => ({ ...namespace, required: true }))
+		const optionalNamespaces = proposal.params.optionalNamespaces
+			? Object.values(proposal.params.optionalNamespaces)
+			: []
+
+		return [...requiredNamespaces, ...optionalNamespaces]
+	}
 
 	const formatAccountsByChain = (proposal: Proposal, accounts: Account[]) => {
 		const families = getChains(proposal)
 
-		const chainsRequested = Object.values(families)
+		const chains = families
 			.map((f) => f.chains)
 			.reduce((value, acc) => acc.concat(value), [])
 
-		const mappedChains = chainsRequested.map((chain) => {
+		const chainsDeduplicated = [...Array.from(new Set(chains))]
+
+		const mappedChains = chainsDeduplicated.map((chain) => {
 			const formatedChain = formatChainName(chain).toLowerCase()
 
 			return {
@@ -75,6 +85,10 @@ export function useProposal({ proposal }: Props) {
 				isSupported: networks
 					.map((n) => n.currency)
 					.includes(formatedChain),
+				isRequired: families.some(
+					(family) =>
+						family.required && family.chains.includes(chain),
+				),
 				accounts: accounts.filter(
 					(acc) => acc.currency === formatedChain,
 				),
