@@ -7,14 +7,16 @@ import { Container } from '@/styles/styles'
 import WalletConnect from '@/components/WalletConnect'
 import { NetworkConfig } from '@/types/types'
 import { SDKProvider } from 'src/shared/SDKProvider'
+import { appSelector, useAppStore } from 'src/store/App.store'
 
 export { getServerSideProps } from '../lib/serverProps'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let initialParams: any
 
 const Index: NextPage = () => {
 	const router = useRouter()
-
+	const networks = useAppStore(appSelector.selectNetworks)
 	const {
 		params: rawParams,
 		uri: rawURI,
@@ -31,7 +33,7 @@ const Index: NextPage = () => {
 			: initialParams
 			? JSON.parse(initialParams)
 			: {}
-	const networkConfigs: NetworkConfig[] = params.networks ?? []
+	const networkConfigs: NetworkConfig[] = params.networks ?? networks
 
 	const uri = rawURI && typeof rawURI === 'string' ? rawURI : undefined
 	const initialAccountId =
