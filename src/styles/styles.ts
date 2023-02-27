@@ -14,17 +14,19 @@ export const ResponsiveContainer = styled.div`
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-	width: 100%;
 	min-height: 100%;
 
 	@media ${device.mobile} {
-		margin-left: 16px;
-		margin-right: 16px;
+		width: calc(100% - 32px);
+		padding-left: 16px;
+		padding-right: 16px;
 	}
 	@media ${device.tablet} {
+		width: 100%;
 		max-width: 465px;
 	}
 	@media ${device.desktop} {
+		width: 100%;
 		max-width: 465px;
 	}
 `
