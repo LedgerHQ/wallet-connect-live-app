@@ -3,17 +3,12 @@ import { convertEthToLiveTX } from '@/helpers/converters'
 import { compareETHAddresses } from '@/helpers/generic'
 import { stripHexPrefix } from '@/utils/currencyFormatter/helpers'
 import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
-import {
-	useRef,
-	useState,
-	useEffect,
-	useCallback,
-	Dispatch,
-	SetStateAction,
-} from 'react'
+import { useRef, useEffect, useCallback, Dispatch, SetStateAction } from 'react'
 import { useAppStore, appSelector } from 'src/store/App.store'
 import WalletConnectClient from '@walletconnect/client'
 import useNavigation from './useNavigation'
+import { useV1Store } from 'src/store/v1.store'
+import { Proposal } from '@/types/types'
 
 type WalletConnectState = {
 	session: any | null
@@ -24,9 +19,8 @@ type WalletConnectState = {
 const getInitialState = (
 	accounts: Account[],
 	initialAccountId?: string,
+	savedAccountId?: string,
 ): WalletConnectState => {
-	const savedAccountId = localStorage.getItem('accountId')
-
 	const initialAccount = initialAccountId
 		? accounts.find((account) => account.id === initialAccountId)
 		: undefined
@@ -64,11 +58,24 @@ export default function useWalletConnectV1Logic({
 	const wcRef = useRef<WalletConnectClient>()
 	const networks = useAppStore(appSelector.selectNetworks)
 	const { navigate, routes, tabsIndexes } = useNavigation()
+	const {
+		setSelectedAccount,
+		setSession,
+		setTimedOut,
+		selectedAccount,
+		setProposal,
+	} = useV1Store()
 
-	const [{ session, selectedAccount, timedOut }, setState] =
-		useState<WalletConnectState>(
-			getInitialState(accounts, initialAccountId),
-		)
+	useEffect(() => {
+		const {
+			selectedAccount: selectedAccountLocal,
+			timedOut,
+			session,
+		} = getInitialState(accounts, initialAccountId, selectedAccount?.id)
+		setSelectedAccount(selectedAccountLocal)
+		setTimedOut(timedOut)
+		setSession(session)
+	}, [accounts, initialAccountId])
 
 	const isV1 = (uri: string) => uri?.includes('@1?')
 
@@ -77,7 +84,7 @@ export default function useWalletConnectV1Logic({
 		const wc = wcRef.current
 
 		if (selectedAccount) {
-			localStorage.setItem('accountId', selectedAccount.id)
+			setSelectedAccount(selectedAccount)
 			if (wc && wc.connected) {
 				const networkConfig = networks.find(
 					(networkConfig) =>
@@ -89,25 +96,15 @@ export default function useWalletConnectV1Logic({
 						accounts: [selectedAccount.address],
 					})
 				}
-				setState((oldState) => ({
-					...oldState,
-					session: {
-						...wc.session,
-					},
-				}))
+				setSession(wc.session)
 			}
 		}
 	}, [selectedAccount])
 
 	const cleanup = useCallback((timedOut = false) => {
 		// cleaning everything and reverting to initial state
-		setState((oldState) => {
-			return {
-				...oldState,
-				session: null,
-				timedOut,
-			}
-		})
+		setSession(null)
+		setTimedOut(timedOut)
 		wcRef.current = undefined
 		setUri(undefined)
 		localStorage.removeItem('session')
@@ -130,13 +127,8 @@ export default function useWalletConnectV1Logic({
 
 			// synchronize WC state with react and trigger necessary rerenders
 			const syncSessionWithReactState = () => {
-				setState((oldState) => ({
-					...oldState,
-					timedOut: false,
-					session: {
-						...wc.session,
-					},
-				}))
+				setSession(wc.session)
+				setTimedOut(false)
 			}
 
 			wc.on('session_request', (error, payload) => {
@@ -148,9 +140,9 @@ export default function useWalletConnectV1Logic({
 
 				if (error) {
 				}
-
+				setProposal(payload as Proposal)
 				syncSessionWithReactState()
-				navigate(routes.sessionProposalV1, payload)
+				navigate(routes.sessionProposalV1)
 			})
 
 			wc.on('connect', () => {
@@ -416,14 +408,11 @@ export default function useWalletConnectV1Logic({
 				currencies: enabledCurrencies,
 			})
 
-			setState((oldState) => ({
-				...oldState,
-				selectedAccount: newSelectedAccount,
-			}))
+			setSelectedAccount(newSelectedAccount)
 		} catch (error) {
 			console.log('request account canceled by user')
 		}
-	}, [setState])
+	}, [])
 
 	const handleTimeout = useCallback(() => {
 		cleanup(true)
@@ -434,9 +423,6 @@ export default function useWalletConnectV1Logic({
 	}, [])
 
 	walletConnectV1Logic = {
-		session,
-		timedOut,
-		selectedAccount,
 		handleDisconnect,
 		handleSwitchAccount,
 		handleAccept,

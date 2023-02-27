@@ -22,6 +22,7 @@ import {
 import { web3wallet } from './v2/utils/WalletConnectUtil'
 import { walletConnectV1Logic } from './v2/hooks/useWalletConnectV1Logic'
 import styled from 'styled-components'
+import { useV1Store, v1Selector } from 'src/store/v1.store'
 
 export type SessionsProps = {
 	sessions: Session[]
@@ -42,6 +43,7 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 	const { navigate, routes } = useNavigation()
 	const { openModal, closeModal, isModalOpen } = useWalletConnectPopin()
 	const clearSessions = useSessionsStore(sessionSelector.clearSessions)
+
 	const goToDetailSession = useCallback((topic: string, isV1?: boolean) => {
 		if (isV1) {
 			navigate(routes.sessionDetailsV1)
@@ -50,7 +52,7 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 		}
 	}, [])
 
-	const v1Session = walletConnectV1Logic.session
+	const v1Session = useV1Store(v1Selector.selectSession)
 
 	const disconnect = useCallback(async () => {
 		if (v1Session) {

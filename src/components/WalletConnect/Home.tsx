@@ -1,12 +1,5 @@
 import { InputMode } from '@/types/types'
-import {
-	useCallback,
-	useState,
-	Dispatch,
-	SetStateAction,
-	useMemo,
-	useEffect,
-} from 'react'
+import { useCallback, useState, Dispatch, SetStateAction, useMemo } from 'react'
 import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
 import styled from 'styled-components'
 import { TransitionGroup } from 'react-transition-group'
@@ -20,8 +13,8 @@ import Tabs from './Tabs'
 import { Flex } from '@ledgerhq/react-ui'
 import { sessionSelector, useSessionsStore } from 'src/store/Sessions.store'
 import useNavigation from './v2/hooks/useNavigation'
-import { walletConnectV1Logic } from './v2/hooks/useWalletConnectV1Logic'
 import useHydratation from './v2/hooks/useHydratation'
+import { useV1Store, v1Selector } from 'src/store/v1.store'
 
 const WalletConnectContainer = styled.div`
 	display: flex;
@@ -65,7 +58,7 @@ export default function Home({
 		? JSON.parse(String(routerQueryData))?.tab
 		: tabsIndexes.connect
 
-	const v1Session = walletConnectV1Logic.session
+	const v1Session = useV1Store(v1Selector.selectSession)
 	const sessions = useSessionsStore(sessionSelector.selectSessions)
 
 	const { t } = useTranslation()
