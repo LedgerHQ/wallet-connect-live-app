@@ -77,7 +77,7 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 
 	if (
 		(!sessions || !sessions.length || sessions.length === 0) &&
-		!v1Session
+		(!v1Session || !v1Session.peerMeta)
 	) {
 		return (
 			<Flex
@@ -88,7 +88,7 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 				justifyContent="center"
 				my={6}
 			>
-				<Text variant="h2" fontWeight="medium">
+				<Text variant="h2" fontWeight="medium" textAlign="center">
 					{t('sessions.emptyState.title')}
 				</Text>
 				<Text
@@ -96,6 +96,7 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 					fontWeight="medium"
 					color="neutral.c80"
 					mt={6}
+					textAlign="center"
 				>
 					{t('sessions.emptyState.desc')}
 				</Text>
@@ -120,7 +121,7 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 	return (
 		<Flex flexDirection="column" width="100%" height="100%" mt={6}>
 			<List>
-				{v1Session ? (
+				{v1Session && v1Session.peerMeta ? (
 					<Box key={v1Session.handshakeTopic} mt={3}>
 						<GenericRow
 							key={v1Session.handshakeTopic}

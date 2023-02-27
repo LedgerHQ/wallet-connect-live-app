@@ -1,7 +1,7 @@
 import { Flex, Text, Box, CryptoIcon, Button } from '@ledgerhq/react-ui'
 import styled, { useTheme } from 'styled-components'
 import useNavigation from '@/components/WalletConnect/v2/hooks/useNavigation'
-import { Proposal } from '@/types/types'
+import { AddAccountPlaceholder } from '@/components/WalletConnect/v2/components/SessionProposal/AddAccountPlaceholder'
 import {
 	formatUrl,
 	getTicker,
@@ -134,7 +134,7 @@ export default function SessionProposal() {
 								variant="body"
 								fontWeight="medium"
 								textAlign="center"
-								color={colors.neutral.c80}
+								color="neutral.c80"
 								uppercase={false}
 							>
 								{formatUrl(proposer.url)}
@@ -142,69 +142,78 @@ export default function SessionProposal() {
 						</Header>
 
 						<ListChains>
-							<Box
-								key={
-									walletConnectV1Logic.selectedAccount
-										.currency
-								}
-								mb={6}
-							>
-								<Box mb={6}>
-									<Text
-										variant="subtitle"
-										color={colors.neutral.c70}
-									>
-										{
-											walletConnectV1Logic.selectedAccount
-												.currency
-										}
-									</Text>
+							{walletConnectV1Logic.selectedAccount ? (
+								<Box
+									key={
+										walletConnectV1Logic.selectedAccount
+											.currency
+									}
+									mb={6}
+								>
+									<Box mb={6}>
+										<Text
+											variant="subtitle"
+											color="neutral.c70"
+										>
+											{
+												walletConnectV1Logic
+													.selectedAccount.currency
+											}
+										</Text>
+									</Box>
+									<List>
+										<li
+											key={
+												walletConnectV1Logic
+													.selectedAccount.id
+											}
+										>
+											<GenericRow
+												title={
+													walletConnectV1Logic
+														.selectedAccount.name
+												}
+												subtitle={truncate(
+													walletConnectV1Logic
+														.selectedAccount
+														.address,
+													30,
+												)}
+												onClick={
+													walletConnectV1Logic.handleSwitchAccount
+												}
+												LeftIcon={
+													<CryptoIcon
+														name={getTicker(
+															walletConnectV1Logic
+																.selectedAccount
+																.currency,
+														)}
+														circleIcon
+														size={24}
+													/>
+												}
+												rightElement={
+													<Text
+														variant="small"
+														fontWeight="medium"
+														color="neutral.c70"
+													>
+														{t('sessions.switch')}
+													</Text>
+												}
+												rowType={RowType.Detail}
+											/>
+										</li>
+									</List>
 								</Box>
-								<List>
-									<li
-										key={
-											walletConnectV1Logic.selectedAccount
-												.id
-										}
-									>
-										<GenericRow
-											title={
-												walletConnectV1Logic
-													.selectedAccount.name
-											}
-											subtitle={truncate(
-												walletConnectV1Logic
-													.selectedAccount.address,
-												30,
-											)}
-											onClick={
-												walletConnectV1Logic.handleSwitchAccount
-											}
-											LeftIcon={
-												<CryptoIcon
-													name={getTicker(
-														walletConnectV1Logic
-															.selectedAccount
-															.currency,
-													)}
-													circleIcon
-													size={24}
-												/>
-											}
-											rightElement={
-												<Text
-													variant="small"
-													fontWeight="medium"
-													color="neutral.c70"
-												>
-													{t('sessions.switch')}
-												</Text>
-											}
-											rowType={RowType.Detail}
-										/>
-									</li>
-								</List>
-							</Box>
+							) : (
+								<AddAccountPlaceholder
+									onClick={
+										walletConnectV1Logic.handleSwitchAccount
+									}
+								/>
+							)}
 						</ListChains>
 					</Flex>
 
@@ -212,7 +221,8 @@ export default function SessionProposal() {
 						<Box mt={6}>
 							<InfoSessionProposal />
 						</Box>
-						{walletConnectV1Logic.session ? (
+						{walletConnectV1Logic.session &&
+						walletConnectV1Logic.session.peerMeta ? (
 							<Box mt={6}>
 								<Text
 									variant="small"

@@ -42,11 +42,13 @@ export default function WalletConnect({
 	)
 
 	useEffect(() => {
-		if (accounts.length > 0 && networks.length > 0) {
-			clearAppStore()
-			clearAccounts()
-			setLastSessionVisited(null)
+		clearAppStore()
+		clearAccounts()
+		setLastSessionVisited(null)
+		if (accounts.length > 0) {
 			addAccounts(accounts)
+		}
+		if (networks.length > 0) {
 			addNetworks(networks)
 		}
 	}, [platformSDK])
