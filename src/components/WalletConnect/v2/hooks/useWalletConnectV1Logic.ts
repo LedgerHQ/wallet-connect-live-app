@@ -70,6 +70,8 @@ export default function useWalletConnectV1Logic({
 			getInitialState(accounts, initialAccountId),
 		)
 
+	const isV1 = (uri: string) => uri?.includes('@1?')
+
 	useEffect(() => {
 		selectedAccountRef.current = selectedAccount
 		const wc = wcRef.current
@@ -362,7 +364,7 @@ export default function useWalletConnectV1Logic({
 
 	useEffect(() => {
 		const sessionURI = localStorage.getItem('sessionURI')
-		if (initialURI && initialURI !== sessionURI) {
+		if (initialURI && initialURI !== sessionURI && isV1(initialURI)) {
 			createClient({ uri: initialURI })
 			return
 		}
@@ -421,7 +423,7 @@ export default function useWalletConnectV1Logic({
 		} catch (error) {
 			console.log('request account canceled by user')
 		}
-	}, [])
+	}, [setState])
 
 	const handleTimeout = useCallback(() => {
 		cleanup(true)
@@ -430,8 +432,6 @@ export default function useWalletConnectV1Logic({
 	const handleCancel = useCallback(() => {
 		cleanup()
 	}, [])
-
-	const isV1 = (uri: string) => uri?.includes('@1?')
 
 	walletConnectV1Logic = {
 		session,
