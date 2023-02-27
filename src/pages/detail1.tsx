@@ -7,7 +7,6 @@ import { Box, Button, CryptoIcon, Flex, Text } from '@ledgerhq/react-ui'
 import { ArrowLeftMedium } from '@ledgerhq/react-ui/assets/icons'
 import { useCallback } from 'react'
 import styled from 'styled-components'
-import Image from 'next/image'
 import { useTranslation } from 'next-i18next'
 import useNavigation from '@/components/WalletConnect/v2/hooks/useNavigation'
 import Link from 'next/link'
@@ -22,6 +21,8 @@ import {
 } from '@/components/WalletConnect/v2/components/Containers/util'
 import { ResponsiveContainer } from '@/styles/styles'
 import { walletConnectV1Logic } from '@/components/WalletConnect/v2/hooks/useWalletConnectV1Logic'
+import { useV1Store, v1Selector } from 'src/store/v1.store'
+import { ImageWithPlaceholder } from '@/components/WalletConnect/v2/components/images/imageWithPlaceholder'
 
 export { getServerSideProps } from '../lib/serverProps'
 
@@ -44,9 +45,8 @@ const V1Container = styled.div`
 export default function SessionDetail() {
 	const { t } = useTranslation()
 	const { routes, navigate, tabsIndexes } = useNavigation()
-
-	const session = walletConnectV1Logic.session
-	const account = walletConnectV1Logic.selectedAccount
+	const session = useV1Store(v1Selector.selectSession)
+	const account = useV1Store(v1Selector.selectAccount)
 
 	const navigateToSessionsHomeTab = useCallback(() => {
 		navigate(routes.home, { tab: tabsIndexes.sessions })
@@ -105,15 +105,10 @@ export default function SessionDetail() {
 									justifyContent="space-between"
 									alignItems="center"
 								>
-									<Image
-										src={metadata?.icons[0] ?? ''}
-										alt="Picture of the proposer"
-										width={32}
-										style={{
-											borderRadius: '8px',
-										}}
-										height={32}
+									<ImageWithPlaceholder
+										icon={metadata?.icons[0]}
 									/>
+
 									<Flex flexDirection="column" ml={5}>
 										<Text
 											variant="body"
@@ -172,32 +167,35 @@ export default function SessionDetail() {
 						<Text variant="h4" mt={8} mb={6} color="neutral.c100">
 							{t('sessions.detail.account')}
 						</Text>
-						<Box key={account.currency} mb={6} flex={1}>
-							<GenericRow
-								title={account.name}
-								subtitle={truncate(account.address, 30)}
-								onClick={
-									walletConnectV1Logic.handleSwitchAccount
-								}
-								LeftIcon={
-									<CryptoIcon
-										name={getTicker(account.currency)}
-										circleIcon
-										size={24}
-									/>
-								}
-								rightElement={
-									<Text
-										variant="small"
-										fontWeight="medium"
-										color="neutral.c70"
-									>
-										{t('sessions.switch')}
-									</Text>
-								}
-								rowType={RowType.Detail}
-							/>
-						</Box>
+						{!!account && (
+							<Box key={account.currency} mb={6} flex={1}>
+								<GenericRow
+									title={account.name}
+									subtitle={truncate(account.address, 30)}
+									onClick={
+										walletConnectV1Logic.handleSwitchAccount
+									}
+									LeftIcon={
+										<CryptoIcon
+											name={getTicker(account.currency)}
+											circleIcon
+											size={24}
+										/>
+									}
+									rightElement={
+										<Text
+											variant="small"
+											fontWeight="medium"
+											color="neutral.c70"
+										>
+											{t('sessions.switch')}
+										</Text>
+									}
+									rowType={RowType.Detail}
+								/>
+							</Box>
+						)}
+
 						<Box mt={6}>
 							<InfoSessionProposal isInSessionDetails />
 						</Box>

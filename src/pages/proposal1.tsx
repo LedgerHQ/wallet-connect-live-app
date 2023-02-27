@@ -1,6 +1,5 @@
 import { Flex, Text, Box, CryptoIcon, Button } from '@ledgerhq/react-ui'
 import styled, { useTheme } from 'styled-components'
-import useNavigation from '@/components/WalletConnect/v2/hooks/useNavigation'
 import { AddAccountPlaceholder } from '@/components/WalletConnect/v2/components/SessionProposal/AddAccountPlaceholder'
 import {
 	formatUrl,
@@ -25,7 +24,9 @@ import {
 	List,
 } from '@/components/WalletConnect/v2/components/Containers/util'
 import { ResponsiveContainer } from '@/styles/styles'
+import { useV1Store, v1Selector } from 'src/store/v1.store'
 import { walletConnectV1Logic } from '@/components/WalletConnect/v2/hooks/useWalletConnectV1Logic'
+
 export { getServerSideProps } from '../lib/serverProps'
 
 const DAppContainer = styled(Flex).attrs(
@@ -62,10 +63,11 @@ const Header = styled(Flex)`
 
 export default function SessionProposal() {
 	const { colors } = useTheme()
-	const { router } = useNavigation()
-	const { t } = useTranslation()
 
-	const proposal = JSON.parse(router.query.data as string)
+	const { t } = useTranslation()
+	const selectedAccount = useV1Store(v1Selector.selectAccount)
+	const session = useV1Store(v1Selector.selectSession)
+	const proposal = useV1Store(v1Selector.selectProposal)
 	const proposer = proposal?.params[0]?.peerMeta
 
 	return (
@@ -85,7 +87,7 @@ export default function SessionProposal() {
 				>
 					<Flex flexDirection="column">
 						<Header mt={12} mb={10}>
-							{proposer.icons.length > 0 ? (
+							{proposer && proposer.icons.length > 0 ? (
 								<Container>
 									<LogoContainer>
 										<Logo size={30} />
@@ -126,7 +128,7 @@ export default function SessionProposal() {
 								fontWeight="medium"
 							>
 								{t('sessionProposal.connectTo', {
-									name: proposer.name,
+									name: proposer?.name,
 								})}
 							</Text>
 
@@ -137,46 +139,27 @@ export default function SessionProposal() {
 								color="neutral.c80"
 								uppercase={false}
 							>
-								{formatUrl(proposer.url)}
+								{formatUrl(proposer?.url ?? '')}
 							</Text>
 						</Header>
 
 						<ListChains>
-							{walletConnectV1Logic.selectedAccount ? (
-								<Box
-									key={
-										walletConnectV1Logic.selectedAccount
-											.currency
-									}
-									mb={6}
-								>
+							{selectedAccount ? (
+								<Box key={selectedAccount.currency} mb={6}>
 									<Box mb={6}>
 										<Text
 											variant="subtitle"
 											color="neutral.c70"
 										>
-											{
-												walletConnectV1Logic
-													.selectedAccount.currency
-											}
+											{selectedAccount.currency}
 										</Text>
 									</Box>
 									<List>
-										<li
-											key={
-												walletConnectV1Logic
-													.selectedAccount.id
-											}
-										>
+										<li key={selectedAccount.id}>
 											<GenericRow
-												title={
-													walletConnectV1Logic
-														.selectedAccount.name
-												}
+												title={selectedAccount.name}
 												subtitle={truncate(
-													walletConnectV1Logic
-														.selectedAccount
-														.address,
+													selectedAccount.address,
 													30,
 												)}
 												onClick={
@@ -185,9 +168,7 @@ export default function SessionProposal() {
 												LeftIcon={
 													<CryptoIcon
 														name={getTicker(
-															walletConnectV1Logic
-																.selectedAccount
-																.currency,
+															selectedAccount.currency,
 														)}
 														circleIcon
 														size={24}
@@ -221,8 +202,7 @@ export default function SessionProposal() {
 						<Box mt={6}>
 							<InfoSessionProposal />
 						</Box>
-						{walletConnectV1Logic.session &&
-						walletConnectV1Logic.session.peerMeta ? (
+						{session && session.peerMeta ? (
 							<Box mt={6}>
 								<Text
 									variant="small"
@@ -246,9 +226,7 @@ export default function SessionProposal() {
 										color="neutral.c100"
 									>
 										{t(`sessionProposal.infoBullet.2`, {
-											dAppName:
-												walletConnectV1Logic.session
-													.peerMeta.name,
+											dAppName: session.peerMeta.name,
 										})}
 									</Text>
 								</Flex>
