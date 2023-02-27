@@ -117,14 +117,23 @@ export default function SessionProposal() {
 								</LogoContainer>
 							)}
 
-							<Text variant="h4" mt={3} mb={2} uppercase={false}>
+							<Text
+								variant="h4"
+								mt={3}
+								mb={3}
+								uppercase={false}
+								textAlign="center"
+								fontWeight="medium"
+							>
 								{t('sessionProposal.connectTo', {
 									name: proposer.name,
 								})}
 							</Text>
 
 							<Text
-								variant="h4"
+								variant="body"
+								fontWeight="medium"
+								textAlign="center"
 								color={colors.neutral.c80}
 								uppercase={false}
 							>

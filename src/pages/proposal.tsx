@@ -21,7 +21,10 @@ import { ErrorBlockchainSupport } from '@/components/WalletConnect/v2/components
 import { useProposal } from '@/components/WalletConnect/v2/hooks/useProposal'
 import { useMemo } from 'react'
 import { AddAccountPlaceholder } from '@/components/WalletConnect/v2/components/SessionProposal/AddAccountPlaceholder'
-import { WalletConnectMedium } from '@ledgerhq/react-ui/assets/icons'
+import {
+	CircledCrossSolidMedium,
+	WalletConnectMedium,
+} from '@ledgerhq/react-ui/assets/icons'
 import {
 	ButtonsContainer,
 	List,
@@ -86,9 +89,13 @@ export default function SessionProposal() {
 
 	const requiredChains = accountsByChain.filter((entry) => entry.isRequired)
 
-	const noChainsSupported =
-		accountsByChain.filter((entry) => !entry.isSupported).length ===
-		accountsByChain.length
+	const chainsNotSupported = accountsByChain.filter(
+		(entry) => !entry.isSupported,
+	)
+
+	const noChainsSupported = !accountsByChain.some(
+		(entry) => entry.isSupported,
+	)
 
 	const everyRequiredChainsSupported = requiredChains.every(
 		(entry) => entry.isSupported,
@@ -181,8 +188,10 @@ export default function SessionProposal() {
 								<Text
 									variant="h4"
 									mt={3}
-									mb={2}
+									mb={3}
 									uppercase={false}
+									textAlign="center"
+									fontWeight="medium"
 								>
 									{t('sessionProposal.connectTo', {
 										name: proposer.metadata.name,
@@ -190,7 +199,9 @@ export default function SessionProposal() {
 								</Text>
 
 								<Text
-									variant="h4"
+									variant="body"
+									fontWeight="medium"
+									textAlign="center"
 									color={colors.neutral.c80}
 									uppercase={false}
 								>
@@ -292,6 +303,35 @@ export default function SessionProposal() {
 										)
 									})}
 							</ListChains>
+							{chainsNotSupported &&
+							chainsNotSupported.length > 0 ? (
+								<GenericRow
+									title={
+										chainsNotSupported.length > 1
+											? t(
+													'sessionProposal.notSupported_plural',
+											  )
+											: t('sessionProposal.notSupported')
+									}
+									subtitle={chainsNotSupported
+										.map((entry) => entry.chain)
+										.join(', ')
+										.concat('.')}
+									LeftIcon={
+										<Flex
+											p={3}
+											bg="error.c100a025"
+											borderRadius="50%"
+										>
+											<CircledCrossSolidMedium
+												size={16}
+												color="error.c100"
+											/>
+										</Flex>
+									}
+									rowType={RowType.Default}
+								/>
+							) : null}
 						</Flex>
 
 						<Flex flexDirection="column">

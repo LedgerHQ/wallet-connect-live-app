@@ -1,5 +1,12 @@
 import { InputMode } from '@/types/types'
-import { useCallback, useState, Dispatch, SetStateAction, useMemo } from 'react'
+import {
+	useCallback,
+	useState,
+	Dispatch,
+	SetStateAction,
+	useMemo,
+	useEffect,
+} from 'react'
 import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
 import styled from 'styled-components'
 import { TransitionGroup } from 'react-transition-group'
@@ -48,10 +55,8 @@ export type WalletConnectProps = {
 }
 
 export default function Home({
-	platformSDK,
+	initialURI,
 	initialMode,
-	accounts,
-	networks,
 	setUri,
 }: WalletConnectProps) {
 	const { router, tabsIndexes } = useNavigation()
@@ -103,6 +108,7 @@ export default function Home({
 					<WalletConnectInnerContainer>
 						<ResponsiveContainer>
 							<Connect
+								initialURI={initialURI}
 								mode={initialMode}
 								onConnect={handleConnect}
 							/>

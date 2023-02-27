@@ -6,6 +6,7 @@ import { PasteMedium } from '@ledgerhq/react-ui/assets/icons'
 import { QRScanner } from './QRScanner'
 import { InputMode } from '@/types/types'
 import { useTranslation } from 'next-i18next'
+import { walletConnectV1Logic } from './v2/hooks/useWalletConnectV1Logic'
 
 const QRScannerContainer = styled.div`
 	display: flex;
@@ -34,13 +35,14 @@ const QrCodeButton = styled.div`
 `
 
 export type ConnectProps = {
+	initialURI?: string
 	onConnect: (uri: string) => void
 	mode?: InputMode
 }
 
 let previouslyPasted = ''
 
-export function Connect({ onConnect, mode }: ConnectProps) {
+export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 	const { t } = useTranslation()
 	const [inputValue, setInputValue] = useState<string>('')
 	const [errorValue, setErrorValue] = useState<string | undefined>(undefined)
@@ -63,6 +65,12 @@ export function Connect({ onConnect, mode }: ConnectProps) {
 	const startScanning = useCallback(() => {
 		setScanner(true)
 	}, [])
+
+	useEffect(() => {
+		if (initialURI && !walletConnectV1Logic.isV1(initialURI)) {
+			onConnect(initialURI)
+		}
+	}, [initialURI])
 
 	useEffect(() => {
 		const interval = setInterval(async () => {
