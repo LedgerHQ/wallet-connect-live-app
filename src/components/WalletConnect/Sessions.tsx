@@ -5,7 +5,6 @@ import {
 import { formatUrl } from '@/components/WalletConnect/v2/utils/HelperUtil'
 import { Box, Button, Flex, Text } from '@ledgerhq/react-ui'
 import { useCallback } from 'react'
-import Image from 'next/image'
 import useNavigation from '@/components/WalletConnect/v2/hooks/useNavigation'
 import {
 	ButtonsContainer,
@@ -23,6 +22,7 @@ import { web3wallet } from './v2/utils/WalletConnectUtil'
 import { walletConnectV1Logic } from './v2/hooks/useWalletConnectV1Logic'
 import styled from 'styled-components'
 import { useV1Store, v1Selector } from 'src/store/v1.store'
+import { ImageWithPlaceholder } from './v2/components/images/imageWithPlaceholder'
 
 export type SessionsProps = {
 	sessions: Session[]
@@ -130,14 +130,8 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 							title={v1Session.peerMeta.name}
 							subtitle={formatUrl(v1Session.peerMeta.url)}
 							LeftIcon={
-								<Image
-									src={v1Session.peerMeta.icons[0]}
-									alt="Picture of the proposer"
-									width={32}
-									style={{
-										borderRadius: '8px',
-									}}
-									height={32}
+								<ImageWithPlaceholder
+									icon={v1Session.peerMeta.icons[0]}
 								/>
 							}
 							rowType={RowType.Detail}
@@ -168,14 +162,8 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 							title={session.peer.metadata.name}
 							subtitle={formatUrl(session.peer.metadata.url)}
 							LeftIcon={
-								<Image
-									src={session.peer.metadata.icons[0]}
-									alt="Picture of the proposer"
-									width={32}
-									style={{
-										borderRadius: '8px',
-									}}
-									height={32}
+								<ImageWithPlaceholder
+									icon={session.peer.metadata.icons[0]}
 								/>
 							}
 							rowType={RowType.Detail}
