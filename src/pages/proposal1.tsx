@@ -227,7 +227,7 @@ export default function SessionProposal() {
 									>
 										{t(`sessionProposal.infoBullet.2`, {
 											dAppName:
-												session.peerMeta.name ??
+												session.peerMeta.name ||
 												formatUrl(session.peerMeta.url),
 										})}
 									</Text>
