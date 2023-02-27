@@ -149,7 +149,7 @@ export function useProposal({ proposal }: Props) {
 			})
 			.then((res) => {
 				addSession(res)
-				navigate(routes.home, { tab: tabsIndexes.sessions })
+				navigate(routes.sessionDetails, res.topic)
 			})
 			.catch((error) => {
 				console.log(error)
