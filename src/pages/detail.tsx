@@ -7,7 +7,7 @@ import {
 import { web3wallet } from '@/components/WalletConnect/v2/utils/WalletConnectUtil'
 import { Box, Button, CryptoIcon, Flex, Text } from '@ledgerhq/react-ui'
 import { ArrowLeftMedium } from '@ledgerhq/react-ui/assets/icons'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import styled from 'styled-components'
 import Image from 'next/image'
 import { useTranslation } from 'next-i18next'
@@ -28,6 +28,7 @@ import {
 import { ResponsiveContainer } from '@/styles/styles'
 import { sessionSelector, useSessionsStore } from 'src/store/Sessions.store'
 import { useAccountsStore, accountSelector } from 'src/store/Accounts.store'
+import useHydratation from '@/components/WalletConnect/v2/hooks/useHydratation'
 
 export { getServerSideProps } from '../lib/serverProps'
 
@@ -38,7 +39,7 @@ const DetailContainer = styled(Flex)`
 	flex-direction: column;
 `
 export default function SessionDetail() {
-	const [hydrated, setHydrated] = useState(false)
+	const { hydrated } = useHydratation()
 	const { t } = useTranslation()
 	const { router, routes, navigate, tabsIndexes } = useNavigation()
 
@@ -53,12 +54,6 @@ export default function SessionDetail() {
 	const navigateToSessionsHomeTab = useCallback(() => {
 		navigate(routes.home, { tab: tabsIndexes.sessions })
 	}, [routes, tabsIndexes])
-
-	useEffect(() => {
-		// This forces a rerender, so the component is rendered
-		// the second time but not the first
-		setHydrated(true)
-	}, [])
 
 	useEffect(() => {
 		if (!!router.query.data) {

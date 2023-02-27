@@ -539,8 +539,8 @@ export function WalletConnectV1({
 							<>
 								<StatusIcon pulse={session.connected}>
 									<Image
-										width="55px"
-										height="55px"
+										width={55}
+										height={55}
 										src="/icons/walletconnect-logo.svg"
 										alt="walletconnect-logo"
 									/>

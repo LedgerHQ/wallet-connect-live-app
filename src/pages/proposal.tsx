@@ -30,6 +30,7 @@ import {
 	List,
 } from '@/components/WalletConnect/v2/components/Containers/util'
 import { ResponsiveContainer } from '@/styles/styles'
+import useHydratation from '@/components/WalletConnect/v2/hooks/useHydratation'
 export { getServerSideProps } from '../lib/serverProps'
 
 const DAppContainer = styled(Flex).attrs(
@@ -68,7 +69,7 @@ export default function SessionProposal() {
 	const { colors } = useTheme()
 	const { router } = useNavigation()
 	const { t } = useTranslation()
-
+	const { hydrated } = useHydratation()
 	const proposal = JSON.parse(router.query.data as string) as Proposal
 	const {
 		handleClick,
@@ -107,6 +108,10 @@ export default function SessionProposal() {
 
 	const disabled =
 		selectedAccounts.length === 0 || !eachRequiredChainHasOneAccount
+
+	if (!hydrated) {
+		return null
+	}
 
 	return (
 		<Flex
