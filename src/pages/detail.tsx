@@ -9,7 +9,6 @@ import { Box, Button, CryptoIcon, Flex, Text } from '@ledgerhq/react-ui'
 import { ArrowLeftMedium } from '@ledgerhq/react-ui/assets/icons'
 import { useCallback, useEffect, useMemo } from 'react'
 import styled from 'styled-components'
-import Image from 'next/image'
 import { useTranslation } from 'next-i18next'
 import useNavigation from '@/components/WalletConnect/v2/hooks/useNavigation'
 import Link from 'next/link'
@@ -29,6 +28,7 @@ import { ResponsiveContainer } from '@/styles/styles'
 import { sessionSelector, useSessionsStore } from 'src/store/Sessions.store'
 import { useAccountsStore, accountSelector } from 'src/store/Accounts.store'
 import useHydratation from '@/components/WalletConnect/v2/hooks/useHydratation'
+import { ImageWithPlaceholder } from '@/components/WalletConnect/v2/components/images/imageWithPlaceholder'
 
 export { getServerSideProps } from '../lib/serverProps'
 
@@ -164,15 +164,10 @@ export default function SessionDetail() {
 									justifyContent="space-between"
 									alignItems="center"
 								>
-									<Image
-										src={metadata?.icons[0] ?? ''}
-										alt="Picture of the proposer"
-										width={32}
-										style={{
-											borderRadius: '8px',
-										}}
-										height={32}
+									<ImageWithPlaceholder
+										icon={metadata?.icons[0]}
 									/>
+
 									<Flex flexDirection="column" ml={5}>
 										<Text
 											variant="body"
