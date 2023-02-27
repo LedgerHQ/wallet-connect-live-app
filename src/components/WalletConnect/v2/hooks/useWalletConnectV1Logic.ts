@@ -57,7 +57,7 @@ export default function useWalletConnectV1Logic({
 	const selectedAccountRef = useRef<Account>()
 	const wcRef = useRef<WalletConnectClient>()
 	const networks = useAppStore(appSelector.selectNetworks)
-	const { navigate, routes, tabsIndexes } = useNavigation()
+	const { navigate, routes } = useNavigation()
 	const {
 		setSelectedAccount,
 		setSession,
@@ -134,17 +134,13 @@ export default function useWalletConnectV1Logic({
 			}
 
 			wc.on('session_request', (error, payload) => {
-				console.log('session_request', {
-					error,
-					payload,
-					selectedAccount,
-				})
-
 				if (error) {
 				}
 				setProposal(payload as Proposal)
 				syncSessionWithReactState()
-				navigate(routes.sessionProposalV1)
+				setTimeout(() => {
+					navigate(routes.sessionProposalV1)
+				}, 500)
 			})
 
 			wc.on('connect', () => {
@@ -381,7 +377,7 @@ export default function useWalletConnectV1Logic({
 					chainId: networkConfig.chainId,
 					accounts: [account.address],
 				})
-				navigate(routes.home, { tab: tabsIndexes.sessions })
+				navigate(routes.sessionDetailsV1)
 			}
 		}
 	}, [])

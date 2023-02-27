@@ -226,7 +226,9 @@ export default function SessionProposal() {
 										color="neutral.c100"
 									>
 										{t(`sessionProposal.infoBullet.2`, {
-											dAppName: session.peerMeta.name,
+											dAppName:
+												session.peerMeta.name ??
+												formatUrl(session.peerMeta.url),
 										})}
 									</Text>
 								</Flex>
