@@ -42,6 +42,13 @@ const V1Container = styled.div`
 	padding: ${(p) => p.theme.space[2]}px;
 `
 
+const BackButton = styled(Flex)`
+	cursor: pointer;
+	&:hover {
+		opacity: 0.7;
+	}
+`
+
 export default function SessionDetail() {
 	const { t } = useTranslation()
 	const { routes, navigate, tabsIndexes } = useNavigation()
@@ -82,14 +89,14 @@ export default function SessionDetail() {
 					justifyContent="space-between"
 				>
 					<Flex flexDirection="column" width="100%">
-						<Flex onClick={navigateToSessionsHomeTab}>
+						<BackButton onClick={navigateToSessionsHomeTab}>
 							<Flex mt={10} mb={8}>
 								<ArrowLeftMedium
 									size={24}
 									color="neutral.c100"
 								/>
 							</Flex>
-						</Flex>
+						</BackButton>
 
 						<Text variant="h4" mb={8} color="neutral.c100">
 							{t('sessions.detail.title')}

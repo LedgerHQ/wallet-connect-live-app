@@ -19,8 +19,8 @@ const AddAccountButton = styled.div`
 
 	&:hover {
 		cursor: pointer;
-		border-color: ${(p) => p.theme.colors.constant.white};
-		color: ${(p) => p.theme.colors.constant.white};
+		border-color: ${(p) => p.theme.colors.neutral.c100};
+		color: ${(p) => p.theme.colors.neutral.c100};
 	}
 `
 type Props = {

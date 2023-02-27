@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from 'react'
 import { accountSelector, useAccountsStore } from 'src/store/Accounts.store'
 import { appSelector, useAppStore } from 'src/store/App.store'
 import { sessionSelector, useSessionsStore } from 'src/store/Sessions.store'
-import { useV1Store, v1Selector } from 'src/store/v1.store'
 import Home from './Home'
 import { useLedgerLive } from './v2/hooks/useLedgerLive'
 import useWalletConnectV1Logic from './v2/hooks/useWalletConnectV1Logic'
@@ -41,12 +40,9 @@ export default function WalletConnect({
 	const setLastSessionVisited = useSessionsStore(
 		sessionSelector.setLastSessionVisited,
 	)
-	const setSelectedAccount = useV1Store(v1Selector.setSelectedAccount)
-
 	useEffect(() => {
 		clearAppStore()
 		clearAccounts()
-		setSelectedAccount(undefined)
 		setLastSessionVisited(null)
 		if (accounts.length > 0) {
 			addAccounts(accounts)

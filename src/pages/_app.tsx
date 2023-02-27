@@ -5,15 +5,18 @@ import type { AppProps } from 'next/app'
 import { StyleProvider } from '@ledgerhq/react-ui'
 import { ThemeNames } from '@ledgerhq/react-ui/styles'
 import GlobalStyle from '@/styles/globalStyle'
-
-let initialTheme: ThemeNames
+import { appSelector, useAppStore } from 'src/store/App.store'
+import { useEffect } from 'react'
 
 function MyApp({ Component, pageProps }: AppProps) {
 	const router = useRouter()
-	const theme = router?.query?.theme || initialTheme || 'dark'
-	if (!initialTheme) {
-		initialTheme = theme as ThemeNames
-	}
+
+	const setTheme = useAppStore(appSelector.setTheme)
+	const theme = useAppStore(appSelector.selectTheme)
+
+	useEffect(() => {
+		setTheme((router?.query?.theme as ThemeNames) || theme)
+	}, [router?.query?.theme])
 
 	return (
 		<>
