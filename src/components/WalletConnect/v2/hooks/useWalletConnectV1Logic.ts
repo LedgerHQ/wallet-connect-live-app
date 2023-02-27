@@ -105,6 +105,8 @@ export default function useWalletConnectV1Logic({
 		// cleaning everything and reverting to initial state
 		setSession(null)
 		setTimedOut(timedOut)
+		setSelectedAccount(undefined)
+		setProposal(null)
 		wcRef.current = undefined
 		setUri(undefined)
 		localStorage.removeItem('session')
