@@ -6,9 +6,14 @@ import { StyleProvider } from '@ledgerhq/react-ui'
 import { ThemeNames } from '@ledgerhq/react-ui/styles'
 import GlobalStyle from '@/styles/globalStyle'
 
+let initialTheme: ThemeNames
+
 function MyApp({ Component, pageProps }: AppProps) {
 	const router = useRouter()
-	const { theme = 'dark' } = router.query
+	const theme = router?.query?.theme || initialTheme || 'dark'
+	if (!initialTheme) {
+		initialTheme = theme as ThemeNames
+	}
 
 	return (
 		<>
