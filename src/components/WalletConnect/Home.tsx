@@ -111,8 +111,9 @@ export default function Home({
 				index: tabsIndexes.sessions,
 				title: t('sessions.title'),
 				badge:
-					sessions?.length || v1Session
-						? (sessions.length || 0) + (v1Session ? 1 : 0)
+					sessions?.length || (v1Session && v1Session.peerMeta)
+						? (sessions.length || 0) +
+						  (v1Session && v1Session.peerMeta ? 1 : 0)
 						: undefined,
 				Component: (
 					<WalletConnectInnerContainer>

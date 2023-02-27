@@ -55,7 +55,7 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 	const v1Session = useV1Store(v1Selector.selectSession)
 
 	const disconnect = useCallback(async () => {
-		if (v1Session) {
+		if (v1Session && v1Session.peerMeta) {
 			walletConnectV1Logic.handleDisconnect()
 			walletConnectV1Logic.cleanup()
 		}
