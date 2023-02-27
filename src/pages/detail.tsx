@@ -38,6 +38,12 @@ const DetailContainer = styled(Flex)`
 	padding: 12px;
 	flex-direction: column;
 `
+const BackButton = styled(Flex)`
+	cursor: pointer;
+	&:hover {
+		opacity: 0.7;
+	}
+`
 export default function SessionDetail() {
 	const { hydrated } = useHydratation()
 	const { t } = useTranslation()
@@ -141,14 +147,14 @@ export default function SessionDetail() {
 					justifyContent="space-between"
 				>
 					<Flex flexDirection="column" width="100%">
-						<Flex onClick={navigateToSessionsHomeTab}>
+						<BackButton onClick={navigateToSessionsHomeTab}>
 							<Flex mt={10} mb={8}>
 								<ArrowLeftMedium
 									size={24}
 									color="neutral.c100"
 								/>
 							</Flex>
-						</Flex>
+						</BackButton>
 
 						<Text variant="h4" mb={8} color="neutral.c100">
 							{t('sessions.detail.title')}
@@ -228,7 +234,12 @@ export default function SessionDetail() {
 									fontWeight="medium"
 									color="neutral.c70"
 								>
-									{new Date(session.expiry).toDateString()}
+									{
+										//https://stackoverflow.com/a/37001827
+										new Date(
+											session.expiry * 1000,
+										).toDateString()
+									}
 								</Text>
 							</Row>
 						</DetailContainer>

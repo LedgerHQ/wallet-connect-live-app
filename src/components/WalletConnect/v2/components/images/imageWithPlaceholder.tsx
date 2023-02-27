@@ -23,7 +23,7 @@ export const ImageWithPlaceholder = ({ icon }: Props) => {
 			style={{
 				borderRadius: '8px',
 				backgroundColor: colors.background.drawer,
-				color: colors.constant.white,
+				color: colors.neutral.c100,
 			}}
 		/>
 	)
