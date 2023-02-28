@@ -57,7 +57,7 @@ export default function useWalletConnectV1Logic({
 	const selectedAccountRef = useRef<Account>()
 	const wcRef = useRef<WalletConnectClient>()
 	const networks = useAppStore(appSelector.selectNetworks)
-	const { navigate, routes } = useNavigation()
+	const { routes, navigate, tabsIndexes, router } = useNavigation()
 	const {
 		setSelectedAccount,
 		setSession,
@@ -80,6 +80,8 @@ export default function useWalletConnectV1Logic({
 	const isV1 = (uri: string) => uri?.includes('@1?')
 
 	useEffect(() => {
+		console.log('USE EFFECT', selectedAccount)
+		console.log('account id', selectedAccount?.id)
 		selectedAccountRef.current = selectedAccount
 		const wc = wcRef.current
 
@@ -99,7 +101,7 @@ export default function useWalletConnectV1Logic({
 				setSession(wc.session)
 			}
 		}
-	}, [selectedAccount])
+	}, [selectedAccount, selectedAccount?.id])
 
 	const cleanup = useCallback((timedOut = false) => {
 		// cleaning everything and reverting to initial state
@@ -154,6 +156,7 @@ export default function useWalletConnectV1Logic({
 
 			wc.on('disconnect', () => {
 				cleanup()
+				navigate(routes.home, { tab: tabsIndexes.sessions })
 			})
 
 			wc.on('error', (error) => {
