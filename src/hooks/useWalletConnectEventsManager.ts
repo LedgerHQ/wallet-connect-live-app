@@ -1,15 +1,16 @@
-import { EIP155_SIGNING_METHODS } from '../data/EIP155Data'
 // import ModalStore from '@/store/ModalStore'
-import { web3wallet } from '../utils/WalletConnectUtil'
+
 import { SignClientTypes } from '@walletconnect/types'
 import { useCallback, useEffect } from 'react'
 import { Web3WalletTypes } from '@walletconnect/web3wallet'
-import useNavigation from '../hooks/useNavigation'
+import useNavigation from './useNavigation'
 import { hasETHAddress } from '@/helpers/generic'
 import { stripHexPrefix } from '@/utils/currencyFormatter/helpers'
 import { platformSDK } from './useLedgerLive'
 import { convertEthToLiveTX } from '@/helpers/converters'
-import { accountSelector, useAccountsStore } from 'src/store/Accounts.store'
+import { accountSelector, useAccountsStore } from '@/storage/accounts.store'
+import { EIP155_SIGNING_METHODS } from '@/data/EIP155Data'
+import { web3wallet } from '@/helpers/walletConnect.util'
 
 enum Errors {
 	userDecline = 'User rejected',
@@ -31,7 +32,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 	)
 
 	const onAuthRequest = useCallback(
-		(request: Web3WalletTypes.AuthRequest) => {
+		(_request: Web3WalletTypes.AuthRequest) => {
 			// ModalStore.open('AuthRequestModal', { request })
 		},
 		[],

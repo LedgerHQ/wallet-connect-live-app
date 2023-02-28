@@ -4,14 +4,14 @@ import { SessionTypes } from '@walletconnect/types'
 
 import router from 'next/router'
 import { useCallback, useState } from 'react'
-import { EIP155_SIGNING_METHODS } from '../data/EIP155Data'
-import { formatChainName } from '../utils/HelperUtil'
-import { web3wallet } from '../utils/WalletConnectUtil'
 import useNavigation from './useNavigation'
 import { platformSDK } from './useLedgerLive'
-import { sessionSelector, useSessionsStore } from 'src/store/Sessions.store'
-import { accountSelector, useAccountsStore } from 'src/store/Accounts.store'
-import { useAppStore, appSelector } from 'src/store/App.store'
+import { sessionSelector, useSessionsStore } from '@/storage/sessions.store'
+import { accountSelector, useAccountsStore } from '@/storage/accounts.store'
+import { useAppStore, appSelector } from '@/storage/app.store'
+import { formatChainName } from '@/helpers/helper.util'
+import { EIP155_SIGNING_METHODS } from '@/data/EIP155Data'
+import { web3wallet } from '@/helpers/walletConnect.util'
 
 type Props = {
 	proposal: Proposal

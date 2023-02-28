@@ -4,10 +4,10 @@ import { useRouter } from 'next/router'
 import Head from 'next/head'
 
 import { Container } from '@/styles/styles'
-import WalletConnect from '@/components/WalletConnect'
 import { NetworkConfig } from '@/types/types'
 import { SDKProvider } from 'src/shared/SDKProvider'
-import { appSelector, useAppStore } from 'src/store/App.store'
+import { appSelector, useAppStore } from '@/storage/app.store'
+import WalletConnect from '@/components/screens'
 
 export { getServerSideProps } from '../lib/serverProps'
 

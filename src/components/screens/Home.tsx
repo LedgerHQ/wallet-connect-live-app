@@ -1,20 +1,19 @@
-import { InputMode } from '@/types/types'
-import { useCallback, useState, Dispatch, SetStateAction, useMemo } from 'react'
-import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
-import styled from 'styled-components'
-import { TransitionGroup } from 'react-transition-group'
-import { useTranslation } from 'next-i18next'
-import { startProposal } from './v2/utils/WalletConnectUtil'
-import { Connect } from './Connect'
-import { NetworkConfig } from '@/types/types'
+import { startProposal } from '@/helpers/walletConnect.util'
 import { ResponsiveContainer } from '@/styles/styles'
-import Sessions from './Sessions'
-import Tabs from './Tabs'
+import { NetworkConfig, InputMode } from '@/types/types'
+import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
 import { Flex } from '@ledgerhq/react-ui'
-import { sessionSelector, useSessionsStore } from 'src/store/Sessions.store'
-import useNavigation from './v2/hooks/useNavigation'
-import useHydratation from './v2/hooks/useHydratation'
-import { useV1Store, v1Selector } from 'src/store/v1.store'
+import { useTranslation } from 'next-i18next'
+import { Dispatch, SetStateAction, useState, useCallback, useMemo } from 'react'
+import { TransitionGroup } from 'react-transition-group'
+import useHydratation from '@/hooks/useHydratation'
+import useNavigation from '@/hooks/useNavigation'
+import { useSessionsStore, sessionSelector } from '@/storage/sessions.store'
+import { useV1Store, v1Selector } from '@/storage/v1.store'
+import styled from 'styled-components'
+import { Connect } from './Connect'
+import Sessions from './sessions/Sessions'
+import Tabs from './Tabs'
 
 const WalletConnectContainer = styled.div`
 	display: flex;
@@ -64,8 +63,8 @@ export default function Home({
 	const { t } = useTranslation()
 
 	const [activeTabIndex, setActiveTabIndex] = useState(initialTab)
-	const [inputValue, setInputValue] = useState<string>('')
-	const [errorValue, setErrorValue] = useState<string | undefined>(undefined)
+	const [inputValue] = useState<string>('')
+	const [, setErrorValue] = useState<string | undefined>(undefined)
 
 	const handleConnect = useCallback(
 		async (inputValue: string) => {
