@@ -1,13 +1,13 @@
 import { Flex, Text, Box, CryptoIcon, Button } from '@ledgerhq/react-ui'
 import styled, { useTheme } from 'styled-components'
-import { AddAccountPlaceholder } from '@/components/atoms/SessionProposal/AddAccountPlaceholder'
+import { AddAccountPlaceholder } from '@/components/screens/sessions/SessionProposal/AddAccountPlaceholder'
 import { formatUrl, getTicker, truncate } from 'src/utils/HelperUtil'
 import { useTranslation } from 'next-i18next'
 import LogoContainer from '@/components/atoms/LogoContainers/LedgerLogoContainer'
 import Image from 'next/image'
-import { GenericRow, RowType } from '@/components/atoms/GenericRow'
+import { GenericRow, RowType } from '@/components/atoms/Containers/GenericRow'
 import { Logo } from 'src/icons/LedgerLiveLogo'
-import { InfoSessionProposal } from '@/components/atoms/SessionProposal/InfoSessionProposal'
+import { InfoSessionProposal } from '@/components/screens/sessions/SessionProposal/InfoSessionProposal'
 import {
 	WalletConnectMedium,
 	WarningMedium,

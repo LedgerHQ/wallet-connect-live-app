@@ -1,4 +1,4 @@
-import { GenericRow, RowType } from '@/components/atoms/GenericRow'
+import { GenericRow, RowType } from '@/components/atoms/Containers/GenericRow'
 import { formatUrl } from 'src/utils/HelperUtil'
 import { Box, Button, Flex, Text } from '@ledgerhq/react-ui'
 import { useCallback } from 'react'
@@ -14,9 +14,9 @@ import {
 } from 'src/store/Sessions.store'
 import styled from 'styled-components'
 import { useV1Store, v1Selector } from 'src/store/v1.store'
-import { ImageWithPlaceholder } from '../atoms/images/imageWithPlaceholder'
-import { walletConnectV1Logic } from '../../hooks/useWalletConnectV1Logic'
-import { web3wallet } from '../../utils/WalletConnectUtil'
+import { ImageWithPlaceholder } from '../../atoms/Images/imageWithPlaceholder'
+import { walletConnectV1Logic } from '../../../hooks/useWalletConnectV1Logic'
+import { web3wallet } from '../../../utils/WalletConnectUtil'
 
 export type SessionsProps = {
 	sessions: Session[]

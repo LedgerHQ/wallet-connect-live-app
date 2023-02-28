@@ -6,14 +6,14 @@ import { formatUrl, getTicker, truncate } from 'src/utils/HelperUtil'
 import { useTranslation } from 'next-i18next'
 import LogoContainer from '@/components/atoms/LogoContainers/LedgerLogoContainer'
 import Image from 'next/image'
-import { GenericRow, RowType } from '@/components/atoms/GenericRow'
+import { GenericRow, RowType } from '@/components/atoms/Containers/GenericRow'
 import { space } from '@ledgerhq/react-ui/styles/theme'
 import { Logo } from 'src/icons/LedgerLiveLogo'
-import { InfoSessionProposal } from '@/components/atoms/SessionProposal/InfoSessionProposal'
-import { ErrorBlockchainSupport } from '@/components/atoms/SessionProposal/ErrorBlockchainSupport'
+import { InfoSessionProposal } from '@/components/screens/sessions/SessionProposal/InfoSessionProposal'
+import { ErrorBlockchainSupport } from '@/components/screens/sessions/SessionProposal/ErrorBlockchainSupport'
 import { useProposal } from 'src/hooks/useProposal'
 import { useMemo } from 'react'
-import { AddAccountPlaceholder } from '@/components/atoms/SessionProposal/AddAccountPlaceholder'
+import { AddAccountPlaceholder } from '@/components/screens/sessions/SessionProposal/AddAccountPlaceholder'
 import {
 	CircledCrossSolidMedium,
 	WalletConnectMedium,
