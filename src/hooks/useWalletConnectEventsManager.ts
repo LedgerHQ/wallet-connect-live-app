@@ -9,7 +9,7 @@ import { hasETHAddress } from '@/helpers/generic'
 import { stripHexPrefix } from '@/utils/currencyFormatter/helpers'
 import { platformSDK } from './useLedgerLive'
 import { convertEthToLiveTX } from '@/helpers/converters'
-import { accountSelector, useAccountsStore } from 'src/storage/accounts.store'
+import { accountSelector, useAccountsStore } from '@/storage/accounts.store'
 import { web3wallet } from '@/helpers/walletConnect.util'
 
 enum Errors {

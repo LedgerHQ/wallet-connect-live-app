@@ -7,7 +7,7 @@ import { Container } from '@/styles/styles'
 import WalletConnect from '@/components/screens'
 import { NetworkConfig } from '@/types/types'
 import { SDKProvider } from 'src/shared/SDKProvider'
-import { appSelector, useAppStore } from 'src/storage/app.store'
+import { appSelector, useAppStore } from '@/storage/app.store'
 
 export { getServerSideProps } from '../lib/serverProps'
 
