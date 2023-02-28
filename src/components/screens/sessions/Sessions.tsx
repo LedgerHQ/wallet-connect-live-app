@@ -1,28 +1,24 @@
-import {
-	GenericRow,
-	RowType,
-} from '@/components/WalletConnect/v2/components/GenericRow'
-import { formatUrl } from '@/components/WalletConnect/v2/utils/HelperUtil'
-import { Box, Button, Flex, Text } from '@ledgerhq/react-ui'
-import { useCallback } from 'react'
-import useNavigation from '@/components/WalletConnect/v2/hooks/useNavigation'
-import {
-	ButtonsContainer,
-	List,
-} from '@/components/WalletConnect/v2/components/Containers/util'
+import { List, ButtonsContainer } from '@/components/atoms/containers/Elements'
+import { GenericRow, RowType } from '@/components/atoms/GenericRow'
+import { ImageWithPlaceholder } from '@/components/atoms/images/ImageWithPlaceholder'
+import { WalletConnectPopin } from '@/components/atoms/popin/WalletConnectPopin'
+import { formatUrl } from '@/helpers/helper.util'
+import { web3wallet } from '@/helpers/walletConnect.util'
+import { Flex, Button, Box, Text } from '@ledgerhq/react-ui'
+
 import { useTranslation } from 'next-i18next'
-import { WalletConnectPopin } from '@/components/WalletConnect/v2/components/Popin/WalletConnectPopin'
-import useWalletConnectPopin from '@/components/WalletConnect/v2/hooks/useWalletConnectPopin'
-import {
-	Session,
-	sessionSelector,
-	useSessionsStore,
-} from 'src/store/Sessions.store'
-import { web3wallet } from './v2/utils/WalletConnectUtil'
-import { walletConnectV1Logic } from './v2/hooks/useWalletConnectV1Logic'
+import { useCallback } from 'react'
+import useNavigation from '@/hooks/useNavigation'
+import useWalletConnectPopin from '@/hooks/useWalletConnectPopin'
+import { walletConnectV1Logic } from '@/hooks/useWalletConnectV1Logic'
+
 import styled from 'styled-components'
-import { useV1Store, v1Selector } from 'src/store/v1.store'
-import { ImageWithPlaceholder } from './v2/components/images/imageWithPlaceholder'
+import {
+	useSessionsStore,
+	sessionSelector,
+	Session,
+} from '@/storage/sessions.store'
+import { useV1Store, v1Selector } from '@/storage/v1.store'
 
 export type SessionsProps = {
 	sessions: Session[]

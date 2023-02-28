@@ -18,9 +18,11 @@
 		"paths": {
 			"@/components/*": ["src/components/*"],
 			"@/pages/*": ["src/pages/*"],
+			"@/data/*": ["src/data/*"],
+			"@/hooks/*": ["src/hooks/*"],
+			"@/storage/*": ["src/storage/*"],
 			"@/styles/*": ["src/styles/*"],
 			"@/utils/*": ["src/shared/utils/*"],
-			"@/hooks/*": ["src/shared/hooks/*"],
 			"@/constants/*": ["src/shared/constants/*"],
 			"@/context/*": ["src/shared/context/*"],
 			"@/mocks/*": ["src/__mocks__/*"],

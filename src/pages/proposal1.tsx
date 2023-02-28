@@ -1,31 +1,21 @@
-import { Flex, Text, Box, CryptoIcon, Button } from '@ledgerhq/react-ui'
-import styled, { useTheme } from 'styled-components'
-import { AddAccountPlaceholder } from '@/components/WalletConnect/v2/components/SessionProposal/AddAccountPlaceholder'
-import {
-	formatUrl,
-	getTicker,
-	truncate,
-} from '@/components/WalletConnect/v2/utils/HelperUtil'
-import { useTranslation } from 'next-i18next'
-import LogoContainer from '@/components/WalletConnect/v2/components/LogoContainers/LedgerLogoContainer'
-import Image from 'next/image'
-import {
-	GenericRow,
-	RowType,
-} from '@/components/WalletConnect/v2/components/GenericRow'
-import { Logo } from '@/components/WalletConnect/v2/icons/LedgerLiveLogo'
-import { InfoSessionProposal } from '@/components/WalletConnect/v2/components/SessionProposal/InfoSessionProposal'
+import { List, ButtonsContainer } from '@/components/atoms/containers/Elements'
+import { GenericRow, RowType } from '@/components/atoms/GenericRow'
+import LogoContainer from '@/components/atoms/logoContainers/LedgerLogoContainer'
+import { AddAccountPlaceholder } from '@/components/screens/sessions/sessionProposal/AddAccountPlaceholder'
+import { InfoSessionProposal } from '@/components/screens/sessions/sessionProposal/InfoSessionProposal'
+import { formatUrl, getTicker, truncate } from '@/helpers/helper.util'
+import { walletConnectV1Logic } from '@/hooks/useWalletConnectV1Logic'
+import { useV1Store, v1Selector } from '@/storage/v1.store'
+import { ResponsiveContainer } from '@/styles/styles'
+import { Flex, Box, CryptoIcon, Button, Text } from '@ledgerhq/react-ui'
 import {
 	WalletConnectMedium,
 	WarningMedium,
 } from '@ledgerhq/react-ui/assets/icons'
-import {
-	ButtonsContainer,
-	List,
-} from '@/components/WalletConnect/v2/components/Containers/util'
-import { ResponsiveContainer } from '@/styles/styles'
-import { useV1Store, v1Selector } from 'src/store/v1.store'
-import { walletConnectV1Logic } from '@/components/WalletConnect/v2/hooks/useWalletConnectV1Logic'
+import Image from 'next/image'
+import { useTranslation } from 'next-i18next'
+import { Logo } from 'src/icons/LedgerLiveLogo'
+import styled, { useTheme } from 'styled-components'
 
 export { getServerSideProps } from '../lib/serverProps'
 

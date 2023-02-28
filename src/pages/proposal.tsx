@@ -1,36 +1,27 @@
-import { Flex, Text, Box, CryptoIcon, Button } from '@ledgerhq/react-ui'
-import styled, { useTheme } from 'styled-components'
-import useNavigation from '@/components/WalletConnect/v2/hooks/useNavigation'
-import { Proposal } from '@/types/types'
-import {
-	formatUrl,
-	getTicker,
-	truncate,
-} from '@/components/WalletConnect/v2/utils/HelperUtil'
-import { useTranslation } from 'next-i18next'
-import LogoContainer from '@/components/WalletConnect/v2/components/LogoContainers/LedgerLogoContainer'
-import Image from 'next/image'
-import {
-	GenericRow,
-	RowType,
-} from '@/components/WalletConnect/v2/components/GenericRow'
-import { space } from '@ledgerhq/react-ui/styles/theme'
-import { Logo } from '@/components/WalletConnect/v2/icons/LedgerLiveLogo'
-import { InfoSessionProposal } from '@/components/WalletConnect/v2/components/SessionProposal/InfoSessionProposal'
-import { ErrorBlockchainSupport } from '@/components/WalletConnect/v2/components/SessionProposal/ErrorBlockchainSupport'
-import { useProposal } from '@/components/WalletConnect/v2/hooks/useProposal'
-import { useMemo } from 'react'
-import { AddAccountPlaceholder } from '@/components/WalletConnect/v2/components/SessionProposal/AddAccountPlaceholder'
-import {
-	CircledCrossSolidMedium,
-	WalletConnectMedium,
-} from '@ledgerhq/react-ui/assets/icons'
-import {
-	ButtonsContainer,
-	List,
-} from '@/components/WalletConnect/v2/components/Containers/util'
+import { ButtonsContainer, List } from '@/components/atoms/containers/Elements'
+import { GenericRow, RowType } from '@/components/atoms/GenericRow'
+import LogoContainer from '@/components/atoms/logoContainers/LedgerLogoContainer'
+import { AddAccountPlaceholder } from '@/components/screens/sessions/sessionProposal/AddAccountPlaceholder'
+import { ErrorBlockchainSupport } from '@/components/screens/sessions/sessionProposal/ErrorBlockchainSupport'
+import { InfoSessionProposal } from '@/components/screens/sessions/sessionProposal/InfoSessionProposal'
+import { formatUrl, getTicker, truncate } from '@/helpers/helper.util'
+import useHydratation from '@/hooks/useHydratation'
+import useNavigation from '@/hooks/useNavigation'
+import { useProposal } from '@/hooks/useProposal'
 import { ResponsiveContainer } from '@/styles/styles'
-import useHydratation from '@/components/WalletConnect/v2/hooks/useHydratation'
+import { Proposal } from '@/types/types'
+import { Flex, Button, Box, CryptoIcon, Text } from '@ledgerhq/react-ui'
+import {
+	WalletConnectMedium,
+	CircledCrossSolidMedium,
+} from '@ledgerhq/react-ui/assets/icons'
+import Image from 'next/image'
+import { space } from '@ledgerhq/react-ui/styles/theme'
+import { useTranslation } from 'next-i18next'
+import { useMemo } from 'react'
+import { Logo } from 'src/icons/LedgerLiveLogo'
+import styled, { useTheme } from 'styled-components'
+
 export { getServerSideProps } from '../lib/serverProps'
 
 const DAppContainer = styled(Flex).attrs(

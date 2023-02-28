@@ -6,7 +6,7 @@ import { PasteMedium } from '@ledgerhq/react-ui/assets/icons'
 import { QRScanner } from './QRScanner'
 import { InputMode } from '@/types/types'
 import { useTranslation } from 'next-i18next'
-import { walletConnectV1Logic } from './v2/hooks/useWalletConnectV1Logic'
+import { walletConnectV1Logic } from '@/hooks/useWalletConnectV1Logic'
 
 const QRScannerContainer = styled.div`
 	display: flex;
