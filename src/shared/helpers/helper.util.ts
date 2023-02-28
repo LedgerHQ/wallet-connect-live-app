@@ -1,8 +1,8 @@
-import { COSMOS_MAINNET_CHAINS, TCosmosChain } from '../data/COSMOSData'
-import { EIP155_CHAINS, TEIP155Chain } from '../data/EIP155Data'
-import { NEAR_TEST_CHAINS, TNearChain } from '../data/NEARData'
-import { SOLANA_CHAINS, TSolanaChain } from '../data/SolanaData'
-import { ELROND_CHAINS, TElrondChain } from '../data/ElrondData'
+import { COSMOS_MAINNET_CHAINS, TCosmosChain } from '@/data/COSMOSData'
+import { EIP155_CHAINS, TEIP155Chain } from '@/data/EIP155Data'
+import { ELROND_CHAINS, TElrondChain } from '@/data/ElrondData'
+import { NEAR_TEST_CHAINS, TNearChain } from '@/data/NEARData'
+import { SOLANA_CHAINS, TSolanaChain } from '@/data/SolanaData'
 
 /**
  * Truncates string (in the middle) via given lenght value

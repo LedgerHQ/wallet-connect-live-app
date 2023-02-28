@@ -59,7 +59,7 @@ All Live apps are defined with a manifest. Here is one that can be used for loca
 {
 	"id": "ledger-wallet-connect",
 	"name": "Wallet Connect",
-	"url": "http://localhost:3000",
+	"url": "http://127.0.0.1:3000/",
 	"params": {
 		"networks": [
 			{
@@ -81,8 +81,8 @@ All Live apps are defined with a manifest. Here is one that can be used for loca
 	"platform": "all",
 	"apiVersion": "^1.0.0",
 	"manifestVersion": "1",
-	"branch": "experimental",
-	"categories": ["defi"],
+	"branch": "stable",
+	"categories": ["bridge", "defi"],
 	"currencies": ["ethereum", "polygon", "bsc"],
 	"content": {
 		"shortDescription": {
@@ -93,6 +93,6 @@ All Live apps are defined with a manifest. Here is one that can be used for loca
 		}
 	},
 	"permissions": [],
-	"domains": ["http://*"]
+	"domains": ["http://*", "https://*"]
 }
 ```

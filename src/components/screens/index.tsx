@@ -1,12 +1,12 @@
+import { useLedgerLive } from '@/hooks/useLedgerLive'
+import useWalletConnectV1Logic from '@/hooks/useWalletConnectV1Logic'
+import { useAccountsStore, accountSelector } from '@/store/accounts.store'
+import { useAppStore, appSelector } from '@/store/app.store'
+import { useSessionsStore, sessionSelector } from '@/store/sessions.store'
 import { InputMode, NetworkConfig } from '@/types/types'
 import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
-import { useEffect, useMemo, useState } from 'react'
-import { accountSelector, useAccountsStore } from 'src/store/Accounts.store'
-import { appSelector, useAppStore } from 'src/store/App.store'
-import { sessionSelector, useSessionsStore } from 'src/store/Sessions.store'
-import Home from './Home'
-import { useLedgerLive } from './v2/hooks/useLedgerLive'
-import useWalletConnectV1Logic from './v2/hooks/useWalletConnectV1Logic'
+import { useMemo, useState, useEffect } from 'react'
+import Home from './home'
 
 export type WalletConnectProps = {
 	initialMode?: InputMode

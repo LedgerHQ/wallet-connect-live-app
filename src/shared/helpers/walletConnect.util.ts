@@ -1,7 +1,7 @@
+import { walletConnectV1Logic } from '@/hooks/useWalletConnectV1Logic'
 import { Core } from '@walletconnect/core'
 import { ICore } from '@walletconnect/types'
 import { Web3Wallet, IWeb3Wallet } from '@walletconnect/web3wallet'
-import { walletConnectV1Logic } from '../hooks/useWalletConnectV1Logic'
 
 export let web3wallet: IWeb3Wallet
 export let core: ICore
