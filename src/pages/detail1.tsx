@@ -1,28 +1,18 @@
-import {
-	formatUrl,
-	getTicker,
-	truncate,
-} from '@/components/WalletConnect/v2/utils/HelperUtil'
+import { formatUrl, getTicker, truncate } from '@/helpers/helper.util'
 import { Box, Button, CryptoIcon, Flex, Text } from '@ledgerhq/react-ui'
 import { ArrowLeftMedium } from '@ledgerhq/react-ui/assets/icons'
 import { useCallback } from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'next-i18next'
-import useNavigation from '@/components/WalletConnect/v2/hooks/useNavigation'
+import useNavigation from 'src/hooks/useNavigation'
 import Link from 'next/link'
-import {
-	GenericRow,
-	RowType,
-} from '@/components/WalletConnect/v2/components/GenericRow'
-import { InfoSessionProposal } from '@/components/WalletConnect/v2/components/SessionProposal/InfoSessionProposal'
-import {
-	ButtonsContainer,
-	Row,
-} from '@/components/WalletConnect/v2/components/Containers/util'
+import { GenericRow, RowType } from '@/components/atoms/containers/genericRow'
+import { InfoSessionProposal } from '@/components/screens/sessions/sessionProposal/infoSessionProposal'
+import { ButtonsContainer, Row } from '@/components/atoms/containers/elements'
 import { ResponsiveContainer } from '@/styles/styles'
-import { walletConnectV1Logic } from '@/components/WalletConnect/v2/hooks/useWalletConnectV1Logic'
+import { walletConnectV1Logic } from 'src/hooks/useWalletConnectV1Logic'
 import { useV1Store, v1Selector } from 'src/store/v1.store'
-import { ImageWithPlaceholder } from '@/components/WalletConnect/v2/components/images/imageWithPlaceholder'
+import { ImageWithPlaceholder } from '@/components/atoms/images/imageWithPlaceholder'
 
 export { getServerSideProps } from '../lib/serverProps'
 

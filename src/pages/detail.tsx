@@ -3,32 +3,29 @@ import {
 	formatUrl,
 	getTicker,
 	truncate,
-} from '@/components/WalletConnect/v2/utils/HelperUtil'
-import { web3wallet } from '@/components/WalletConnect/v2/utils/WalletConnectUtil'
+} from '@/helpers/helper.util'
+import { web3wallet } from '@/helpers/walletConnect.util'
 import { Box, Button, CryptoIcon, Flex, Text } from '@ledgerhq/react-ui'
 import { ArrowLeftMedium } from '@ledgerhq/react-ui/assets/icons'
 import { useCallback, useEffect, useMemo } from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'next-i18next'
-import useNavigation from '@/components/WalletConnect/v2/hooks/useNavigation'
+import useNavigation from '@/hooks/useNavigation'
 import Link from 'next/link'
 import { Account } from '@ledgerhq/live-app-sdk'
-import {
-	GenericRow,
-	RowType,
-} from '@/components/WalletConnect/v2/components/GenericRow'
-import { InfoSessionProposal } from '@/components/WalletConnect/v2/components/SessionProposal/InfoSessionProposal'
+import { GenericRow, RowType } from '@/components/atoms/containers/genericRow'
+import { InfoSessionProposal } from '@/components/screens/sessions/sessionProposal/infoSessionProposal'
 import { space } from '@ledgerhq/react-ui/styles/theme'
 import {
 	ButtonsContainer,
 	List,
 	Row,
-} from '@/components/WalletConnect/v2/components/Containers/util'
+} from '@/components/atoms/containers/elements'
 import { ResponsiveContainer } from '@/styles/styles'
-import { sessionSelector, useSessionsStore } from 'src/store/Sessions.store'
-import { useAccountsStore, accountSelector } from 'src/store/Accounts.store'
-import useHydratation from '@/components/WalletConnect/v2/hooks/useHydratation'
-import { ImageWithPlaceholder } from '@/components/WalletConnect/v2/components/images/imageWithPlaceholder'
+import { sessionSelector, useSessionsStore } from '@/store/Sessions.store'
+import { useAccountsStore, accountSelector } from '@/store/Accounts.store'
+import useHydratation from '@/hooks/useHydratation'
+import { ImageWithPlaceholder } from '@/components/atoms/images/imageWithPlaceholder'
 
 export { getServerSideProps } from '../lib/serverProps'
 

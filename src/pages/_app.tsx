@@ -5,7 +5,7 @@ import type { AppProps } from 'next/app'
 import { StyleProvider } from '@ledgerhq/react-ui'
 import { ThemeNames } from '@ledgerhq/react-ui/styles'
 import GlobalStyle from '@/styles/globalStyle'
-import { appSelector, useAppStore } from 'src/store/App.store'
+import { appSelector, useAppStore } from '@/store/App.store'
 import { useEffect } from 'react'
 
 function MyApp({ Component, pageProps }: AppProps) {

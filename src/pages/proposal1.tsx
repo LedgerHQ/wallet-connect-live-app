@@ -1,31 +1,21 @@
 import { Flex, Text, Box, CryptoIcon, Button } from '@ledgerhq/react-ui'
 import styled, { useTheme } from 'styled-components'
-import { AddAccountPlaceholder } from '@/components/WalletConnect/v2/components/SessionProposal/AddAccountPlaceholder'
-import {
-	formatUrl,
-	getTicker,
-	truncate,
-} from '@/components/WalletConnect/v2/utils/HelperUtil'
+import { AddAccountPlaceholder } from '@/components/screens/sessions/sessionProposal/addAccountPlaceholder'
+import { formatUrl, getTicker, truncate } from '@/helpers/helper.util'
 import { useTranslation } from 'next-i18next'
-import LogoContainer from '@/components/WalletConnect/v2/components/LogoContainers/LedgerLogoContainer'
+import LogoContainer from '@/components/atoms/logoContainers/ledgerLogoContainer'
 import Image from 'next/image'
-import {
-	GenericRow,
-	RowType,
-} from '@/components/WalletConnect/v2/components/GenericRow'
-import { Logo } from '@/components/WalletConnect/v2/icons/LedgerLiveLogo'
-import { InfoSessionProposal } from '@/components/WalletConnect/v2/components/SessionProposal/InfoSessionProposal'
+import { GenericRow, RowType } from '@/components/atoms/containers/genericRow'
+import { Logo } from 'src/icons/LedgerLiveLogo'
+import { InfoSessionProposal } from '@/components/screens/sessions/sessionProposal/infoSessionProposal'
 import {
 	WalletConnectMedium,
 	WarningMedium,
 } from '@ledgerhq/react-ui/assets/icons'
-import {
-	ButtonsContainer,
-	List,
-} from '@/components/WalletConnect/v2/components/Containers/util'
+import { ButtonsContainer, List } from '@/components/atoms/containers/elements'
 import { ResponsiveContainer } from '@/styles/styles'
 import { useV1Store, v1Selector } from 'src/store/v1.store'
-import { walletConnectV1Logic } from '@/components/WalletConnect/v2/hooks/useWalletConnectV1Logic'
+import { walletConnectV1Logic } from 'src/hooks/useWalletConnectV1Logic'
 
 export { getServerSideProps } from '../lib/serverProps'
 

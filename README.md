@@ -33,6 +33,16 @@ This live app need parameters to be defined in the manifest file
 
 Use of [Zustand](https://github.com/pmndrs/zustand) and `persist` middleware to have a persistent store via the `localStorage`
 
+Each store is independent of the other
+
+## Architecture
+
+- Hooks 🎣 (All useful and usable logics everywhere)
+- Store 🛒 (All stored data (persistent or not) useful to the functioning of the app)
+- Pages 📝 (All main pages)
+- Components 💄 (All components (screen parts, reusable components) useful for development)
+- Data 📈 (All data types for each supported string. Also contains examples of payloads)
+
 ## Getting Started
 
 First, you should install dependencies
@@ -59,7 +69,7 @@ All Live apps are defined with a manifest. Here is one that can be used for loca
 {
 	"id": "ledger-wallet-connect",
 	"name": "Wallet Connect",
-	"url": "http://localhost:3000",
+	"url": "http://127.0.0.1:3000/",
 	"params": {
 		"networks": [
 			{
@@ -81,8 +91,8 @@ All Live apps are defined with a manifest. Here is one that can be used for loca
 	"platform": "all",
 	"apiVersion": "^1.0.0",
 	"manifestVersion": "1",
-	"branch": "experimental",
-	"categories": ["defi"],
+	"branch": "stable",
+	"categories": ["bridge", "defi"],
 	"currencies": ["ethereum", "polygon", "bsc"],
 	"content": {
 		"shortDescription": {
@@ -93,6 +103,8 @@ All Live apps are defined with a manifest. Here is one that can be used for loca
 		}
 	},
 	"permissions": [],
-	"domains": ["http://*"]
+	"domains": ["http://*", "https://*"]
 }
 ```
+
+To test the LiveApp you can use DApp from https://lab.web3modal.com/ 🧪

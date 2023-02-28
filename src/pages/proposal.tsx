@@ -1,36 +1,26 @@
 import { Flex, Text, Box, CryptoIcon, Button } from '@ledgerhq/react-ui'
 import styled, { useTheme } from 'styled-components'
-import useNavigation from '@/components/WalletConnect/v2/hooks/useNavigation'
+import useNavigation from 'src/hooks/useNavigation'
 import { Proposal } from '@/types/types'
-import {
-	formatUrl,
-	getTicker,
-	truncate,
-} from '@/components/WalletConnect/v2/utils/HelperUtil'
+import { formatUrl, getTicker, truncate } from '@/helpers/helper.util'
 import { useTranslation } from 'next-i18next'
-import LogoContainer from '@/components/WalletConnect/v2/components/LogoContainers/LedgerLogoContainer'
+import LogoContainer from '@/components/atoms/logoContainers/ledgerLogoContainer'
 import Image from 'next/image'
-import {
-	GenericRow,
-	RowType,
-} from '@/components/WalletConnect/v2/components/GenericRow'
+import { GenericRow, RowType } from '@/components/atoms/containers/genericRow'
 import { space } from '@ledgerhq/react-ui/styles/theme'
-import { Logo } from '@/components/WalletConnect/v2/icons/LedgerLiveLogo'
-import { InfoSessionProposal } from '@/components/WalletConnect/v2/components/SessionProposal/InfoSessionProposal'
-import { ErrorBlockchainSupport } from '@/components/WalletConnect/v2/components/SessionProposal/ErrorBlockchainSupport'
-import { useProposal } from '@/components/WalletConnect/v2/hooks/useProposal'
+import { Logo } from 'src/icons/LedgerLiveLogo'
+import { InfoSessionProposal } from '@/components/screens/sessions/sessionProposal/infoSessionProposal'
+import { ErrorBlockchainSupport } from '@/components/screens/sessions/sessionProposal/errorBlockchainSupport'
+import { useProposal } from 'src/hooks/useProposal'
 import { useMemo } from 'react'
-import { AddAccountPlaceholder } from '@/components/WalletConnect/v2/components/SessionProposal/AddAccountPlaceholder'
+import { AddAccountPlaceholder } from '@/components/screens/sessions/sessionProposal/addAccountPlaceholder'
 import {
 	CircledCrossSolidMedium,
 	WalletConnectMedium,
 } from '@ledgerhq/react-ui/assets/icons'
-import {
-	ButtonsContainer,
-	List,
-} from '@/components/WalletConnect/v2/components/Containers/util'
+import { ButtonsContainer, List } from '@/components/atoms/containers/elements'
 import { ResponsiveContainer } from '@/styles/styles'
-import useHydratation from '@/components/WalletConnect/v2/hooks/useHydratation'
+import useHydratation from 'src/hooks/useHydratation'
 export { getServerSideProps } from '../lib/serverProps'
 
 const DAppContainer = styled(Flex).attrs(

@@ -1,20 +1,18 @@
-import { InputMode } from '@/types/types'
-import { useCallback, useState, Dispatch, SetStateAction, useMemo } from 'react'
-import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
-import styled from 'styled-components'
-import { TransitionGroup } from 'react-transition-group'
-import { useTranslation } from 'next-i18next'
-import { startProposal } from './v2/utils/WalletConnectUtil'
-import { Connect } from './Connect'
-import { NetworkConfig } from '@/types/types'
+import useHydratation from '@/hooks/useHydratation'
+import useNavigation from '@/hooks/useNavigation'
+import { useSessionsStore, sessionSelector } from '@/store/Sessions.store'
+import { useV1Store, v1Selector } from '@/store/v1.store'
 import { ResponsiveContainer } from '@/styles/styles'
-import Sessions from './Sessions'
-import Tabs from './Tabs'
+import { InputMode } from '@/types/types'
 import { Flex } from '@ledgerhq/react-ui'
-import { sessionSelector, useSessionsStore } from 'src/store/Sessions.store'
-import useNavigation from './v2/hooks/useNavigation'
-import useHydratation from './v2/hooks/useHydratation'
-import { useV1Store, v1Selector } from 'src/store/v1.store'
+import { useTranslation } from 'next-i18next'
+import { Dispatch, SetStateAction, useState, useCallback, useMemo } from 'react'
+import { TransitionGroup } from 'react-transition-group'
+import { startProposal } from '@/helpers/walletConnect.util'
+import styled from 'styled-components'
+import { Connect } from './connect'
+import Sessions from './sessions/sessions'
+import Tabs from './tabs'
 
 const WalletConnectContainer = styled.div`
 	display: flex;
@@ -37,11 +35,7 @@ const WalletConnectInnerContainer = styled(TransitionGroup)`
 `
 
 export type WalletConnectProps = {
-	initialAccountId?: string
 	initialURI?: string
-	networks: NetworkConfig[]
-	platformSDK: LedgerLivePlarformSDK
-	accounts: Account[]
 	initialMode?: InputMode
 	setUri: Dispatch<SetStateAction<string | undefined>>
 }
@@ -64,8 +58,8 @@ export default function Home({
 	const { t } = useTranslation()
 
 	const [activeTabIndex, setActiveTabIndex] = useState(initialTab)
-	const [inputValue, setInputValue] = useState<string>('')
-	const [errorValue, setErrorValue] = useState<string | undefined>(undefined)
+	const [inputValue] = useState<string>('')
+	const [, setErrorValue] = useState<string | undefined>(undefined)
 
 	const handleConnect = useCallback(
 		async (inputValue: string) => {
