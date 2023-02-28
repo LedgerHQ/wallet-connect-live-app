@@ -4,7 +4,7 @@ import { web3wallet } from '../utils/WalletConnectUtil'
 import { SignClientTypes } from '@walletconnect/types'
 import { useCallback, useEffect } from 'react'
 import { Web3WalletTypes } from '@walletconnect/web3wallet'
-import useNavigation from '../hooks/useNavigation'
+import useNavigation from './useNavigation'
 import { hasETHAddress } from '@/helpers/generic'
 import { stripHexPrefix } from '@/utils/currencyFormatter/helpers'
 import { platformSDK } from './useLedgerLive'
@@ -31,7 +31,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 	)
 
 	const onAuthRequest = useCallback(
-		(request: Web3WalletTypes.AuthRequest) => {
+		(_request: Web3WalletTypes.AuthRequest) => {
 			// ModalStore.open('AuthRequestModal', { request })
 		},
 		[],

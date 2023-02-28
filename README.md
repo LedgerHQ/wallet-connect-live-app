@@ -33,6 +33,16 @@ This live app need parameters to be defined in the manifest file
 
 Use of [Zustand](https://github.com/pmndrs/zustand) and `persist` middleware to have a persistent store via the `localStorage`
 
+Each store is independent of the other
+
+## Architecture
+
+- Hooks 🎣 (All useful and usable logics everywhere)
+- Store 🛒 (All stored data (persistent or not) useful to the functioning of the app)
+- Pages 📝 (All main pages)
+- Components 💄 (All components (screen parts, reusable components) useful for development)
+- Data 📈 (All data types for each supported string. Also contains examples of payloads)
+
 ## Getting Started
 
 First, you should install dependencies

@@ -1,7 +1,4 @@
-import {
-	createWeb3Wallet,
-	web3wallet,
-} from '@/components/WalletConnect/v2/utils/WalletConnectUtil'
+import { createWeb3Wallet, web3wallet } from 'src/utils/WalletConnectUtil'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSessionsStore, sessionSelector } from 'src/store/Sessions.store'
 
