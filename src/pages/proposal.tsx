@@ -10,10 +10,8 @@ import { GenericRow, RowType } from '@/components/atoms/containers/genericRow'
 import { space } from '@ledgerhq/react-ui/styles/theme'
 import { Logo } from 'src/icons/LedgerLiveLogo'
 import { InfoSessionProposal } from '@/components/screens/sessions/sessionProposal/infoSessionProposal'
-import { ErrorBlockchainSupport } from '@/components/screens/sessions/sessionProposal/errorBlockchainSupport'
 import { useProposal } from 'src/hooks/useProposal'
 import { useMemo } from 'react'
-import { AddAccountPlaceholder } from '@/components/screens/sessions/sessionProposal/addAccountPlaceholder'
 import {
 	CircledCrossSolidMedium,
 	WalletConnectMedium,
@@ -21,6 +19,8 @@ import {
 import { ButtonsContainer, List } from '@/components/atoms/containers/elements'
 import { ResponsiveContainer } from '@/styles/styles'
 import useHydratation from 'src/hooks/useHydratation'
+import { AddAccountPlaceholder } from '@/components/screens/sessions/sessionProposal/addAccountPlaceholder'
+import { ErrorBlockchainSupport } from '@/components/screens/sessions/sessionProposal/errorBlockchainSupport'
 export { getServerSideProps } from '../lib/serverProps'
 
 const DAppContainer = styled(Flex).attrs(
