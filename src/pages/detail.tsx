@@ -41,6 +41,13 @@ const BackButton = styled(Flex)`
 		opacity: 0.7;
 	}
 `
+
+const CustomList = styled(Flex)`
+	max-height: 45vh;
+	overflow-y: scroll;
+	flex-direction: column;
+`
+
 export default function SessionDetail() {
 	const { hydrated } = useHydratation()
 	const { t } = useTranslation()
@@ -145,7 +152,7 @@ export default function SessionDetail() {
 				>
 					<Flex flexDirection="column" width="100%">
 						<BackButton onClick={navigateToSessionsHomeTab}>
-							<Flex mt={10} mb={8}>
+							<Flex mt={8} mb={8}>
 								<ArrowLeftMedium
 									size={24}
 									color="neutral.c100"
@@ -243,68 +250,625 @@ export default function SessionDetail() {
 						<Text variant="h4" mt={8} mb={6} color="neutral.c100">
 							{t('sessions.detail.accounts')}
 						</Text>
-						{Array.from(sessionAccounts).map(
-							([chain, accounts]) => {
-								return (
-									<Box key={chain} mb={6} flex={1}>
-										<Box mb={6}>
-											<Text
-												variant="subtitle"
-												color="neutral.c70"
-											>
-												{chain}
-											</Text>
-										</Box>
 
-										<List>
-											{accounts.map(
-												(
-													account: Account,
-													index: number,
-												) => (
-													<li
-														key={account.id}
-														style={{
-															marginBottom:
-																index !==
-																accounts.length -
-																	1
-																	? space[3]
-																	: 0,
-														}}
-													>
-														<GenericRow
-															title={account.name}
-															subtitle={truncate(
-																account.address,
-																30,
-															)}
-															LeftIcon={
-																<CryptoIcon
-																	name={getTicker(
-																		chain,
-																	)}
-																	circleIcon
-																	size={24}
-																/>
-															}
-															rowType={
-																RowType.Default
-															}
-														/>
-													</li>
-												),
-											)}
-										</List>
-									</Box>
-								)
-							},
-						)}
-						<Box mt={6}>
-							<InfoSessionProposal isInSessionDetails />
-						</Box>
+						<CustomList>
+							{Array.from(sessionAccounts).map(
+								([chain, accounts]) => {
+									return (
+										<Box key={chain} mb={6} flex={1}>
+											<Box mb={6}>
+												<Text
+													variant="subtitle"
+													color="neutral.c70"
+												>
+													{chain}
+												</Text>
+											</Box>
+
+											<List>
+												{accounts.map(
+													(
+														account: Account,
+														index: number,
+													) => (
+														<li
+															key={account.id}
+															style={{
+																marginBottom:
+																	index !==
+																	accounts.length -
+																		1
+																		? space[3]
+																		: 0,
+															}}
+														>
+															<GenericRow
+																title={
+																	account.name
+																}
+																subtitle={truncate(
+																	account.address,
+																	30,
+																)}
+																LeftIcon={
+																	<CryptoIcon
+																		name={getTicker(
+																			chain,
+																		)}
+																		circleIcon
+																		size={
+																			24
+																		}
+																	/>
+																}
+																rowType={
+																	RowType.Default
+																}
+															/>
+														</li>
+													),
+												)}
+											</List>
+										</Box>
+									)
+								},
+							)}
+							{Array.from(sessionAccounts).map(
+								([chain, accounts]) => {
+									return (
+										<Box key={chain} mb={6} flex={1}>
+											<Box mb={6}>
+												<Text
+													variant="subtitle"
+													color="neutral.c70"
+												>
+													{chain}
+												</Text>
+											</Box>
+
+											<List>
+												{accounts.map(
+													(
+														account: Account,
+														index: number,
+													) => (
+														<li
+															key={account.id}
+															style={{
+																marginBottom:
+																	index !==
+																	accounts.length -
+																		1
+																		? space[3]
+																		: 0,
+															}}
+														>
+															<GenericRow
+																title={
+																	account.name
+																}
+																subtitle={truncate(
+																	account.address,
+																	30,
+																)}
+																LeftIcon={
+																	<CryptoIcon
+																		name={getTicker(
+																			chain,
+																		)}
+																		circleIcon
+																		size={
+																			24
+																		}
+																	/>
+																}
+																rowType={
+																	RowType.Default
+																}
+															/>
+														</li>
+													),
+												)}
+											</List>
+										</Box>
+									)
+								},
+							)}
+							{Array.from(sessionAccounts).map(
+								([chain, accounts]) => {
+									return (
+										<Box key={chain} mb={6} flex={1}>
+											<Box mb={6}>
+												<Text
+													variant="subtitle"
+													color="neutral.c70"
+												>
+													{chain}
+												</Text>
+											</Box>
+
+											<List>
+												{accounts.map(
+													(
+														account: Account,
+														index: number,
+													) => (
+														<li
+															key={account.id}
+															style={{
+																marginBottom:
+																	index !==
+																	accounts.length -
+																		1
+																		? space[3]
+																		: 0,
+															}}
+														>
+															<GenericRow
+																title={
+																	account.name
+																}
+																subtitle={truncate(
+																	account.address,
+																	30,
+																)}
+																LeftIcon={
+																	<CryptoIcon
+																		name={getTicker(
+																			chain,
+																		)}
+																		circleIcon
+																		size={
+																			24
+																		}
+																	/>
+																}
+																rowType={
+																	RowType.Default
+																}
+															/>
+														</li>
+													),
+												)}
+											</List>
+										</Box>
+									)
+								},
+							)}
+							{Array.from(sessionAccounts).map(
+								([chain, accounts]) => {
+									return (
+										<Box key={chain} mb={6} flex={1}>
+											<Box mb={6}>
+												<Text
+													variant="subtitle"
+													color="neutral.c70"
+												>
+													{chain}
+												</Text>
+											</Box>
+
+											<List>
+												{accounts.map(
+													(
+														account: Account,
+														index: number,
+													) => (
+														<li
+															key={account.id}
+															style={{
+																marginBottom:
+																	index !==
+																	accounts.length -
+																		1
+																		? space[3]
+																		: 0,
+															}}
+														>
+															<GenericRow
+																title={
+																	account.name
+																}
+																subtitle={truncate(
+																	account.address,
+																	30,
+																)}
+																LeftIcon={
+																	<CryptoIcon
+																		name={getTicker(
+																			chain,
+																		)}
+																		circleIcon
+																		size={
+																			24
+																		}
+																	/>
+																}
+																rowType={
+																	RowType.Default
+																}
+															/>
+														</li>
+													),
+												)}
+											</List>
+										</Box>
+									)
+								},
+							)}
+							{Array.from(sessionAccounts).map(
+								([chain, accounts]) => {
+									return (
+										<Box key={chain} mb={6} flex={1}>
+											<Box mb={6}>
+												<Text
+													variant="subtitle"
+													color="neutral.c70"
+												>
+													{chain}
+												</Text>
+											</Box>
+
+											<List>
+												{accounts.map(
+													(
+														account: Account,
+														index: number,
+													) => (
+														<li
+															key={account.id}
+															style={{
+																marginBottom:
+																	index !==
+																	accounts.length -
+																		1
+																		? space[3]
+																		: 0,
+															}}
+														>
+															<GenericRow
+																title={
+																	account.name
+																}
+																subtitle={truncate(
+																	account.address,
+																	30,
+																)}
+																LeftIcon={
+																	<CryptoIcon
+																		name={getTicker(
+																			chain,
+																		)}
+																		circleIcon
+																		size={
+																			24
+																		}
+																	/>
+																}
+																rowType={
+																	RowType.Default
+																}
+															/>
+														</li>
+													),
+												)}
+											</List>
+										</Box>
+									)
+								},
+							)}
+							{Array.from(sessionAccounts).map(
+								([chain, accounts]) => {
+									return (
+										<Box key={chain} mb={6} flex={1}>
+											<Box mb={6}>
+												<Text
+													variant="subtitle"
+													color="neutral.c70"
+												>
+													{chain}
+												</Text>
+											</Box>
+
+											<List>
+												{accounts.map(
+													(
+														account: Account,
+														index: number,
+													) => (
+														<li
+															key={account.id}
+															style={{
+																marginBottom:
+																	index !==
+																	accounts.length -
+																		1
+																		? space[3]
+																		: 0,
+															}}
+														>
+															<GenericRow
+																title={
+																	account.name
+																}
+																subtitle={truncate(
+																	account.address,
+																	30,
+																)}
+																LeftIcon={
+																	<CryptoIcon
+																		name={getTicker(
+																			chain,
+																		)}
+																		circleIcon
+																		size={
+																			24
+																		}
+																	/>
+																}
+																rowType={
+																	RowType.Default
+																}
+															/>
+														</li>
+													),
+												)}
+											</List>
+										</Box>
+									)
+								},
+							)}
+							{Array.from(sessionAccounts).map(
+								([chain, accounts]) => {
+									return (
+										<Box key={chain} mb={6} flex={1}>
+											<Box mb={6}>
+												<Text
+													variant="subtitle"
+													color="neutral.c70"
+												>
+													{chain}
+												</Text>
+											</Box>
+
+											<List>
+												{accounts.map(
+													(
+														account: Account,
+														index: number,
+													) => (
+														<li
+															key={account.id}
+															style={{
+																marginBottom:
+																	index !==
+																	accounts.length -
+																		1
+																		? space[3]
+																		: 0,
+															}}
+														>
+															<GenericRow
+																title={
+																	account.name
+																}
+																subtitle={truncate(
+																	account.address,
+																	30,
+																)}
+																LeftIcon={
+																	<CryptoIcon
+																		name={getTicker(
+																			chain,
+																		)}
+																		circleIcon
+																		size={
+																			24
+																		}
+																	/>
+																}
+																rowType={
+																	RowType.Default
+																}
+															/>
+														</li>
+													),
+												)}
+											</List>
+										</Box>
+									)
+								},
+							)}
+							{Array.from(sessionAccounts).map(
+								([chain, accounts]) => {
+									return (
+										<Box key={chain} mb={6} flex={1}>
+											<Box mb={6}>
+												<Text
+													variant="subtitle"
+													color="neutral.c70"
+												>
+													{chain}
+												</Text>
+											</Box>
+
+											<List>
+												{accounts.map(
+													(
+														account: Account,
+														index: number,
+													) => (
+														<li
+															key={account.id}
+															style={{
+																marginBottom:
+																	index !==
+																	accounts.length -
+																		1
+																		? space[3]
+																		: 0,
+															}}
+														>
+															<GenericRow
+																title={
+																	account.name
+																}
+																subtitle={truncate(
+																	account.address,
+																	30,
+																)}
+																LeftIcon={
+																	<CryptoIcon
+																		name={getTicker(
+																			chain,
+																		)}
+																		circleIcon
+																		size={
+																			24
+																		}
+																	/>
+																}
+																rowType={
+																	RowType.Default
+																}
+															/>
+														</li>
+													),
+												)}
+											</List>
+										</Box>
+									)
+								},
+							)}
+							{Array.from(sessionAccounts).map(
+								([chain, accounts]) => {
+									return (
+										<Box key={chain} mb={6} flex={1}>
+											<Box mb={6}>
+												<Text
+													variant="subtitle"
+													color="neutral.c70"
+												>
+													{chain}
+												</Text>
+											</Box>
+
+											<List>
+												{accounts.map(
+													(
+														account: Account,
+														index: number,
+													) => (
+														<li
+															key={account.id}
+															style={{
+																marginBottom:
+																	index !==
+																	accounts.length -
+																		1
+																		? space[3]
+																		: 0,
+															}}
+														>
+															<GenericRow
+																title={
+																	account.name
+																}
+																subtitle={truncate(
+																	account.address,
+																	30,
+																)}
+																LeftIcon={
+																	<CryptoIcon
+																		name={getTicker(
+																			chain,
+																		)}
+																		circleIcon
+																		size={
+																			24
+																		}
+																	/>
+																}
+																rowType={
+																	RowType.Default
+																}
+															/>
+														</li>
+													),
+												)}
+											</List>
+										</Box>
+									)
+								},
+							)}
+							{Array.from(sessionAccounts).map(
+								([chain, accounts]) => {
+									return (
+										<Box key={chain} mb={6} flex={1}>
+											<Box mb={6}>
+												<Text
+													variant="subtitle"
+													color="neutral.c70"
+												>
+													{chain}
+												</Text>
+											</Box>
+
+											<List>
+												{accounts.map(
+													(
+														account: Account,
+														index: number,
+													) => (
+														<li
+															key={account.id}
+															style={{
+																marginBottom:
+																	index !==
+																	accounts.length -
+																		1
+																		? space[3]
+																		: 0,
+															}}
+														>
+															<GenericRow
+																title={
+																	account.name
+																}
+																subtitle={truncate(
+																	account.address,
+																	30,
+																)}
+																LeftIcon={
+																	<CryptoIcon
+																		name={getTicker(
+																			chain,
+																		)}
+																		circleIcon
+																		size={
+																			24
+																		}
+																	/>
+																}
+																rowType={
+																	RowType.Default
+																}
+															/>
+														</li>
+													),
+												)}
+											</List>
+										</Box>
+									)
+								},
+							)}
+
+							<Box mt={6}>
+								<InfoSessionProposal isInSessionDetails />
+							</Box>
+						</CustomList>
 					</Flex>
-					<ButtonsContainer mt={4}>
+					<ButtonsContainer mt={5}>
 						<Button
 							variant="shade"
 							size="large"
