@@ -113,7 +113,7 @@ export function useProposal({ proposal }: Props) {
 			(accum, elem) =>
 				accum.concat(
 					elem.accounts
-						.filter((acc) => selectedAccounts.includes(acc.address))
+						.filter((acc) => selectedAccounts.includes(acc.id))
 						.map((a) => `${getNamespace(a.currency)}:${a.address}`),
 				),
 			[],
