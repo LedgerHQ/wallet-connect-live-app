@@ -50,7 +50,7 @@ const Container = styled(Flex).attrs((p: { size: number }) => ({
 
 const ListChains = styled(Flex)`
 	flex-direction: column;
-	max-height: 450px;
+	max-height: 65vh;
 	overflow-y: scroll;
 `
 
