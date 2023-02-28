@@ -1,22 +1,25 @@
-import { GenericRow, RowType } from '@/components/atoms/Containers/GenericRow'
-import { formatUrl } from 'src/utils/HelperUtil'
-import { Box, Button, Flex, Text } from '@ledgerhq/react-ui'
-import { useCallback } from 'react'
-import useNavigation from 'src/hooks/useNavigation'
-import { ButtonsContainer, List } from '@/components/atoms/Containers/util'
-import { useTranslation } from 'next-i18next'
-import { WalletConnectPopin } from '@/components/atoms/Popin/WalletConnectPopin'
-import useWalletConnectPopin from 'src/hooks/useWalletConnectPopin'
+import {
+	List,
+	ButtonsContainer,
+} from '@/components/atoms/containers/Containers'
+import { GenericRow, RowType } from '@/components/atoms/containers/GenericRow'
+import { ImageWithPlaceholder } from '@/components/atoms/images/ImageWithPlaceholder'
+import { WalletConnectPopin } from '@/components/atoms/popin/WalletConnectPopin'
+import useNavigation from '@/hooks/useNavigation'
+import useWalletConnectPopin from '@/hooks/useWalletConnectPopin'
+import { walletConnectV1Logic } from '@/hooks/useWalletConnectV1Logic'
 import {
 	Session,
 	sessionSelector,
 	useSessionsStore,
-} from 'src/store/Sessions.store'
-import styled from 'styled-components'
+} from '@/store/Sessions.store'
+import { Flex, Button, Box, Text } from '@ledgerhq/react-ui'
+import { useTranslation } from 'next-i18next'
+import { useCallback } from 'react'
 import { useV1Store, v1Selector } from 'src/store/v1.store'
-import { ImageWithPlaceholder } from '../../atoms/Images/imageWithPlaceholder'
-import { walletConnectV1Logic } from '../../../hooks/useWalletConnectV1Logic'
-import { web3wallet } from '../../../utils/WalletConnectUtil'
+import { formatUrl } from 'src/helpers/Helper.util'
+import { web3wallet } from 'src/helpers/WalletConnect.util'
+import styled from 'styled-components'
 
 export type SessionsProps = {
 	sessions: Session[]

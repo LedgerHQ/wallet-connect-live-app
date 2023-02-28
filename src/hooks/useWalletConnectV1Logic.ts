@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { convertEthToLiveTX } from '@/helpers/converters'
-import { compareETHAddresses } from '@/helpers/generic'
 import { stripHexPrefix } from '@/utils/currencyFormatter/helpers'
 import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
 import { useRef, useEffect, useCallback, Dispatch, SetStateAction } from 'react'
-import { useAppStore, appSelector } from 'src/store/App.store'
+import { useAppStore, appSelector } from '@/store/App.store'
 import WalletConnectClient from '@walletconnect/client'
-import useNavigation from './useNavigation'
-import { useV1Store } from 'src/store/v1.store'
+import { useV1Store } from '@/store/v1.store'
 import { Proposal } from '@/types/types'
+import useNavigation from './useNavigation'
+import { convertEthToLiveTX } from '@/shared/helpers/converters'
+import { compareETHAddresses } from '@/shared/helpers/generic'
 
 type WalletConnectState = {
 	session: any | null

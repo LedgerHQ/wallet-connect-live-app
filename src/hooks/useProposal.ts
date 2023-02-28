@@ -1,17 +1,16 @@
+import { EIP155_SIGNING_METHODS } from '@/data/EIP155Data'
+import { useAccountsStore, accountSelector } from '@/store/Accounts.store'
+import { useAppStore, appSelector } from '@/store/App.store'
+import { useSessionsStore, sessionSelector } from '@/store/Sessions.store'
 import { Proposal } from '@/types/types'
 import { Account } from '@ledgerhq/live-app-sdk'
 import { SessionTypes } from '@walletconnect/types'
-
 import router from 'next/router'
-import { useCallback, useState } from 'react'
-import { EIP155_SIGNING_METHODS } from '../data/EIP155Data'
-import { formatChainName } from '../utils/HelperUtil'
-import { web3wallet } from '../utils/WalletConnectUtil'
-import useNavigation from './useNavigation'
+import { useState, useCallback } from 'react'
+import { formatChainName } from 'src/helpers/Helper.util'
+import { web3wallet } from 'src/helpers/WalletConnect.util'
 import { platformSDK } from './useLedgerLive'
-import { sessionSelector, useSessionsStore } from 'src/store/Sessions.store'
-import { accountSelector, useAccountsStore } from 'src/store/Accounts.store'
-import { useAppStore, appSelector } from 'src/store/App.store'
+import useNavigation from './useNavigation'
 
 type Props = {
 	proposal: Proposal

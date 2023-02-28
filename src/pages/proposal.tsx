@@ -2,23 +2,26 @@ import { Flex, Text, Box, CryptoIcon, Button } from '@ledgerhq/react-ui'
 import styled, { useTheme } from 'styled-components'
 import useNavigation from 'src/hooks/useNavigation'
 import { Proposal } from '@/types/types'
-import { formatUrl, getTicker, truncate } from 'src/utils/HelperUtil'
+import { formatUrl, getTicker, truncate } from 'src/helpers/Helper.util'
 import { useTranslation } from 'next-i18next'
-import LogoContainer from '@/components/atoms/LogoContainers/LedgerLogoContainer'
+import LogoContainer from '@/components/atoms/logoContainers/LedgerLogoContainer'
 import Image from 'next/image'
-import { GenericRow, RowType } from '@/components/atoms/Containers/GenericRow'
+import { GenericRow, RowType } from '@/components/atoms/containers/GenericRow'
 import { space } from '@ledgerhq/react-ui/styles/theme'
 import { Logo } from 'src/icons/LedgerLiveLogo'
-import { InfoSessionProposal } from '@/components/screens/sessions/SessionProposal/InfoSessionProposal'
-import { ErrorBlockchainSupport } from '@/components/screens/sessions/SessionProposal/ErrorBlockchainSupport'
+import { InfoSessionProposal } from '@/components/screens/sessions/sessionProposal/InfoSessionProposal'
+import { ErrorBlockchainSupport } from '@/components/screens/sessions/sessionProposal/ErrorBlockchainSupport'
 import { useProposal } from 'src/hooks/useProposal'
 import { useMemo } from 'react'
-import { AddAccountPlaceholder } from '@/components/screens/sessions/SessionProposal/AddAccountPlaceholder'
+import { AddAccountPlaceholder } from '@/components/screens/sessions/sessionProposal/AddAccountPlaceholder'
 import {
 	CircledCrossSolidMedium,
 	WalletConnectMedium,
 } from '@ledgerhq/react-ui/assets/icons'
-import { ButtonsContainer, List } from '@/components/atoms/Containers/util'
+import {
+	ButtonsContainer,
+	List,
+} from '@/components/atoms/containers/Containers'
 import { ResponsiveContainer } from '@/styles/styles'
 import useHydratation from 'src/hooks/useHydratation'
 export { getServerSideProps } from '../lib/serverProps'

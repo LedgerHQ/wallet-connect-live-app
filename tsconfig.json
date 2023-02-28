@@ -19,12 +19,15 @@
 			"@/components/*": ["src/components/*"],
 			"@/pages/*": ["src/pages/*"],
 			"@/styles/*": ["src/styles/*"],
+			"@/data/*": ["src/data/*"],
 			"@/utils/*": ["src/shared/utils/*"],
-			"@/hooks/*": ["src/shared/hooks/*"],
+			"@/store/*": ["src/store/*"],
+			"@/hooks/*": ["src/hooks/*"],
 			"@/constants/*": ["src/shared/constants/*"],
 			"@/context/*": ["src/shared/context/*"],
 			"@/mocks/*": ["src/__mocks__/*"],
-			"@/helpers/*": ["src/shared/helpers/*"],
+			"@/shared/helpers/*": ["src/shared/helpers/*"],
+			"@/helpers/*": ["src/helpers/*"],
 			"@/mappers/*": ["src/shared/mappers/*"],
 			"@/types/*": ["src/shared/types/*"]
 		}

@@ -1,6 +1,6 @@
-import { createWeb3Wallet, web3wallet } from 'src/utils/WalletConnectUtil'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { useSessionsStore, sessionSelector } from 'src/store/Sessions.store'
+import { useSessionsStore, sessionSelector } from '@/store/Sessions.store'
+import { useState, useRef, useCallback, useEffect } from 'react'
+import { createWeb3Wallet, web3wallet } from 'src/helpers/WalletConnect.util'
 
 export default function useInitialization() {
 	const [initialized, setInitialized] = useState(false)

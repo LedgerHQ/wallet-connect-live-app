@@ -1,12 +1,11 @@
-import styled from 'styled-components'
-import { Input, Button, Text, Flex } from '@ledgerhq/react-ui'
-import { QrCodeMedium } from '@ledgerhq/react-ui/assets/icons'
-import { useCallback, useEffect, useState } from 'react'
-import { PasteMedium } from '@ledgerhq/react-ui/assets/icons'
-import { QRScanner } from './QRScanner'
+import { walletConnectV1Logic } from '@/hooks/useWalletConnectV1Logic'
 import { InputMode } from '@/types/types'
+import { Flex, Button, Input, Text } from '@ledgerhq/react-ui'
+import { QrCodeMedium, PasteMedium } from '@ledgerhq/react-ui/assets/icons'
 import { useTranslation } from 'next-i18next'
-import { walletConnectV1Logic } from '../../hooks/useWalletConnectV1Logic'
+import { useState, useCallback, useEffect } from 'react'
+import styled from 'styled-components'
+import { QRScanner } from './QRScanner'
 
 const QRScannerContainer = styled.div`
 	display: flex;

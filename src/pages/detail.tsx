@@ -3,25 +3,29 @@ import {
 	formatUrl,
 	getTicker,
 	truncate,
-} from 'src/utils/HelperUtil'
-import { web3wallet } from 'src/utils/WalletConnectUtil'
+} from 'src/helpers/Helper.util'
+import { web3wallet } from 'src/helpers/WalletConnect.util'
 import { Box, Button, CryptoIcon, Flex, Text } from '@ledgerhq/react-ui'
 import { ArrowLeftMedium } from '@ledgerhq/react-ui/assets/icons'
 import { useCallback, useEffect, useMemo } from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'next-i18next'
-import useNavigation from 'src/hooks/useNavigation'
+import useNavigation from '@/hooks/useNavigation'
 import Link from 'next/link'
 import { Account } from '@ledgerhq/live-app-sdk'
-import { GenericRow, RowType } from '@/components/atoms/Containers/GenericRow'
-import { InfoSessionProposal } from '@/components/screens/sessions/SessionProposal/InfoSessionProposal'
+import { GenericRow, RowType } from '@/components/atoms/containers/GenericRow'
+import { InfoSessionProposal } from '@/components/screens/sessions/sessionProposal/InfoSessionProposal'
 import { space } from '@ledgerhq/react-ui/styles/theme'
-import { ButtonsContainer, List, Row } from '@/components/atoms/Containers/util'
+import {
+	ButtonsContainer,
+	List,
+	Row,
+} from '@/components/atoms/containers/Containers'
 import { ResponsiveContainer } from '@/styles/styles'
-import { sessionSelector, useSessionsStore } from 'src/store/Sessions.store'
-import { useAccountsStore, accountSelector } from 'src/store/Accounts.store'
-import useHydratation from 'src/hooks/useHydratation'
-import { ImageWithPlaceholder } from '@/components/atoms/Images/imageWithPlaceholder'
+import { sessionSelector, useSessionsStore } from '@/store/Sessions.store'
+import { useAccountsStore, accountSelector } from '@/store/Accounts.store'
+import useHydratation from '@/hooks/useHydratation'
+import { ImageWithPlaceholder } from '@/components/atoms/images/ImageWithPlaceholder'
 
 export { getServerSideProps } from '../lib/serverProps'
 
