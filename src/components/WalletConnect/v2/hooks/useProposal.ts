@@ -167,7 +167,7 @@ export function useProposal({ proposal }: Props) {
 			},
 		})
 		navigate(routes.home)
-	}, [])
+	}, [proposal])
 
 	const addNewAccount = useCallback(async (currency: string) => {
 		try {
