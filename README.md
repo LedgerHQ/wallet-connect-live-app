@@ -106,3 +106,5 @@ All Live apps are defined with a manifest. Here is one that can be used for loca
 	"domains": ["http://*"]
 }
 ```
+
+To test the LiveApp you can use DApp from https://lab.web3modal.com/ 🧪
