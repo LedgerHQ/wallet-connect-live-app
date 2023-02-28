@@ -8,11 +8,11 @@ import { Flex } from '@ledgerhq/react-ui'
 import { useTranslation } from 'next-i18next'
 import { Dispatch, SetStateAction, useState, useCallback, useMemo } from 'react'
 import { TransitionGroup } from 'react-transition-group'
-import { startProposal } from 'src/helpers/WalletConnect.util'
+import { startProposal } from '@/helpers/walletConnect.util'
 import styled from 'styled-components'
-import { Connect } from './Connect'
-import Sessions from './sessions/Sessions'
-import Tabs from './Tabs'
+import { Connect } from './connect'
+import Sessions from './sessions/sessions'
+import Tabs from './tabs'
 
 const WalletConnectContainer = styled.div`
 	display: flex;

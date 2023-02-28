@@ -5,7 +5,7 @@ import { QrCodeMedium, PasteMedium } from '@ledgerhq/react-ui/assets/icons'
 import { useTranslation } from 'next-i18next'
 import { useState, useCallback, useEffect } from 'react'
 import styled from 'styled-components'
-import { QRScanner } from './QRScanner'
+import { QRScanner } from './qrScanner'
 
 const QRScannerContainer = styled.div`
 	display: flex;

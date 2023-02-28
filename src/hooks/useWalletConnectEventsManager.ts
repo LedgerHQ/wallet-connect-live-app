@@ -6,7 +6,7 @@ import { stripHexPrefix } from '@/utils/currencyFormatter/helpers'
 import { SignClientTypes } from '@walletconnect/types'
 import { Web3WalletTypes } from '@walletconnect/web3wallet'
 import { useCallback, useEffect } from 'react'
-import { web3wallet } from 'src/helpers/WalletConnect.util'
+import { web3wallet } from '@/helpers/walletConnect.util'
 import { platformSDK } from './useLedgerLive'
 import useNavigation from './useNavigation'
 

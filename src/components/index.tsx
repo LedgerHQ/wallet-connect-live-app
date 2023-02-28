@@ -6,7 +6,7 @@ import { useSessionsStore, sessionSelector } from '@/store/Sessions.store'
 import { InputMode, NetworkConfig } from '@/types/types'
 import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
 import { useMemo, useState, useEffect } from 'react'
-import Home from './screens/Home'
+import Home from './screens/home'
 
 export type WalletConnectProps = {
 	initialMode?: InputMode
