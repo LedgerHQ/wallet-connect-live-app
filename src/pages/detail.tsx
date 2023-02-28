@@ -20,7 +20,7 @@ import {
 	ButtonsContainer,
 	List,
 	Row,
-} from '@/components/atoms/containers/Containers'
+} from '@/components/atoms/containers/Elements'
 import { ResponsiveContainer } from '@/styles/styles'
 import { sessionSelector, useSessionsStore } from '@/store/Sessions.store'
 import { useAccountsStore, accountSelector } from '@/store/Accounts.store'

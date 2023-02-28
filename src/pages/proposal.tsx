@@ -18,10 +18,7 @@ import {
 	CircledCrossSolidMedium,
 	WalletConnectMedium,
 } from '@ledgerhq/react-ui/assets/icons'
-import {
-	ButtonsContainer,
-	List,
-} from '@/components/atoms/containers/Containers'
+import { ButtonsContainer, List } from '@/components/atoms/containers/Elements'
 import { ResponsiveContainer } from '@/styles/styles'
 import useHydratation from 'src/hooks/useHydratation'
 export { getServerSideProps } from '../lib/serverProps'

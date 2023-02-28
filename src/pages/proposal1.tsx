@@ -12,10 +12,7 @@ import {
 	WalletConnectMedium,
 	WarningMedium,
 } from '@ledgerhq/react-ui/assets/icons'
-import {
-	ButtonsContainer,
-	List,
-} from '@/components/atoms/containers/Containers'
+import { ButtonsContainer, List } from '@/components/atoms/containers/Elements'
 import { ResponsiveContainer } from '@/styles/styles'
 import { useV1Store, v1Selector } from 'src/store/v1.store'
 import { walletConnectV1Logic } from 'src/hooks/useWalletConnectV1Logic'

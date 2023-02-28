@@ -1,7 +1,4 @@
-import {
-	List,
-	ButtonsContainer,
-} from '@/components/atoms/containers/Containers'
+import { List, ButtonsContainer } from '@/components/atoms/containers/Elements'
 import { GenericRow, RowType } from '@/components/atoms/containers/GenericRow'
 import { ImageWithPlaceholder } from '@/components/atoms/images/ImageWithPlaceholder'
 import { WalletConnectPopin } from '@/components/atoms/popin/WalletConnectPopin'
