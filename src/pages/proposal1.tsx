@@ -5,7 +5,7 @@ import { AddAccountPlaceholder } from '@/components/screens/sessions/sessionProp
 import { InfoSessionProposal } from '@/components/screens/sessions/sessionProposal/infoSessionProposal'
 import { formatUrl, getTicker, truncate } from '@/helpers/helper.util'
 import { walletConnectV1Logic } from '@/hooks/useWalletConnectV1Logic'
-import { useV1Store, v1Selector } from '@/store/v1.store'
+import { useV1Store, v1Selector } from 'src/storage/v1.store'
 import { ResponsiveContainer } from '@/styles/styles'
 import { Flex, Box, CryptoIcon, Button, Text } from '@ledgerhq/react-ui'
 import {

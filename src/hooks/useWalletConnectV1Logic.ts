@@ -4,10 +4,10 @@ import { compareETHAddresses } from '@/helpers/generic'
 import { stripHexPrefix } from '@/utils/currencyFormatter/helpers'
 import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
 import { useRef, useEffect, useCallback, Dispatch, SetStateAction } from 'react'
-import { useAppStore, appSelector } from '@/store/app.store'
+import { useAppStore, appSelector } from 'src/storage/app.store'
 import WalletConnectClient from '@walletconnect/client'
 import useNavigation from './useNavigation'
-import { useV1Store } from '@/store/v1.store'
+import { useV1Store } from 'src/storage/v1.store'
 import { Proposal } from '@/types/types'
 
 type WalletConnectState = {

@@ -11,8 +11,8 @@ import {
 	useSessionsStore,
 	sessionSelector,
 	Session,
-} from '@/store/sessions.store'
-import { useV1Store, v1Selector } from '@/store/v1.store'
+} from 'src/storage/sessions.store'
+import { useV1Store, v1Selector } from 'src/storage/v1.store'
 import { Flex, Button, Box, Text } from '@ledgerhq/react-ui'
 
 import { useTranslation } from 'next-i18next'

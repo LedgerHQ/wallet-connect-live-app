@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useSessionsStore, sessionSelector } from '@/store/sessions.store'
+import { useSessionsStore, sessionSelector } from 'src/storage/sessions.store'
 import { createWeb3Wallet, web3wallet } from '@/helpers/walletConnect.util'
 
 export default function useInitialization() {

@@ -15,8 +15,8 @@ import {
 	Row,
 } from '@/components/atoms/elements/elements'
 import { ResponsiveContainer } from '@/styles/styles'
-import { sessionSelector, useSessionsStore } from '@/store/sessions.store'
-import { useAccountsStore, accountSelector } from '@/store/accounts.store'
+import { sessionSelector, useSessionsStore } from 'src/storage/sessions.store'
+import { useAccountsStore, accountSelector } from 'src/storage/accounts.store'
 import { ImageWithPlaceholder } from '@/components/atoms/images/imageWithPlaceholder'
 import {
 	formatChainName,

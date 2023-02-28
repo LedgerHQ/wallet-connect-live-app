@@ -21,7 +21,7 @@
 			"@/styles/*": ["src/styles/*"],
 			"@/utils/*": ["src/shared/utils/*"],
 			"@/hooks/*": ["src/hooks/*"],
-			"@/store/*": ["src/store/*"],
+			"@/store/*": ["src/storage/*"],
 			"@/data/*": ["src/data/*"],
 			"@/constants/*": ["src/shared/constants/*"],
 			"@/context/*": ["src/shared/context/*"],
