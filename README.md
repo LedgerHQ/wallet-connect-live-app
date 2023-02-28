@@ -29,6 +29,14 @@ This live app need parameters to be defined in the manifest file
     }
 ```
 
+## Architecture
+
+- Pages 📝 (All the main screens)
+- Components 💄 (UI libray with part of screens and reusable components)
+- Hooks 🎣 (All the reusable logic)
+- Store 🛒 (All the stored (persistent or not) data to manage the running of the app )
+- Data 📈 (All the types for each chain and some payloads)
+
 ## Store Management
 
 Use of [Zustand](https://github.com/pmndrs/zustand) and `persist` middleware to have a persistent store via the `localStorage`
