@@ -302,6 +302,1110 @@ export default function SessionProposal() {
 											</Box>
 										)
 									})}
+								{accountsByChain
+									.filter((entry) => entry.isSupported)
+									.map((entry) => {
+										return (
+											<Box key={entry.chain} mb={6}>
+												<Box mb={6}>
+													<Text
+														variant="subtitle"
+														color={
+															colors.neutral.c70
+														}
+													>
+														{entry.chain}
+														{entry.isRequired ? (
+															<Text
+																color="error.c80"
+																ml={1}
+															>
+																*
+															</Text>
+														) : null}
+													</Text>
+												</Box>
+												{entry.accounts.length > 0 ? (
+													<List>
+														{entry.accounts.map(
+															(
+																account,
+																index: number,
+															) => (
+																<li
+																	key={
+																		account.id
+																	}
+																	style={{
+																		marginBottom:
+																			index !==
+																			entry
+																				.accounts
+																				.length -
+																				1
+																				? space[3]
+																				: 0,
+																	}}
+																>
+																	<GenericRow
+																		title={
+																			account.name
+																		}
+																		subtitle={truncate(
+																			account.address,
+																			30,
+																		)}
+																		isSelected={selectedAccounts.includes(
+																			account.address,
+																		)}
+																		onClick={() =>
+																			handleClick(
+																				account.address,
+																			)
+																		}
+																		LeftIcon={
+																			<CryptoIcon
+																				name={getTicker(
+																					entry.chain,
+																				)}
+																				circleIcon
+																				size={
+																					24
+																				}
+																			/>
+																		}
+																		rowType={
+																			RowType.Select
+																		}
+																	/>
+																</li>
+															),
+														)}
+													</List>
+												) : (
+													<AddAccountPlaceholder
+														onClick={() =>
+															addNewAccount(
+																entry.chain,
+															)
+														}
+													/>
+												)}
+											</Box>
+										)
+									})}
+								{accountsByChain
+									.filter((entry) => entry.isSupported)
+									.map((entry) => {
+										return (
+											<Box key={entry.chain} mb={6}>
+												<Box mb={6}>
+													<Text
+														variant="subtitle"
+														color={
+															colors.neutral.c70
+														}
+													>
+														{entry.chain}
+														{entry.isRequired ? (
+															<Text
+																color="error.c80"
+																ml={1}
+															>
+																*
+															</Text>
+														) : null}
+													</Text>
+												</Box>
+												{entry.accounts.length > 0 ? (
+													<List>
+														{entry.accounts.map(
+															(
+																account,
+																index: number,
+															) => (
+																<li
+																	key={
+																		account.id
+																	}
+																	style={{
+																		marginBottom:
+																			index !==
+																			entry
+																				.accounts
+																				.length -
+																				1
+																				? space[3]
+																				: 0,
+																	}}
+																>
+																	<GenericRow
+																		title={
+																			account.name
+																		}
+																		subtitle={truncate(
+																			account.address,
+																			30,
+																		)}
+																		isSelected={selectedAccounts.includes(
+																			account.address,
+																		)}
+																		onClick={() =>
+																			handleClick(
+																				account.address,
+																			)
+																		}
+																		LeftIcon={
+																			<CryptoIcon
+																				name={getTicker(
+																					entry.chain,
+																				)}
+																				circleIcon
+																				size={
+																					24
+																				}
+																			/>
+																		}
+																		rowType={
+																			RowType.Select
+																		}
+																	/>
+																</li>
+															),
+														)}
+													</List>
+												) : (
+													<AddAccountPlaceholder
+														onClick={() =>
+															addNewAccount(
+																entry.chain,
+															)
+														}
+													/>
+												)}
+											</Box>
+										)
+									})}
+								{accountsByChain
+									.filter((entry) => entry.isSupported)
+									.map((entry) => {
+										return (
+											<Box key={entry.chain} mb={6}>
+												<Box mb={6}>
+													<Text
+														variant="subtitle"
+														color={
+															colors.neutral.c70
+														}
+													>
+														{entry.chain}
+														{entry.isRequired ? (
+															<Text
+																color="error.c80"
+																ml={1}
+															>
+																*
+															</Text>
+														) : null}
+													</Text>
+												</Box>
+												{entry.accounts.length > 0 ? (
+													<List>
+														{entry.accounts.map(
+															(
+																account,
+																index: number,
+															) => (
+																<li
+																	key={
+																		account.id
+																	}
+																	style={{
+																		marginBottom:
+																			index !==
+																			entry
+																				.accounts
+																				.length -
+																				1
+																				? space[3]
+																				: 0,
+																	}}
+																>
+																	<GenericRow
+																		title={
+																			account.name
+																		}
+																		subtitle={truncate(
+																			account.address,
+																			30,
+																		)}
+																		isSelected={selectedAccounts.includes(
+																			account.address,
+																		)}
+																		onClick={() =>
+																			handleClick(
+																				account.address,
+																			)
+																		}
+																		LeftIcon={
+																			<CryptoIcon
+																				name={getTicker(
+																					entry.chain,
+																				)}
+																				circleIcon
+																				size={
+																					24
+																				}
+																			/>
+																		}
+																		rowType={
+																			RowType.Select
+																		}
+																	/>
+																</li>
+															),
+														)}
+													</List>
+												) : (
+													<AddAccountPlaceholder
+														onClick={() =>
+															addNewAccount(
+																entry.chain,
+															)
+														}
+													/>
+												)}
+											</Box>
+										)
+									})}
+								{accountsByChain
+									.filter((entry) => entry.isSupported)
+									.map((entry) => {
+										return (
+											<Box key={entry.chain} mb={6}>
+												<Box mb={6}>
+													<Text
+														variant="subtitle"
+														color={
+															colors.neutral.c70
+														}
+													>
+														{entry.chain}
+														{entry.isRequired ? (
+															<Text
+																color="error.c80"
+																ml={1}
+															>
+																*
+															</Text>
+														) : null}
+													</Text>
+												</Box>
+												{entry.accounts.length > 0 ? (
+													<List>
+														{entry.accounts.map(
+															(
+																account,
+																index: number,
+															) => (
+																<li
+																	key={
+																		account.id
+																	}
+																	style={{
+																		marginBottom:
+																			index !==
+																			entry
+																				.accounts
+																				.length -
+																				1
+																				? space[3]
+																				: 0,
+																	}}
+																>
+																	<GenericRow
+																		title={
+																			account.name
+																		}
+																		subtitle={truncate(
+																			account.address,
+																			30,
+																		)}
+																		isSelected={selectedAccounts.includes(
+																			account.address,
+																		)}
+																		onClick={() =>
+																			handleClick(
+																				account.address,
+																			)
+																		}
+																		LeftIcon={
+																			<CryptoIcon
+																				name={getTicker(
+																					entry.chain,
+																				)}
+																				circleIcon
+																				size={
+																					24
+																				}
+																			/>
+																		}
+																		rowType={
+																			RowType.Select
+																		}
+																	/>
+																</li>
+															),
+														)}
+													</List>
+												) : (
+													<AddAccountPlaceholder
+														onClick={() =>
+															addNewAccount(
+																entry.chain,
+															)
+														}
+													/>
+												)}
+											</Box>
+										)
+									})}
+								{accountsByChain
+									.filter((entry) => entry.isSupported)
+									.map((entry) => {
+										return (
+											<Box key={entry.chain} mb={6}>
+												<Box mb={6}>
+													<Text
+														variant="subtitle"
+														color={
+															colors.neutral.c70
+														}
+													>
+														{entry.chain}
+														{entry.isRequired ? (
+															<Text
+																color="error.c80"
+																ml={1}
+															>
+																*
+															</Text>
+														) : null}
+													</Text>
+												</Box>
+												{entry.accounts.length > 0 ? (
+													<List>
+														{entry.accounts.map(
+															(
+																account,
+																index: number,
+															) => (
+																<li
+																	key={
+																		account.id
+																	}
+																	style={{
+																		marginBottom:
+																			index !==
+																			entry
+																				.accounts
+																				.length -
+																				1
+																				? space[3]
+																				: 0,
+																	}}
+																>
+																	<GenericRow
+																		title={
+																			account.name
+																		}
+																		subtitle={truncate(
+																			account.address,
+																			30,
+																		)}
+																		isSelected={selectedAccounts.includes(
+																			account.address,
+																		)}
+																		onClick={() =>
+																			handleClick(
+																				account.address,
+																			)
+																		}
+																		LeftIcon={
+																			<CryptoIcon
+																				name={getTicker(
+																					entry.chain,
+																				)}
+																				circleIcon
+																				size={
+																					24
+																				}
+																			/>
+																		}
+																		rowType={
+																			RowType.Select
+																		}
+																	/>
+																</li>
+															),
+														)}
+													</List>
+												) : (
+													<AddAccountPlaceholder
+														onClick={() =>
+															addNewAccount(
+																entry.chain,
+															)
+														}
+													/>
+												)}
+											</Box>
+										)
+									})}
+								{accountsByChain
+									.filter((entry) => entry.isSupported)
+									.map((entry) => {
+										return (
+											<Box key={entry.chain} mb={6}>
+												<Box mb={6}>
+													<Text
+														variant="subtitle"
+														color={
+															colors.neutral.c70
+														}
+													>
+														{entry.chain}
+														{entry.isRequired ? (
+															<Text
+																color="error.c80"
+																ml={1}
+															>
+																*
+															</Text>
+														) : null}
+													</Text>
+												</Box>
+												{entry.accounts.length > 0 ? (
+													<List>
+														{entry.accounts.map(
+															(
+																account,
+																index: number,
+															) => (
+																<li
+																	key={
+																		account.id
+																	}
+																	style={{
+																		marginBottom:
+																			index !==
+																			entry
+																				.accounts
+																				.length -
+																				1
+																				? space[3]
+																				: 0,
+																	}}
+																>
+																	<GenericRow
+																		title={
+																			account.name
+																		}
+																		subtitle={truncate(
+																			account.address,
+																			30,
+																		)}
+																		isSelected={selectedAccounts.includes(
+																			account.address,
+																		)}
+																		onClick={() =>
+																			handleClick(
+																				account.address,
+																			)
+																		}
+																		LeftIcon={
+																			<CryptoIcon
+																				name={getTicker(
+																					entry.chain,
+																				)}
+																				circleIcon
+																				size={
+																					24
+																				}
+																			/>
+																		}
+																		rowType={
+																			RowType.Select
+																		}
+																	/>
+																</li>
+															),
+														)}
+													</List>
+												) : (
+													<AddAccountPlaceholder
+														onClick={() =>
+															addNewAccount(
+																entry.chain,
+															)
+														}
+													/>
+												)}
+											</Box>
+										)
+									})}
+								{accountsByChain
+									.filter((entry) => entry.isSupported)
+									.map((entry) => {
+										return (
+											<Box key={entry.chain} mb={6}>
+												<Box mb={6}>
+													<Text
+														variant="subtitle"
+														color={
+															colors.neutral.c70
+														}
+													>
+														{entry.chain}
+														{entry.isRequired ? (
+															<Text
+																color="error.c80"
+																ml={1}
+															>
+																*
+															</Text>
+														) : null}
+													</Text>
+												</Box>
+												{entry.accounts.length > 0 ? (
+													<List>
+														{entry.accounts.map(
+															(
+																account,
+																index: number,
+															) => (
+																<li
+																	key={
+																		account.id
+																	}
+																	style={{
+																		marginBottom:
+																			index !==
+																			entry
+																				.accounts
+																				.length -
+																				1
+																				? space[3]
+																				: 0,
+																	}}
+																>
+																	<GenericRow
+																		title={
+																			account.name
+																		}
+																		subtitle={truncate(
+																			account.address,
+																			30,
+																		)}
+																		isSelected={selectedAccounts.includes(
+																			account.address,
+																		)}
+																		onClick={() =>
+																			handleClick(
+																				account.address,
+																			)
+																		}
+																		LeftIcon={
+																			<CryptoIcon
+																				name={getTicker(
+																					entry.chain,
+																				)}
+																				circleIcon
+																				size={
+																					24
+																				}
+																			/>
+																		}
+																		rowType={
+																			RowType.Select
+																		}
+																	/>
+																</li>
+															),
+														)}
+													</List>
+												) : (
+													<AddAccountPlaceholder
+														onClick={() =>
+															addNewAccount(
+																entry.chain,
+															)
+														}
+													/>
+												)}
+											</Box>
+										)
+									})}
+								{accountsByChain
+									.filter((entry) => entry.isSupported)
+									.map((entry) => {
+										return (
+											<Box key={entry.chain} mb={6}>
+												<Box mb={6}>
+													<Text
+														variant="subtitle"
+														color={
+															colors.neutral.c70
+														}
+													>
+														{entry.chain}
+														{entry.isRequired ? (
+															<Text
+																color="error.c80"
+																ml={1}
+															>
+																*
+															</Text>
+														) : null}
+													</Text>
+												</Box>
+												{entry.accounts.length > 0 ? (
+													<List>
+														{entry.accounts.map(
+															(
+																account,
+																index: number,
+															) => (
+																<li
+																	key={
+																		account.id
+																	}
+																	style={{
+																		marginBottom:
+																			index !==
+																			entry
+																				.accounts
+																				.length -
+																				1
+																				? space[3]
+																				: 0,
+																	}}
+																>
+																	<GenericRow
+																		title={
+																			account.name
+																		}
+																		subtitle={truncate(
+																			account.address,
+																			30,
+																		)}
+																		isSelected={selectedAccounts.includes(
+																			account.address,
+																		)}
+																		onClick={() =>
+																			handleClick(
+																				account.address,
+																			)
+																		}
+																		LeftIcon={
+																			<CryptoIcon
+																				name={getTicker(
+																					entry.chain,
+																				)}
+																				circleIcon
+																				size={
+																					24
+																				}
+																			/>
+																		}
+																		rowType={
+																			RowType.Select
+																		}
+																	/>
+																</li>
+															),
+														)}
+													</List>
+												) : (
+													<AddAccountPlaceholder
+														onClick={() =>
+															addNewAccount(
+																entry.chain,
+															)
+														}
+													/>
+												)}
+											</Box>
+										)
+									})}
+								{accountsByChain
+									.filter((entry) => entry.isSupported)
+									.map((entry) => {
+										return (
+											<Box key={entry.chain} mb={6}>
+												<Box mb={6}>
+													<Text
+														variant="subtitle"
+														color={
+															colors.neutral.c70
+														}
+													>
+														{entry.chain}
+														{entry.isRequired ? (
+															<Text
+																color="error.c80"
+																ml={1}
+															>
+																*
+															</Text>
+														) : null}
+													</Text>
+												</Box>
+												{entry.accounts.length > 0 ? (
+													<List>
+														{entry.accounts.map(
+															(
+																account,
+																index: number,
+															) => (
+																<li
+																	key={
+																		account.id
+																	}
+																	style={{
+																		marginBottom:
+																			index !==
+																			entry
+																				.accounts
+																				.length -
+																				1
+																				? space[3]
+																				: 0,
+																	}}
+																>
+																	<GenericRow
+																		title={
+																			account.name
+																		}
+																		subtitle={truncate(
+																			account.address,
+																			30,
+																		)}
+																		isSelected={selectedAccounts.includes(
+																			account.address,
+																		)}
+																		onClick={() =>
+																			handleClick(
+																				account.address,
+																			)
+																		}
+																		LeftIcon={
+																			<CryptoIcon
+																				name={getTicker(
+																					entry.chain,
+																				)}
+																				circleIcon
+																				size={
+																					24
+																				}
+																			/>
+																		}
+																		rowType={
+																			RowType.Select
+																		}
+																	/>
+																</li>
+															),
+														)}
+													</List>
+												) : (
+													<AddAccountPlaceholder
+														onClick={() =>
+															addNewAccount(
+																entry.chain,
+															)
+														}
+													/>
+												)}
+											</Box>
+										)
+									})}
+								{accountsByChain
+									.filter((entry) => entry.isSupported)
+									.map((entry) => {
+										return (
+											<Box key={entry.chain} mb={6}>
+												<Box mb={6}>
+													<Text
+														variant="subtitle"
+														color={
+															colors.neutral.c70
+														}
+													>
+														{entry.chain}
+														{entry.isRequired ? (
+															<Text
+																color="error.c80"
+																ml={1}
+															>
+																*
+															</Text>
+														) : null}
+													</Text>
+												</Box>
+												{entry.accounts.length > 0 ? (
+													<List>
+														{entry.accounts.map(
+															(
+																account,
+																index: number,
+															) => (
+																<li
+																	key={
+																		account.id
+																	}
+																	style={{
+																		marginBottom:
+																			index !==
+																			entry
+																				.accounts
+																				.length -
+																				1
+																				? space[3]
+																				: 0,
+																	}}
+																>
+																	<GenericRow
+																		title={
+																			account.name
+																		}
+																		subtitle={truncate(
+																			account.address,
+																			30,
+																		)}
+																		isSelected={selectedAccounts.includes(
+																			account.address,
+																		)}
+																		onClick={() =>
+																			handleClick(
+																				account.address,
+																			)
+																		}
+																		LeftIcon={
+																			<CryptoIcon
+																				name={getTicker(
+																					entry.chain,
+																				)}
+																				circleIcon
+																				size={
+																					24
+																				}
+																			/>
+																		}
+																		rowType={
+																			RowType.Select
+																		}
+																	/>
+																</li>
+															),
+														)}
+													</List>
+												) : (
+													<AddAccountPlaceholder
+														onClick={() =>
+															addNewAccount(
+																entry.chain,
+															)
+														}
+													/>
+												)}
+											</Box>
+										)
+									})}
+								{accountsByChain
+									.filter((entry) => entry.isSupported)
+									.map((entry) => {
+										return (
+											<Box key={entry.chain} mb={6}>
+												<Box mb={6}>
+													<Text
+														variant="subtitle"
+														color={
+															colors.neutral.c70
+														}
+													>
+														{entry.chain}
+														{entry.isRequired ? (
+															<Text
+																color="error.c80"
+																ml={1}
+															>
+																*
+															</Text>
+														) : null}
+													</Text>
+												</Box>
+												{entry.accounts.length > 0 ? (
+													<List>
+														{entry.accounts.map(
+															(
+																account,
+																index: number,
+															) => (
+																<li
+																	key={
+																		account.id
+																	}
+																	style={{
+																		marginBottom:
+																			index !==
+																			entry
+																				.accounts
+																				.length -
+																				1
+																				? space[3]
+																				: 0,
+																	}}
+																>
+																	<GenericRow
+																		title={
+																			account.name
+																		}
+																		subtitle={truncate(
+																			account.address,
+																			30,
+																		)}
+																		isSelected={selectedAccounts.includes(
+																			account.address,
+																		)}
+																		onClick={() =>
+																			handleClick(
+																				account.address,
+																			)
+																		}
+																		LeftIcon={
+																			<CryptoIcon
+																				name={getTicker(
+																					entry.chain,
+																				)}
+																				circleIcon
+																				size={
+																					24
+																				}
+																			/>
+																		}
+																		rowType={
+																			RowType.Select
+																		}
+																	/>
+																</li>
+															),
+														)}
+													</List>
+												) : (
+													<AddAccountPlaceholder
+														onClick={() =>
+															addNewAccount(
+																entry.chain,
+															)
+														}
+													/>
+												)}
+											</Box>
+										)
+									})}
+								{accountsByChain
+									.filter((entry) => entry.isSupported)
+									.map((entry) => {
+										return (
+											<Box key={entry.chain} mb={6}>
+												<Box mb={6}>
+													<Text
+														variant="subtitle"
+														color={
+															colors.neutral.c70
+														}
+													>
+														{entry.chain}
+														{entry.isRequired ? (
+															<Text
+																color="error.c80"
+																ml={1}
+															>
+																*
+															</Text>
+														) : null}
+													</Text>
+												</Box>
+												{entry.accounts.length > 0 ? (
+													<List>
+														{entry.accounts.map(
+															(
+																account,
+																index: number,
+															) => (
+																<li
+																	key={
+																		account.id
+																	}
+																	style={{
+																		marginBottom:
+																			index !==
+																			entry
+																				.accounts
+																				.length -
+																				1
+																				? space[3]
+																				: 0,
+																	}}
+																>
+																	<GenericRow
+																		title={
+																			account.name
+																		}
+																		subtitle={truncate(
+																			account.address,
+																			30,
+																		)}
+																		isSelected={selectedAccounts.includes(
+																			account.address,
+																		)}
+																		onClick={() =>
+																			handleClick(
+																				account.address,
+																			)
+																		}
+																		LeftIcon={
+																			<CryptoIcon
+																				name={getTicker(
+																					entry.chain,
+																				)}
+																				circleIcon
+																				size={
+																					24
+																				}
+																			/>
+																		}
+																		rowType={
+																			RowType.Select
+																		}
+																	/>
+																</li>
+															),
+														)}
+													</List>
+												) : (
+													<AddAccountPlaceholder
+														onClick={() =>
+															addNewAccount(
+																entry.chain,
+															)
+														}
+													/>
+												)}
+											</Box>
+										)
+									})}
 
 								{chainsNotSupported &&
 								chainsNotSupported.length > 0 ? (
