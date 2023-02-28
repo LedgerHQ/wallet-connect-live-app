@@ -48,7 +48,11 @@ const Container = styled(Flex).attrs((p: { size: number }) => ({
 	left: '-25px',
 }))<{ size: number }>``
 
-const ListChains = styled.ul``
+const ListChains = styled(Flex)`
+	flex-direction: column;
+	max-height: 450px;
+	overflow-y: scroll;
+`
 
 const Header = styled(Flex)`
 	flex-direction: column;
@@ -298,42 +302,45 @@ export default function SessionProposal() {
 											</Box>
 										)
 									})}
+
+								{chainsNotSupported &&
+								chainsNotSupported.length > 0 ? (
+									<GenericRow
+										title={
+											chainsNotSupported.length > 1
+												? t(
+														'sessionProposal.notSupported_plural',
+												  )
+												: t(
+														'sessionProposal.notSupported',
+												  )
+										}
+										subtitle={chainsNotSupported
+											.map((entry) => entry.chain)
+											.join(', ')
+											.concat('.')}
+										LeftIcon={
+											<Flex
+												p={3}
+												bg="error.c100a025"
+												borderRadius="50%"
+											>
+												<CircledCrossSolidMedium
+													size={16}
+													color="error.c100"
+												/>
+											</Flex>
+										}
+										rowType={RowType.Default}
+									/>
+								) : null}
+								<Box mt={6}>
+									<InfoSessionProposal />
+								</Box>
 							</ListChains>
-							{chainsNotSupported &&
-							chainsNotSupported.length > 0 ? (
-								<GenericRow
-									title={
-										chainsNotSupported.length > 1
-											? t(
-													'sessionProposal.notSupported_plural',
-											  )
-											: t('sessionProposal.notSupported')
-									}
-									subtitle={chainsNotSupported
-										.map((entry) => entry.chain)
-										.join(', ')
-										.concat('.')}
-									LeftIcon={
-										<Flex
-											p={3}
-											bg="error.c100a025"
-											borderRadius="50%"
-										>
-											<CircledCrossSolidMedium
-												size={16}
-												color="error.c100"
-											/>
-										</Flex>
-									}
-									rowType={RowType.Default}
-								/>
-							) : null}
 						</Flex>
 
-						<Flex flexDirection="column">
-							<Box mt={6}>
-								<InfoSessionProposal />
-							</Box>
+						<Flex>
 							<ButtonsContainer>
 								<Button
 									variant="shade"
