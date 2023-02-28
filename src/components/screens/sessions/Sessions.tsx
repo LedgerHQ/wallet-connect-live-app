@@ -182,12 +182,12 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 			</ButtonsContainer>
 
 			<WalletConnectPopin isOpen={isModalOpen} onClose={closeModal}>
-				<Flex flexDirection="column">
+				<Flex flexDirection="column" mx={6}>
 					<Text variant="h4" color="neutral.c100" mb={10}>
 						{t('sessions.modal.title')}
 					</Text>
 
-					<Text variant="bodyLineHeight" color="neutral.c70" mb={10}>
+					<Text variant="bodyLineHeight" color="neutral.c70" mb={3}>
 						{t('sessions.modal.desc')}
 					</Text>
 

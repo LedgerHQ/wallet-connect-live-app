@@ -1,7 +1,8 @@
-import { Flex, Popin } from '@ledgerhq/react-ui'
+import { Flex } from '@ledgerhq/react-ui'
 import { CloseMedium } from '@ledgerhq/react-ui/assets/icons'
 import React from 'react'
 import styled from 'styled-components'
+import Popin from './Popin'
 
 type Props = {
 	isOpen: boolean
@@ -10,10 +11,9 @@ type Props = {
 }
 
 const CustomPopin = styled(Popin)`
-	height: 300px;
 	border-radius: 16px;
-	padding: 32px;
-	position: relative;
+	padding: 16px;
+	margin: 16px;
 	background-color: ${(props) => props.theme.colors.background.drawer};
 	align-items: center;
 	justify-content: center;
@@ -22,11 +22,10 @@ const CustomPopin = styled(Popin)`
 const CloseButton = styled(Flex)`
 	height: 32px;
 	width: 32px;
+	margin-bottom: 8px;
 	align-items: center;
 	justify-content: center;
-	position: absolute;
-	right: 16px;
-	top: 8px;
+	align-self: flex-end;
 	border-radius: 50px;
 	cursor: pointer;
 	background-color: ${(props) => props.theme.colors.neutral.c30};
