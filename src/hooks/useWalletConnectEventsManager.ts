@@ -1,7 +1,7 @@
 import { EIP155_SIGNING_METHODS } from '@/data/EIP155Data'
 import { convertEthToLiveTX } from '@/shared/helpers/converters'
 import { hasETHAddress } from '@/shared/helpers/generic'
-import { useAccountsStore, accountSelector } from '@/store/Accounts.store'
+import { useAccountsStore, accountSelector } from '@/store/accounts.store'
 import { stripHexPrefix } from '@/utils/currencyFormatter/helpers'
 import { SignClientTypes } from '@walletconnect/types'
 import { Web3WalletTypes } from '@walletconnect/web3wallet'

@@ -22,8 +22,8 @@ import {
 	Row,
 } from '@/components/atoms/containers/elements'
 import { ResponsiveContainer } from '@/styles/styles'
-import { sessionSelector, useSessionsStore } from '@/store/Sessions.store'
-import { useAccountsStore, accountSelector } from '@/store/Accounts.store'
+import { sessionSelector, useSessionsStore } from '@/store/sessions.store'
+import { useAccountsStore, accountSelector } from '@/store/accounts.store'
 import useHydratation from '@/hooks/useHydratation'
 import { ImageWithPlaceholder } from '@/components/atoms/images/imageWithPlaceholder'
 

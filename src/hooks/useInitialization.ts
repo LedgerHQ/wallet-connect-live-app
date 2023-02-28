@@ -1,4 +1,4 @@
-import { useSessionsStore, sessionSelector } from '@/store/Sessions.store'
+import { useSessionsStore, sessionSelector } from '@/store/sessions.store'
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { createWeb3Wallet, web3wallet } from '@/helpers/walletConnect.util'
 

@@ -14,6 +14,8 @@ import { ErrorBlockchainSupport } from '@/components/screens/sessions/sessionPro
 import { useProposal } from 'src/hooks/useProposal'
 import { useMemo } from 'react'
 import { AddAccountPlaceholder } from '@/components/screens/sessions/sessionProposal/addAccountPlaceholder'
+
+
 import {
 	CircledCrossSolidMedium,
 	WalletConnectMedium,
@@ -21,6 +23,7 @@ import {
 import { ButtonsContainer, List } from '@/components/atoms/containers/elements'
 import { ResponsiveContainer } from '@/styles/styles'
 import useHydratation from 'src/hooks/useHydratation'
+
 export { getServerSideProps } from '../lib/serverProps'
 
 const DAppContainer = styled(Flex).attrs(
