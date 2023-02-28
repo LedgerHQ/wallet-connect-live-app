@@ -34,6 +34,11 @@ const V1Container = styled.div`
 	padding: ${(p) => p.theme.space[2]}px;
 `
 
+const CustomList = styled(List)`
+	max-height: 75vh;
+	overflow-y: scroll;
+`
+
 export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 	const { t } = useTranslation()
 	const { navigate, routes } = useNavigation()
@@ -118,7 +123,7 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 
 	return (
 		<Flex flexDirection="column" width="100%" height="100%" mt={6}>
-			<List>
+			<CustomList>
 				{v1Session && v1Session.peerMeta ? (
 					<Box key={v1Session.handshakeTopic} mt={3}>
 						<GenericRow
@@ -167,7 +172,7 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 						/>
 					</Box>
 				))}
-			</List>
+			</CustomList>
 
 			<ButtonsContainer mt={4}>
 				<Button variant="shade" flex={1} onClick={openModal}>
