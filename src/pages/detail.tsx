@@ -43,8 +43,6 @@ const BackButton = styled(Flex)`
 `
 
 const CustomList = styled(Flex)`
-	max-height: 45vh;
-	overflow-y: scroll;
 	flex-direction: column;
 `
 
@@ -139,7 +137,7 @@ export default function SessionDetail() {
 			alignItems="center"
 			justifyContent="center"
 			width="100%"
-			height="100%"
+			height="auto"
 		>
 			<ResponsiveContainer>
 				<Flex

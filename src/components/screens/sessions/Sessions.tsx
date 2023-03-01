@@ -34,10 +34,7 @@ const V1Container = styled.div`
 	padding: ${(p) => p.theme.space[2]}px;
 `
 
-const CustomList = styled(List)`
-	max-height: 75vh;
-	overflow-y: scroll;
-`
+const CustomList = styled(List)``
 
 export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 	const { t } = useTranslation()
@@ -174,8 +171,13 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 				))}
 			</CustomList>
 
-			<ButtonsContainer mt={4}>
-				<Button variant="shade" flex={1} onClick={openModal}>
+			<ButtonsContainer my={6}>
+				<Button
+					variant="shade"
+					size="large"
+					flex={1}
+					onClick={openModal}
+				>
 					<Text
 						variant="body"
 						fontWeight="semiBold"
