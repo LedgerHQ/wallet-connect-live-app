@@ -16,6 +16,7 @@ import Image from 'next/image'
 import { useTranslation } from 'next-i18next'
 import { Logo } from 'src/icons/LedgerLiveLogo'
 import styled, { useTheme } from 'styled-components'
+import { useState } from 'react'
 
 export { getServerSideProps } from '../lib/serverProps'
 
@@ -53,7 +54,7 @@ const Header = styled(Flex)`
 
 export default function SessionProposal() {
 	const { colors } = useTheme()
-
+	const [imageLoadingError, setImageLoadingError] = useState(false)
 	const { t } = useTranslation()
 	const selectedAccount = useV1Store(v1Selector.selectAccount)
 	const session = useV1Store(v1Selector.selectSession)
@@ -77,7 +78,9 @@ export default function SessionProposal() {
 				>
 					<Flex flexDirection="column">
 						<Header mt={12} mb={10}>
-							{proposer && proposer.icons.length > 0 ? (
+							{proposer &&
+							proposer.icons.length > 0 &&
+							!imageLoadingError ? (
 								<Container>
 									<LogoContainer>
 										<Logo size={30} />
@@ -96,6 +99,11 @@ export default function SessionProposal() {
 														borderRadius: '50%',
 													}}
 													height={60}
+													onError={() =>
+														setImageLoadingError(
+															true,
+														)
+													}
 												/>
 											) : (
 												<div></div>

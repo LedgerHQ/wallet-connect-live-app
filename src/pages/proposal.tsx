@@ -18,7 +18,7 @@ import {
 import Image from 'next/image'
 import { space } from '@ledgerhq/react-ui/styles/theme'
 import { useTranslation } from 'next-i18next'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Logo } from 'src/icons/LedgerLiveLogo'
 import styled, { useTheme } from 'styled-components'
 
@@ -77,6 +77,8 @@ export default function SessionProposal() {
 		proposer,
 		addNewAccount,
 	} = useProposal({ proposal })
+
+	const [imageLoadingError, setImageLoadingError] = useState(false)
 
 	const accountsByChain = useMemo(
 		() => formatAccountsByChain(proposal, accounts),
@@ -145,7 +147,8 @@ export default function SessionProposal() {
 					>
 						<Flex flexDirection="column">
 							<Header mt={12} mb={10}>
-								{proposer.metadata.icons.length > 0 ? (
+								{proposer.metadata.icons.length > 0 &&
+								!imageLoadingError ? (
 									<Container>
 										<LogoContainer>
 											<Logo size={30} />
@@ -169,6 +172,11 @@ export default function SessionProposal() {
 															borderLeft: `3px solid ${colors.background.main}`,
 														}}
 														height={60}
+														onError={() =>
+															setImageLoadingError(
+																true,
+															)
+														}
 													/>
 												) : (
 													<div></div>
