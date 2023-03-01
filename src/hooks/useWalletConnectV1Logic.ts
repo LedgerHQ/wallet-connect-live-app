@@ -11,7 +11,6 @@ import { useV1Store } from '@/storage/v1.store'
 import { Proposal } from '@/types/types'
 
 type WalletConnectState = {
-	session: any | null
 	timedOut: boolean
 	selectedAccount?: Account
 }
@@ -31,7 +30,6 @@ const getInitialState = (
 
 	const selectedAccount = initialAccount || savedAccount || defaultAccount
 	return {
-		session: null,
 		timedOut: false,
 		selectedAccount,
 	}
@@ -54,65 +52,69 @@ export default function useWalletConnectV1Logic({
 	accounts,
 	setUri,
 }: WalletConnectV1Props) {
-	const selectedAccountRef = useRef<Account>()
 	const wcRef = useRef<WalletConnectClient>()
 	const networks = useAppStore(appSelector.selectNetworks)
-	const { routes, navigate, tabsIndexes, router } = useNavigation()
+	const { routes, navigate, tabsIndexes } = useNavigation()
 	const {
 		setSelectedAccount,
 		setSession,
 		setTimedOut,
-		selectedAccount,
 		setProposal,
+		setSessionUri,
+		clearStore,
+		selectedAccount,
+		session,
+		sessionURI,
 	} = useV1Store()
-
-	useEffect(() => {
-		const {
-			selectedAccount: selectedAccountLocal,
-			timedOut,
-			session,
-		} = getInitialState(accounts, initialAccountId, selectedAccount?.id)
-		setSelectedAccount(selectedAccountLocal)
-		setTimedOut(timedOut)
-		setSession(session)
-	}, [accounts, initialAccountId])
 
 	const isV1 = (uri: string) => uri?.includes('@1?')
 
 	useEffect(() => {
+		if (initialURI && initialURI !== sessionURI && isV1(initialURI)) {
+			createClient({ uri: initialURI })
+			return
+		}
+		// restoring WC session if one is to be found in local storage
+		if (session) {
+			createClient({ session })
+		}
+	}, [])
+
+	useEffect(() => {
+		const { selectedAccount: selectedAccountLocal, timedOut } =
+			getInitialState(accounts, initialAccountId, selectedAccount?.id)
+		setSelectedAccount(selectedAccountLocal)
+		setTimedOut(timedOut)
+	}, [accounts, initialAccountId])
+
+	useEffect(() => {
 		console.log('USE EFFECT', selectedAccount)
 		console.log('account id', selectedAccount?.id)
-		selectedAccountRef.current = selectedAccount
 		const wc = wcRef.current
 
-		if (selectedAccount) {
-			setSelectedAccount(selectedAccount)
-			if (wc && wc.connected) {
-				const networkConfig = networks.find(
-					(networkConfig) =>
-						networkConfig.currency === selectedAccount.currency,
-				)
-				if (networkConfig) {
-					wc.updateSession({
-						chainId: networkConfig.chainId,
-						accounts: [selectedAccount.address],
-					})
-				}
+		if (selectedAccount && wc && wc.connected) {
+			const networkConfig = networks.find(
+				(networkConfig) =>
+					networkConfig.currency === selectedAccount.currency,
+			)
+			if (networkConfig) {
+				wc.updateSession({
+					chainId: networkConfig.chainId,
+					accounts: [selectedAccount.address],
+				})
 				setSession(wc.session)
 			}
+			wcRef.current = wc
 		}
 	}, [selectedAccount, selectedAccount?.id])
 
-	const cleanup = useCallback((timedOut = false) => {
+	const cleanup = useCallback(() => {
 		// cleaning everything and reverting to initial state
-		setSession(null)
-		setTimedOut(timedOut)
-		setSelectedAccount(undefined)
-		setProposal(undefined)
 		wcRef.current = undefined
+		const tempAcc = selectedAccount
 		setUri(undefined)
-		localStorage.removeItem('session')
-		localStorage.removeItem('sessionURI')
+		clearStore()
+		setSelectedAccount(tempAcc)
 	}, [])
 
 	const createClient = useCallback(
@@ -129,28 +131,20 @@ export default function useWalletConnectV1Logic({
 
 			const wc = new WalletConnectClient({ uri, session })
 
-			// synchronize WC state with react and trigger necessary rerenders
-			const syncSessionWithReactState = () => {
-				setSession(wc.session)
-				setTimedOut(false)
-			}
-
 			wc.on('session_request', (error, payload) => {
 				if (error) {
 				}
 				setProposal(payload as Proposal)
-				syncSessionWithReactState()
 				setTimeout(() => {
 					navigate(routes.sessionProposalV1)
 				}, 500)
 			})
 
-			wc.on('connect', () => {
-				syncSessionWithReactState()
-				localStorage.setItem('session', JSON.stringify(wc.session))
+			wc.on('connect', async () => {
+				setSession(wc.session)
 
 				if (uri) {
-					localStorage.setItem('sessionURI', uri)
+					setSessionUri(uri)
 				}
 			})
 
@@ -173,12 +167,12 @@ export default function useWalletConnectV1Logic({
 						const ethTX = payload.params[0]
 						console.log('eth_sendTransaction', {
 							ethTX,
-							selectedAccount: selectedAccountRef.current,
+							selectedAccount: selectedAccount,
 						})
 						if (
-							selectedAccountRef.current &&
+							selectedAccount &&
 							compareETHAddresses(
-								selectedAccountRef.current.address,
+								selectedAccount.address,
 								ethTX.from,
 							)
 						) {
@@ -186,12 +180,12 @@ export default function useWalletConnectV1Logic({
 								const liveTX = convertEthToLiveTX(ethTX)
 								const signedTransaction =
 									await platformSDK.signTransaction(
-										selectedAccountRef.current.id,
+										selectedAccount.id,
 										liveTX,
 									)
 								const hash =
 									await platformSDK.broadcastSignedTransaction(
-										selectedAccountRef.current.id,
+										selectedAccount.id,
 										signedTransaction,
 									)
 								wc.approveRequest({
@@ -217,9 +211,9 @@ export default function useWalletConnectV1Logic({
 					// https://github.com/WalletConnect/walletconnect-docs/issues/32#issuecomment-644697172
 					case 'personal_sign': {
 						if (
-							selectedAccountRef.current &&
+							selectedAccount &&
 							compareETHAddresses(
-								selectedAccountRef.current.address,
+								selectedAccount.address,
 								payload.params[1],
 							)
 						) {
@@ -230,7 +224,7 @@ export default function useWalletConnectV1Logic({
 
 								const signedMessage =
 									await platformSDK.signMessage(
-										selectedAccountRef.current.id,
+										selectedAccount.id,
 										Buffer.from(message, 'hex'),
 									)
 								wc.approveRequest({
@@ -254,9 +248,9 @@ export default function useWalletConnectV1Logic({
 					}
 					case 'eth_sign': {
 						if (
-							selectedAccountRef.current &&
+							selectedAccount &&
 							compareETHAddresses(
-								selectedAccountRef.current.address,
+								selectedAccount.address,
 								payload.params[0],
 							)
 						) {
@@ -267,7 +261,7 @@ export default function useWalletConnectV1Logic({
 
 								const signedMessage =
 									await platformSDK.signMessage(
-										selectedAccountRef.current.id,
+										selectedAccount.id,
 										Buffer.from(message, 'hex'),
 									)
 								wc.approveRequest({
@@ -290,9 +284,9 @@ export default function useWalletConnectV1Logic({
 					}
 					case 'eth_signTypedData': {
 						if (
-							selectedAccountRef.current &&
+							selectedAccount &&
 							compareETHAddresses(
-								selectedAccountRef.current.address,
+								selectedAccount.address,
 								payload.params[0],
 							)
 						) {
@@ -303,7 +297,7 @@ export default function useWalletConnectV1Logic({
 
 								const signedMessage =
 									await platformSDK.signMessage(
-										selectedAccountRef.current.id,
+										selectedAccount.id,
 										Buffer.from(message),
 									)
 								wc.approveRequest({
@@ -362,10 +356,9 @@ export default function useWalletConnectV1Logic({
 
 			// saving the client instance ref for further usage
 			wcRef.current = wc
-			syncSessionWithReactState()
 
 			// a client is already connected
-			if (wc.connected && selectedAccountRef.current) {
+			if (wc.connected && selectedAccount) {
 				// if a uri was provided, then the user probably want to connect to another dapp, we disconnect the previous one
 				if (uri) {
 					await wc.killSession()
@@ -374,44 +367,34 @@ export default function useWalletConnectV1Logic({
 
 				const networkConfig = networks.find(
 					(networkConfig) =>
-						networkConfig.currency ===
-						selectedAccountRef.current?.currency,
+						networkConfig.currency === selectedAccount?.currency,
 				)
+
 				if (networkConfig) {
 					wc.updateSession({
 						chainId: networkConfig.chainId,
-						accounts: [selectedAccountRef.current.address],
+						accounts: [selectedAccount.address],
 					})
+
+					setSession(wc.session)
 				}
 			}
 		},
 		[],
 	)
 
-	useEffect(() => {
-		const sessionURI = localStorage.getItem('sessionURI')
-		if (initialURI && initialURI !== sessionURI && isV1(initialURI)) {
-			createClient({ uri: initialURI })
-			return
-		}
-		// restoring WC session if one is to be found in local storage
-		const rawSession = localStorage.getItem('session')
-		if (rawSession) {
-			const session = JSON.parse(rawSession)
-			createClient({ session })
-		}
-	}, [])
-
 	const handleAccept = useCallback(() => {
-		const account = selectedAccountRef.current
-		if (wcRef.current && account) {
+		console.log(wcRef)
+		if (wcRef.current && selectedAccount) {
+			console.log(wcRef.current, 'azccept')
 			const networkConfig = networks.find(
-				(networkConfig) => networkConfig.currency === account.currency,
+				(networkConfig) =>
+					networkConfig.currency === selectedAccount.currency,
 			)
 			if (networkConfig) {
 				wcRef.current.approveSession({
 					chainId: networkConfig.chainId,
-					accounts: [account.address],
+					accounts: [selectedAccount.address],
 				})
 				navigate(routes.sessionDetailsV1)
 			}
@@ -423,6 +406,9 @@ export default function useWalletConnectV1Logic({
 			wcRef.current.rejectSession({
 				message: 'DECLINED_BY_USER',
 			})
+
+			setProposal(undefined)
+			wcRef.current = undefined
 		}
 		navigate(routes.home)
 	}, [])
@@ -431,6 +417,7 @@ export default function useWalletConnectV1Logic({
 		if (wcRef.current) {
 			wcRef.current.killSession()
 		}
+		wcRef.current = undefined
 	}, [])
 
 	const handleSwitchAccount = useCallback(async (currencies?: string[]) => {
@@ -448,21 +435,11 @@ export default function useWalletConnectV1Logic({
 		}
 	}, [])
 
-	const handleTimeout = useCallback(() => {
-		cleanup(true)
-	}, [])
-
-	const handleCancel = useCallback(() => {
-		cleanup()
-	}, [])
-
 	walletConnectV1Logic = {
 		handleDisconnect,
 		handleSwitchAccount,
 		handleAccept,
 		handleDecline,
-		handleTimeout,
-		handleCancel,
 		createClient,
 		isV1,
 		cleanup,
