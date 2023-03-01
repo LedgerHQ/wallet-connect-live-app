@@ -50,8 +50,6 @@ const Container = styled(Flex).attrs((p: { size: number }) => ({
 
 const ListChains = styled(Flex)`
 	flex-direction: column;
-	max-height: 65vh;
-	overflow-y: scroll;
 `
 
 const Header = styled(Flex)`
@@ -113,7 +111,7 @@ export default function SessionProposal() {
 			alignItems="center"
 			justifyContent="center"
 			width="100%"
-			height="100%"
+			height="auto"
 		>
 			<ResponsiveContainer>
 				{noChainsSupported || !everyRequiredChainsSupported ? (
@@ -141,6 +139,7 @@ export default function SessionProposal() {
 				) : (
 					<Flex
 						width="100%"
+						height="100%"
 						flex={1}
 						justifyContent="space-between"
 						flexDirection="column"
@@ -213,7 +212,6 @@ export default function SessionProposal() {
 									{formatUrl(proposer.metadata.url)}
 								</Text>
 							</Header>
-
 							<ListChains>
 								{accountsByChain
 									.filter((entry) => entry.isSupported)
