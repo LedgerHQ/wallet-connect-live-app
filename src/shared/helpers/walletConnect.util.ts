@@ -28,6 +28,7 @@ async function pair(uri: string) {
 	return await core.pairing.pair({ uri })
 }
 
+export const isV1 = (uri: string) => uri?.includes('@1?')
 export async function startProposal(uri: string) {
 	try {
 		const url = new URL(uri)

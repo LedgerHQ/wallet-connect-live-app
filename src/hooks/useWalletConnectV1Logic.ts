@@ -9,6 +9,7 @@ import WalletConnectClient from '@walletconnect/client'
 import useNavigation from './useNavigation'
 import { useV1Store } from '@/storage/v1.store'
 import { Proposal } from '@/types/types'
+import { isV1 } from '@/helpers/walletConnect.util'
 
 type WalletConnectState = {
 	timedOut: boolean
@@ -66,8 +67,6 @@ export default function useWalletConnectV1Logic({
 		session,
 		sessionURI,
 	} = useV1Store()
-
-	const isV1 = (uri: string) => uri?.includes('@1?')
 
 	useEffect(() => {
 		if (initialURI && initialURI !== sessionURI && isV1(initialURI)) {

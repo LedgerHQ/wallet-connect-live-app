@@ -6,7 +6,11 @@ import { PasteMedium } from '@ledgerhq/react-ui/assets/icons'
 import { QRScanner } from './QRScanner'
 import { InputMode } from '@/types/types'
 import { useTranslation } from 'next-i18next'
-import { walletConnectV1Logic } from '@/hooks/useWalletConnectV1Logic'
+import { ButtonsContainer } from '../atoms/containers/Elements'
+import { WalletConnectPopin } from '../atoms/popin/WalletConnectPopin'
+import { useV1Store, v1Selector } from '@/storage/v1.store'
+import { isV1 } from '@/helpers/walletConnect.util'
+import { formatUrl } from '@/helpers/helper.util'
 
 const QRScannerContainer = styled.div`
 	display: flex;
@@ -47,7 +51,10 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 	const [inputValue, setInputValue] = useState<string>('')
 	const [errorValue, setErrorValue] = useState<string | undefined>(undefined)
 	const [scanner, setScanner] = useState(mode === 'scan')
-
+	const session = useV1Store(v1Selector.selectSession)
+	const sessionUri = useV1Store(v1Selector.selectSessionUri)
+	const isModalOpen = useV1Store(v1Selector.selectModalOpen)
+	const setModalOpen = useV1Store(v1Selector.setModalOpen)
 	const handleConnect = useCallback(() => {
 		if (!inputValue) {
 			setErrorValue(t('error.noInput'))
@@ -67,7 +74,7 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 	}, [])
 
 	useEffect(() => {
-		if (initialURI && !walletConnectV1Logic.isV1(initialURI)) {
+		if (initialURI && !isV1(initialURI)) {
 			onConnect(initialURI)
 		}
 	}, [initialURI])
@@ -107,7 +114,16 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 				switch (url.protocol) {
 					// handle usual wallet connect URIs
 					case 'wc:': {
-						onConnect(url.toString())
+						if (
+							isV1(url.toString()) &&
+							session &&
+							sessionUri !== url.toString()
+						) {
+							setModalOpen(true)
+						} else {
+							onConnect(url.toString())
+						}
+
 						break
 					}
 
@@ -131,6 +147,10 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 		},
 		[onConnect],
 	)
+
+	const closeModal = useCallback(() => {
+		setModalOpen(false)
+	}, [])
 
 	return (
 		<Flex
@@ -193,7 +213,7 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 				/>
 				<Button
 					mt={6}
-					onClick={handleConnect}
+					onClick={() => tryConnect(inputValue)}
 					data-test="connect-button"
 					variant="main"
 					size="large"
@@ -208,6 +228,62 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 					</Text>
 				</Button>
 			</Flex>
+			{session && (
+				<WalletConnectPopin isOpen={isModalOpen} onClose={closeModal}>
+					<Flex flexDirection="column" mx={6}>
+						<Text variant="h4" color="neutral.c100" mb={10}>
+							{t('connect.modal.title', {
+								appName:
+									session.peerMeta.name ||
+									formatUrl(session.peerMeta.url),
+							})}
+						</Text>
+
+						<Text
+							variant="bodyLineHeight"
+							color="neutral.c70"
+							mb={3}
+						>
+							{t('connect.modal.desc', {
+								appName:
+									session.peerMeta.name ||
+									formatUrl(session.peerMeta.url),
+							})}
+						</Text>
+
+						<ButtonsContainer>
+							<Button
+								variant="shade"
+								flex={0.9}
+								mr={6}
+								onClick={closeModal}
+							>
+								<Text
+									variant="body"
+									fontWeight="semiBold"
+									color="neutral.c100"
+								>
+									{t('connect.modal.cancel')}
+								</Text>
+							</Button>
+
+							<Button
+								variant="main"
+								flex={0.9}
+								onClick={handleConnect}
+							>
+								<Text
+									variant="body"
+									fontWeight="semiBold"
+									color="neutral.c00"
+								>
+									{t('connect.modal.continue')}
+								</Text>
+							</Button>
+						</ButtonsContainer>
+					</Flex>
+				</WalletConnectPopin>
+			)}
 		</Flex>
 	)
 }
