@@ -168,8 +168,8 @@ export default function SessionDetail() {
 								<GenericRow
 									title={account.name}
 									subtitle={truncate(account.address, 30)}
-									onClick={
-										walletConnectV1Logic.handleSwitchAccount
+									onClick={() =>
+										walletConnectV1Logic.handleSwitchAccount()
 									}
 									LeftIcon={
 										<CryptoIcon
