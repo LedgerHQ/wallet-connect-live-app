@@ -97,12 +97,9 @@ export default function SessionProposal() {
 		(entry) => entry.isSupported,
 	)
 
-	const eachRequiredChainHasOneAccount = requiredChains.every(
-		(entry) => entry.accounts.length > 0,
+	const disabled = !requiredChains.every((entry) =>
+		entry.accounts.some((account) => selectedAccounts.includes(account.id)),
 	)
-
-	const disabled =
-		selectedAccounts.length === 0 || !eachRequiredChainHasOneAccount
 
 	if (!hydrated) {
 		return null
@@ -264,11 +261,11 @@ export default function SessionProposal() {
 																			30,
 																		)}
 																		isSelected={selectedAccounts.includes(
-																			account.address,
+																			account.id,
 																		)}
 																		onClick={() =>
 																			handleClick(
-																				account.address,
+																				account.id,
 																			)
 																		}
 																		LeftIcon={

@@ -11,6 +11,7 @@ import { convertEthToLiveTX } from '@/helpers/converters'
 import { accountSelector, useAccountsStore } from '@/storage/accounts.store'
 import { EIP155_SIGNING_METHODS } from '@/data/EIP155Data'
 import { web3wallet } from '@/helpers/walletConnect.util'
+import { sessionSelector, useSessionsStore } from '@/storage/sessions.store'
 
 enum Errors {
 	userDecline = 'User rejected',
@@ -19,7 +20,8 @@ enum Errors {
 }
 
 export default function useWalletConnectEventsManager(initialized: boolean) {
-	const { navigate, routes } = useNavigation()
+	const { navigate, routes, tabsIndexes } = useNavigation()
+	const removeSession = useSessionsStore(sessionSelector.removeSession)
 	const accounts = useAccountsStore(accountSelector.selectAccounts)
 	/******************************************************************************
 	 * 1. Open session proposal modal for confirmation / rejection
@@ -122,6 +124,21 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 		[],
 	)
 
+	const onSessionDeleted = useCallback(
+		async (session: SignClientTypes.EventArguments['session_delete']) => {
+			removeSession(session.topic)
+			await web3wallet.disconnectSession({
+				topic: session.topic,
+				reason: {
+					code: 3,
+					message: 'Session has been disconnected',
+				},
+			})
+			navigate(routes.home, { tab: tabsIndexes.sessions })
+		},
+		[],
+	)
+
 	/******************************************************************************
 	 * Set up WalletConnect event listeners
 	 *****************************************************************************/
@@ -137,7 +154,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 			// signClient.on('session_ping', data => console.log('ping', data))
 			// signClient.on('session_event', data => console.log('event', data))
 			// signClient.on('session_update', data => console.log('update', data))
-			// signClient.on('session_delete', data => console.log('delete', data))
+			web3wallet.on('session_delete', onSessionDeleted)
 		}
 	}, [initialized, onSessionProposal, onSessionRequest, onAuthRequest])
 
