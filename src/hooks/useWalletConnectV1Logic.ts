@@ -9,8 +9,6 @@ import WalletConnectClient from '@walletconnect/client'
 import useNavigation from './useNavigation'
 import { useV1Store } from '@/storage/v1.store'
 import { Proposal } from '@/types/types'
-import { formatChainName } from '@/helpers/helper.util'
-import { EIP155_CHAINS } from '@/data/EIP155Data'
 
 type WalletConnectState = {
 	session: any | null
