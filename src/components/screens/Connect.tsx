@@ -119,6 +119,7 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 							session &&
 							sessionUri !== url.toString()
 						) {
+							setInputValue(url.toString())
 							setModalOpen(true)
 						} else {
 							onConnect(url.toString())
@@ -227,63 +228,66 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 						{t('connect.cta')}
 					</Text>
 				</Button>
+				{session && session.peerMeta ? (
+					<WalletConnectPopin
+						isOpen={isModalOpen}
+						onClose={closeModal}
+					>
+						<Flex flexDirection="column" mx={6}>
+							<Text variant="h4" color="neutral.c100" mb={10}>
+								{t('connect.modal.title', {
+									appName:
+										session.peerMeta.name ||
+										formatUrl(session.peerMeta.url),
+								})}
+							</Text>
+
+							<Text
+								variant="bodyLineHeight"
+								color="neutral.c70"
+								mb={3}
+							>
+								{t('connect.modal.desc', {
+									appName:
+										session.peerMeta.name ||
+										formatUrl(session.peerMeta.url),
+								})}
+							</Text>
+
+							<ButtonsContainer>
+								<Button
+									variant="shade"
+									flex={0.9}
+									mr={6}
+									onClick={closeModal}
+								>
+									<Text
+										variant="body"
+										fontWeight="semiBold"
+										color="neutral.c100"
+									>
+										{t('connect.modal.cancel')}
+									</Text>
+								</Button>
+
+								<Button
+									variant="main"
+									flex={0.9}
+									onClick={handleConnect}
+								>
+									<Text
+										variant="body"
+										fontWeight="semiBold"
+										color="neutral.c00"
+									>
+										{t('connect.modal.continue')}
+									</Text>
+								</Button>
+							</ButtonsContainer>
+						</Flex>
+					</WalletConnectPopin>
+				) : null}
 			</Flex>
-			{session && (
-				<WalletConnectPopin isOpen={isModalOpen} onClose={closeModal}>
-					<Flex flexDirection="column" mx={6}>
-						<Text variant="h4" color="neutral.c100" mb={10}>
-							{t('connect.modal.title', {
-								appName:
-									session.peerMeta.name ||
-									formatUrl(session.peerMeta.url),
-							})}
-						</Text>
-
-						<Text
-							variant="bodyLineHeight"
-							color="neutral.c70"
-							mb={3}
-						>
-							{t('connect.modal.desc', {
-								appName:
-									session.peerMeta.name ||
-									formatUrl(session.peerMeta.url),
-							})}
-						</Text>
-
-						<ButtonsContainer>
-							<Button
-								variant="shade"
-								flex={0.9}
-								mr={6}
-								onClick={closeModal}
-							>
-								<Text
-									variant="body"
-									fontWeight="semiBold"
-									color="neutral.c100"
-								>
-									{t('connect.modal.cancel')}
-								</Text>
-							</Button>
-
-							<Button
-								variant="main"
-								flex={0.9}
-								onClick={handleConnect}
-							>
-								<Text
-									variant="body"
-									fontWeight="semiBold"
-									color="neutral.c00"
-								>
-									{t('connect.modal.continue')}
-								</Text>
-							</Button>
-						</ButtonsContainer>
-					</Flex>
-				</WalletConnectPopin>
-			)}
 		</Flex>
 	)
 }
