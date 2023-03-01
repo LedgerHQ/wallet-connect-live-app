@@ -1,12 +1,13 @@
 import { InputMode, NetworkConfig } from '@/types/types'
 import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { accountSelector, useAccountsStore } from '@/storage/accounts.store'
 import { appSelector, useAppStore } from '@/storage/app.store'
 import { sessionSelector, useSessionsStore } from '@/storage/sessions.store'
 import Home from './Home'
 import { useLedgerLive } from '@/hooks/useLedgerLive'
 import useWalletConnectV1Logic from '@/hooks/useWalletConnectV1Logic'
+import { useV1Store, v1Selector } from '@/storage/v1.store'
 
 export type WalletConnectProps = {
 	initialMode?: InputMode
@@ -26,9 +27,8 @@ export default function WalletConnect({
 	initialAccountId,
 	...rest
 }: WalletConnectProps) {
-	const sessionURI = useMemo(() => {
-		return localStorage.getItem('sessionURI') ?? undefined
-	}, [])
+	const sessionURI = useV1Store(v1Selector.selectSessionUri)
+
 	const [uri, setUri] = useState<string | undefined>(
 		initialURI && initialURI !== sessionURI ? initialURI : sessionURI,
 	)
