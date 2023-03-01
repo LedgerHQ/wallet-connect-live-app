@@ -324,6 +324,39 @@ export default function useWalletConnectV1Logic({
 							break
 						}
 					}
+					case 'wallet_switchEthereumChain': {
+						try {
+							const chainIdParam = payload.params[0]?.chainId
+							const chainId = parseInt(chainIdParam)
+							const chain = networks.find(
+								(networkConfig) =>
+									networkConfig.chainId === chainId,
+							)
+							if (chain) {
+								handleSwitchAccount([chain.currency])
+							} else {
+								wc.rejectRequest({
+									id: payload.id,
+									jsonrpc: '2.0',
+									error: {
+										code: 3,
+										message: 'This chain is not supported',
+									},
+								})
+							}
+						} catch (error) {
+							console.log(error)
+							wc.rejectRequest({
+								id: payload.id,
+								jsonrpc: '2.0',
+								error: {
+									code: 3,
+									message: 'An error occured',
+								},
+							})
+						}
+						break
+					}
 				}
 			})
 
@@ -400,13 +433,13 @@ export default function useWalletConnectV1Logic({
 		}
 	}, [])
 
-	const handleSwitchAccount = useCallback(async () => {
+	const handleSwitchAccount = useCallback(async (currencies?: string[]) => {
 		const enabledCurrencies = networks.map(
 			(networkConfig) => networkConfig.currency,
 		)
 		try {
 			const newSelectedAccount = await platformSDK.requestAccount({
-				currencies: enabledCurrencies,
+				currencies: currencies || enabledCurrencies,
 			})
 
 			setSelectedAccount(newSelectedAccount)
