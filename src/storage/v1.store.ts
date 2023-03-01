@@ -10,8 +10,10 @@ interface WalletConnectState {
 	timedOut: boolean
 	selectedAccount?: Account
 	proposal?: any
+	modalOpen: boolean
 	clearStore: () => void
 	setSession: (session: any) => void
+	setModalOpen: (open: boolean) => void
 	setSessionUri: (sessionUri?: string) => void
 	setTimedOut: (timed: boolean) => void
 	setSelectedAccount: (account?: Account) => void
@@ -25,6 +27,7 @@ const useV1Store = create<WalletConnectState>()(
 			timedOut: false,
 			session: null,
 			sessionURI: undefined,
+			modalOpen: false,
 			clearStore: () =>
 				set(() => ({
 					selectedAccount: undefined,
@@ -32,6 +35,7 @@ const useV1Store = create<WalletConnectState>()(
 					timedOut: false,
 					session: null,
 					sessionURI: undefined,
+					modalOpen: false,
 				})),
 			setSession: (session) =>
 				set(() => ({
@@ -53,6 +57,10 @@ const useV1Store = create<WalletConnectState>()(
 				set(() => ({
 					timedOut,
 				})),
+			setModalOpen: (open) =>
+				set(() => ({
+					modalOpen: open,
+				})),
 		}),
 		{
 			name: 'v1-storage',
@@ -63,6 +71,7 @@ const useV1Store = create<WalletConnectState>()(
 const v1Selector = {
 	selectAccount: (state: WalletConnectState): Account | undefined =>
 		state.selectedAccount,
+	selectModalOpen: (state: WalletConnectState): boolean => state.modalOpen,
 	selectSession: (state: WalletConnectState) => state.session,
 	selectSessionUri: (state: WalletConnectState) => state.sessionURI,
 	selectTimeout: (state: WalletConnectState) => state.timedOut,
@@ -73,6 +82,7 @@ const v1Selector = {
 	setSessionUri: (state: WalletConnectState) => state.setSessionUri,
 	setTimedOut: (state: WalletConnectState) => state.setTimedOut,
 	setProposal: (state: WalletConnectState) => state.setProposal,
+	setModalOpen: (state: WalletConnectState) => state.setModalOpen,
 }
 
 export { useV1Store, v1Selector }
