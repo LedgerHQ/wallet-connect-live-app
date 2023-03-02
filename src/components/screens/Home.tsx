@@ -14,6 +14,7 @@ import styled from 'styled-components'
 import { Connect } from './Connect'
 import Sessions from './sessions/Sessions'
 import Tabs from './Tabs'
+import useWalletConnectV1Logic from '@/hooks/useWalletConnectV1Logic'
 
 const WalletConnectContainer = styled.div`
 	display: flex;
@@ -48,6 +49,7 @@ export type WalletConnectProps = {
 export default function Home({
 	initialURI,
 	initialMode,
+	initialAccountId,
 	setUri,
 }: WalletConnectProps) {
 	const { initialized } = useHydratation()
@@ -57,7 +59,8 @@ export default function Home({
 		? JSON.parse(String(routerQueryData))?.tab
 		: tabsIndexes.connect
 
-	const v1Session = useV1Store(v1Selector.selectSession)
+	const walletConnectClient = useV1Store(v1Selector.selectWalletConnectClient)
+	const v1Session = walletConnectClient?.session
 	const sessions = useSessionsStore(sessionSelector.selectSessions)
 
 	const { t } = useTranslation()
@@ -65,6 +68,11 @@ export default function Home({
 	const [activeTabIndex, setActiveTabIndex] = useState(initialTab)
 	const [inputValue] = useState<string>('')
 	const [, setErrorValue] = useState<string | undefined>(undefined)
+
+	const walletConnectV1Logic = useWalletConnectV1Logic({
+		initialAccountId,
+		initialURI,
+	})
 
 	const handleConnect = useCallback(
 		async (inputValue: string) => {
@@ -74,7 +82,10 @@ export default function Home({
 				try {
 					setUri(inputValue)
 					const uri = new URL(inputValue)
-					await startProposal(uri.toString())
+					await startProposal(
+						uri.toString(),
+						walletConnectV1Logic.createClient,
+					)
 				} catch (error: unknown) {
 					setErrorValue(t('error.invalidUri'))
 				} finally {

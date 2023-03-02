@@ -3,21 +3,21 @@ import { Proposal } from '@/types/types'
 import { Account } from '@ledgerhq/live-app-sdk'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-
+import WalletConnectClient from '@walletconnect/client'
 interface WalletConnectState {
-	session: any | null
+	walletConnectClient?: WalletConnectClient
 	sessionURI?: string
 	timedOut: boolean
 	selectedAccount?: Account
 	proposal?: any
 	modalOpen: boolean
 	clearStore: () => void
-	setSession: (session: any) => void
 	setModalOpen: (open: boolean) => void
 	setSessionUri: (sessionUri?: string) => void
 	setTimedOut: (timed: boolean) => void
 	setSelectedAccount: (account?: Account) => void
 	setProposal: (proposal?: Proposal) => void
+	setWalletConnectClient: (walletConnectClient?: WalletConnectClient) => void
 }
 const useV1Store = create<WalletConnectState>()(
 	persist(
@@ -25,21 +25,22 @@ const useV1Store = create<WalletConnectState>()(
 			selectedAccount: undefined,
 			proposal: undefined,
 			timedOut: false,
-			session: null,
 			sessionURI: undefined,
 			modalOpen: false,
+			walletConnectClient: undefined,
 			clearStore: () =>
 				set(() => ({
 					selectedAccount: undefined,
 					proposal: undefined,
 					timedOut: false,
-					session: null,
+
 					sessionURI: undefined,
 					modalOpen: false,
+					walletConnectClient: undefined,
 				})),
-			setSession: (session) =>
+			setWalletConnectClient: (walletConnectClient) =>
 				set(() => ({
-					session,
+					walletConnectClient,
 				})),
 			setSessionUri: (sessionURI) =>
 				set(() => ({
@@ -69,20 +70,23 @@ const useV1Store = create<WalletConnectState>()(
 )
 
 const v1Selector = {
+	selectWalletConnectClient: (
+		state: WalletConnectState,
+	): WalletConnectClient | undefined => state.walletConnectClient,
 	selectAccount: (state: WalletConnectState): Account | undefined =>
 		state.selectedAccount,
 	selectModalOpen: (state: WalletConnectState): boolean => state.modalOpen,
-	selectSession: (state: WalletConnectState) => state.session,
 	selectSessionUri: (state: WalletConnectState) => state.sessionURI,
 	selectTimeout: (state: WalletConnectState) => state.timedOut,
 	selectProposal: (state: WalletConnectState) => state.proposal,
 	clearStore: (state: WalletConnectState) => state.clearStore,
 	setSelectedAccount: (state: WalletConnectState) => state.setSelectedAccount,
-	setSession: (state: WalletConnectState) => state.setSession,
 	setSessionUri: (state: WalletConnectState) => state.setSessionUri,
 	setTimedOut: (state: WalletConnectState) => state.setTimedOut,
 	setProposal: (state: WalletConnectState) => state.setProposal,
 	setModalOpen: (state: WalletConnectState) => state.setModalOpen,
+	setWalletConnectClient: (state: WalletConnectState) =>
+		state.setWalletConnectClient,
 }
 
 export { useV1Store, v1Selector }
