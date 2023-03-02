@@ -8,6 +8,7 @@ import { convertEthToLiveTX } from '@/helpers/converters'
 import { accountSelector, useAccountsStore } from '@/storage/accounts.store'
 import { wc } from '@/helpers/walletConnectV1.util'
 import { sessionSelector, useSessionsStore } from '@/storage/sessions.store'
+import { EIP155_SIGNING_METHODS } from '@/data/EIP155Data'
 
 enum Errors {
 	userDecline = 'User rejected',
@@ -48,7 +49,7 @@ export default function useWalletConnectEventsManagerV1(initialized: boolean) {
 		}
 
 		switch (payload.method) {
-			case 'eth_sendTransaction': {
+			case EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION: {
 				const ethTX = payload.params[0]
 				console.log('eth_sendTransaction', {
 					ethTX,
@@ -91,7 +92,7 @@ export default function useWalletConnectEventsManagerV1(initialized: boolean) {
 			// https://docs.walletconnect.com/json-rpc-api-methods/ethereum
 			// Discussion about the diff between eth_sign and personal_sign:
 			// https://github.com/WalletConnect/walletconnect-docs/issues/32#issuecomment-644697172
-			case 'personal_sign': {
+			case EIP155_SIGNING_METHODS.PERSONAL_SIGN: {
 				if (
 					selectedAccount &&
 					compareETHAddresses(
@@ -124,7 +125,7 @@ export default function useWalletConnectEventsManagerV1(initialized: boolean) {
 					break
 				}
 			}
-			case 'eth_sign': {
+			case EIP155_SIGNING_METHODS.ETH_SIGN: {
 				if (
 					selectedAccount &&
 					compareETHAddresses(
@@ -157,7 +158,7 @@ export default function useWalletConnectEventsManagerV1(initialized: boolean) {
 					break
 				}
 			}
-			case 'eth_signTypedData': {
+			case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA: {
 				if (
 					selectedAccount &&
 					compareETHAddresses(
@@ -190,7 +191,7 @@ export default function useWalletConnectEventsManagerV1(initialized: boolean) {
 					break
 				}
 			}
-			case 'wallet_switchEthereumChain': {
+			case EIP155_SIGNING_METHODS.SWITCH_CHAIN: {
 				try {
 					const chainIdParam = payload.params[0]?.chainId
 					const chainId = parseInt(chainIdParam)
