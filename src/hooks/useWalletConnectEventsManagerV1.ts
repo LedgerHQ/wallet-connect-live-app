@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // import ModalStore from '@/store/ModalStore'
 
 import { useCallback, useEffect } from 'react'
@@ -5,37 +6,37 @@ import useNavigation from './useNavigation'
 import { stripHexPrefix } from '@/utils/currencyFormatter/helpers'
 import { platformSDK } from './useLedgerLive'
 import { convertEthToLiveTX } from '@/helpers/converters'
-import { accountSelector, useAccountsStore } from '@/storage/accounts.store'
 import { wc } from '@/helpers/walletConnectV1.util'
-import { sessionSelector, useSessionsStore } from '@/storage/sessions.store'
 import { EIP155_SIGNING_METHODS } from '@/data/EIP155Data'
-
-enum Errors {
-	userDecline = 'User rejected',
-	txDeclined = 'Transaction declined',
-	msgDecline = 'Message signed declined',
-}
+import { useV1Store, v1Selector } from '@/storage/v1.store'
+import { Proposal } from '@/types/types'
+import { appSelector, useAppStore } from '@/storage/app.store'
+import { compareETHAddresses } from '@/helpers/generic'
+import useWalletConnectV1Utils from './useWalletConnectV1Utils'
 
 export default function useWalletConnectEventsManagerV1(initialized: boolean) {
+	const networks = useAppStore(appSelector.selectNetworks)
 	const { navigate, routes, tabsIndexes } = useNavigation()
-	const removeSession = useSessionsStore(sessionSelector.removeSession)
-	const accounts = useAccountsStore(accountSelector.selectAccounts)
+	const { cleanup, handleSwitchAccount } = useWalletConnectV1Utils()
+	const { setProposal, selectedAccount } = useV1Store()
+	const setWalletConnectClient = useV1Store(v1Selector.setWalletConnectClient)
 
-	const onSessionRequest = useCallback(async (error, payload) => {
-		if (error) {
-		}
-		setProposal(payload as Proposal)
-		setTimeout(() => {
-			navigate(routes.sessionProposalV1)
-		}, 500)
-	}, [])
+	const onSessionRequest = useCallback(
+		async (error: any, payload: Proposal) => {
+			if (error) {
+			}
+			console.log('ON SESS REQ', error, payload)
+			setProposal(payload)
+			setTimeout(() => {
+				navigate(routes.sessionProposalV1)
+			}, 500)
+		},
+		[],
+	)
 
 	const onConnect = useCallback(async () => {
-		setSession(wc.session)
-
-		if (uri) {
-			setSessionUri(uri)
-		}
+		setWalletConnectClient(wc)
+		navigate(routes.sessionDetailsV1)
 	}, [])
 
 	const onDisconnect = useCallback(() => {
@@ -43,7 +44,7 @@ export default function useWalletConnectEventsManagerV1(initialized: boolean) {
 		navigate(routes.home, { tab: tabsIndexes.sessions })
 	}, [])
 
-	const onCallRequest = useCallback(async (error, payload: any) => {
+	const onCallRequest = useCallback(async (error: any, payload: any) => {
 		console.log('call_request', { error, payload })
 		if (error) {
 		}
@@ -230,7 +231,8 @@ export default function useWalletConnectEventsManagerV1(initialized: boolean) {
 	 * Set up WalletConnect event listeners
 	 *****************************************************************************/
 	useEffect(() => {
-		if (initialized) {
+		console.log('RESET LISTENERS', initialized, wc)
+		if (initialized && wc) {
 			wc.on('session_request', onSessionRequest)
 
 			wc.on('connect', onConnect)
@@ -251,36 +253,4 @@ export default function useWalletConnectEventsManagerV1(initialized: boolean) {
 		onDisconnect,
 		onCallRequest,
 	])
-
-	/******************************************************************************
-	 * Util functions
-	 *****************************************************************************/
-	const acceptRequest = (
-		topic: string,
-		id: number,
-		signedMessage: string,
-	) => {
-		web3wallet.respondSessionRequest({
-			topic,
-			response: {
-				id,
-				jsonrpc: '2.0',
-				result: signedMessage,
-			},
-		})
-	}
-
-	const rejectRequest = (topic: string, id: number, message: Errors) => {
-		web3wallet.respondSessionRequest({
-			topic,
-			response: {
-				id,
-				jsonrpc: '2.0',
-				error: {
-					code: 5000,
-					message,
-				},
-			},
-		})
-	}
 }

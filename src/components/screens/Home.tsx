@@ -9,14 +9,13 @@ import { TransitionGroup } from 'react-transition-group'
 import useHydratation from '@/hooks/useHydratation'
 import useNavigation from '@/hooks/useNavigation'
 import { useSessionsStore, sessionSelector } from '@/storage/sessions.store'
-import { useV1Store, v1Selector } from '@/storage/v1.store'
 import styled from 'styled-components'
 import { Connect } from './Connect'
 import Sessions from './sessions/Sessions'
 import Tabs from './Tabs'
-import useWalletConnectV1Logic from '@/hooks/useWalletConnectV1Logic'
 import useHydratationV1 from '@/hooks/useHydratationV1'
 import { wc } from '@/helpers/walletConnectV1.util'
+import { useV1Store, v1Selector } from '@/storage/v1.store'
 
 const WalletConnectContainer = styled.div`
 	display: flex;
@@ -55,7 +54,7 @@ export default function Home({
 	setUri,
 }: WalletConnectProps) {
 	const { initialized } = useHydratation()
-	const { initializedV1 } = useHydratationV1()
+	const { initializedV1 } = useHydratationV1(initialURI)
 	const { router, tabsIndexes } = useNavigation()
 	const routerQueryData = router?.query?.data
 	const initialTab = routerQueryData
@@ -63,6 +62,7 @@ export default function Home({
 		: tabsIndexes.connect
 
 	const sessions = useSessionsStore(sessionSelector.selectSessions)
+	const setWalletConnectClient = useV1Store(v1Selector.setWalletConnectClient)
 
 	const { t } = useTranslation()
 
@@ -78,7 +78,7 @@ export default function Home({
 				try {
 					setUri(inputValue)
 					const uri = new URL(inputValue)
-					await startProposal(uri.toString())
+					await startProposal(uri.toString(), setWalletConnectClient)
 				} catch (error: unknown) {
 					setErrorValue(t('error.invalidUri'))
 				} finally {

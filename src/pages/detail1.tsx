@@ -12,7 +12,8 @@ import { ButtonsContainer, Row } from '@/components/atoms/containers/Elements'
 import { ResponsiveContainer } from '@/styles/styles'
 import { useV1Store, v1Selector } from '@/storage/v1.store'
 import { ImageWithPlaceholder } from '@/components/atoms/images/ImageWithPlaceholder'
-import useWalletConnectV1Logic from '@/hooks/useWalletConnectV1Logic'
+import useWalletConnectV1Utils from '@/hooks/useWalletConnectV1Utils'
+import { wc } from '@/helpers/walletConnectV1.util'
 export { getServerSideProps } from '../lib/serverProps'
 
 const DetailContainer = styled(Flex)`
@@ -41,23 +42,22 @@ const BackButton = styled(Flex)`
 export default function SessionDetail() {
 	const { t } = useTranslation()
 	const { routes, navigate, tabsIndexes } = useNavigation()
-	const walletConnectClient = useV1Store(v1Selector.selectWalletConnectClient)
 	const account = useV1Store(v1Selector.selectAccount)
-	const walletConnectV1Logic = useWalletConnectV1Logic({})
+	const { handleDisconnect, handleSwitchAccount } = useWalletConnectV1Utils()
 
 	const navigateToSessionsHomeTab = useCallback(() => {
 		navigate(routes.home, { tab: tabsIndexes.sessions })
 	}, [routes, tabsIndexes])
 
 	const handleDelete = useCallback(async () => {
-		if (!walletConnectClient?.session) return
-		walletConnectV1Logic.handleDisconnect()
+		if (!wc?.session) return
+		handleDisconnect()
 		navigateToSessionsHomeTab()
-	}, [walletConnectClient?.session])
+	}, [wc?.session])
 
-	const metadata = walletConnectClient?.session?.peerMeta
+	const metadata = wc?.session?.peerMeta
 
-	if (!walletConnectClient) {
+	if (!wc) {
 		return null
 	}
 
@@ -169,9 +169,7 @@ export default function SessionDetail() {
 								<GenericRow
 									title={account.name}
 									subtitle={truncate(account.address, 30)}
-									onClick={() =>
-										walletConnectV1Logic.handleSwitchAccount()
-									}
+									onClick={() => handleSwitchAccount()}
 									LeftIcon={
 										<CryptoIcon
 											name={getTicker(account.currency)}

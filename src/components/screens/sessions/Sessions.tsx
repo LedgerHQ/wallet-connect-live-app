@@ -17,8 +17,8 @@ import {
 	sessionSelector,
 	Session,
 } from '@/storage/sessions.store'
-import { useV1Store, v1Selector } from '@/storage/v1.store'
-import useWalletConnectV1Logic from '@/hooks/useWalletConnectV1Logic'
+import useWalletConnectV1Utils from '@/hooks/useWalletConnectV1Utils'
+import { wc } from '@/helpers/walletConnectV1.util'
 
 export type SessionsProps = {
 	sessions: Session[]
@@ -50,15 +50,14 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 		}
 	}, [])
 
-	const walletConnectV1Logic = useWalletConnectV1Logic({})
+	const { handleDisconnect, cleanup } = useWalletConnectV1Utils()
 
-	const walletConnectClient = useV1Store(v1Selector.selectWalletConnectClient)
-	const v1Session = walletConnectClient?.session
+	const v1Session = wc?.session
 
 	const disconnect = useCallback(async () => {
 		if (v1Session && v1Session.peerMeta) {
-			walletConnectV1Logic.handleDisconnect()
-			walletConnectV1Logic.cleanup()
+			handleDisconnect()
+			cleanup()
 		}
 		await Promise.all(
 			sessions.map((session) =>

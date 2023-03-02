@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NetworkConfig } from '@/types/types'
 import { Account } from '@ledgerhq/live-app-sdk'
 import WalletConnectClient from '@walletconnect/client'
@@ -9,6 +10,9 @@ export async function restoreClient(
 	session: any,
 	networks: NetworkConfig[],
 	selectedAccount: Account | undefined,
+	setWalletConnectClient: (
+		walletConnectClient?: WalletConnect | undefined,
+	) => void,
 ): Promise<void> {
 	if (wc && wc.session) {
 		console.log('walletConnectClient IF 2', wc.session)
@@ -35,14 +39,19 @@ export async function restoreClient(
 	console.log('restore', wc)
 }
 
-export async function createClient(uri: string): Promise<void> {
+export async function createClient(
+	uri: string,
+	setWalletConnectClient: (
+		walletConnectClient?: WalletConnect | undefined,
+	) => void,
+): Promise<void> {
 	if (wc && wc.session) {
 		console.log('walletConnectClient IF', wc.session)
 		await wc.killSession()
 	}
 
 	wc = new WalletConnectClient({ uri })
-	setWalletConnectClient(wc)
+	setWalletConnectClient?.(wc)
 
 	console.log('createClient', wc)
 }

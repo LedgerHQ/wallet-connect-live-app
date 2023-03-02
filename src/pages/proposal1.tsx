@@ -13,7 +13,7 @@ import { useTranslation } from 'next-i18next'
 import { Logo } from 'src/icons/LedgerLiveLogo'
 import styled, { useTheme } from 'styled-components'
 import { useState } from 'react'
-import useWalletConnectV1Logic from '@/hooks/useWalletConnectV1Logic'
+import useWalletConnectV1Utils from '@/hooks/useWalletConnectV1Utils'
 
 export { getServerSideProps } from '../lib/serverProps'
 
@@ -54,7 +54,8 @@ export default function SessionProposal() {
 	const [imageLoadingError, setImageLoadingError] = useState(false)
 	const { t } = useTranslation()
 	const selectedAccount = useV1Store(v1Selector.selectAccount)
-	const walletConnectV1Logic = useWalletConnectV1Logic({})
+	const { handleSwitchAccount, handleDecline, handleAccept } =
+		useWalletConnectV1Utils()
 
 	const proposal = useV1Store(v1Selector.selectProposal)
 	const proposer = proposal?.params[0]?.peerMeta
@@ -159,7 +160,7 @@ export default function SessionProposal() {
 													30,
 												)}
 												onClick={() =>
-													walletConnectV1Logic.handleSwitchAccount()
+													handleSwitchAccount()
 												}
 												LeftIcon={
 													<CryptoIcon
@@ -186,9 +187,7 @@ export default function SessionProposal() {
 								</Box>
 							) : (
 								<AddAccountPlaceholder
-									onClick={() =>
-										walletConnectV1Logic.handleSwitchAccount()
-									}
+									onClick={() => handleSwitchAccount()}
 								/>
 							)}
 						</ListChains>
@@ -205,7 +204,7 @@ export default function SessionProposal() {
 								size="large"
 								flex={0.9}
 								mr={6}
-								onClick={walletConnectV1Logic.handleDecline}
+								onClick={handleDecline}
 							>
 								<Text
 									variant="body"
@@ -220,7 +219,7 @@ export default function SessionProposal() {
 								variant="main"
 								size="large"
 								flex={0.9}
-								onClick={walletConnectV1Logic.handleAccept}
+								onClick={handleAccept}
 							>
 								<Text
 									variant="body"
