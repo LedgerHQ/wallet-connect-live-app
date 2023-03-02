@@ -947,10 +947,10 @@
     bignumber.js "^9.0.2"
     json-rpc-2.0 "^1.1.0"
 
-"@ledgerhq/react-ui@^0.10.4":
-  version "0.10.5"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/react-ui/-/react-ui-0.10.5.tgz#d03e67cbde37f7ff7fc5cc964bc817619d720081"
-  integrity sha512-yAR49bdmnGQg1DZgnoZXX7zRG2VtVEQ/sDI2BzhTmmRbxbwvRtBR4aULJ7KS7aZp3bKcAK84DhMMSq6drpp6Sg==
+"@ledgerhq/react-ui@^0.11.0":
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/react-ui/-/react-ui-0.11.0.tgz#38b44531706d9ebb13fdf2465f988c4407154316"
+  integrity sha512-9FjvnIwJtMV6MZ/v1aQYOXwYS4KB/vbsOsXd/3WjyArmfOQewi4Ja1nbcvs9rlyzwMMwjF//dqdlPDeg9MTFJA==
   dependencies:
     "@floating-ui/react-dom" "^0.4.0"
     "@ledgerhq/crypto-icons-ui" "^0.2.1"
