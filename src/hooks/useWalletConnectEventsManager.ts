@@ -53,13 +53,19 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 			switch (request.method) {
 				case EIP155_SIGNING_METHODS.ETH_SIGN:
 				case EIP155_SIGNING_METHODS.PERSONAL_SIGN:
+					const isPersonaLSign =
+						request.method === EIP155_SIGNING_METHODS.PERSONAL_SIGN
 					const accountSign = hasETHAddress(
 						accounts,
-						request.params[1],
+						isPersonaLSign ? request.params[1] : request.params[0],
 					)
 					if (!!accountSign) {
 						try {
-							const message = stripHexPrefix(request.params[0])
+							const message = stripHexPrefix(
+								isPersonaLSign
+									? request.params[0]
+									: request.params[1],
+							)
 
 							const signedMessage = await platformSDK.signMessage(
 								accountSign.id,
