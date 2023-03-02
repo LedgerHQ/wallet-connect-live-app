@@ -20,12 +20,14 @@ export default function useWalletConnectEventsManagerV1(initialized: boolean) {
 	const { cleanup, handleSwitchAccount } = useWalletConnectV1Utils()
 	const { setProposal, selectedAccount } = useV1Store()
 	const setWalletConnectClient = useV1Store(v1Selector.setWalletConnectClient)
+	const walletConnectClient = useV1Store(v1Selector.selectWalletConnectClient)
+
+	const setSession = useV1Store(v1Selector.setSession)
 
 	const onSessionRequest = useCallback(
 		async (error: any, payload: Proposal) => {
 			if (error) {
 			}
-			console.log('ON SESS REQ', error, payload)
 			setProposal(payload)
 			setTimeout(() => {
 				navigate(routes.sessionProposalV1)
@@ -35,7 +37,8 @@ export default function useWalletConnectEventsManagerV1(initialized: boolean) {
 	)
 
 	const onConnect = useCallback(async () => {
-		setWalletConnectClient(wc)
+		setWalletConnectClient(wc || walletConnectClient)
+		setSession(wc.session || walletConnectClient?.session)
 		navigate(routes.sessionDetailsV1)
 	}, [])
 
@@ -231,7 +234,6 @@ export default function useWalletConnectEventsManagerV1(initialized: boolean) {
 	 * Set up WalletConnect event listeners
 	 *****************************************************************************/
 	useEffect(() => {
-		console.log('RESET LISTENERS', initialized, wc)
 		if (initialized && wc) {
 			wc.on('session_request', onSessionRequest)
 

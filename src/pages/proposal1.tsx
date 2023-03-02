@@ -14,6 +14,9 @@ import { Logo } from 'src/icons/LedgerLiveLogo'
 import styled, { useTheme } from 'styled-components'
 import { useState } from 'react'
 import useWalletConnectV1Utils from '@/hooks/useWalletConnectV1Utils'
+import useHydratationV1 from '@/hooks/useHydratationV1'
+import { wc } from '@/helpers/walletConnectV1.util'
+import useNavigation from '@/hooks/useNavigation'
 
 export { getServerSideProps } from '../lib/serverProps'
 
@@ -53,12 +56,20 @@ export default function SessionProposal() {
 	const { colors } = useTheme()
 	const [imageLoadingError, setImageLoadingError] = useState(false)
 	const { t } = useTranslation()
+	const { routes, navigate } = useNavigation()
+	const { hydratedV1 } = useHydratationV1()
 	const selectedAccount = useV1Store(v1Selector.selectAccount)
 	const { handleSwitchAccount, handleDecline, handleAccept } =
 		useWalletConnectV1Utils()
 
 	const proposal = useV1Store(v1Selector.selectProposal)
 	const proposer = proposal?.params[0]?.peerMeta
+
+	if (!hydratedV1) return null
+	if (!wc) {
+		navigate(routes.home)
+		return null
+	}
 
 	return (
 		<Flex

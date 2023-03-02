@@ -44,8 +44,6 @@ export type ConnectProps = {
 	mode?: InputMode
 }
 
-const previouslyPasted = ''
-
 export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 	const { t } = useTranslation()
 	const [inputValue, setInputValue] = useState<string>('')
@@ -79,24 +77,6 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 			onConnect(initialURI)
 		}
 	}, [initialURI])
-
-	// useEffect(() => {
-	// 	const interval = setInterval(async () => {
-	// 		try {
-	// 			if (document.hasFocus()) {
-	// 				const text = await navigator.clipboard.readText()
-	// 				if (text !== previouslyPasted) {
-	// 					previouslyPasted = text
-	// 					tryConnect(text)
-	// 				}
-	// 			}
-	// 		} catch (err) {
-	// 			console.error(err)
-	// 		}
-	// 	}, 500)
-
-	// 	return () => clearInterval(interval)
-	// }, [])
 
 	const handlePasteClick = useCallback(async () => {
 		try {

@@ -7,6 +7,7 @@ import WalletConnectClient from '@walletconnect/client'
 interface WalletConnectState {
 	walletConnectClient?: WalletConnectClient
 	sessionURI?: string
+	session?: any
 	timedOut: boolean
 	selectedAccount?: Account
 	proposal?: any
@@ -17,6 +18,7 @@ interface WalletConnectState {
 	setTimedOut: (timed: boolean) => void
 	setSelectedAccount: (account?: Account) => void
 	setProposal: (proposal?: Proposal) => void
+	setSession: (session?: any) => void
 	setWalletConnectClient: (walletConnectClient?: WalletConnectClient) => void
 }
 const useV1Store = create<WalletConnectState>()(
@@ -28,15 +30,16 @@ const useV1Store = create<WalletConnectState>()(
 			sessionURI: undefined,
 			modalOpen: false,
 			walletConnectClient: undefined,
+			session: undefined,
 			clearStore: () =>
 				set(() => ({
 					selectedAccount: undefined,
 					proposal: undefined,
 					timedOut: false,
-
 					sessionURI: undefined,
 					modalOpen: false,
 					walletConnectClient: undefined,
+					session: undefined,
 				})),
 			setWalletConnectClient: (walletConnectClient) =>
 				set(() => ({
@@ -62,6 +65,10 @@ const useV1Store = create<WalletConnectState>()(
 				set(() => ({
 					modalOpen: open,
 				})),
+			setSession: (session) =>
+				set(() => ({
+					session: session,
+				})),
 		}),
 		{
 			name: 'v1-storage',
@@ -73,6 +80,8 @@ const v1Selector = {
 	selectWalletConnectClient: (
 		state: WalletConnectState,
 	): WalletConnectClient | undefined => state.walletConnectClient,
+	selectSession: (state: WalletConnectState): any | undefined =>
+		state.session,
 	selectAccount: (state: WalletConnectState): Account | undefined =>
 		state.selectedAccount,
 	selectModalOpen: (state: WalletConnectState): boolean => state.modalOpen,
@@ -85,6 +94,7 @@ const v1Selector = {
 	setTimedOut: (state: WalletConnectState) => state.setTimedOut,
 	setProposal: (state: WalletConnectState) => state.setProposal,
 	setModalOpen: (state: WalletConnectState) => state.setModalOpen,
+	setSession: (state: WalletConnectState) => state.setSession,
 	setWalletConnectClient: (state: WalletConnectState) =>
 		state.setWalletConnectClient,
 }

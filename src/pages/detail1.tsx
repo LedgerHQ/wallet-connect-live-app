@@ -14,6 +14,7 @@ import { useV1Store, v1Selector } from '@/storage/v1.store'
 import { ImageWithPlaceholder } from '@/components/atoms/images/ImageWithPlaceholder'
 import useWalletConnectV1Utils from '@/hooks/useWalletConnectV1Utils'
 import { wc } from '@/helpers/walletConnectV1.util'
+import useHydratationV1 from '@/hooks/useHydratationV1'
 export { getServerSideProps } from '../lib/serverProps'
 
 const DetailContainer = styled(Flex)`
@@ -41,6 +42,7 @@ const BackButton = styled(Flex)`
 
 export default function SessionDetail() {
 	const { t } = useTranslation()
+	const { hydratedV1 } = useHydratationV1()
 	const { routes, navigate, tabsIndexes } = useNavigation()
 	const account = useV1Store(v1Selector.selectAccount)
 	const { handleDisconnect, handleSwitchAccount } = useWalletConnectV1Utils()
@@ -57,7 +59,7 @@ export default function SessionDetail() {
 
 	const metadata = wc?.session?.peerMeta
 
-	if (!wc) {
+	if (!hydratedV1 || !wc) {
 		return null
 	}
 

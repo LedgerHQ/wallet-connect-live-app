@@ -18,7 +18,7 @@ import {
 	Session,
 } from '@/storage/sessions.store'
 import useWalletConnectV1Utils from '@/hooks/useWalletConnectV1Utils'
-import { wc } from '@/helpers/walletConnectV1.util'
+import { useV1Store, v1Selector } from '@/storage/v1.store'
 
 export type SessionsProps = {
 	sessions: Session[]
@@ -41,6 +41,7 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 	const { navigate, routes } = useNavigation()
 	const { openModal, closeModal, isModalOpen } = useWalletConnectPopin()
 	const clearSessions = useSessionsStore(sessionSelector.clearSessions)
+	const v1Session = useV1Store(v1Selector.selectSession)
 
 	const goToDetailSession = useCallback((topic: string, isV1?: boolean) => {
 		if (isV1) {
@@ -51,8 +52,6 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 	}, [])
 
 	const { handleDisconnect, cleanup } = useWalletConnectV1Utils()
-
-	const v1Session = wc?.session
 
 	const disconnect = useCallback(async () => {
 		if (v1Session && v1Session.peerMeta) {

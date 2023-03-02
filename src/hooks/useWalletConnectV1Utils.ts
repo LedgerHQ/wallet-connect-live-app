@@ -14,8 +14,9 @@ export default function useWalletConnectV1Utils() {
 		setSessionUri,
 		clearStore,
 		selectedAccount,
-		walletConnectClient,
 		setWalletConnectClient,
+		session,
+		setSession,
 	} = useV1Store()
 
 	/******************************************************************************
@@ -23,17 +24,15 @@ export default function useWalletConnectV1Utils() {
 	 *****************************************************************************/
 	const cleanup = useCallback(() => {
 		// cleaning everything and reverting to initial state
-
 		const tempAcc = selectedAccount
 		setSessionUri(undefined)
+		setSession(undefined)
 		clearStore()
 		setSelectedAccount(tempAcc)
 	}, [])
 
 	const handleAccept = useCallback(() => {
-		console.log('HANDLE ACCEPT', wc, selectedAccount)
 		if (wc && selectedAccount) {
-			console.log(wc, 'azccept')
 			const networkConfig = networks.find(
 				(networkConfig) =>
 					networkConfig.currency === selectedAccount.currency,
@@ -43,6 +42,8 @@ export default function useWalletConnectV1Utils() {
 					chainId: networkConfig.chainId,
 					accounts: [selectedAccount.address],
 				})
+				setWalletConnectClient(wc)
+				setSession(wc.session)
 				navigate(routes.sessionDetailsV1)
 			}
 		}
@@ -56,15 +57,17 @@ export default function useWalletConnectV1Utils() {
 
 			setProposal(undefined)
 			setWalletConnectClient(undefined)
+			setSession(undefined)
 		}
 		navigate(routes.home)
 	}, [])
 
 	const handleDisconnect = useCallback(() => {
-		if (walletConnectClient) {
-			walletConnectClient.killSession()
+		if (!!wc && session) {
+			wc.killSession()
 		}
 		setWalletConnectClient(undefined)
+		setSession(undefined)
 	}, [])
 
 	const handleSwitchAccount = useCallback(async (currencies?: string[]) => {

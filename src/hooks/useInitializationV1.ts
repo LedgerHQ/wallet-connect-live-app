@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useV1Store, v1Selector } from '@/storage/v1.store'
 import { createClient, restoreClient } from '@/helpers/walletConnectV1.util'
 import { appSelector, useAppStore } from '@/storage/app.store'
@@ -25,14 +25,14 @@ const getInitialAccount = (
 	return selectedAccount
 }
 
+let initialized = false
 export default function useInitializationV1(
 	initialURI?: string,
 	initialAccountId?: string,
 ) {
-	const [initialized, setInitialized] = useState(false)
-
-	const walletConnectClient = useV1Store(v1Selector.selectWalletConnectClient)
 	const setWalletConnectClient = useV1Store(v1Selector.setWalletConnectClient)
+	const setSession = useV1Store(v1Selector.setSession)
+	const session = useV1Store(v1Selector.selectSession)
 	const selectedAccount = useV1Store(v1Selector.selectAccount)
 	const setSelectedAccount = useV1Store(v1Selector.setSelectedAccount)
 	const sessionURI = useV1Store(v1Selector.selectSessionUri)
@@ -53,14 +53,13 @@ export default function useInitializationV1(
 				return
 			}
 
-			console.log('RESTORE ?', walletConnectClient)
-
-			if (walletConnectClient?.session) {
+			if (session) {
 				await restoreClient(
-					walletConnectClient.session,
+					session,
 					networks,
 					initialAccount || selectedAccount,
 					setWalletConnectClient,
+					setSession,
 				)
 			}
 
@@ -68,7 +67,7 @@ export default function useInitializationV1(
 				setSelectedAccount(initialAccount)
 			}
 
-			setInitialized(true)
+			initialized = true
 		} catch (err: unknown) {
 			console.log(err)
 		}
@@ -78,27 +77,22 @@ export default function useInitializationV1(
 		if (!initialized) {
 			onInitialize()
 		}
-	}, [initialized, onInitialize])
+	}, [])
 
 	useEffect(() => {
-		console.log('use effect => account id', selectedAccount?.id)
-
 		if (selectedAccount && wc && wc.connected) {
 			const networkConfig = networks.find(
 				(networkConfig) =>
 					networkConfig.currency === selectedAccount.currency,
 			)
-			console.log(
-				'network config',
-				networkConfig,
-				selectedAccount.address,
-			)
+
 			if (networkConfig) {
 				wc.updateSession({
 					chainId: networkConfig.chainId,
 					accounts: [selectedAccount.address],
 				})
 				setWalletConnectClient(wc)
+				setSession(wc.session)
 			}
 		}
 	}, [selectedAccount, selectedAccount?.id])

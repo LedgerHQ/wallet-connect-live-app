@@ -50,7 +50,6 @@ export type WalletConnectProps = {
 export default function Home({
 	initialURI,
 	initialMode,
-	initialAccountId,
 	setUri,
 }: WalletConnectProps) {
 	const { initialized } = useHydratation()

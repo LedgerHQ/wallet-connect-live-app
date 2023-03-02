@@ -13,9 +13,9 @@ export async function restoreClient(
 	setWalletConnectClient: (
 		walletConnectClient?: WalletConnect | undefined,
 	) => void,
+	setSession: (session: any) => void,
 ): Promise<void> {
 	if (wc && wc.session) {
-		console.log('walletConnectClient IF 2', wc.session)
 		await wc.killSession()
 	}
 
@@ -36,7 +36,7 @@ export async function restoreClient(
 	}
 
 	setWalletConnectClient(wc)
-	console.log('restore', wc)
+	setSession(wc.session)
 }
 
 export async function createClient(
@@ -46,12 +46,9 @@ export async function createClient(
 	) => void,
 ): Promise<void> {
 	if (wc && wc.session) {
-		console.log('walletConnectClient IF', wc.session)
 		await wc.killSession()
 	}
 
 	wc = new WalletConnectClient({ uri })
 	setWalletConnectClient?.(wc)
-
-	console.log('createClient', wc)
 }
