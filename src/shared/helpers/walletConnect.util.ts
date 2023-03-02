@@ -2,6 +2,7 @@
 import { Core } from '@walletconnect/core'
 import { ICore } from '@walletconnect/types'
 import { Web3Wallet, IWeb3Wallet } from '@walletconnect/web3wallet'
+import { createClient } from './walletConnectV1.util'
 
 export let web3wallet: IWeb3Wallet
 export let core: ICore
@@ -30,13 +31,7 @@ async function pair(uri: string) {
 
 export const isV1 = (uri: string) => uri?.includes('@1?')
 
-export async function startProposal(
-	uri: string,
-	createClient: (params: {
-		uri?: string | undefined
-		session?: any
-	}) => Promise<void>,
-) {
+export async function startProposal(uri: string) {
 	try {
 		const url = new URL(uri)
 
@@ -44,7 +39,7 @@ export async function startProposal(
 			// handle usual wallet connect URIs
 			case 'wc:': {
 				if (isV1(uri)) {
-					createClient({ uri: url.toString() })
+					createClient(url.toString())
 				} else {
 					await pair(uri)
 				}
@@ -56,7 +51,7 @@ export async function startProposal(
 				const uriParam = url.searchParams.get('uri')
 
 				if (url.pathname === '//wc' && uriParam) {
-					await startProposal(uriParam, createClient)
+					await startProposal(uriParam)
 				}
 				break
 			}
