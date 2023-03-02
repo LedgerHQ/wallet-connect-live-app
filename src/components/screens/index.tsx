@@ -8,6 +8,24 @@ import Home from './Home'
 import { useLedgerLive } from '@/hooks/useLedgerLive'
 import { useV1Store, v1Selector } from '@/storage/v1.store'
 
+const getInitialAccountV1 = (
+	accounts: Account[],
+	initialAccountId?: string,
+	savedAccountId?: string,
+): Account | undefined => {
+	const initialAccount = initialAccountId
+		? accounts.find((account) => account.id === initialAccountId)
+		: undefined
+	const savedAccount = savedAccountId
+		? accounts.find((account) => account.id === savedAccountId)
+		: undefined
+	const defaultAccount = accounts.length > 0 ? accounts[0] : undefined
+
+	const selectedAccount = initialAccount || savedAccount || defaultAccount
+
+	return selectedAccount
+}
+
 export type WalletConnectProps = {
 	initialMode?: InputMode
 	initialAccountId?: string
@@ -19,6 +37,7 @@ export type WalletConnectProps = {
 
 export default function WalletConnect({
 	initialURI,
+	initialAccountId,
 	initialMode,
 	accounts,
 	platformSDK,
@@ -38,6 +57,9 @@ export default function WalletConnect({
 	const setLastSessionVisited = useSessionsStore(
 		sessionSelector.setLastSessionVisited,
 	)
+	const setSelectedAccount = useV1Store(v1Selector.setSelectedAccount)
+	const selectedAccount = useV1Store(v1Selector.selectedAccount)
+
 	useEffect(() => {
 		clearAppStore()
 		clearAccounts()
@@ -50,6 +72,21 @@ export default function WalletConnect({
 		}
 	}, [platformSDK])
 
+	useEffect(() => {
+		clearAccounts()
+		addAccounts(accounts)
+
+		const initialAccount = getInitialAccountV1(
+			accounts,
+			initialAccountId,
+			selectedAccount?.id,
+		)
+
+		if (initialAccount) {
+			setSelectedAccount(initialAccount)
+		}
+	}, [accounts])
+
 	useLedgerLive(platformSDK)
 
 	return (
@@ -60,6 +97,7 @@ export default function WalletConnect({
 			accounts={accounts}
 			initialURI={uri}
 			networks={networks}
+			initialAccountId={initialAccountId}
 			{...rest}
 		/>
 	)

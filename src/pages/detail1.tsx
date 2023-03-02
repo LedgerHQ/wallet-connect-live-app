@@ -44,7 +44,7 @@ export default function SessionDetail() {
 	const { t } = useTranslation()
 	const { hydratedV1 } = useHydratationV1()
 	const { routes, navigate, tabsIndexes } = useNavigation()
-	const account = useV1Store(v1Selector.selectAccount)
+	const account = useV1Store(v1Selector.selectedAccount)
 	const { handleDisconnect, handleSwitchAccount } = useWalletConnectV1Utils()
 
 	const navigateToSessionsHomeTab = useCallback(() => {

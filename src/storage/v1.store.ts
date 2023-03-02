@@ -82,7 +82,7 @@ const v1Selector = {
 	): WalletConnectClient | undefined => state.walletConnectClient,
 	selectSession: (state: WalletConnectState): any | undefined =>
 		state.session,
-	selectAccount: (state: WalletConnectState): Account | undefined =>
+	selectedAccount: (state: WalletConnectState): Account | undefined =>
 		state.selectedAccount,
 	selectModalOpen: (state: WalletConnectState): boolean => state.modalOpen,
 	selectSessionUri: (state: WalletConnectState) => state.sessionURI,

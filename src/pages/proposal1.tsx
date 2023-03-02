@@ -58,7 +58,7 @@ export default function SessionProposal() {
 	const { t } = useTranslation()
 	const { routes, navigate } = useNavigation()
 	const { hydratedV1 } = useHydratationV1()
-	const selectedAccount = useV1Store(v1Selector.selectAccount)
+	const selectedAccount = useV1Store(v1Selector.selectedAccount)
 	const { handleSwitchAccount, handleDecline, handleAccept } =
 		useWalletConnectV1Utils()
 
