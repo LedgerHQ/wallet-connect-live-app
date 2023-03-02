@@ -1,7 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Core } from '@walletconnect/core'
 import { ICore } from '@walletconnect/types'
 import { Web3Wallet, IWeb3Wallet } from '@walletconnect/web3wallet'
-import { walletConnectV1Logic } from '@/hooks/useWalletConnectV1Logic'
 
 export let web3wallet: IWeb3Wallet
 export let core: ICore
@@ -29,15 +29,22 @@ async function pair(uri: string) {
 }
 
 export const isV1 = (uri: string) => uri?.includes('@1?')
-export async function startProposal(uri: string) {
+
+export async function startProposal(
+	uri: string,
+	createClient: (params: {
+		uri?: string | undefined
+		session?: any
+	}) => Promise<void>,
+) {
 	try {
 		const url = new URL(uri)
 
 		switch (url.protocol) {
 			// handle usual wallet connect URIs
 			case 'wc:': {
-				if (walletConnectV1Logic.isV1(uri)) {
-					walletConnectV1Logic.createClient({ uri: url.toString() })
+				if (isV1(uri)) {
+					createClient({ uri: url.toString() })
 				} else {
 					await pair(uri)
 				}
@@ -49,7 +56,7 @@ export async function startProposal(uri: string) {
 				const uriParam = url.searchParams.get('uri')
 
 				if (url.pathname === '//wc' && uriParam) {
-					await startProposal(uriParam)
+					await startProposal(uriParam, createClient)
 				}
 				break
 			}

@@ -44,14 +44,15 @@ export type ConnectProps = {
 	mode?: InputMode
 }
 
-let previouslyPasted = ''
+const previouslyPasted = ''
 
 export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 	const { t } = useTranslation()
 	const [inputValue, setInputValue] = useState<string>('')
 	const [errorValue, setErrorValue] = useState<string | undefined>(undefined)
 	const [scanner, setScanner] = useState(mode === 'scan')
-	const session = useV1Store(v1Selector.selectSession)
+	const walletConnectClient = useV1Store(v1Selector.selectWalletConnectClient)
+	const session = walletConnectClient?.session
 	const sessionUri = useV1Store(v1Selector.selectSessionUri)
 	const isModalOpen = useV1Store(v1Selector.selectModalOpen)
 	const setModalOpen = useV1Store(v1Selector.setModalOpen)
@@ -79,23 +80,23 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 		}
 	}, [initialURI])
 
-	useEffect(() => {
-		const interval = setInterval(async () => {
-			try {
-				if (document.hasFocus()) {
-					const text = await navigator.clipboard.readText()
-					if (text !== previouslyPasted) {
-						previouslyPasted = text
-						tryConnect(text)
-					}
-				}
-			} catch (err) {
-				console.error(err)
-			}
-		}, 500)
+	// useEffect(() => {
+	// 	const interval = setInterval(async () => {
+	// 		try {
+	// 			if (document.hasFocus()) {
+	// 				const text = await navigator.clipboard.readText()
+	// 				if (text !== previouslyPasted) {
+	// 					previouslyPasted = text
+	// 					tryConnect(text)
+	// 				}
+	// 			}
+	// 		} catch (err) {
+	// 			console.error(err)
+	// 		}
+	// 	}, 500)
 
-		return () => clearInterval(interval)
-	}, [])
+	// 	return () => clearInterval(interval)
+	// }, [])
 
 	const handlePasteClick = useCallback(async () => {
 		try {

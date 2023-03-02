@@ -6,7 +6,6 @@ import { appSelector, useAppStore } from '@/storage/app.store'
 import { sessionSelector, useSessionsStore } from '@/storage/sessions.store'
 import Home from './Home'
 import { useLedgerLive } from '@/hooks/useLedgerLive'
-import useWalletConnectV1Logic from '@/hooks/useWalletConnectV1Logic'
 import { useV1Store, v1Selector } from '@/storage/v1.store'
 
 export type WalletConnectProps = {
@@ -24,7 +23,6 @@ export default function WalletConnect({
 	accounts,
 	platformSDK,
 	networks,
-	initialAccountId,
 	...rest
 }: WalletConnectProps) {
 	const sessionURI = useV1Store(v1Selector.selectSessionUri)
@@ -53,13 +51,6 @@ export default function WalletConnect({
 	}, [platformSDK])
 
 	useLedgerLive(platformSDK)
-	useWalletConnectV1Logic({
-		initialAccountId,
-		initialURI,
-		platformSDK,
-		accounts,
-		setUri,
-	})
 
 	return (
 		<Home

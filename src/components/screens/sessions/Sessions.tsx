@@ -10,7 +10,6 @@ import { useTranslation } from 'next-i18next'
 import { useCallback } from 'react'
 import useNavigation from '@/hooks/useNavigation'
 import useWalletConnectPopin from '@/hooks/useWalletConnectPopin'
-import { walletConnectV1Logic } from '@/hooks/useWalletConnectV1Logic'
 
 import styled from 'styled-components'
 import {
@@ -19,6 +18,7 @@ import {
 	Session,
 } from '@/storage/sessions.store'
 import { useV1Store, v1Selector } from '@/storage/v1.store'
+import useWalletConnectV1Logic from '@/hooks/useWalletConnectV1Logic'
 
 export type SessionsProps = {
 	sessions: Session[]
@@ -50,7 +50,10 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 		}
 	}, [])
 
-	const v1Session = useV1Store(v1Selector.selectSession)
+	const walletConnectV1Logic = useWalletConnectV1Logic({})
+
+	const walletConnectClient = useV1Store(v1Selector.selectWalletConnectClient)
+	const v1Session = walletConnectClient?.session
 
 	const disconnect = useCallback(async () => {
 		if (v1Session && v1Session.peerMeta) {

@@ -4,7 +4,6 @@ import LogoContainer from '@/components/atoms/logoContainers/LedgerLogoContainer
 import { AddAccountPlaceholder } from '@/components/screens/sessions/sessionProposal/AddAccountPlaceholder'
 import { InfoSessionProposal } from '@/components/screens/sessions/sessionProposal/InfoSessionProposal'
 import { formatUrl, getTicker, truncate } from '@/helpers/helper.util'
-import { walletConnectV1Logic } from '@/hooks/useWalletConnectV1Logic'
 import { useV1Store, v1Selector } from '@/storage/v1.store'
 import { ResponsiveContainer } from '@/styles/styles'
 import { Flex, Box, CryptoIcon, Button, Text } from '@ledgerhq/react-ui'
@@ -14,6 +13,7 @@ import { useTranslation } from 'next-i18next'
 import { Logo } from 'src/icons/LedgerLiveLogo'
 import styled, { useTheme } from 'styled-components'
 import { useState } from 'react'
+import useWalletConnectV1Logic from '@/hooks/useWalletConnectV1Logic'
 
 export { getServerSideProps } from '../lib/serverProps'
 
@@ -54,6 +54,7 @@ export default function SessionProposal() {
 	const [imageLoadingError, setImageLoadingError] = useState(false)
 	const { t } = useTranslation()
 	const selectedAccount = useV1Store(v1Selector.selectAccount)
+	const walletConnectV1Logic = useWalletConnectV1Logic({})
 
 	const proposal = useV1Store(v1Selector.selectProposal)
 	const proposer = proposal?.params[0]?.peerMeta
