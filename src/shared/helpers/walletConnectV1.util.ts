@@ -15,7 +15,7 @@ export async function restoreClient(
 	) => void,
 	setSession: (session: any) => void,
 ): Promise<void> {
-	if (wc && wc.session && wc.session.connected) {
+	if (wc && wc.session && wc.connected) {
 		await wc.killSession()
 	}
 
@@ -45,7 +45,7 @@ export async function createClient(
 		walletConnectClient?: WalletConnect | undefined,
 	) => void,
 ): Promise<void> {
-	if (wc && wc.session && wc.session.connected) {
+	if (wc && wc.session && wc.connected) {
 		await wc.killSession()
 	}
 
