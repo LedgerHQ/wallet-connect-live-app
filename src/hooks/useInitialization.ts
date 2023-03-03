@@ -1,17 +1,15 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useSessionsStore, sessionSelector } from '@/storage/sessions.store'
 import { createWeb3Wallet, web3wallet } from '@/helpers/walletConnect.util'
 
 export default function useInitialization() {
 	const [initialized, setInitialized] = useState(false)
-	const prevRelayerURLValue = useRef<string>('')
 
 	const relayerRegionURL = 'wss://relay.walletconnect.com'
 	const addSessions = useSessionsStore(sessionSelector.addSessions)
 	const clearSessions = useSessionsStore(sessionSelector.clearSessions)
 	const onInitialize = useCallback(async () => {
 		try {
-			prevRelayerURLValue.current = relayerRegionURL
 			clearSessions()
 			await createWeb3Wallet(relayerRegionURL)
 
@@ -25,10 +23,6 @@ export default function useInitialization() {
 
 	useEffect(() => {
 		if (!initialized) {
-			onInitialize()
-		}
-		if (prevRelayerURLValue.current !== relayerRegionURL) {
-			setInitialized(false)
 			onInitialize()
 		}
 	}, [initialized, onInitialize, relayerRegionURL])

@@ -14,6 +14,9 @@ interface SessionsState {
 	setLastSessionVisited: (session: Session | null) => void
 }
 
+const removeSession = (state: SessionsState, sessionId: string): Session[] =>
+	state.sessions.filter((session: Session) => session.topic !== sessionId)
+
 const useSessionsStore = create<SessionsState>()(
 	persist(
 		(set) => ({
@@ -28,9 +31,7 @@ const useSessionsStore = create<SessionsState>()(
 				set(() => ({ sessions: [], lastSessionVisited: null })),
 			removeSession: (sessionId) =>
 				set((state) => ({
-					sessions: state.sessions.filter(
-						(session: Session) => session.topic !== sessionId,
-					),
+					sessions: removeSession(state, sessionId),
 				})),
 		}),
 		{
