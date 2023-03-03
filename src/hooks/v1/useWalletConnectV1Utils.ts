@@ -63,7 +63,7 @@ export default function useWalletConnectV1Utils() {
 	}, [])
 
 	const handleDisconnect = useCallback(() => {
-		if (!!wc && session) {
+		if (!!wc && session && session.connected) {
 			wc.killSession()
 		}
 		setWalletConnectClient(undefined)
