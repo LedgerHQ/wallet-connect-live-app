@@ -4,15 +4,18 @@ import { ArrowLeftMedium } from '@ledgerhq/react-ui/assets/icons'
 import { useCallback } from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'next-i18next'
-import useNavigation from 'src/hooks/useNavigation'
+import useNavigation from '@/hooks/common/useNavigation'
 import Link from 'next/link'
 import { GenericRow, RowType } from '@/components/atoms/GenericRow'
 import { InfoSessionProposal } from '@/components/screens/sessions/sessionProposal/InfoSessionProposal'
 import { ButtonsContainer, Row } from '@/components/atoms/containers/Elements'
 import { ResponsiveContainer } from '@/styles/styles'
-import { walletConnectV1Logic } from 'src/hooks/useWalletConnectV1Logic'
 import { useV1Store, v1Selector } from '@/storage/v1.store'
 import { ImageWithPlaceholder } from '@/components/atoms/images/ImageWithPlaceholder'
+import useWalletConnectV1Utils from '@/hooks/v1/useWalletConnectV1Utils'
+import useHydratationV1 from '@/hooks/v1/useHydratationV1'
+import { wc } from '@/helpers/walletConnectV1.util'
+
 export { getServerSideProps } from '../lib/serverProps'
 
 const DetailContainer = styled(Flex)`
@@ -40,23 +43,24 @@ const BackButton = styled(Flex)`
 
 export default function SessionDetail() {
 	const { t } = useTranslation()
+	const { hydratedV1 } = useHydratationV1()
 	const { routes, navigate, tabsIndexes } = useNavigation()
-	const session = useV1Store(v1Selector.selectSession)
-	const account = useV1Store(v1Selector.selectAccount)
+	const account = useV1Store(v1Selector.selectedAccount)
+	const { handleDisconnect, handleSwitchAccount } = useWalletConnectV1Utils()
 
 	const navigateToSessionsHomeTab = useCallback(() => {
 		navigate(routes.home, { tab: tabsIndexes.sessions })
 	}, [routes, tabsIndexes])
 
 	const handleDelete = useCallback(async () => {
-		if (!session) return
-		walletConnectV1Logic.handleDisconnect()
+		if (!wc?.session) return
+		handleDisconnect()
 		navigateToSessionsHomeTab()
-	}, [session])
+	}, [wc?.session])
 
-	const metadata = session?.peerMeta
+	const metadata = wc?.session?.peerMeta
 
-	if (!session) {
+	if (!hydratedV1 || !wc) {
 		return null
 	}
 
@@ -168,9 +172,7 @@ export default function SessionDetail() {
 								<GenericRow
 									title={account.name}
 									subtitle={truncate(account.address, 30)}
-									onClick={() =>
-										walletConnectV1Logic.handleSwitchAccount()
-									}
+									onClick={() => handleSwitchAccount()}
 									LeftIcon={
 										<CryptoIcon
 											name={getTicker(account.currency)}

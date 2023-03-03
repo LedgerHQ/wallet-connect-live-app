@@ -7,13 +7,15 @@ import { useTranslation } from 'next-i18next'
 import { Dispatch, SetStateAction, useState, useCallback, useMemo } from 'react'
 import { TransitionGroup } from 'react-transition-group'
 import useHydratation from '@/hooks/useHydratation'
-import useNavigation from '@/hooks/useNavigation'
+import useNavigation from '@/hooks/common/useNavigation'
 import { useSessionsStore, sessionSelector } from '@/storage/sessions.store'
-import { useV1Store, v1Selector } from '@/storage/v1.store'
 import styled from 'styled-components'
 import { Connect } from './Connect'
 import Sessions from './sessions/Sessions'
 import Tabs from './Tabs'
+import useHydratationV1 from '@/hooks/v1/useHydratationV1'
+import { wc } from '@/helpers/walletConnectV1.util'
+import { useV1Store, v1Selector } from '@/storage/v1.store'
 
 const WalletConnectContainer = styled.div`
 	display: flex;
@@ -51,14 +53,15 @@ export default function Home({
 	setUri,
 }: WalletConnectProps) {
 	const { initialized } = useHydratation()
+	const { initializedV1 } = useHydratationV1(initialURI)
 	const { router, tabsIndexes } = useNavigation()
 	const routerQueryData = router?.query?.data
 	const initialTab = routerQueryData
 		? JSON.parse(String(routerQueryData))?.tab
 		: tabsIndexes.connect
 
-	const v1Session = useV1Store(v1Selector.selectSession)
 	const sessions = useSessionsStore(sessionSelector.selectSessions)
+	const setWalletConnectClient = useV1Store(v1Selector.setWalletConnectClient)
 
 	const { t } = useTranslation()
 
@@ -74,7 +77,7 @@ export default function Home({
 				try {
 					setUri(inputValue)
 					const uri = new URL(inputValue)
-					await startProposal(uri.toString())
+					await startProposal(uri.toString(), setWalletConnectClient)
 				} catch (error: unknown) {
 					setErrorValue(t('error.invalidUri'))
 				} finally {
@@ -110,9 +113,9 @@ export default function Home({
 				index: tabsIndexes.sessions,
 				title: t('sessions.title'),
 				badge:
-					sessions?.length || (v1Session && v1Session.peerMeta)
+					sessions?.length || wc?.session?.connected
 						? (sessions.length || 0) +
-						  (v1Session && v1Session.peerMeta ? 1 : 0)
+						  (wc?.session?.connected ? 1 : 0)
 						: undefined,
 				Component: (
 					<WalletConnectInnerContainer>
@@ -131,7 +134,7 @@ export default function Home({
 
 	return (
 		<WalletConnectContainer>
-			{initialized ? (
+			{initialized && initializedV1 ? (
 				<Tabs
 					tabs={TABS}
 					activeTabIndex={activeTabIndex}

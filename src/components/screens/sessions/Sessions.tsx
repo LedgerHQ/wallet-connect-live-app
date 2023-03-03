@@ -8,9 +8,8 @@ import { Flex, Button, Box, Text } from '@ledgerhq/react-ui'
 
 import { useTranslation } from 'next-i18next'
 import { useCallback } from 'react'
-import useNavigation from '@/hooks/useNavigation'
+import useNavigation from '@/hooks/common/useNavigation'
 import useWalletConnectPopin from '@/hooks/useWalletConnectPopin'
-import { walletConnectV1Logic } from '@/hooks/useWalletConnectV1Logic'
 
 import styled from 'styled-components'
 import {
@@ -19,6 +18,7 @@ import {
 	Session,
 } from '@/storage/sessions.store'
 import { useV1Store, v1Selector } from '@/storage/v1.store'
+import useWalletConnectV1Utils from '@/hooks/v1/useWalletConnectV1Utils'
 
 export type SessionsProps = {
 	sessions: Session[]
@@ -41,6 +41,7 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 	const { navigate, routes } = useNavigation()
 	const { openModal, closeModal, isModalOpen } = useWalletConnectPopin()
 	const clearSessions = useSessionsStore(sessionSelector.clearSessions)
+	const v1Session = useV1Store(v1Selector.selectSession)
 
 	const goToDetailSession = useCallback((topic: string, isV1?: boolean) => {
 		if (isV1) {
@@ -50,12 +51,12 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 		}
 	}, [])
 
-	const v1Session = useV1Store(v1Selector.selectSession)
+	const { handleDisconnect, cleanup } = useWalletConnectV1Utils()
 
 	const disconnect = useCallback(async () => {
 		if (v1Session && v1Session.peerMeta) {
-			walletConnectV1Logic.handleDisconnect()
-			walletConnectV1Logic.cleanup()
+			handleDisconnect()
+			cleanup()
 		}
 		await Promise.all(
 			sessions.map((session) =>

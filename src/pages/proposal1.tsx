@@ -4,19 +4,19 @@ import LogoContainer from '@/components/atoms/logoContainers/LedgerLogoContainer
 import { AddAccountPlaceholder } from '@/components/screens/sessions/sessionProposal/AddAccountPlaceholder'
 import { InfoSessionProposal } from '@/components/screens/sessions/sessionProposal/InfoSessionProposal'
 import { formatUrl, getTicker, truncate } from '@/helpers/helper.util'
-import { walletConnectV1Logic } from '@/hooks/useWalletConnectV1Logic'
 import { useV1Store, v1Selector } from '@/storage/v1.store'
 import { ResponsiveContainer } from '@/styles/styles'
 import { Flex, Box, CryptoIcon, Button, Text } from '@ledgerhq/react-ui'
-import {
-	WalletConnectMedium,
-	WarningMedium,
-} from '@ledgerhq/react-ui/assets/icons'
+import { WalletConnectMedium } from '@ledgerhq/react-ui/assets/icons'
 import Image from 'next/image'
 import { useTranslation } from 'next-i18next'
 import { Logo } from 'src/icons/LedgerLiveLogo'
 import styled, { useTheme } from 'styled-components'
 import { useState } from 'react'
+import useWalletConnectV1Utils from '@/hooks/v1/useWalletConnectV1Utils'
+import useHydratationV1 from '@/hooks/v1/useHydratationV1'
+import { wc } from '@/helpers/walletConnectV1.util'
+import useNavigation from '@/hooks/common/useNavigation'
 
 export { getServerSideProps } from '../lib/serverProps'
 
@@ -56,10 +56,20 @@ export default function SessionProposal() {
 	const { colors } = useTheme()
 	const [imageLoadingError, setImageLoadingError] = useState(false)
 	const { t } = useTranslation()
-	const selectedAccount = useV1Store(v1Selector.selectAccount)
-	const session = useV1Store(v1Selector.selectSession)
+	const { routes, navigate } = useNavigation()
+	const { hydratedV1 } = useHydratationV1()
+	const selectedAccount = useV1Store(v1Selector.selectedAccount)
+	const { handleSwitchAccount, handleDecline, handleAccept } =
+		useWalletConnectV1Utils()
+
 	const proposal = useV1Store(v1Selector.selectProposal)
 	const proposer = proposal?.params[0]?.peerMeta
+
+	if (!hydratedV1) return null
+	if (!wc) {
+		navigate(routes.home)
+		return null
+	}
 
 	return (
 		<Flex
@@ -161,7 +171,7 @@ export default function SessionProposal() {
 													30,
 												)}
 												onClick={() =>
-													walletConnectV1Logic.handleSwitchAccount()
+													handleSwitchAccount()
 												}
 												LeftIcon={
 													<CryptoIcon
@@ -188,9 +198,7 @@ export default function SessionProposal() {
 								</Box>
 							) : (
 								<AddAccountPlaceholder
-									onClick={() =>
-										walletConnectV1Logic.handleSwitchAccount()
-									}
+									onClick={() => handleSwitchAccount()}
 								/>
 							)}
 						</ListChains>
@@ -200,45 +208,14 @@ export default function SessionProposal() {
 						<Box mt={6}>
 							<InfoSessionProposal />
 						</Box>
-						{session && session.peerMeta ? (
-							<Box mt={6}>
-								<Text
-									variant="small"
-									fontWeight="medium"
-									color="neutral.c70"
-									mb={6}
-								>
-									{t('sessionProposal.info3')}
-								</Text>
 
-								<Flex mt={6} alignItems="center">
-									<WarningMedium
-										size={16}
-										color="warning.c60"
-									/>
-
-									<Text
-										ml={4}
-										variant="small"
-										fontWeight="medium"
-										color="neutral.c100"
-									>
-										{t(`sessionProposal.infoBullet.2`, {
-											dAppName:
-												session.peerMeta.name ||
-												formatUrl(session.peerMeta.url),
-										})}
-									</Text>
-								</Flex>
-							</Box>
-						) : null}
 						<ButtonsContainer>
 							<Button
 								variant="shade"
 								size="large"
 								flex={0.9}
 								mr={6}
-								onClick={walletConnectV1Logic.handleDecline}
+								onClick={handleDecline}
 							>
 								<Text
 									variant="body"
@@ -253,7 +230,7 @@ export default function SessionProposal() {
 								variant="main"
 								size="large"
 								flex={0.9}
-								onClick={walletConnectV1Logic.handleAccept}
+								onClick={handleAccept}
 							>
 								<Text
 									variant="body"

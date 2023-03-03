@@ -3,10 +3,10 @@
 import { SignClientTypes } from '@walletconnect/types'
 import { useCallback, useEffect } from 'react'
 import { Web3WalletTypes } from '@walletconnect/web3wallet'
-import useNavigation from './useNavigation'
+import useNavigation from '@/hooks/common/useNavigation'
 import { hasETHAddress } from '@/helpers/generic'
 import { stripHexPrefix } from '@/utils/currencyFormatter/helpers'
-import { platformSDK } from './useLedgerLive'
+import { platformSDK } from './common/useLedgerLive'
 import { convertEthToLiveTX } from '@/helpers/converters'
 import { accountSelector, useAccountsStore } from '@/storage/accounts.store'
 import { EIP155_SIGNING_METHODS } from '@/data/EIP155Data'
@@ -149,7 +149,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 	 * Set up WalletConnect event listeners
 	 *****************************************************************************/
 	useEffect(() => {
-		if (initialized) {
+		if (initialized && web3wallet) {
 			// sign
 			web3wallet.on('session_proposal', onSessionProposal)
 			web3wallet.on('session_request', onSessionRequest)

@@ -26,7 +26,13 @@
 		"waiting": "Waiting for DApp",
 		"cancel": "Cancel",
 		"accept": "Accept",
-		"decline": "Decline"
+		"decline": "Decline",
+		"modal": {
+			"title": "You already have an active Wallet Connect v1 session",
+			"desc": "If you continue, you will be disconnected from {{appName}}",
+			"continue": "Continue",
+			"cancel": "Cancel"
+		}
 	},
 	"sessionProposal": {
 		"connectTo": "Connect to {{name}}",

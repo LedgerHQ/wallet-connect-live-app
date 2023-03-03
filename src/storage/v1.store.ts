@@ -3,17 +3,23 @@ import { Proposal } from '@/types/types'
 import { Account } from '@ledgerhq/live-app-sdk'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-
+import WalletConnectClient from '@walletconnect/client'
 interface WalletConnectState {
-	session: any | null
+	walletConnectClient?: WalletConnectClient
+	sessionURI?: string
+	session?: any
 	timedOut: boolean
 	selectedAccount?: Account
 	proposal?: any
+	modalOpen: boolean
 	clearStore: () => void
-	setSession: (session: any) => void
+	setModalOpen: (open: boolean) => void
+	setSessionUri: (sessionUri?: string) => void
 	setTimedOut: (timed: boolean) => void
 	setSelectedAccount: (account?: Account) => void
 	setProposal: (proposal?: Proposal) => void
+	setSession: (session?: any) => void
+	setWalletConnectClient: (walletConnectClient?: WalletConnectClient) => void
 }
 const useV1Store = create<WalletConnectState>()(
 	persist(
@@ -21,19 +27,28 @@ const useV1Store = create<WalletConnectState>()(
 			selectedAccount: undefined,
 			proposal: undefined,
 			timedOut: false,
-			session: null,
+			sessionURI: undefined,
+			modalOpen: false,
+			walletConnectClient: undefined,
+			session: undefined,
 			clearStore: () =>
 				set(() => ({
 					selectedAccount: undefined,
-					session: null,
+					proposal: undefined,
 					timedOut: false,
+					sessionURI: undefined,
+					modalOpen: false,
+					walletConnectClient: undefined,
+					session: undefined,
 				})),
-
-			setSession: (session) =>
+			setWalletConnectClient: (walletConnectClient) =>
 				set(() => ({
-					session,
+					walletConnectClient,
 				})),
-
+			setSessionUri: (sessionURI) =>
+				set(() => ({
+					sessionURI,
+				})),
 			setProposal: (newProposal) =>
 				set(() => ({
 					proposal: newProposal,
@@ -46,6 +61,14 @@ const useV1Store = create<WalletConnectState>()(
 				set(() => ({
 					timedOut,
 				})),
+			setModalOpen: (open) =>
+				set(() => ({
+					modalOpen: open,
+				})),
+			setSession: (session) =>
+				set(() => ({
+					session: session,
+				})),
 		}),
 		{
 			name: 'v1-storage',
@@ -54,16 +77,26 @@ const useV1Store = create<WalletConnectState>()(
 )
 
 const v1Selector = {
-	selectAccount: (state: WalletConnectState): Account | undefined =>
+	selectWalletConnectClient: (
+		state: WalletConnectState,
+	): WalletConnectClient | undefined => state.walletConnectClient,
+	selectSession: (state: WalletConnectState): any | undefined =>
+		state.session,
+	selectedAccount: (state: WalletConnectState): Account | undefined =>
 		state.selectedAccount,
-	selectSession: (state: WalletConnectState) => state.session,
+	selectModalOpen: (state: WalletConnectState): boolean => state.modalOpen,
+	selectSessionUri: (state: WalletConnectState) => state.sessionURI,
 	selectTimeout: (state: WalletConnectState) => state.timedOut,
 	selectProposal: (state: WalletConnectState) => state.proposal,
 	clearStore: (state: WalletConnectState) => state.clearStore,
 	setSelectedAccount: (state: WalletConnectState) => state.setSelectedAccount,
-	setSession: (state: WalletConnectState) => state.setSession,
+	setSessionUri: (state: WalletConnectState) => state.setSessionUri,
 	setTimedOut: (state: WalletConnectState) => state.setTimedOut,
 	setProposal: (state: WalletConnectState) => state.setProposal,
+	setModalOpen: (state: WalletConnectState) => state.setModalOpen,
+	setSession: (state: WalletConnectState) => state.setSession,
+	setWalletConnectClient: (state: WalletConnectState) =>
+		state.setWalletConnectClient,
 }
 
 export { useV1Store, v1Selector }
