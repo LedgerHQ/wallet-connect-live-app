@@ -8,7 +8,7 @@ import { Flex, Button, Box, Text } from '@ledgerhq/react-ui'
 
 import { useTranslation } from 'next-i18next'
 import { useCallback } from 'react'
-import useNavigation from '@/hooks/useNavigation'
+import useNavigation from '@/hooks/common/useNavigation'
 import useWalletConnectPopin from '@/hooks/useWalletConnectPopin'
 
 import styled from 'styled-components'
@@ -17,8 +17,8 @@ import {
 	sessionSelector,
 	Session,
 } from '@/storage/sessions.store'
-import useWalletConnectV1Utils from '@/hooks/useWalletConnectV1Utils'
 import { useV1Store, v1Selector } from '@/storage/v1.store'
+import useWalletConnectV1Utils from '@/hooks/v1/useWalletConnectV1Utils'
 
 export type SessionsProps = {
 	sessions: Session[]

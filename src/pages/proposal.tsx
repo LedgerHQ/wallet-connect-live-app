@@ -6,7 +6,7 @@ import { ErrorBlockchainSupport } from '@/components/screens/sessions/sessionPro
 import { InfoSessionProposal } from '@/components/screens/sessions/sessionProposal/InfoSessionProposal'
 import { formatUrl, getTicker, truncate } from '@/helpers/helper.util'
 import useHydratation from '@/hooks/useHydratation'
-import useNavigation from '@/hooks/useNavigation'
+import useNavigation from '@/hooks/common/useNavigation'
 import { useProposal } from '@/hooks/useProposal'
 import { ResponsiveContainer } from '@/styles/styles'
 import { Proposal } from '@/types/types'

@@ -13,10 +13,10 @@ import { useTranslation } from 'next-i18next'
 import { Logo } from 'src/icons/LedgerLiveLogo'
 import styled, { useTheme } from 'styled-components'
 import { useState } from 'react'
-import useWalletConnectV1Utils from '@/hooks/useWalletConnectV1Utils'
-import useHydratationV1 from '@/hooks/useHydratationV1'
+import useWalletConnectV1Utils from '@/hooks/v1/useWalletConnectV1Utils'
+import useHydratationV1 from '@/hooks/v1/useHydratationV1'
 import { wc } from '@/helpers/walletConnectV1.util'
-import useNavigation from '@/hooks/useNavigation'
+import useNavigation from '@/hooks/common/useNavigation'
 
 export { getServerSideProps } from '../lib/serverProps'
 

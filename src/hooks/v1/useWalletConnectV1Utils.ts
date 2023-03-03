@@ -2,8 +2,8 @@ import { wc } from '@/helpers/walletConnectV1.util'
 import { appSelector, useAppStore } from '@/storage/app.store'
 import { useV1Store } from '@/storage/v1.store'
 import { useCallback } from 'react'
-import { platformSDK } from './useLedgerLive'
-import useNavigation from './useNavigation'
+import { platformSDK } from '@/hooks/common/useLedgerLive'
+import useNavigation from '@/hooks/common/useNavigation'
 
 export default function useWalletConnectV1Utils() {
 	const networks = useAppStore(appSelector.selectNetworks)

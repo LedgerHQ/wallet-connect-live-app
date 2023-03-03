@@ -1,28 +1,39 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// import ModalStore from '@/store/ModalStore'
 
 import { useCallback, useEffect } from 'react'
-import useNavigation from './useNavigation'
 import { stripHexPrefix } from '@/utils/currencyFormatter/helpers'
-import { platformSDK } from './useLedgerLive'
 import { convertEthToLiveTX } from '@/helpers/converters'
 import { wc } from '@/helpers/walletConnectV1.util'
 import { EIP155_SIGNING_METHODS } from '@/data/EIP155Data'
-import { useV1Store, v1Selector } from '@/storage/v1.store'
+import { useV1Store } from '@/storage/v1.store'
 import { Proposal } from '@/types/types'
 import { appSelector, useAppStore } from '@/storage/app.store'
 import { compareETHAddresses } from '@/helpers/generic'
 import useWalletConnectV1Utils from './useWalletConnectV1Utils'
+import { platformSDK } from '@/hooks/common/useLedgerLive'
+import useNavigation from '@/hooks/common/useNavigation'
+
+enum Errors {
+	txDeclined = 'Transaction declined',
+	errorOccured = 'An error occured',
+	chainNotSupported = 'This chain is not supported',
+	messageSignDeclined = 'Message signed declined',
+	ethSignDeclined = 'ETH signed declined',
+	personalSignDeclined = 'Personal message signed declined',
+}
 
 export default function useWalletConnectEventsManagerV1(initialized: boolean) {
-	const networks = useAppStore(appSelector.selectNetworks)
 	const { navigate, routes, tabsIndexes } = useNavigation()
 	const { cleanup, handleSwitchAccount } = useWalletConnectV1Utils()
-	const { setProposal, selectedAccount } = useV1Store()
-	const setWalletConnectClient = useV1Store(v1Selector.setWalletConnectClient)
-	const walletConnectClient = useV1Store(v1Selector.selectWalletConnectClient)
+	const {
+		setProposal,
+		setSession,
+		setWalletConnectClient,
+		walletConnectClient,
+		selectedAccount,
+	} = useV1Store()
 
-	const setSession = useV1Store(v1Selector.setSession)
+	const networks = useAppStore(appSelector.selectNetworks)
 
 	const onSessionRequest = useCallback(
 		async (error: any, payload: Proposal) => {
@@ -75,20 +86,10 @@ export default function useWalletConnectEventsManagerV1(initialized: boolean) {
 								selectedAccount.id,
 								signedTransaction,
 							)
-						wc.approveRequest({
-							id: payload.id,
-							jsonrpc: '2.0',
-							result: hash,
-						})
+
+						acceptRequest(payload.id, hash)
 					} catch (error) {
-						wc.rejectRequest({
-							id: payload.id,
-							jsonrpc: '2.0',
-							error: {
-								code: 3,
-								message: 'Transaction declined',
-							},
-						})
+						rejectRequest(payload.id, Errors.txDeclined)
 					}
 				}
 			}
@@ -111,20 +112,9 @@ export default function useWalletConnectEventsManagerV1(initialized: boolean) {
 							selectedAccount.id,
 							Buffer.from(message, 'hex'),
 						)
-						wc.approveRequest({
-							id: payload.id,
-							jsonrpc: '2.0',
-							result: signedMessage,
-						})
+						acceptRequest(payload.id, signedMessage)
 					} catch (error) {
-						wc.rejectRequest({
-							id: payload.id,
-							jsonrpc: '2.0',
-							error: {
-								code: 3,
-								message: 'Personal message signed declined',
-							},
-						})
+						rejectRequest(payload.id, Errors.personalSignDeclined)
 					}
 					break
 				}
@@ -144,20 +134,9 @@ export default function useWalletConnectEventsManagerV1(initialized: boolean) {
 							selectedAccount.id,
 							Buffer.from(message, 'hex'),
 						)
-						wc.approveRequest({
-							id: payload.id,
-							jsonrpc: '2.0',
-							result: signedMessage,
-						})
+						acceptRequest(payload.id, signedMessage)
 					} catch (error) {
-						wc.rejectRequest({
-							id: payload.id,
-							jsonrpc: '2.0',
-							error: {
-								code: 3,
-								message: 'Message signed declined',
-							},
-						})
+						rejectRequest(payload.id, Errors.ethSignDeclined)
 					}
 					break
 				}
@@ -177,20 +156,9 @@ export default function useWalletConnectEventsManagerV1(initialized: boolean) {
 							selectedAccount.id,
 							Buffer.from(message),
 						)
-						wc.approveRequest({
-							id: payload.id,
-							jsonrpc: '2.0',
-							result: signedMessage,
-						})
+						acceptRequest(payload.id, signedMessage)
 					} catch (error) {
-						wc.rejectRequest({
-							id: payload.id,
-							jsonrpc: '2.0',
-							error: {
-								code: 3,
-								message: 'Message signed declined',
-							},
-						})
+						rejectRequest(payload.id, Errors.messageSignDeclined)
 					}
 					break
 				}
@@ -205,25 +173,11 @@ export default function useWalletConnectEventsManagerV1(initialized: boolean) {
 					if (chain) {
 						handleSwitchAccount([chain.currency])
 					} else {
-						wc.rejectRequest({
-							id: payload.id,
-							jsonrpc: '2.0',
-							error: {
-								code: 3,
-								message: 'This chain is not supported',
-							},
-						})
+						rejectRequest(payload.id, Errors.chainNotSupported)
 					}
 				} catch (error) {
 					console.log(error)
-					wc.rejectRequest({
-						id: payload.id,
-						jsonrpc: '2.0',
-						error: {
-							code: 3,
-							message: 'An error occured',
-						},
-					})
+					rejectRequest(payload.id, Errors.errorOccured)
 				}
 				break
 			}
@@ -255,4 +209,26 @@ export default function useWalletConnectEventsManagerV1(initialized: boolean) {
 		onDisconnect,
 		onCallRequest,
 	])
+
+	/******************************************************************************
+	 * Util functions
+	 *****************************************************************************/
+	const acceptRequest = (id: number, signedMessage: string) => {
+		wc.approveRequest({
+			id: id,
+			jsonrpc: '2.0',
+			result: signedMessage,
+		})
+	}
+
+	const rejectRequest = (id: number, message: Errors) => {
+		wc.rejectRequest({
+			id: id,
+			jsonrpc: '2.0',
+			error: {
+				code: 3,
+				message: message,
+			},
+		})
+	}
 }

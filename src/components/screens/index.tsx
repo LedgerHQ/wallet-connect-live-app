@@ -5,7 +5,7 @@ import { accountSelector, useAccountsStore } from '@/storage/accounts.store'
 import { appSelector, useAppStore } from '@/storage/app.store'
 import { sessionSelector, useSessionsStore } from '@/storage/sessions.store'
 import Home from './Home'
-import { useLedgerLive } from '@/hooks/useLedgerLive'
+import { useLedgerLive } from '@/hooks/common/useLedgerLive'
 import { useV1Store, v1Selector } from '@/storage/v1.store'
 
 const getInitialAccountV1 = (
