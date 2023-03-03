@@ -45,7 +45,7 @@ export async function createClient(
 		walletConnectClient?: WalletConnect | undefined,
 	) => void,
 ): Promise<void> {
-	if (wc && wc.session) {
+	if (wc && wc.connected && wc.session) {
 		await wc.killSession()
 	}
 
