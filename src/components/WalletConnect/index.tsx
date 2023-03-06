@@ -1,6 +1,6 @@
 import { InputMode, NetworkConfig } from '@/types/types'
 import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
-import { Text } from '@ledgerhq/react-ui'
+import { Link, Text } from '@ledgerhq/react-ui'
 import GlitchText from '@ledgerhq/react-ui/components/animations/GlitchText'
 
 import { convertEthToLiveTX } from '@/helpers/converters'
@@ -19,6 +19,7 @@ import { Connected } from './Connected'
 import { Disconnected } from './Disconnected'
 import { PendingConnection } from './PendingConnection'
 import { PendingRequest } from './PendingRequest'
+import { ArrowRightMedium } from '@ledgerhq/react-ui/assets/icons'
 
 const pulseAnimationLight = keyframes`
 	0% {
@@ -374,8 +375,7 @@ export function WalletConnect({
 									jsonrpc: '2.0',
 									error: {
 										code: 3,
-										message:
-											'Message signed declined',
+										message: 'Message signed declined',
 									},
 								})
 							}
@@ -411,8 +411,7 @@ export function WalletConnect({
 									jsonrpc: '2.0',
 									error: {
 										code: 3,
-										message:
-											'Message signed declined',
+										message: 'Message signed declined',
 									},
 								})
 							}
@@ -455,6 +454,10 @@ export function WalletConnect({
 	useEffect(() => {
 		const sessionURI = localStorage.getItem('sessionURI')
 		if (initialURI && initialURI !== sessionURI) {
+			if (isV2(initialURI)) {
+				goToWalletConnectV2(initialURI)
+				return
+			}
 			createClient({ uri: initialURI })
 			return
 		}
@@ -529,8 +532,21 @@ export function WalletConnect({
 	}, [])
 
 	const handleConnect = useCallback((uri: string) => {
+		if (isV2(uri)) {
+			goToWalletConnectV2(uri)
+			return
+		}
 		createClient({ uri })
 	}, [])
+
+	const isV2 = (uri: string) => uri?.includes('@2?')
+
+	const goToWalletConnectV2 = (uri?: string) => {
+		const uriParam = `?uri=${uri ? encodeURIComponent(uri) : ''}`
+		window.location.assign(
+			`ledgerlive://discover/ledger-wallet-connect-v2${uriParam}`,
+		)
+	}
 
 	return (
 		<WalletConnectContainer>
@@ -551,6 +567,17 @@ export function WalletConnect({
 					<>
 						{session.peerMeta ? (
 							<>
+								{session.connected ? (
+									<Link
+										onClick={() => goToWalletConnectV2()}
+										mb={6}
+										mr={6}
+										alignSelf="flex-end"
+										Icon={ArrowRightMedium}
+									>
+										{t('goToWalletConnectV2')}
+									</Link>
+								) : null}
 								<StatusIcon pulse={session.connected}>
 									<Image
 										width="55px"
@@ -629,6 +656,7 @@ export function WalletConnect({
 					<CSSTransition classNames="fade" timeout={200}>
 						<Disconnected
 							mode={initialMode}
+							initialURI={initialURI}
 							onConnect={handleConnect}
 						/>
 					</CSSTransition>

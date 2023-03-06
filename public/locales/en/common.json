@@ -28,5 +28,6 @@
 	"session": {
 		"connected": "connected to [{{appName}}]",
 		"connecting": "[{{appName}}] is trying to connect"
-	}
+	},
+	"goToWalletConnectV2": "Go to Wallet Connect v2"
 }
