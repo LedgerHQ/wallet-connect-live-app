@@ -60,6 +60,7 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 		} else {
 			try {
 				const uri = new URL(inputValue)
+				setInputValue('')
 				onConnect(uri.toString())
 			} catch (error) {
 				console.log('invalid uri: ', error)
