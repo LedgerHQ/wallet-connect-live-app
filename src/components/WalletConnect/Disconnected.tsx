@@ -64,7 +64,7 @@ export type DisconnectedProps = {
 	initialURI?: string
 }
 
-let previouslyPasted = ''
+// let previouslyPasted = ''
 
 export function Disconnected({
 	onConnect,

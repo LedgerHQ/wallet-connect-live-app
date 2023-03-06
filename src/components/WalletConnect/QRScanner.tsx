@@ -2,7 +2,6 @@ import styled from 'styled-components'
 import { BrowserQRCodeReader, IScannerControls } from '@zxing/browser'
 import { useLayoutEffect, useRef } from 'react'
 import { Result } from '@zxing/library'
-import { Flex, Text } from '@ledgerhq/react-ui'
 
 const QRScannerContainer = styled.div`
 	width: 100%;
@@ -16,7 +15,7 @@ const QRScannerContainer = styled.div`
 
 const QRScannerVideoElement = styled.video`
 	object-fit: cover;
-    object-position: center center;
+	object-position: center center;
 	width: 100%;
 	height: 100%;
 `
@@ -52,27 +51,31 @@ export function QRScanner({ onQRScan }: QRScannerProps) {
 	const videoRef = useRef(null)
 
 	useLayoutEffect(() => {
-		const codeReader = new BrowserQRCodeReader(undefined, { delayBetweenScanAttempts: 500 })
+		const codeReader = new BrowserQRCodeReader(undefined, {
+			delayBetweenScanAttempts: 500,
+		})
 		let controlsRef: IScannerControls | null = null
 
-        if (!videoRef.current) {
-            return
-        }
-        codeReader.decodeFromConstraints(
-            {
-                video: {
-                    facingMode: "environment"
-                }
-            },
-            videoRef.current,
-            (result?: Result) => {
-                if (result) {
-                    onQRScan(result.toString())
-                }
-            },
-        ).then(controls => {
-            controlsRef = controls
-        })
+		if (!videoRef.current) {
+			return
+		}
+		codeReader
+			.decodeFromConstraints(
+				{
+					video: {
+						facingMode: 'environment',
+					},
+				},
+				videoRef.current,
+				(result?: Result) => {
+					if (result) {
+						onQRScan(result.toString())
+					}
+				},
+			)
+			.then((controls) => {
+				controlsRef = controls
+			})
 
 		return () => {
 			if (controlsRef) {
