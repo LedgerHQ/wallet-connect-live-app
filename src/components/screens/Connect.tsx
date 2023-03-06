@@ -6,11 +6,7 @@ import { PasteMedium } from '@ledgerhq/react-ui/assets/icons'
 import { QRScanner } from './QRScanner'
 import { InputMode } from '@/types/types'
 import { useTranslation } from 'next-i18next'
-import { ButtonsContainer } from '@/components/atoms/containers/Elements'
-import { WalletConnectPopin } from '@/components/atoms/popin/WalletConnectPopin'
-import { useV1Store, v1Selector } from '@/storage/v1.store'
-import { isV1 } from '@/helpers/walletConnect.util'
-import { formatUrl } from '@/helpers/helper.util'
+import { goToWalletConnectV1, isV1 } from '@/helpers/walletConnect.util'
 
 const QRScannerContainer = styled.div`
 	display: flex;
@@ -49,23 +45,15 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 	const [inputValue, setInputValue] = useState<string>('')
 	const [errorValue, setErrorValue] = useState<string | undefined>(undefined)
 	const [scanner, setScanner] = useState(mode === 'scan')
-	const walletConnectClient = useV1Store(v1Selector.selectWalletConnectClient)
-	const session = walletConnectClient?.session
-	const sessionUri = useV1Store(v1Selector.selectSessionUri)
-	const isModalOpen = useV1Store(v1Selector.selectModalOpen)
-	const setModalOpen = useV1Store(v1Selector.setModalOpen)
+
 	const handleConnect = useCallback(() => {
-		if (!inputValue) {
-			setErrorValue(t('error.noInput'))
-		} else {
-			try {
-				const uri = new URL(inputValue)
-				setInputValue('')
-				onConnect(uri.toString())
-			} catch (error) {
-				console.log('invalid uri: ', error)
-				setErrorValue(t('error.invalidUri'))
-			}
+		try {
+			const uri = new URL(inputValue)
+			setInputValue('')
+			onConnect(uri.toString())
+		} catch (error) {
+			console.log('invalid uri: ', error)
+			setErrorValue(t('error.invalidUri'))
 		}
 	}, [onConnect, inputValue])
 
@@ -74,7 +62,11 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 	}, [])
 
 	useEffect(() => {
-		if (initialURI && !isV1(initialURI)) {
+		if (initialURI) {
+			if (isV1(initialURI)) {
+				goToWalletConnectV1(initialURI)
+				return
+			}
 			onConnect(initialURI)
 		}
 	}, [initialURI])
@@ -96,17 +88,7 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 				switch (url.protocol) {
 					// handle usual wallet connect URIs
 					case 'wc:': {
-						if (
-							isV1(url.toString()) &&
-							session &&
-							sessionUri !== url.toString()
-						) {
-							setInputValue(url.toString())
-							setModalOpen(true)
-						} else {
-							onConnect(url.toString())
-						}
-
+						onConnect(url.toString())
 						break
 					}
 
@@ -130,10 +112,6 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 		},
 		[onConnect],
 	)
-
-	const closeModal = useCallback(() => {
-		setModalOpen(false)
-	}, [])
 
 	return (
 		<Flex
@@ -196,7 +174,7 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 				/>
 				<Button
 					mt={6}
-					onClick={() => tryConnect(inputValue)}
+					onClick={handleConnect}
 					data-test="connect-button"
 					variant="main"
 					size="large"
@@ -210,65 +188,6 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 						{t('connect.cta')}
 					</Text>
 				</Button>
-				{session && session.peerMeta ? (
-					<WalletConnectPopin
-						isOpen={isModalOpen}
-						onClose={closeModal}
-					>
-						<Flex flexDirection="column" mx={6}>
-							<Text variant="h4" color="neutral.c100" mb={10}>
-								{t('connect.modal.title', {
-									appName:
-										session.peerMeta.name ||
-										formatUrl(session.peerMeta.url),
-								})}
-							</Text>
-
-							<Text
-								variant="bodyLineHeight"
-								color="neutral.c70"
-								mb={3}
-							>
-								{t('connect.modal.desc', {
-									appName:
-										session.peerMeta.name ||
-										formatUrl(session.peerMeta.url),
-								})}
-							</Text>
-
-							<ButtonsContainer>
-								<Button
-									variant="shade"
-									flex={0.9}
-									mr={6}
-									onClick={closeModal}
-								>
-									<Text
-										variant="body"
-										fontWeight="semiBold"
-										color="neutral.c100"
-									>
-										{t('connect.modal.cancel')}
-									</Text>
-								</Button>
-
-								<Button
-									variant="main"
-									flex={0.9}
-									onClick={handleConnect}
-								>
-									<Text
-										variant="body"
-										fontWeight="semiBold"
-										color="neutral.c00"
-									>
-										{t('connect.modal.continue')}
-									</Text>
-								</Button>
-							</ButtonsContainer>
-						</Flex>
-					</WalletConnectPopin>
-				) : null}
 			</Flex>
 		</Flex>
 	)

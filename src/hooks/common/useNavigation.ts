@@ -9,10 +9,6 @@ enum routes {
 	home = '/',
 	sessionProposal = '/proposal',
 	sessionDetails = '/detail',
-
-	// Routes specific to Wallet Connect V1
-	sessionDetailsV1 = '/detail1',
-	sessionProposalV1 = '/proposal1',
 }
 
 export default function useNavigation() {

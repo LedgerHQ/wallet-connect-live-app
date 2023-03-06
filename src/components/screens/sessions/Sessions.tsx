@@ -3,8 +3,8 @@ import { GenericRow, RowType } from '@/components/atoms/GenericRow'
 import { ImageWithPlaceholder } from '@/components/atoms/images/ImageWithPlaceholder'
 import { WalletConnectPopin } from '@/components/atoms/popin/WalletConnectPopin'
 import { formatUrl } from '@/helpers/helper.util'
-import { web3wallet } from '@/helpers/walletConnect.util'
-import { Flex, Button, Box, Text } from '@ledgerhq/react-ui'
+import { goToWalletConnectV1, web3wallet } from '@/helpers/walletConnect.util'
+import { Flex, Button, Box, Text, Link } from '@ledgerhq/react-ui'
 
 import { useTranslation } from 'next-i18next'
 import { useCallback } from 'react'
@@ -17,22 +17,12 @@ import {
 	sessionSelector,
 	Session,
 } from '@/storage/sessions.store'
-import { useV1Store, v1Selector } from '@/storage/v1.store'
-import useWalletConnectV1Utils from '@/hooks/v1/useWalletConnectV1Utils'
+import { ArrowRightMedium } from '@ledgerhq/react-ui/assets/icons'
 
 export type SessionsProps = {
 	sessions: Session[]
 	goToConnect: () => void
 }
-
-const V1Container = styled.div`
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	border: ${(p) => `1px solid ${p.theme.colors.neutral.c70}`};
-	border-radius: ${(p) => p.theme.space[2]}px;
-	padding: ${(p) => p.theme.space[2]}px;
-`
 
 const CustomList = styled(List)``
 
@@ -41,23 +31,12 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 	const { navigate, routes } = useNavigation()
 	const { openModal, closeModal, isModalOpen } = useWalletConnectPopin()
 	const clearSessions = useSessionsStore(sessionSelector.clearSessions)
-	const v1Session = useV1Store(v1Selector.selectSession)
 
-	const goToDetailSession = useCallback((topic: string, isV1?: boolean) => {
-		if (isV1) {
-			navigate(routes.sessionDetailsV1)
-		} else {
-			navigate(routes.sessionDetails, topic)
-		}
+	const goToDetailSession = useCallback((topic: string) => {
+		navigate(routes.sessionDetails, topic)
 	}, [])
 
-	const { handleDisconnect, cleanup } = useWalletConnectV1Utils()
-
 	const disconnect = useCallback(async () => {
-		if (v1Session && v1Session.peerMeta) {
-			handleDisconnect()
-			cleanup()
-		}
 		await Promise.all(
 			sessions.map((session) =>
 				web3wallet.disconnectSession({
@@ -76,10 +55,7 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 			})
 	}, [sessions])
 
-	if (
-		(!sessions || !sessions.length || sessions.length === 0) &&
-		(!v1Session || !v1Session.peerMeta)
-	) {
+	if (!sessions || !sessions.length || sessions.length === 0) {
 		return (
 			<Flex
 				flexDirection="column"
@@ -89,6 +65,15 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 				justifyContent="center"
 				my={6}
 			>
+				<Link
+					onClick={() => goToWalletConnectV1()}
+					Icon={ArrowRightMedium}
+					position="absolute"
+					top="84px"
+					right="16px"
+				>
+					{t('goToWalletConnectV1')}
+				</Link>
 				<Text variant="h2" fontWeight="medium" textAlign="center">
 					{t('sessions.emptyState.title')}
 				</Text>
@@ -121,39 +106,16 @@ export default function Sessions({ sessions, goToConnect }: SessionsProps) {
 
 	return (
 		<Flex flexDirection="column" width="100%" height="100%" mt={6}>
+			<Link
+				onClick={() => goToWalletConnectV1()}
+				Icon={ArrowRightMedium}
+				top="10px"
+				right="10px"
+				alignSelf="flex-end"
+			>
+				{t('goToWalletConnectV1')}
+			</Link>
 			<CustomList>
-				{v1Session && v1Session.peerMeta ? (
-					<Box key={v1Session.handshakeTopic} mt={3}>
-						<GenericRow
-							key={v1Session.handshakeTopic}
-							title={v1Session.peerMeta.name}
-							subtitle={formatUrl(v1Session.peerMeta.url)}
-							LeftIcon={
-								<ImageWithPlaceholder
-									icon={v1Session.peerMeta.icons[0]}
-								/>
-							}
-							rowType={RowType.Detail}
-							rightElement={
-								<V1Container>
-									<Text
-										variant="tiny"
-										fontWeight="semiBold"
-										color="neutral.c70"
-									>
-										WalletConnect v1
-									</Text>
-								</V1Container>
-							}
-							onClick={() =>
-								goToDetailSession(
-									v1Session.handshakeTopic,
-									true,
-								)
-							}
-						/>
-					</Box>
-				) : null}
 				{sessions.map((session) => (
 					<Box key={session.topic} mt={3}>
 						<GenericRow

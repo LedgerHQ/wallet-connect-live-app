@@ -6,25 +6,6 @@ import { appSelector, useAppStore } from '@/storage/app.store'
 import { sessionSelector, useSessionsStore } from '@/storage/sessions.store'
 import Home from './Home'
 import { useLedgerLive } from '@/hooks/common/useLedgerLive'
-import { useV1Store, v1Selector } from '@/storage/v1.store'
-
-const getInitialAccountV1 = (
-	accounts: Account[],
-	initialAccountId?: string,
-	savedAccountId?: string,
-): Account | undefined => {
-	const initialAccount = initialAccountId
-		? accounts.find((account) => account.id === initialAccountId)
-		: undefined
-	const savedAccount = savedAccountId
-		? accounts.find((account) => account.id === savedAccountId)
-		: undefined
-	const defaultAccount = accounts.length > 0 ? accounts[0] : undefined
-
-	const selectedAccount = initialAccount || savedAccount || defaultAccount
-
-	return selectedAccount
-}
 
 export type WalletConnectProps = {
 	initialMode?: InputMode
@@ -44,11 +25,7 @@ export default function WalletConnect({
 	networks,
 	...rest
 }: WalletConnectProps) {
-	const sessionURI = useV1Store(v1Selector.selectSessionUri)
-
-	const [uri, setUri] = useState<string | undefined>(
-		initialURI && initialURI !== sessionURI ? initialURI : sessionURI,
-	)
+	const [uri, setUri] = useState<string | undefined>(initialURI)
 
 	const addAccounts = useAccountsStore(accountSelector.addAccounts)
 	const clearAccounts = useAccountsStore(accountSelector.clearAccounts)
@@ -57,8 +34,6 @@ export default function WalletConnect({
 	const setLastSessionVisited = useSessionsStore(
 		sessionSelector.setLastSessionVisited,
 	)
-	const setSelectedAccount = useV1Store(v1Selector.setSelectedAccount)
-	const selectedAccount = useV1Store(v1Selector.selectedAccount)
 
 	useEffect(() => {
 		clearAppStore()
@@ -75,16 +50,6 @@ export default function WalletConnect({
 	useEffect(() => {
 		clearAccounts()
 		addAccounts(accounts)
-
-		const initialAccount = getInitialAccountV1(
-			accounts,
-			initialAccountId,
-			selectedAccount?.id,
-		)
-
-		if (initialAccount) {
-			setSelectedAccount(initialAccount)
-		}
 	}, [accounts])
 
 	useLedgerLive(platformSDK)

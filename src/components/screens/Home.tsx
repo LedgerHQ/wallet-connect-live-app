@@ -1,4 +1,8 @@
-import { startProposal } from '@/helpers/walletConnect.util'
+import {
+	goToWalletConnectV1,
+	isV1,
+	startProposal,
+} from '@/helpers/walletConnect.util'
 import { ResponsiveContainer } from '@/styles/styles'
 import { NetworkConfig, InputMode } from '@/types/types'
 import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
@@ -13,9 +17,6 @@ import styled from 'styled-components'
 import { Connect } from './Connect'
 import Sessions from './sessions/Sessions'
 import Tabs from './Tabs'
-import useHydratationV1 from '@/hooks/v1/useHydratationV1'
-import { wc } from '@/helpers/walletConnectV1.util'
-import { useV1Store, v1Selector } from '@/storage/v1.store'
 
 const WalletConnectContainer = styled.div`
 	display: flex;
@@ -53,7 +54,6 @@ export default function Home({
 	setUri,
 }: WalletConnectProps) {
 	const { initialized } = useHydratation()
-	const { initializedV1 } = useHydratationV1(initialURI)
 	const { router, tabsIndexes } = useNavigation()
 	const routerQueryData = router?.query?.data
 	const initialTab = routerQueryData
@@ -61,28 +61,26 @@ export default function Home({
 		: tabsIndexes.connect
 
 	const sessions = useSessionsStore(sessionSelector.selectSessions)
-	const setWalletConnectClient = useV1Store(v1Selector.setWalletConnectClient)
 
 	const { t } = useTranslation()
 
 	const [activeTabIndex, setActiveTabIndex] = useState(initialTab)
 	const [inputValue] = useState<string>('')
-	const [, setErrorValue] = useState<string | undefined>(undefined)
 
 	const handleConnect = useCallback(
 		async (inputValue: string) => {
-			if (!inputValue) {
-				setErrorValue(t('error.noInput'))
-			} else {
-				try {
-					setUri(inputValue)
-					const uri = new URL(inputValue)
-					await startProposal(uri.toString(), setWalletConnectClient)
-				} catch (error: unknown) {
-					setErrorValue(t('error.invalidUri'))
-				} finally {
-					setUri('')
+			try {
+				if (isV1(inputValue)) {
+					goToWalletConnectV1(inputValue)
+					return
 				}
+				setUri(inputValue)
+				const uri = new URL(inputValue)
+				await startProposal(uri.toString())
+			} catch (error: unknown) {
+				console.log(error)
+			} finally {
+				setUri('')
 			}
 		},
 		[inputValue],
@@ -112,11 +110,7 @@ export default function Home({
 			{
 				index: tabsIndexes.sessions,
 				title: t('sessions.title'),
-				badge:
-					sessions?.length || wc?.session?.connected
-						? (sessions.length || 0) +
-						  (wc?.session?.connected ? 1 : 0)
-						: undefined,
+				badge: sessions?.length || undefined,
 				Component: (
 					<WalletConnectInnerContainer>
 						<ResponsiveContainer>
@@ -134,7 +128,7 @@ export default function Home({
 
 	return (
 		<WalletConnectContainer>
-			{initialized && initializedV1 ? (
+			{initialized ? (
 				<Tabs
 					tabs={TABS}
 					activeTabIndex={activeTabIndex}
