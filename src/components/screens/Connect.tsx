@@ -71,6 +71,14 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 		}
 	}, [initialURI])
 
+	const isRunningInAndroidWebview = useCallback(
+		() =>
+			navigator.userAgent &&
+			navigator.userAgent.includes('; wv') &&
+			navigator.userAgent.includes('Android'),
+		[],
+	)
+
 	const handlePasteClick = useCallback(async () => {
 		try {
 			const text = await navigator.clipboard.readText()
@@ -163,12 +171,14 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 					error={errorValue}
 					data-test="input-uri"
 					renderRight={
-						<QrCodeButton
-							onClick={handlePasteClick}
-							data-test="copy-button"
-						>
-							<PasteMedium size={18} color="neutral.c100" />
-						</QrCodeButton>
+						!isRunningInAndroidWebview() ? (
+							<QrCodeButton
+								onClick={handlePasteClick}
+								data-test="copy-button"
+							>
+								<PasteMedium size={18} color="neutral.c100" />
+							</QrCodeButton>
+						) : null
 					}
 					placeholder={t('connect.pasteUrl')}
 				/>

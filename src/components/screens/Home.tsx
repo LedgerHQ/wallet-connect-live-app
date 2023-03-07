@@ -114,10 +114,7 @@ export default function Home({
 				Component: (
 					<WalletConnectInnerContainer>
 						<ResponsiveContainer>
-							<Sessions
-								sessions={sessions}
-								goToConnect={goToConnect}
-							/>
+							<Sessions goToConnect={goToConnect} />
 						</ResponsiveContainer>
 					</WalletConnectInnerContainer>
 				),

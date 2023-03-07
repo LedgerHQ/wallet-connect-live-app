@@ -20,17 +20,17 @@ import {
 import { ArrowRightMedium } from '@ledgerhq/react-ui/assets/icons'
 
 export type SessionsProps = {
-	sessions: Session[]
 	goToConnect: () => void
 }
 
 const CustomList = styled(List)``
 
-export default function Sessions({ sessions, goToConnect }: SessionsProps) {
+export default function Sessions({ goToConnect }: SessionsProps) {
 	const { t } = useTranslation()
 	const { navigate, routes } = useNavigation()
 	const { openModal, closeModal, isModalOpen } = useWalletConnectPopin()
 	const clearSessions = useSessionsStore(sessionSelector.clearSessions)
+	const sessions = useSessionsStore(sessionSelector.selectSessions)
 
 	const goToDetailSession = useCallback((topic: string) => {
 		navigate(routes.sessionDetails, topic)
