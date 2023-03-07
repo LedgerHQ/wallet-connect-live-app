@@ -106,6 +106,14 @@ export function Disconnected({
 	// 	return () => clearInterval(interval)
 	// }, [])
 
+	const isRunningInAndroidWebview = useCallback(
+		() =>
+			navigator.userAgent &&
+			navigator.userAgent.includes('; wv') &&
+			navigator.userAgent.includes('Android'),
+		[],
+	)
+
 	const handlePasteClick = useCallback(async () => {
 		try {
 			const text = await navigator.clipboard.readText()
@@ -160,19 +168,22 @@ export function Disconnected({
 						error={errorValue}
 						data-test="input-uri"
 						renderRight={
-							<Flex
-								alignItems={'center'}
-								justifyContent={'center'}
-								pr={'8px'}
-							>
-								<QrCodeButton
-									onClick={handlePasteClick}
-									data-test="copy-button"
+							!isRunningInAndroidWebview() ? (
+								<Flex
+									alignItems={'center'}
+									justifyContent={'center'}
+									pr={'8px'}
 								>
-									<PasteMedium size="20px" />
-								</QrCodeButton>
-							</Flex>
+									<QrCodeButton
+										onClick={handlePasteClick}
+										data-test="copy-button"
+									>
+										<PasteMedium size="20px" />
+									</QrCodeButton>
+								</Flex>
+							) : undefined
 						}
+						placeholder={t('connect.pasteUrl')}
 					/>
 					<Button
 						mt={5}
