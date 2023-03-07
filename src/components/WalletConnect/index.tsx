@@ -418,6 +418,38 @@ export function WalletConnect({
 							break
 						}
 					}
+					case 'wallet_switchEthereumChain': {
+						try {
+							const chainIdParam = payload.params[0]?.chainId
+							const chainId = parseInt(chainIdParam)
+							const chain = networks.find(
+								(networkConfig) =>
+									networkConfig.chainId === chainId,
+							)
+							if (chain) {
+								handleSwitchAccount([chain.currency])
+							} else {
+								wc.rejectRequest({
+									id: payload.id,
+									jsonrpc: '2.0',
+									error: {
+										code: 3,
+										message: 'Chain not supported',
+									},
+								})
+							}
+						} catch (error) {
+							wc.rejectRequest({
+								id: payload.id,
+								jsonrpc: '2.0',
+								error: {
+									code: 3,
+									message: 'Switch chain declined',
+								},
+							})
+						}
+						break
+					}
 				}
 			})
 
@@ -498,13 +530,13 @@ export function WalletConnect({
 		}
 	}, [])
 
-	const handleSwitchAccount = useCallback(async () => {
+	const handleSwitchAccount = useCallback(async (currencies?: string[]) => {
 		const enabledCurrencies = networks.map(
 			(networkConfig) => networkConfig.currency,
 		)
 		try {
 			const newSelectedAccount = await platformSDK.requestAccount({
-				currencies: enabledCurrencies,
+				currencies: currencies || enabledCurrencies,
 			})
 
 			setState((oldState) => ({
@@ -580,8 +612,8 @@ export function WalletConnect({
 								) : null}
 								<StatusIcon pulse={session.connected}>
 									<Image
-										width="55px"
-										height="55px"
+										width={55}
+										height={55}
 										src="/icons/walletconnect-logo.svg"
 										alt="walletconnect-logo"
 									/>
@@ -623,8 +655,8 @@ export function WalletConnect({
 										<Connected
 											account={selectedAccount}
 											onDisconnect={handleDisconnect}
-											onSwitchAccount={
-												handleSwitchAccount
+											onSwitchAccount={() =>
+												handleSwitchAccount()
 											}
 										/>
 									</CSSTransition>
@@ -637,8 +669,8 @@ export function WalletConnect({
 											account={selectedAccount}
 											onAccept={handleAccept}
 											onDecline={handleDecline}
-											onSwitchAccount={
-												handleSwitchAccount
+											onSwitchAccount={() =>
+												handleSwitchAccount()
 											}
 										/>
 									</CSSTransition>
