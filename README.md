@@ -65,7 +65,7 @@ All Live apps are defined with a manifest. Here is one that can be used for loca
 
 ```json
 {
-	"id": "ledger-wallet-connect",
+	"id": "ledger-wallet-connect-v2",
 	"name": "Wallet Connect",
 	"url": "http://127.0.0.1:3000/",
 	"params": {

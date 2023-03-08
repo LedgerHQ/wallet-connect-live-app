@@ -1,7 +1,7 @@
 {
 	"id": "ledger-wallet-connect-v2",
-	"name": "Wallet Connect",
-	"url": "http://127.0.0.1:3000/",
+	"name": "Wallet Connect v2",
+	"url": "https://wallet-connect-live-pn9ryffw0-ledgerhq.vercel.app/",
 	"params": {
 		"networks": [
 			{
@@ -28,10 +28,10 @@
 	"currencies": ["ethereum", "polygon", "bsc"],
 	"content": {
 		"shortDescription": {
-			"en": "WalletConnect is an open source protocol for connecting decentralised applications to mobile wallets with QR code scanning or deep linking."
+			"en": "WalletConnect is an open source protocol for connecting decentralised applications to mobile wallets with QR code scanning or deep linking. V2 introduces new features, including the ability to connect to multiple dapps in parallel with multiple accounts. It's important to note that not all dapps currently support V2"
 		},
 		"description": {
-			"en": "WalletConnect is an open source protocol for connecting decentralised applications to mobile wallets with QR code scanning or deep linking."
+			"en": "WalletConnect is an open source protocol for connecting decentralised applications to mobile wallets with QR code scanning or deep linking. V2 introduces new features, including the ability to connect to multiple dapps in parallel with multiple accounts. It's important to note that not all dapps currently support V2"
 		}
 	},
 	"permissions": [],
