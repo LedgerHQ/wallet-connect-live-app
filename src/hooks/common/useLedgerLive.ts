@@ -1,14 +1,14 @@
-import LedgerLivePlarformSDK from '@ledgerhq/live-app-sdk'
+import { WalletAPIClient } from '@ledgerhq/wallet-api-client'
 import { useState, useEffect } from 'react'
 
-export let platformSDK: LedgerLivePlarformSDK
+export let walletApiClient: WalletAPIClient
 
-export function useLedgerLive(ledgerPlatformSDK: LedgerLivePlarformSDK) {
+export function useLedgerLive(walletApiClient: WalletAPIClient) {
 	const [initialized, setInitialized] = useState(false)
 
 	useEffect(() => {
 		if (!initialized) {
-			platformSDK = ledgerPlatformSDK
+			walletApiClient = walletApiClient
 			setInitialized(true)
 		}
 	}, [initialized])

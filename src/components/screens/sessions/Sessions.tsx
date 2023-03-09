@@ -7,17 +7,14 @@ import { goToWalletConnectV1, web3wallet } from '@/helpers/walletConnect.util'
 import { Flex, Button, Box, Text, Link } from '@ledgerhq/react-ui'
 
 import { useTranslation } from 'next-i18next'
-import { useCallback } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import useNavigation from '@/hooks/common/useNavigation'
 import useWalletConnectPopin from '@/hooks/useWalletConnectPopin'
 
 import styled from 'styled-components'
-import {
-	useSessionsStore,
-	sessionSelector,
-	Session,
-} from '@/storage/sessions.store'
+import { useSessionsStore, sessionSelector } from '@/storage/sessions.store'
 import { ArrowRightMedium } from '@ledgerhq/react-ui/assets/icons'
+import useAnalytics from 'src/shared/useAnalytics'
 
 export type SessionsProps = {
 	goToConnect: () => void
@@ -31,9 +28,40 @@ export default function Sessions({ goToConnect }: SessionsProps) {
 	const { openModal, closeModal, isModalOpen } = useWalletConnectPopin()
 	const clearSessions = useSessionsStore(sessionSelector.clearSessions)
 	const sessions = useSessionsStore(sessionSelector.selectSessions)
+	const analytics = useAnalytics()
+
+	useEffect(() => {
+		analytics.page('Wallet Connect Sessions', {
+			isEmptyState,
+		})
+	}, [])
+
+	useEffect(() => {
+		analytics.track('equipment_connected', {
+			sessionsConnected: sessions?.length || 0,
+		})
+		analytics.identify()
+	}, [sessions?.length])
+
+	const isEmptyState = useMemo(
+		() => !sessions || !sessions.length || sessions.length === 0,
+		[sessions],
+	)
 
 	const goToDetailSession = useCallback((topic: string) => {
 		navigate(routes.sessionDetails, topic)
+		analytics.track('button_clicked', {
+			button: 'Session Detail',
+			page: 'Wallet Connect Sessions',
+		})
+	}, [])
+
+	const onGoToConnect = useCallback(() => {
+		analytics.track('button_clicked', {
+			button: 'Connect',
+			page: 'Wallet Connect Sessions',
+		})
+		goToConnect()
 	}, [])
 
 	const disconnect = useCallback(async () => {
@@ -53,9 +81,13 @@ export default function Sessions({ goToConnect }: SessionsProps) {
 				clearSessions()
 				closeModal()
 			})
+		analytics.track('button_clicked', {
+			button: 'WC-Disconnect All Sessions',
+			page: 'Wallet Connect Sessions',
+		})
 	}, [sessions])
 
-	if (!sessions || !sessions.length || sessions.length === 0) {
+	if (isEmptyState) {
 		return (
 			<Flex
 				flexDirection="column"
@@ -90,7 +122,7 @@ export default function Sessions({ goToConnect }: SessionsProps) {
 					variant="main"
 					size="large"
 					mt={10}
-					onClick={goToConnect}
+					onClick={onGoToConnect}
 				>
 					<Text
 						variant="body"

@@ -1,19 +1,26 @@
 import { InputMode, NetworkConfig } from '@/types/types'
-import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
+import {
+	Account,
+	WalletAPIClient,
+	WalletInfo,
+} from '@ledgerhq/wallet-api-client'
 import { useEffect, useState } from 'react'
 import { accountSelector, useAccountsStore } from '@/storage/accounts.store'
 import { appSelector, useAppStore } from '@/storage/app.store'
 import { sessionSelector, useSessionsStore } from '@/storage/sessions.store'
 import Home from './Home'
 import { useLedgerLive } from '@/hooks/common/useLedgerLive'
+import useAnalytics from 'src/shared/useAnalytics'
 
 export type WalletConnectProps = {
 	initialMode?: InputMode
 	initialAccountId?: string
 	initialURI?: string
 	networks: NetworkConfig[]
-	platformSDK: LedgerLivePlarformSDK
+	walletApiClient: WalletAPIClient
 	accounts: Account[]
+	userId: string
+	walletInfo: WalletInfo['result']
 }
 
 export default function WalletConnect({
@@ -21,8 +28,10 @@ export default function WalletConnect({
 	initialAccountId,
 	initialMode,
 	accounts,
-	platformSDK,
+	walletApiClient,
 	networks,
+	userId,
+	walletInfo,
 	...rest
 }: WalletConnectProps) {
 	const [uri, setUri] = useState<string | undefined>(initialURI)
@@ -34,6 +43,8 @@ export default function WalletConnect({
 	const setLastSessionVisited = useSessionsStore(
 		sessionSelector.setLastSessionVisited,
 	)
+	const analytics = useAnalytics()
+	useLedgerLive(walletApiClient)
 
 	useEffect(() => {
 		clearAppStore()
@@ -45,20 +56,22 @@ export default function WalletConnect({
 		if (networks.length > 0) {
 			addNetworks(networks)
 		}
-	}, [platformSDK])
+	}, [walletApiClient])
 
 	useEffect(() => {
 		clearAccounts()
 		addAccounts(accounts)
 	}, [accounts])
 
-	useLedgerLive(platformSDK)
+	useEffect(() => {
+		analytics.start(userId, walletInfo)
+	}, [])
 
 	return (
 		<Home
 			initialMode={initialMode}
 			setUri={setUri}
-			platformSDK={platformSDK}
+			walletApiClient={walletApiClient}
 			accounts={accounts}
 			initialURI={uri}
 			networks={networks}

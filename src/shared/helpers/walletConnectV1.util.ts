@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NetworkConfig } from '@/types/types'
-import { Account } from '@ledgerhq/live-app-sdk'
+import { Account } from '@ledgerhq/wallet-api-client'
 import WalletConnectClient from '@walletconnect/client'
 import WalletConnect from '@walletconnect/client'
 

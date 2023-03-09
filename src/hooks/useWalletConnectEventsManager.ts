@@ -6,12 +6,13 @@ import { Web3WalletTypes } from '@walletconnect/web3wallet'
 import useNavigation from '@/hooks/common/useNavigation'
 import { hasETHAddress } from '@/helpers/generic'
 import { stripHexPrefix } from '@/utils/currencyFormatter/helpers'
-import { platformSDK } from './common/useLedgerLive'
+import { walletApiClient } from './common/useLedgerLive'
 import { convertEthToLiveTX } from '@/helpers/converters'
 import { accountSelector, useAccountsStore } from '@/storage/accounts.store'
 import { EIP155_SIGNING_METHODS } from '@/data/EIP155Data'
 import { web3wallet } from '@/helpers/walletConnect.util'
 import { sessionSelector, useSessionsStore } from '@/storage/sessions.store'
+import { Transaction } from '@ledgerhq/wallet-api-client'
 
 enum Errors {
 	userDecline = 'User rejected',
@@ -67,11 +68,12 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 									: request.params[1],
 							)
 
-							const signedMessage = await platformSDK.signMessage(
-								accountSign.id,
-								Buffer.from(message, 'hex'),
-							)
-							acceptRequest(topic, id, signedMessage)
+							const signedMessage =
+								await walletApiClient.message.sign(
+									accountSign.id,
+									Buffer.from(message, 'hex'),
+								)
+							acceptRequest(topic, id, signedMessage.toString())
 						} catch (error) {
 							rejectRequest(topic, id, Errors.userDecline)
 						}
@@ -89,11 +91,12 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 						try {
 							const message = stripHexPrefix(request.params[1])
 
-							const signedMessage = await platformSDK.signMessage(
-								accountSignTyped.id,
-								Buffer.from(message),
-							)
-							acceptRequest(topic, id, signedMessage)
+							const signedMessage =
+								await walletApiClient.message.sign(
+									accountSignTyped.id,
+									Buffer.from(message),
+								)
+							acceptRequest(topic, id, signedMessage.toString())
 						} catch (error) {
 							rejectRequest(topic, id, Errors.msgDecline)
 						}
@@ -106,13 +109,16 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 					if (!!accountTX) {
 						try {
 							const liveTX = convertEthToLiveTX(ethTX)
-							const signedTransaction =
-								await platformSDK.signTransaction(
+							const signedTransactionBuffer =
+								await walletApiClient.transaction.sign(
 									accountTX.id,
 									liveTX,
 								)
+							const signedTransaction = JSON.parse(
+								signedTransactionBuffer.toString(),
+							) as Transaction
 							const hash =
-								await platformSDK.broadcastSignedTransaction(
+								await walletApiClient.transaction.signAndBroadcast(
 									accountTX.id,
 									signedTransaction,
 								)

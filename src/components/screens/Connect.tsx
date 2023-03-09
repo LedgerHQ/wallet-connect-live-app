@@ -7,6 +7,7 @@ import { QRScanner } from './QRScanner'
 import { InputMode } from '@/types/types'
 import { useTranslation } from 'next-i18next'
 import { goToWalletConnectV1, isV1 } from '@/helpers/walletConnect.util'
+import useAnalytics from 'src/shared/useAnalytics'
 
 const QRScannerContainer = styled.div`
 	display: flex;
@@ -45,12 +46,17 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 	const [inputValue, setInputValue] = useState<string>('')
 	const [errorValue, setErrorValue] = useState<string | undefined>(undefined)
 	const [scanner, setScanner] = useState(mode === 'scan')
+	const analytics = useAnalytics()
 
 	const handleConnect = useCallback(() => {
 		try {
 			const uri = new URL(inputValue)
 			setInputValue('')
 			onConnect(uri.toString())
+			analytics.track('button_clicked', {
+				button: 'WC-Connect',
+				page: 'Connect',
+			})
 		} catch (error) {
 			console.log('invalid uri: ', error)
 			setErrorValue(t('error.invalidUri'))
@@ -59,6 +65,10 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 
 	const startScanning = useCallback(() => {
 		setScanner(true)
+		analytics.track('button_clicked', {
+			button: 'WC-Scan QR Code',
+			page: 'Connect',
+		})
 	}, [])
 
 	useEffect(() => {
@@ -69,6 +79,7 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 			}
 			onConnect(initialURI)
 		}
+		analytics.page('Wallet Connect')
 	}, [initialURI])
 
 	const isRunningInAndroidWebview = useCallback(
@@ -83,6 +94,10 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 		try {
 			const text = await navigator.clipboard.readText()
 			setInputValue(text)
+			analytics.track('button_clicked', {
+				button: 'WC-Paste Url',
+				page: 'Connect',
+			})
 		} catch (err) {
 			console.error(err)
 		}

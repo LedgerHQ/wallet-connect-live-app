@@ -1,6 +1,9 @@
+import { Account } from '@ledgerhq/wallet-api-client'
 import { Flex, Text } from '@ledgerhq/react-ui'
 import { CloseMedium } from '@ledgerhq/react-ui/assets/icons'
 import { useTranslation } from 'next-i18next'
+import { useEffect } from 'react'
+import useAnalytics from 'src/shared/useAnalytics'
 import styled from 'styled-components'
 
 const LogoContainer = styled(Flex)`
@@ -14,10 +17,25 @@ const LogoContainer = styled(Flex)`
 
 type Props = {
 	appName: string
+	chains: {
+		chain: string
+		isSupported: boolean
+		isRequired: boolean
+		accounts: Account[]
+	}[]
 }
 
-export function ErrorBlockchainSupport({ appName }: Props) {
+export function ErrorBlockchainSupport({ appName, chains }: Props) {
 	const { t } = useTranslation()
+	const analytics = useAnalytics()
+
+	useEffect(() => {
+		analytics.page('Wallet Connect Error Unsupported Blockchains', {
+			dapp: appName,
+			chains,
+		})
+	}, [])
+
 	return (
 		<Flex
 			alignItems="center"
@@ -32,7 +50,7 @@ export function ErrorBlockchainSupport({ appName }: Props) {
 				variant="h4"
 				fontWeight="medium"
 				color="neutral.c100"
-				mt={6}
+				mt={10}
 				textAlign="center"
 			>
 				{t('sessionProposal.error.title', { appName })}
@@ -41,7 +59,7 @@ export function ErrorBlockchainSupport({ appName }: Props) {
 				variant="bodyLineHeight"
 				fontWeight="medium"
 				color="neutral.c80"
-				mt={3}
+				mt={10}
 				textAlign="center"
 			>
 				{t('sessionProposal.error.desc')}

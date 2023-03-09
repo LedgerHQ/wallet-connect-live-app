@@ -1,4 +1,4 @@
-import { Account } from '@ledgerhq/live-app-sdk'
+import { Account } from '@ledgerhq/wallet-api-client'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
