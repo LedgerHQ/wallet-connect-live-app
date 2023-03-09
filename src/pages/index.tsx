@@ -37,6 +37,7 @@ const Index: NextPage = () => {
 	const params =
 		rawParams && typeof rawParams === 'string' ? JSON.parse(rawParams) : {}
 	const networkConfigs: NetworkConfig[] = params.networks
+	const isFromLedgerLive: boolean = !!params.isFromLedgerLive
 
 	const uri = rawURI && typeof rawURI === 'string' ? rawURI : undefined
 	const initialAccountId =
@@ -76,6 +77,7 @@ const Index: NextPage = () => {
 								initialURI={uri}
 								platformSDK={platformSDK}
 								accounts={accounts}
+								isFromLedgerLive={isFromLedgerLive}
 							/>
 						) : (
 							<Flex>{t('account.needed')}</Flex>

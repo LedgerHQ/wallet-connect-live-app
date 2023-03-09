@@ -146,6 +146,7 @@ export type WalletConnectProps = {
 	networks: NetworkConfig[]
 	platformSDK: LedgerLivePlarformSDK
 	accounts: Account[]
+	isFromLedgerLive: boolean
 }
 
 export function WalletConnect({
@@ -155,6 +156,7 @@ export function WalletConnect({
 	networks = [],
 	platformSDK,
 	accounts,
+	isFromLedgerLive,
 }: WalletConnectProps) {
 	const selectedAccountRef = useRef<Account>()
 	const wcRef = useRef<WalletConnectClient>()
@@ -574,6 +576,7 @@ export function WalletConnect({
 	const isV2 = (uri: string) => uri?.includes('@2?')
 
 	const goToWalletConnectV2 = (uri?: string) => {
+		if (!isFromLedgerLive) return
 		const uriParam = `?uri=${uri ? encodeURIComponent(uri) : ''}`
 		window.location.assign(
 			`ledgerlive://discover/ledger-wallet-connect-v2${uriParam}`,
@@ -599,7 +602,7 @@ export function WalletConnect({
 					<>
 						{session.peerMeta ? (
 							<>
-								{session.connected ? (
+								{session.connected && isFromLedgerLive ? (
 									<Link
 										onClick={() => goToWalletConnectV2()}
 										mb={6}
