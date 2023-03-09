@@ -61,11 +61,16 @@ const TopContainer = styled.div`
 export type DisconnectedProps = {
 	onConnect: (uri: string) => void
 	mode?: InputMode
+	initialURI?: string
 }
 
-let previouslyPasted = ''
+// let previouslyPasted = ''
 
-export function Disconnected({ onConnect, mode }: DisconnectedProps) {
+export function Disconnected({
+	onConnect,
+	mode,
+	initialURI,
+}: DisconnectedProps) {
 	const { t } = useTranslation()
 	const [inputValue, setInputValue] = useState<string>('')
 	const [errorValue, setErrorValue] = useState<string | undefined>(undefined)
@@ -85,21 +90,29 @@ export function Disconnected({ onConnect, mode }: DisconnectedProps) {
 		}
 	}, [onConnect, inputValue])
 
-	useEffect(() => {
-		const interval = setInterval(async () => {
-			try {
-				const text = await navigator.clipboard.readText()
-				if (text !== previouslyPasted) {
-					previouslyPasted = text
-					tryConnect(text)
-				}
-			} catch (err) {
-				console.error(err)
-			}
-		}, 500)
+	// useEffect(() => {
+	// 	const interval = setInterval(async () => {
+	// 		try {
+	// 			const text = await navigator.clipboard.readText()
+	// 			if (text !== previouslyPasted && text !== initialURI) {
+	// 				previouslyPasted = text
+	// 				tryConnect(text)
+	// 			}
+	// 		} catch (err) {
+	// 			console.error(err)
+	// 		}
+	// 	}, 500)
 
-		return () => clearInterval(interval)
-	}, [])
+	// 	return () => clearInterval(interval)
+	// }, [])
+
+	const isRunningInAndroidWebview = useCallback(
+		() =>
+			navigator.userAgent &&
+			navigator.userAgent.includes('; wv') &&
+			navigator.userAgent.includes('Android'),
+		[],
+	)
 
 	const handlePasteClick = useCallback(async () => {
 		try {
@@ -110,35 +123,38 @@ export function Disconnected({ onConnect, mode }: DisconnectedProps) {
 		}
 	}, [])
 
-	const tryConnect = useCallback((rawURI: string) => {
-		try {
-			const url = new URL(rawURI)
+	const tryConnect = useCallback(
+		(rawURI: string) => {
+			try {
+				const url = new URL(rawURI)
 
-			switch (url.protocol) {
-				// handle usual wallet connect URIs
-				case 'wc:': {
-					onConnect(url.toString())
-					break
-				}
-
-				// handle Ledger Live specific URIs
-				case 'ledgerlive:': {
-					const uriParam = url.searchParams.get('uri')
-
-					if (url.pathname === '//wc' && uriParam) {
-						tryConnect(uriParam)
+				switch (url.protocol) {
+					// handle usual wallet connect URIs
+					case 'wc:': {
+						onConnect(url.toString())
+						break
 					}
-					break
+
+					// handle Ledger Live specific URIs
+					case 'ledgerlive:': {
+						const uriParam = url.searchParams.get('uri')
+
+						if (url.pathname === '//wc' && uriParam) {
+							tryConnect(uriParam)
+						}
+						break
+					}
 				}
+			} catch (error) {
+				// bad urls are just ignored
+				if (error instanceof TypeError) {
+					return
+				}
+				throw error
 			}
-		} catch (error) {
-			// bad urls are just ignored
-			if (error instanceof TypeError) {
-				return;
-			}
-			throw error;
-		}
-	}, [onConnect])
+		},
+		[onConnect],
+	)
 
 	return (
 		<DisconnectedContainer>
@@ -152,19 +168,22 @@ export function Disconnected({ onConnect, mode }: DisconnectedProps) {
 						error={errorValue}
 						data-test="input-uri"
 						renderRight={
-							<Flex
-								alignItems={'center'}
-								justifyContent={'center'}
-								pr={'8px'}
-							>
-								<QrCodeButton
-									onClick={handlePasteClick}
-									data-test="copy-button"
+							!isRunningInAndroidWebview() ? (
+								<Flex
+									alignItems={'center'}
+									justifyContent={'center'}
+									pr={'8px'}
 								>
-									<PasteMedium size="20px" />
-								</QrCodeButton>
-							</Flex>
+									<QrCodeButton
+										onClick={handlePasteClick}
+										data-test="copy-button"
+									>
+										<PasteMedium size="20px" />
+									</QrCodeButton>
+								</Flex>
+							) : undefined
 						}
+						placeholder={t('connect.pasteUrl')}
 					/>
 					<Button
 						mt={5}

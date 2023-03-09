@@ -1,8 +1,7 @@
 import styled from 'styled-components'
-import { BrowserQRCodeReader, IScannerControls } from '@zxing/browser'
-import { useLayoutEffect, useRef } from 'react'
-import { Result } from '@zxing/library'
-import { Flex, Text } from '@ledgerhq/react-ui'
+import dynamic from 'next/dynamic'
+
+const QrReader = dynamic(() => import('react-qr-reader'), { ssr: false })
 
 const QRScannerContainer = styled.div`
 	width: 100%;
@@ -12,13 +11,6 @@ const QRScannerContainer = styled.div`
 	justify-content: center;
 	overflow: hidden;
 	position: relative;
-`
-
-const QRScannerVideoElement = styled.video`
-	object-fit: cover;
-    object-position: center center;
-	width: 100%;
-	height: 100%;
 `
 
 type QRScannerProps = {
@@ -49,41 +41,29 @@ const QRScannerOverlay = styled.div`
 `
 
 export function QRScanner({ onQRScan }: QRScannerProps) {
-	const videoRef = useRef(null)
-
-	useLayoutEffect(() => {
-		const codeReader = new BrowserQRCodeReader(undefined, { delayBetweenScanAttempts: 500 })
-		let controlsRef: IScannerControls | null = null
-
-        if (!videoRef.current) {
-            return
-        }
-        codeReader.decodeFromConstraints(
-            {
-                video: {
-                    facingMode: "environment"
-                }
-            },
-            videoRef.current,
-            (result?: Result) => {
-                if (result) {
-                    onQRScan(result.toString())
-                }
-            },
-        ).then(controls => {
-            controlsRef = controls
-        })
-
-		return () => {
-			if (controlsRef) {
-				controlsRef.stop()
-			}
-		}
-	}, [])
-
 	return (
 		<QRScannerContainer>
-			<QRScannerVideoElement ref={videoRef} />
+			<QrReader
+				delay={500}
+				onError={(error) => {
+					if (!!error) {
+						console.log(error)
+					}
+				}}
+				onScan={(result) => {
+					if (!!result) {
+						onQRScan(result)
+					}
+				}}
+				style={{
+					objectFit: 'cover',
+					objectPosition: 'center center',
+					width: '100%',
+					height: '100%',
+				}}
+				facingMode="environment"
+				showViewFinder={false}
+			/>
 			<QRScannerOverlay />
 		</QRScannerContainer>
 	)

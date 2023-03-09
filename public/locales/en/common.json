@@ -18,6 +18,7 @@
 		"cta": "Connect",
 		"scanQRCode": "Scan a QRCode to connect",
 		"copyURI": "Copy an URI to connect",
+		"pasteUrl": "Paste URL",
 		"switchToText": "Switch to Text",
 		"switchToScanner": "Switch to Scanner",
 		"waiting": "Waiting for DApp",
@@ -28,5 +29,6 @@
 	"session": {
 		"connected": "connected to [{{appName}}]",
 		"connecting": "[{{appName}}] is trying to connect"
-	}
+	},
+	"goToWalletConnectV2": "Go to Wallet Connect v2"
 }

@@ -35,5 +35,5 @@
 		}
 	},
 	"permissions": [],
-	"domains": ["http://*"]
+	"domains": ["http://*", "https://*"]
 }
