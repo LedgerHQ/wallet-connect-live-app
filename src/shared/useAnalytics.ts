@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import { WalletInfo } from '@ledgerhq/wallet-api-client'
 import { AnalyticsBrowser } from '@segment/analytics-next'
 import { sessionSelector, useSessionsStore } from '@/storage/sessions.store'
@@ -9,9 +9,9 @@ const { publicRuntimeConfig } = getConfig()
 const analyticsOptions = { ip: '0.0.0.0' }
 
 let analytics: AnalyticsBrowser | undefined
+let userId: string | undefined
 
 export default function useAnalytics() {
-	const [userId, setUserId] = useState<string | undefined>(undefined)
 	const sessions = useSessionsStore(sessionSelector.selectSessions)
 	const version = publicRuntimeConfig?.version
 
@@ -20,15 +20,15 @@ export default function useAnalytics() {
 			sessionsConnected: sessions?.length || 0,
 			live_app: 'Wallet Connect v2',
 			live_app_version: version,
-			userId: userId || 'salut',
+			userId,
 		}
-	}, [sessions?.length])
+	}, [sessions?.length, userId, version])
 
 	const start = useCallback(
-		(userId?: string, walletInfo?: WalletInfo['result']) => {
-			console.log('START ANALYTICS', analytics, userId, walletInfo)
-			if (analytics || !userId || !walletInfo) return
-			setUserId(userId)
+		(userIdReceived?: string, walletInfo?: WalletInfo['result']) => {
+			if (analytics || !userIdReceived || !walletInfo) return
+			userId = userIdReceived + 'salut'
+			console.log('START', userId)
 
 			const walletName = walletInfo.wallet.name
 
@@ -50,6 +50,7 @@ export default function useAnalytics() {
 	const identify = useCallback(() => {
 		if (!analytics) return
 
+		console.log('IDENTIFY', userId)
 		analytics.identify(userId, userProperties, analyticsOptions)
 	}, [userId, userProperties])
 
