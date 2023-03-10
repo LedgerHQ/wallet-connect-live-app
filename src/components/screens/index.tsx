@@ -35,6 +35,8 @@ export default function WalletConnect({
 	...rest
 }: WalletConnectProps) {
 	const [uri, setUri] = useState<string | undefined>(initialURI)
+	console.log('WALLET INFO', walletInfo)
+	console.log('USER ID', userId)
 
 	const addAccounts = useAccountsStore(accountSelector.addAccounts)
 	const clearAccounts = useAccountsStore(accountSelector.clearAccounts)
