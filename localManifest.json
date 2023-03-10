@@ -1,7 +1,7 @@
 {
 	"id": "ledger-wallet-connect-v2",
 	"name": "Wallet Connect v2",
-	"url": "http://localhost:3000/",
+	"url": "https://wallet-connect-live-okiaikd24-ledgerhq.vercel.app/",
 	"params": {
 		"networks": [
 			{

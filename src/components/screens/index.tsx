@@ -64,8 +64,8 @@ export default function WalletConnect({
 	}, [accounts])
 
 	useEffect(() => {
-		console.log('WALLET INFO', walletInfo)
-		console.log('USER ID', userId)
+		alert('WALLET INFO' + walletInfo)
+		alert('USER ID' + userId)
 		analytics.start(userId, walletInfo)
 	}, [])
 
