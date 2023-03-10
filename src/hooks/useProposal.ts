@@ -12,6 +12,7 @@ import { useAppStore, appSelector } from '@/storage/app.store'
 import { formatChainName } from '@/helpers/helper.util'
 import { EIP155_SIGNING_METHODS } from '@/data/EIP155Data'
 import { web3wallet } from '@/helpers/walletConnect.util'
+import useAnalytics from 'src/shared/useAnalytics'
 
 type Props = {
 	proposal: Proposal
@@ -35,6 +36,7 @@ export function useProposal({ proposal }: Props) {
 	const addSession = useSessionsStore(sessionSelector.addSession)
 	const accounts = useAccountsStore(accountSelector.selectAccounts)
 	const addAccount = useAccountsStore(accountSelector.addAccount)
+	const analytics = useAnalytics()
 
 	const [selectedAccounts, setSelectedAccounts] = useState<string[]>([])
 

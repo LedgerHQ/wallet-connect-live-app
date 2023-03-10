@@ -2,6 +2,9 @@ import { useCallback, useMemo, useState } from 'react'
 import { WalletInfo } from '@ledgerhq/wallet-api-client'
 import { AnalyticsBrowser } from '@segment/analytics-next'
 import { sessionSelector, useSessionsStore } from '@/storage/sessions.store'
+import getConfig from 'next/config'
+
+const { publicRuntimeConfig } = getConfig()
 
 const analyticsOptions = { ip: '0.0.0.0' }
 
@@ -10,16 +13,18 @@ let analytics: AnalyticsBrowser | undefined
 export default function useAnalytics() {
 	const [userId, setUserId] = useState<string | undefined>(undefined)
 	const sessions = useSessionsStore(sessionSelector.selectSessions)
+	const version = publicRuntimeConfig?.version
 
 	const userProperties = useMemo(() => {
 		return {
 			sessionsConnected: sessions?.length || 0,
+			live_app: 'Wallet Connect v2',
+			live_app_version: version,
 		}
 	}, [sessions?.length])
 
 	const start = useCallback(
 		(userId?: string, walletInfo?: WalletInfo['result']) => {
-			console.log('START', analytics)
 			if (analytics) return
 			if (!userId || !walletInfo) return
 
