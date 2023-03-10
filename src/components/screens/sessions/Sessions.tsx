@@ -64,6 +64,14 @@ export default function Sessions({ goToConnect }: SessionsProps) {
 		goToConnect()
 	}, [])
 
+	const onGoToWalletConnectV1 = useCallback(() => {
+		analytics.track('button_clicked', {
+			button: 'Go To Wallet Connect v1',
+			page: 'Wallet Connect Sessions',
+		})
+		goToWalletConnectV1()
+	}, [])
+
 	const disconnect = useCallback(async () => {
 		await Promise.all(
 			sessions.map((session) =>
@@ -98,7 +106,7 @@ export default function Sessions({ goToConnect }: SessionsProps) {
 				my={6}
 			>
 				<Link
-					onClick={() => goToWalletConnectV1()}
+					onClick={onGoToWalletConnectV1}
 					Icon={ArrowRightMedium}
 					position="absolute"
 					top="84px"
@@ -139,7 +147,7 @@ export default function Sessions({ goToConnect }: SessionsProps) {
 	return (
 		<Flex flexDirection="column" width="100%" height="100%" mt={6}>
 			<Link
-				onClick={() => goToWalletConnectV1()}
+				onClick={onGoToWalletConnectV1}
 				Icon={ArrowRightMedium}
 				top="10px"
 				right="10px"

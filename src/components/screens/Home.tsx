@@ -87,6 +87,11 @@ export default function Home({
 		async (inputValue: string) => {
 			try {
 				if (isV1(inputValue)) {
+					analytics.track('event_triggered', {
+						event: 'WC-Redirection to WC v1',
+						uri: inputValue,
+						page: 'Connect',
+					})
 					goToWalletConnectV1(inputValue)
 					return
 				}

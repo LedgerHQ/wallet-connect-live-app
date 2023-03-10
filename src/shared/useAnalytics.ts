@@ -27,8 +27,7 @@ export default function useAnalytics() {
 	const start = useCallback(
 		(userIdReceived?: string, walletInfo?: WalletInfo['result']) => {
 			if (analytics || !userIdReceived || !walletInfo) return
-			userId = userIdReceived + 'salut'
-			console.log('START', userId)
+			userId = userIdReceived
 
 			const walletName = walletInfo.wallet.name
 
@@ -50,7 +49,6 @@ export default function useAnalytics() {
 	const identify = useCallback(() => {
 		if (!analytics) return
 
-		console.log('IDENTIFY', userId)
 		analytics.identify(userId, userProperties, analyticsOptions)
 	}, [userId, userProperties])
 

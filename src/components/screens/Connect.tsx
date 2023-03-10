@@ -74,6 +74,11 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 	useEffect(() => {
 		if (initialURI) {
 			if (isV1(initialURI)) {
+				analytics.track('event_triggered', {
+					event: 'WC-Initial redirection to WC v1',
+					uri: initialURI,
+					page: 'Connect',
+				})
 				goToWalletConnectV1(initialURI)
 				return
 			}
