@@ -20,14 +20,15 @@ export default function useAnalytics() {
 			sessionsConnected: sessions?.length || 0,
 			live_app: 'Wallet Connect v2',
 			live_app_version: version,
-			userId,
+			userId: userId || 'salut',
 		}
 	}, [sessions?.length])
 
 	const start = useCallback(
 		(userId?: string, walletInfo?: WalletInfo['result']) => {
-			if (analytics) return
-			if (!userId || !walletInfo) return
+			console.log('START ANALYTICS', analytics, userId, walletInfo)
+			if (analytics || !userId || !walletInfo) return
+			setUserId(userId)
 
 			const walletName = walletInfo.wallet.name
 
@@ -42,7 +43,6 @@ export default function useAnalytics() {
 				analytics = AnalyticsBrowser.load({ writeKey })
 				identify()
 			}
-			setUserId(userId)
 		},
 		[],
 	)
