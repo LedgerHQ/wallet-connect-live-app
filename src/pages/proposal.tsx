@@ -85,7 +85,7 @@ export default function SessionProposal() {
 		})
 	}, [])
 
-	const onApprove = useCallback(() => {
+	const onApprove = () => {
 		analytics.track('button_clicked', {
 			button: 'WC-Connect',
 			page: 'Wallet Connect Session Request',
@@ -93,7 +93,7 @@ export default function SessionProposal() {
 			url: proposer?.metadata?.url,
 		})
 		approveSession()
-	}, [])
+	}
 
 	const onReject = useCallback(() => {
 		analytics.track('button_clicked', {

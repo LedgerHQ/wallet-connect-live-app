@@ -165,9 +165,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 			// TODOs
 			// web3wallet.on('session_ping', (data) => console.log('ping', data))
 			// web3wallet.on('session_event', (data) => console.log('event', data))
-			// web3wallet.on('session_update', (data) =>
-			// 	console.log('update', data),
-			// )
+			// web3wallet.on('session_update', (data) => console.log('update', data))
 			web3wallet.on('session_delete', onSessionDeleted)
 		}
 	}, [initialized, onSessionProposal, onSessionRequest, onAuthRequest])

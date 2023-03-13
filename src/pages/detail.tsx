@@ -66,16 +66,19 @@ export default function SessionDetail() {
 	const analytics = useAnalytics()
 
 	useEffect(() => {
+		analytics.page('Wallet Connect Session Detail', {
+			dapp: session?.peer?.metadata?.name,
+			url: session?.peer?.metadata?.url,
+		})
+	}, [])
+
+	useEffect(() => {
 		if (!!router.query.data) {
 			const session = sessions.find(
 				(elem) => elem.topic === JSON.parse(String(router.query?.data)),
 			)
 			setLastSessionVisited(session || null)
 		}
-		analytics.page('Wallet Connect Session Detail', {
-			dapp: metadata?.name,
-			url: metadata?.url,
-		})
 	}, [router.query])
 
 	const handleDelete = useCallback(async () => {
