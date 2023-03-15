@@ -1,6 +1,6 @@
 import { BigNumber } from 'bignumber.js'
 import eip55 from 'eip55'
-import { EthereumTransaction, FAMILIES } from '@ledgerhq/live-app-sdk'
+import { EthereumTransaction } from '@ledgerhq/wallet-api-client'
 
 type EthTransaction = {
 	value: string
@@ -12,7 +12,7 @@ type EthTransaction = {
 
 export function convertEthToLiveTX(ethTX: EthTransaction): EthereumTransaction {
 	return {
-		family: FAMILIES.ETHEREUM,
+		family: 'ethereum',
 		amount:
 			ethTX.value !== undefined
 				? new BigNumber(ethTX.value.replace('0x', ''), 16)

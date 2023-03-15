@@ -11,7 +11,7 @@ import styled from 'styled-components'
 import { useTranslation } from 'next-i18next'
 import useNavigation from '@/hooks/common/useNavigation'
 import Link from 'next/link'
-import { Account } from '@ledgerhq/live-app-sdk'
+import { Account } from '@ledgerhq/wallet-api-client'
 import { GenericRow, RowType } from '@/components/atoms/GenericRow'
 import { InfoSessionProposal } from '@/components/screens/sessions/sessionProposal/InfoSessionProposal'
 import { space } from '@ledgerhq/react-ui/styles/theme'
@@ -26,6 +26,7 @@ import { useAccountsStore, accountSelector } from '@/storage/accounts.store'
 import useHydratation from 'src/hooks/useHydratation'
 import { web3wallet } from '@/helpers/walletConnect.util'
 import { ImageWithPlaceholder } from '@/components/atoms/images/ImageWithPlaceholder'
+import useAnalytics from 'src/shared/useAnalytics'
 
 export { getServerSideProps } from '../lib/serverProps'
 
@@ -62,6 +63,14 @@ export default function SessionDetail() {
 	const navigateToSessionsHomeTab = useCallback(() => {
 		navigate(routes.home, { tab: tabsIndexes.sessions })
 	}, [routes, tabsIndexes])
+	const analytics = useAnalytics()
+
+	useEffect(() => {
+		analytics.page('Wallet Connect Session Detail', {
+			dapp: session?.peer?.metadata?.name,
+			url: session?.peer?.metadata?.url,
+		})
+	}, [])
 
 	useEffect(() => {
 		if (!!router.query.data) {
@@ -82,12 +91,24 @@ export default function SessionDetail() {
 					message: 'Disconnect Session',
 				},
 			})
+			analytics.track('button_clicked', {
+				button: 'WC-Disconnect Session',
+				page: 'Wallet Connect Session Detail',
+			})
 		} catch (error) {
 			console.error(error)
 		}
 		removeSession(session.topic)
 		navigateToSessionsHomeTab()
 	}, [session])
+
+	const onGoBack = useCallback(() => {
+		navigateToSessionsHomeTab()
+		analytics.track('button_clicked', {
+			button: 'WC-Back',
+			page: 'Wallet Connect Session Detail',
+		})
+	}, [])
 
 	const metadata = session?.peer.metadata
 	const fullAddresses = !session
@@ -149,7 +170,7 @@ export default function SessionDetail() {
 					justifyContent="space-between"
 				>
 					<Flex flexDirection="column" width="100%">
-						<BackButton onClick={navigateToSessionsHomeTab}>
+						<BackButton onClick={onGoBack}>
 							<Flex mt={8} mb={8}>
 								<ArrowLeftMedium
 									size={24}

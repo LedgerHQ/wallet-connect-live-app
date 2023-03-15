@@ -5,6 +5,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 })
 
 const { i18n } = require('./next-i18next.config')
+const { version } = require('./package.json')
 
 const nextConfig = {
 	i18n,
@@ -18,6 +19,9 @@ const nextConfig = {
 				hostname: '**',
 			},
 		],
+	},
+	publicRuntimeConfig: {
+		version,
 	},
 }
 

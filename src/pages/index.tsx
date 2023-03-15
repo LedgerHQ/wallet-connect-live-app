@@ -5,7 +5,7 @@ import Head from 'next/head'
 
 import { Container } from '@/styles/styles'
 import { NetworkConfig } from '@/types/types'
-import { SDKProvider } from 'src/shared/SDKProvider'
+import { WalletApiClientProvider } from 'src/shared/WalletApiClientProvider'
 import { appSelector, useAppStore } from '@/storage/app.store'
 import WalletConnect from '@/components/screens'
 
@@ -61,18 +61,20 @@ const Index: NextPage = () => {
 				/>
 			</Head>
 			{isMounted ? (
-				<SDKProvider networks={networkConfigs}>
-					{(platformSDK, accounts) => (
+				<WalletApiClientProvider networks={networkConfigs}>
+					{(walletApiClient, accounts, userId, walletInfo) => (
 						<WalletConnect
 							initialMode={initialMode}
 							initialAccountId={initialAccountId}
 							networks={networkConfigs}
 							initialURI={uri}
-							platformSDK={platformSDK}
+							walletApiClient={walletApiClient}
 							accounts={accounts}
+							userId={userId}
+							walletInfo={walletInfo}
 						/>
 					)}
-				</SDKProvider>
+				</WalletApiClientProvider>
 			) : null}
 		</Container>
 	)

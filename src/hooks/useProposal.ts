@@ -1,17 +1,18 @@
 import { Proposal } from '@/types/types'
-import { Account } from '@ledgerhq/live-app-sdk'
+import { Account } from '@ledgerhq/wallet-api-client'
 import { SessionTypes } from '@walletconnect/types'
 
 import router from 'next/router'
 import { useCallback, useState } from 'react'
 import useNavigation from '@/hooks/common/useNavigation'
-import { platformSDK } from './common/useLedgerLive'
+import { walletApiClient } from './common/useLedgerLive'
 import { sessionSelector, useSessionsStore } from '@/storage/sessions.store'
 import { accountSelector, useAccountsStore } from '@/storage/accounts.store'
 import { useAppStore, appSelector } from '@/storage/app.store'
 import { formatChainName } from '@/helpers/helper.util'
 import { EIP155_SIGNING_METHODS } from '@/data/EIP155Data'
 import { web3wallet } from '@/helpers/walletConnect.util'
+import useAnalytics from 'src/shared/useAnalytics'
 
 type Props = {
 	proposal: Proposal
@@ -35,6 +36,7 @@ export function useProposal({ proposal }: Props) {
 	const addSession = useSessionsStore(sessionSelector.addSession)
 	const accounts = useAccountsStore(accountSelector.selectAccounts)
 	const addAccount = useAccountsStore(accountSelector.addAccount)
+	const analytics = useAnalytics()
 
 	const [selectedAccounts, setSelectedAccounts] = useState<string[]>([])
 
@@ -55,6 +57,10 @@ export function useProposal({ proposal }: Props) {
 
 	const handleClose = useCallback(() => {
 		router.push('/')
+		analytics.track('button_clicked', {
+			button: 'Close',
+			page: 'Wallet Connect Error Unsupported Blockchains',
+		})
 	}, [])
 
 	const getChains = (proposal: Proposal) => {
@@ -171,8 +177,8 @@ export function useProposal({ proposal }: Props) {
 
 	const addNewAccount = useCallback(async (currency: string) => {
 		try {
-			const newAccount = await platformSDK.requestAccount({
-				currencies: [currency],
+			const newAccount = await walletApiClient.account.request({
+				currencyIds: [currency],
 			})
 			addAccount(newAccount)
 		} catch (error) {

@@ -18,9 +18,10 @@ import {
 import Image from 'next/image'
 import { space } from '@ledgerhq/react-ui/styles/theme'
 import { useTranslation } from 'next-i18next'
-import { useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Logo } from 'src/icons/LedgerLiveLogo'
 import styled, { useTheme } from 'styled-components'
+import useAnalytics from 'src/shared/useAnalytics'
 
 export { getServerSideProps } from '../lib/serverProps'
 
@@ -75,6 +76,34 @@ export default function SessionProposal() {
 		proposer,
 		addNewAccount,
 	} = useProposal({ proposal })
+	const analytics = useAnalytics()
+
+	useEffect(() => {
+		analytics.page('Wallet Connect Session Request', {
+			dapp: proposer?.metadata?.name,
+			url: proposer?.metadata?.url,
+		})
+	}, [])
+
+	const onApprove = () => {
+		analytics.track('button_clicked', {
+			button: 'WC-Connect',
+			page: 'Wallet Connect Session Request',
+			dapp: proposer?.metadata?.name,
+			url: proposer?.metadata?.url,
+		})
+		approveSession()
+	}
+
+	const onReject = useCallback(() => {
+		analytics.track('button_clicked', {
+			button: 'WC-Reject',
+			page: 'Wallet Connect Session Request',
+			dapp: proposer?.metadata?.name,
+			url: proposer?.metadata?.url,
+		})
+		rejectSession()
+	}, [])
 
 	const [imageLoadingError, setImageLoadingError] = useState(false)
 
@@ -111,13 +140,18 @@ export default function SessionProposal() {
 			alignItems="center"
 			justifyContent="center"
 			width="100%"
-			height="auto"
+			height={
+				noChainsSupported || !everyRequiredChainsSupported
+					? '100%'
+					: 'auto'
+			}
 		>
 			<ResponsiveContainer>
 				{noChainsSupported || !everyRequiredChainsSupported ? (
-					<>
+					<Flex flex={1} flexDirection="column" height="100%">
 						<ErrorBlockchainSupport
 							appName={proposer.metadata.name}
+							chains={accountsByChain}
 						/>
 						<ButtonsContainer>
 							<Button
@@ -135,7 +169,7 @@ export default function SessionProposal() {
 								</Text>
 							</Button>
 						</ButtonsContainer>
-					</>
+					</Flex>
 				) : (
 					<Flex
 						width="100%"
@@ -349,7 +383,7 @@ export default function SessionProposal() {
 									size="large"
 									flex={0.9}
 									mr={6}
-									onClick={rejectSession}
+									onClick={onReject}
 								>
 									<Text
 										variant="body"
@@ -364,7 +398,7 @@ export default function SessionProposal() {
 									variant="main"
 									size="large"
 									flex={0.9}
-									onClick={approveSession}
+									onClick={onApprove}
 									disabled={disabled}
 								>
 									<Text

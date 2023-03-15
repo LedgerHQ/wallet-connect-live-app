@@ -5,7 +5,7 @@ import {
 } from '@/helpers/walletConnect.util'
 import { ResponsiveContainer } from '@/styles/styles'
 import { NetworkConfig, InputMode } from '@/types/types'
-import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
+import { Account, WalletAPIClient } from '@ledgerhq/wallet-api-client'
 import { Flex } from '@ledgerhq/react-ui'
 import { useTranslation } from 'next-i18next'
 import { Dispatch, SetStateAction, useState, useCallback, useMemo } from 'react'
@@ -17,6 +17,7 @@ import styled from 'styled-components'
 import { Connect } from './Connect'
 import Sessions from './sessions/Sessions'
 import Tabs from './Tabs'
+import useAnalytics from 'src/shared/useAnalytics'
 
 const WalletConnectContainer = styled.div`
 	display: flex;
@@ -42,7 +43,7 @@ export type WalletConnectProps = {
 	initialAccountId?: string
 	initialURI?: string
 	networks: NetworkConfig[]
-	platformSDK: LedgerLivePlarformSDK
+	walletApiClient: WalletAPIClient
 	accounts: Account[]
 	initialMode?: InputMode
 	setUri: Dispatch<SetStateAction<string | undefined>>
@@ -61,16 +62,36 @@ export default function Home({
 		: tabsIndexes.connect
 
 	const sessions = useSessionsStore(sessionSelector.selectSessions)
+	const analytics = useAnalytics()
 
 	const { t } = useTranslation()
 
 	const [activeTabIndex, setActiveTabIndex] = useState(initialTab)
 	const [inputValue] = useState<string>('')
 
+	const onSetActiveTabIndex = useCallback(
+		(newActiveTabIndex: number) => {
+			const newTab =
+				newActiveTabIndex === tabsIndexes.connect
+					? 'Connect'
+					: 'Sessions'
+			const currentTab =
+				activeTabIndex === tabsIndexes.connect ? 'Connect' : 'Sessions'
+			analytics.track('tab_clicked', { tab: newTab, page: currentTab })
+			setActiveTabIndex(newActiveTabIndex)
+		},
+		[activeTabIndex, analytics],
+	)
+
 	const handleConnect = useCallback(
 		async (inputValue: string) => {
 			try {
 				if (isV1(inputValue)) {
+					analytics.track('event_triggered', {
+						event: 'WC-Redirection to WC v1',
+						uri: inputValue,
+						page: 'Connect',
+					})
 					goToWalletConnectV1(inputValue)
 					return
 				}
@@ -129,7 +150,7 @@ export default function Home({
 				<Tabs
 					tabs={TABS}
 					activeTabIndex={activeTabIndex}
-					setActiveTabIndex={setActiveTabIndex}
+					setActiveTabIndex={onSetActiveTabIndex}
 				>
 					<Flex
 						flex={1}

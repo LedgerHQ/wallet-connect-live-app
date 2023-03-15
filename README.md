@@ -66,8 +66,8 @@ All Live apps are defined with a manifest. Here is one that can be used for loca
 ```json
 {
 	"id": "ledger-wallet-connect-v2",
-	"name": "Wallet Connect",
-	"url": "http://127.0.0.1:3000/",
+	"name": "Wallet Connect v2",
+	"url": "http://localhost:3000/",
 	"params": {
 		"networks": [
 			{
@@ -85,22 +85,30 @@ All Live apps are defined with a manifest. Here is one that can be used for loca
 		]
 	},
 	"homepageUrl": "https://walletconnect.com/",
-	"icon": "https://cdn.live.ledger.com/icons/platform/wallet_connect.png",
+	"icon": "https://forum.zeroqode.com/uploads/default/original/2X/e/e363c6521db27335d44c1134d230b8992792dde4.png",
 	"platform": "all",
-	"apiVersion": "^1.0.0",
+	"apiVersion": "^2.0.0",
 	"manifestVersion": "1",
 	"branch": "stable",
 	"categories": ["bridge", "defi"],
 	"currencies": ["ethereum", "polygon", "bsc"],
 	"content": {
 		"shortDescription": {
-			"en": "WalletConnect is an open source protocol for connecting decentralised applications to mobile wallets with QR code scanning or deep linking."
+			"en": "WalletConnect is an open source protocol for connecting decentralised applications to mobile wallets with QR code scanning or deep linking. V2 introduces new features, including the ability to connect to multiple dapps in parallel with multiple accounts. It's important to note that not all dapps currently support V2"
 		},
 		"description": {
-			"en": "WalletConnect is an open source protocol for connecting decentralised applications to mobile wallets with QR code scanning or deep linking."
+			"en": "WalletConnect is an open source protocol for connecting decentralised applications to mobile wallets with QR code scanning or deep linking. V2 introduces new features, including the ability to connect to multiple dapps in parallel with multiple accounts. It's important to note that not all dapps currently support V2"
 		}
 	},
-	"permissions": [],
+	"permissions": [
+		"account.list",
+		"account.request",
+		"message.sign",
+		"transaction.sign",
+		"transaction.signAndBroadcast",
+		"wallet.userId",
+		"wallet.info"
+	],
 	"domains": ["http://*", "https://*"]
 }
 ```
