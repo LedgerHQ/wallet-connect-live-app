@@ -12,7 +12,6 @@ import { accountSelector, useAccountsStore } from '@/storage/accounts.store'
 import { EIP155_SIGNING_METHODS } from '@/data/EIP155Data'
 import { web3wallet } from '@/helpers/walletConnect.util'
 import { sessionSelector, useSessionsStore } from '@/storage/sessions.store'
-import { Transaction } from '@ledgerhq/wallet-api-client'
 
 enum Errors {
 	userDecline = 'User rejected',
@@ -109,20 +108,11 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 					if (!!accountTX) {
 						try {
 							const liveTX = convertEthToLiveTX(ethTX)
-							const signedTransactionBuffer =
-								await walletApiClient.transaction.sign(
-									accountTX.id,
-									liveTX,
-								)
-							const signedTransaction = JSON.parse(
-								signedTransactionBuffer.toString(),
-							) as Transaction
 							const hash =
 								await walletApiClient.transaction.signAndBroadcast(
 									accountTX.id,
-									signedTransaction,
+									liveTX,
 								)
-
 							acceptRequest(topic, id, hash)
 						} catch (error) {
 							rejectRequest(topic, id, Errors.txDeclined)

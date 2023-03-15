@@ -3,12 +3,12 @@ import { useState, useEffect } from 'react'
 
 export let walletApiClient: WalletAPIClient
 
-export function useLedgerLive(walletApiClient: WalletAPIClient) {
+export function useLedgerLive(walletApiClientParam: WalletAPIClient) {
 	const [initialized, setInitialized] = useState(false)
 
 	useEffect(() => {
 		if (!initialized) {
-			walletApiClient = walletApiClient
+			walletApiClient = walletApiClientParam
 			setInitialized(true)
 		}
 	}, [initialized])
