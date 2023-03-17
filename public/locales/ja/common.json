@@ -1,9 +1,34 @@
 {
-  "buy" : "購入",
-  "sell" : "売却",
-  "continue" : "続行",
-  "back" : "戻る",
-  "add_account" : "アカウントを追加",
-  "choose_asset" : "Choose Asset",
-  "choose_account" : "Choose Account"
+  "error" : {
+    "timeout" : "許可された時間内に接続要求が受信されませんでした。\nDApp Webページを更新し、再度お試しください。",
+    "noInput" : "入力値なし",
+    "invalidUri" : "無効なURI"
+  },
+  "info" : {
+    "connection" : "このページを離れても{{appName}}から切断されることはありませんが、このウォレットとのこれ以上の相互作用を防ぐことになります。"
+  },
+  "account" : {
+    "current" : "現在のアカウント：{{account}}",
+    "disconnect" : "接続を切断",
+    "switch" : "アカウントを切り替える",
+    "saved" : "保存済みアカウント: {{account}}",
+    "needed" : "1つ以上の利用可能なアカウントが必要です"
+  },
+  "connect" : {
+    "cta" : "接続",
+    "scanQRCode" : "QRコードをスキャンして接続",
+    "copyURI" : "URIをコピーして接続",
+    "pasteUrl" : "URLを貼り付け",
+    "switchToText" : "テキストに切り替える",
+    "switchToScanner" : "スキャナーに切り替える",
+    "waiting" : "DAppを待機中",
+    "cancel" : "キャンセル",
+    "accept" : "同意する",
+    "decline" : "拒否"
+  },
+  "session" : {
+    "connected" : "{{appName}}に接続済み",
+    "connecting" : "[{{appName}}]に接続中"
+  },
+  "goToWalletConnectV2" : "Wallet Connect v2へ移動"
 }
