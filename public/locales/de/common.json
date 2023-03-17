@@ -1,9 +1,34 @@
 {
-  "buy" : "Kaufen",
-  "sell" : "Verkaufen",
-  "continue" : "Weiter",
-  "back" : "Zurück",
-  "add_account" : "Konto hinzufügen",
-  "choose_asset" : "Vermögenswert wählen",
-  "choose_account" : "Konto wählen"
+  "error" : {
+    "timeout" : "In der zulässigen Zeit wurde keine Verbindungsanfrage empfangen.\nAktualisieren Sie die DApp-Webseite und versuchen Sie es erneut.",
+    "noInput" : "Kein Eingabewert",
+    "invalidUri" : "Ungültige URI"
+  },
+  "info" : {
+    "connection" : "Wenn Sie diese Seite verlassen, werden Sie nicht von <0>{{appName}}</0> getrennt,\nes verhindert aber jede weitere Interaktion mit dieser Wallet."
+  },
+  "account" : {
+    "current" : "Aktuelles Konto: {{account}}",
+    "disconnect" : "Trennen",
+    "switch" : "Konto wechseln",
+    "saved" : "Gespartes Konto: {{account}}",
+    "needed" : "Sie benötigen mindestens ein ausgewähltes Konto"
+  },
+  "connect" : {
+    "cta" : "Verbinden",
+    "scanQRCode" : "Scannen Sie einen QR-Code, um eine Verbindung herzustellen",
+    "copyURI" : "Kopieren Sie einen URI, um eine Verbindung herzustellen",
+    "pasteUrl" : "URL einfügen",
+    "switchToText" : "Zu Text wechseln",
+    "switchToScanner" : "Zum Scanner wechseln",
+    "waiting" : "Warte auf dApp",
+    "cancel" : "Abbrechen",
+    "accept" : "Akzeptieren",
+    "decline" : "Ablehnen"
+  },
+  "session" : {
+    "connected" : "verbunden mit [{{appName}}]",
+    "connecting" : "[{{appName}}] versucht, eine Verbindung herzustellen"
+  },
+  "goToWalletConnectV2" : "Zu Wallet Connect v2 gehen"
 }
