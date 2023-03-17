@@ -1,9 +1,34 @@
 {
-  "buy" : "구매",
-  "sell" : "판매",
-  "continue" : "계속",
-  "back" : "뒤로",
-  "add_account" : "계정 추가",
-  "choose_asset" : "자산 선택",
-  "choose_account" : "계정 선택"
+  "error" : {
+    "timeout" : "허용된 시간 내에 수신한 연결 요청이 없습니다.\n디앱(DApp) 웹페이지 새로고침 후 다시 시도하세요.",
+    "noInput" : "입력 값 없음",
+    "invalidUri" : "유효하지 않은 URI"
+  },
+  "info" : {
+    "connection" : "이 페이지를 벗어나더라도 {{appName}} 앱과의 연결이 해제되지는 않지만\n이 지갑과 더 이상의 소통이 불가능합니다."
+  },
+  "account" : {
+    "current" : "현재 계정: {{account}}",
+    "disconnect" : "연결 해제",
+    "switch" : "계정 변경",
+    "saved" : "저장된 계정: {{account}}",
+    "needed" : "최소 한 개 이상의 이용 가능한 계정이 필요합니다."
+  },
+  "connect" : {
+    "cta" : "연결",
+    "scanQRCode" : "QR코드를 스캔하여 연결",
+    "copyURI" : "URI를 복사하여 연결",
+    "pasteUrl" : "URL 붙여넣기",
+    "switchToText" : "텍스트로 전환",
+    "switchToScanner" : "스캐너로 전환",
+    "waiting" : "디앱 대기 중",
+    "cancel" : "취소",
+    "accept" : "수락",
+    "decline" : "거부"
+  },
+  "session" : {
+    "connected" : "[{{appName}}]에 연결",
+    "connecting" : "[{{appName}}] 앱이 연결 시도 중입니다"
+  },
+  "goToWalletConnectV2" : "Wallet Connect v2로 이동"
 }
