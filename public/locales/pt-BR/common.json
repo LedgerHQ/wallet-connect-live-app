@@ -1,0 +1,34 @@
+{
+  "error" : {
+    "timeout" : "Nenhum pedido de conexão recebido no tempo permitido.\nTente atualizar a página do DApp e tente novamente.",
+    "noInput" : "Sem valor de entrada",
+    "invalidUri" : "URI inválida"
+  },
+  "info" : {
+    "connection" : "Sair desta página não desconectará você de {{appName}},\n mas impedirá qualquer interação adicional com esta carteira."
+  },
+  "account" : {
+    "current" : "Conta Atual: {{account}}",
+    "disconnect" : "Desconectar",
+    "switch" : "Mudar Conta",
+    "saved" : "Conta Salva: {{account}}",
+    "needed" : "Você precisa de pelo menos uma conta disponível"
+  },
+  "connect" : {
+    "cta" : "Conectar",
+    "scanQRCode" : "Escaneie um QR Code para conectar",
+    "copyURI" : "Copie uma URI para conectar",
+    "pasteUrl" : "Colar URL",
+    "switchToText" : "Mudar para Texto",
+    "switchToScanner" : "Mude para Scanner",
+    "waiting" : "Esperando pelo DApp",
+    "cancel" : "Cancelar",
+    "accept" : "Aceitar",
+    "decline" : "Rejeitar"
+  },
+  "session" : {
+    "connected" : "conectada a [{{appName}}]",
+    "connecting" : "[{{appName}}] está tentando se conectar"
+  },
+  "goToWalletConnectV2" : "Ir para WalletConnect v2"
+}
