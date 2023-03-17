@@ -1,9 +1,34 @@
 {
-  "buy" : "Acheter",
-  "sell" : "Vendre",
-  "continue" : "Continuer",
-  "back" : "Retour",
-  "add_account" : "Ajouter un compte",
-  "choose_asset" : "Choisir un actif",
-  "choose_account" : "Choisir un compte"
+  "error" : {
+    "timeout" : "Aucune demande de connexion reçue dans le temps imparti.\nEssayez de rafraîchir la page Web de la dApp et réessayez.",
+    "noInput" : "Aucune saisie",
+    "invalidUri" : "URI invalide"
+  },
+  "info" : {
+    "connection" : "Quitter cette page n’entraînera pas de déconnexion de {{appName}},\nmais empêchera toute autre interaction avec ce wallet."
+  },
+  "account" : {
+    "current" : "Compte actuel : {{account}}",
+    "disconnect" : "Déconnecter",
+    "switch" : "Changer de compte",
+    "saved" : "Compte sauvegardé :{{account}}",
+    "needed" : "Vous devez avoir au moins un compte disponible"
+  },
+  "connect" : {
+    "cta" : "Connecter",
+    "scanQRCode" : "Scannez un code QR pour vous connecter",
+    "copyURI" : "Copiez une URI pour vous connecter",
+    "pasteUrl" : "Coller l’URL",
+    "switchToText" : "Passer en mode texte",
+    "switchToScanner" : "Passer au scanner",
+    "waiting" : "En attente de la dApp",
+    "cancel" : "Annuler",
+    "accept" : "Accepter",
+    "decline" : "Refuser"
+  },
+  "session" : {
+    "connected" : "connecté à [{{appName}}]",
+    "connecting" : "[{{appName}}] essaie de se connecter"
+  },
+  "goToWalletConnectV2" : "Accéder à WalletConnect v2"
 }
