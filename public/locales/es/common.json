@@ -1,9 +1,34 @@
 {
-  "buy" : "Comprar",
-  "sell" : "Vender",
-  "continue" : "Continuar",
-  "back" : "Atrás",
-  "add_account" : "Agregar cuenta",
-  "choose_asset" : "Elegir Activo",
-  "choose_account" : "Elegir Cuenta"
+  "error" : {
+    "timeout" : "No se ha recibido ninguna solicitud de conexión durante el tiempo permitido.\nTrata de actualizar la página web de DApp y vuelve a intentarlo.",
+    "noInput" : "No hay ningún valor de entrada",
+    "invalidUri" : "URI inválido"
+  },
+  "info" : {
+    "connection" : "Al salir de esta página no te desconectarás de {{appName}},\npero eso impedirá cualquier otra interacción con esta billetera."
+  },
+  "account" : {
+    "current" : "Cuenta actual: {{account}}",
+    "disconnect" : "Desconectar",
+    "switch" : "Cambiar de cuenta",
+    "saved" : "Cuenta guardada: {{account}}",
+    "needed" : "Necesitas al menos una cuenta disponible"
+  },
+  "connect" : {
+    "cta" : "Conectar",
+    "scanQRCode" : "Escanea un código QR para conectarte",
+    "copyURI" : "Copia un URI para conectarte",
+    "pasteUrl" : "Pegar URL",
+    "switchToText" : "Cambiar a texto",
+    "switchToScanner" : "Cambiar a escáner",
+    "waiting" : "Esperando a la DApp",
+    "cancel" : "Cancelar",
+    "accept" : "Aceptar",
+    "decline" : "Rechazar"
+  },
+  "session" : {
+    "connected" : "conectado a [{{appName}}]",
+    "connecting" : "[{{appName}}] está intentando conectarse"
+  },
+  "goToWalletConnectV2" : "Ve a Wallet Connect v2"
 }
