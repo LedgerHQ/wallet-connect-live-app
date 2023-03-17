@@ -1,9 +1,34 @@
 {
-  "buy" : "شراء",
-  "sell" : "بيع",
-  "continue" : "متابعة",
-  "back" : "عودة",
-  "add_account" : "إنشاء حساب",
-  "choose_asset" : "Choose Asset",
-  "choose_account" : "Choose Account"
+  "error" : {
+    "timeout" : "ليس هناك طلبات اتصال تم تلقيها في الوقت المسموح.\nحاول تنشيط صفحة التطبيق اللامركزي (DApp) وحاول مرة أخرى.",
+    "noInput" : "لا توجد قيمة الإدخال",
+    "invalidUri" : "مُعرف الموارد المنتظم (URI) غير صالح"
+  },
+  "info" : {
+    "connection" : "مغادرة هذه الصفحة لن تقطع اتصالك من {{appName}}،\nولكن ستمنع المزيد من التفاعل مع هذه المحفظة."
+  },
+  "account" : {
+    "current" : "الحساب الحالي: {{account}}",
+    "disconnect" : "قطع الاتصال",
+    "switch" : "تبديل الحساب",
+    "saved" : "الحساب المحفوظ: {{account}}",
+    "needed" : "تحتاج إلى حساب واحد متاح على الأقل"
+  },
+  "connect" : {
+    "cta" : "اتصال",
+    "scanQRCode" : "امسح رمز QR ضوئياً للاتصال",
+    "copyURI" : "قم بنسخ مُعرف الموارد المنتظم (URI) للاتصال",
+    "pasteUrl" : "لصق رابط URL",
+    "switchToText" : "تبديل إلى النص",
+    "switchToScanner" : "تبديل إلى الماسح الضوئي",
+    "waiting" : "بانتظار التطبيق اللامركزي (DApp)",
+    "cancel" : "إلغاء",
+    "accept" : "قبول",
+    "decline" : "رفض"
+  },
+  "session" : {
+    "connected" : "متّصل بـ [{{appName}}]",
+    "connecting" : "[{{appName}}] يُحاول الاتصال"
+  },
+  "goToWalletConnectV2" : "انتقل إلى الإصدار 2 من Wallet Connect"
 }
