@@ -384,7 +384,9 @@ export function WalletConnect({
 							break
 						}
 					}
-					case 'eth_signTypedData': {
+					case 'eth_signTypedData':
+					case 'eth_signTypedData_v3':
+					case 'eth_signTypedData_v4': {
 						if (
 							selectedAccountRef.current &&
 							compareETHAddresses(
