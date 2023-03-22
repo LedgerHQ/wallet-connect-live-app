@@ -598,7 +598,7 @@ export function WalletConnect({
 				) : null}
 			</BannerContainer>
 			<WalletConnectInnerContainer>
-				{accounts.length === 0 ? (
+				{accounts.length === 0 && !selectedAccount ? (
 					<CSSTransition classNames="fade" timeout={200}>
 						<Flex
 							flexDirection="column"
