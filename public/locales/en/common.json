@@ -12,7 +12,8 @@
 		"disconnect": "Disconnect",
 		"switch": "Switch account",
 		"saved": "Saved Account: {{account}}",
-		"needed": "You need at least one available account"
+		"needed": "You need at least one available account",
+		"add": "Add account"
 	},
 	"connect": {
 		"cta": "Connect",

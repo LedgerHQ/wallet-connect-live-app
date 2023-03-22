@@ -1,6 +1,6 @@
 import { InputMode, NetworkConfig } from '@/types/types'
 import LedgerLivePlarformSDK, { Account } from '@ledgerhq/live-app-sdk'
-import { Link, Text } from '@ledgerhq/react-ui'
+import { Button, Flex, Link, Text } from '@ledgerhq/react-ui'
 import GlitchText from '@ledgerhq/react-ui/components/animations/GlitchText'
 
 import { convertEthToLiveTX } from '@/helpers/converters'
@@ -19,7 +19,7 @@ import { Connected } from './Connected'
 import { Disconnected } from './Disconnected'
 import { PendingConnection } from './PendingConnection'
 import { PendingRequest } from './PendingRequest'
-import { ArrowRightMedium } from '@ledgerhq/react-ui/assets/icons'
+import { ArrowRightMedium, PlusRegular } from '@ledgerhq/react-ui/assets/icons'
 
 const pulseAnimationLight = keyframes`
 	0% {
@@ -598,7 +598,26 @@ export function WalletConnect({
 				) : null}
 			</BannerContainer>
 			<WalletConnectInnerContainer>
-				{session && selectedAccount ? (
+				{accounts.length === 0 ? (
+					<CSSTransition classNames="fade" timeout={200}>
+						<Flex
+							flexDirection="column"
+							alignItems="center"
+							justifyContent="center"
+						>
+							<Text mb={3}>{t('account.needed')}</Text>
+							<Button
+								outline
+								variant="main"
+								m={3}
+								Icon={PlusRegular}
+								onClick={() => handleSwitchAccount()}
+							>
+								<Text>{t('account.add')}</Text>
+							</Button>
+						</Flex>
+					</CSSTransition>
+				) : session && selectedAccount ? (
 					<>
 						{session.peerMeta ? (
 							<>
