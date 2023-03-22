@@ -68,21 +68,17 @@ const Index: NextPage = () => {
 			</Head>
 			{isMounted ? (
 				<SDKProvider networks={networkConfigs}>
-					{(platformSDK, accounts) =>
-						accounts.length > 0 ? (
-							<WalletConnect
-								initialMode={initialMode}
-								initialAccountId={initialAccountId}
-								networks={networkConfigs}
-								initialURI={uri}
-								platformSDK={platformSDK}
-								accounts={accounts}
-								isFromLedgerLive={isFromLedgerLive}
-							/>
-						) : (
-							<Flex>{t('account.needed')}</Flex>
-						)
-					}
+					{(platformSDK, accounts) => (
+						<WalletConnect
+							initialMode={initialMode}
+							initialAccountId={initialAccountId}
+							networks={networkConfigs}
+							initialURI={uri}
+							platformSDK={platformSDK}
+							accounts={accounts}
+							isFromLedgerLive={isFromLedgerLive}
+						/>
+					)}
 				</SDKProvider>
 			) : null}
 		</Container>
