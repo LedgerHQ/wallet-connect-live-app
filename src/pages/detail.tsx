@@ -130,7 +130,11 @@ export default function SessionDetail() {
 
 			const existingEntry = accountsByChain.get(formatedChain)
 
-			const account = accounts.find((a) => a.address === addrSplitted[2])
+			const account = accounts.find(
+				(a) =>
+					a.address === addrSplitted[2] &&
+					formatedChain === a.currency,
+			)
 
 			if (account) {
 				accountsByChain.set(
