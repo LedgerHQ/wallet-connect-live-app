@@ -1,9 +1,35 @@
 {
-  "buy" : "Satın Al",
-  "sell" : "Sat",
-  "continue" : "Devam",
-  "back" : "Geri",
-  "add_account" : "Hesap ekle",
-  "choose_asset" : "Choose Asset",
-  "choose_account" : "Choose Account"
+  "error" : {
+    "timeout" : "Verilen süre içerisinde hiç bağlantı talebi alınmadı.\nDApp internet sayfasını yenileyerek tekrar deneyin.",
+    "noInput" : "Değer girilmedi",
+    "invalidUri" : "Geçersiz URI"
+  },
+  "info" : {
+    "connection" : "Bu sayfadan ayrıldığınızda {{appName}} bağlantınız kesilmeyecek\nama bu cüzdan ile başka herhangi bir etkileşime giremeyeceksiniz."
+  },
+  "account" : {
+    "current" : "Mevcut Hesap: {{account}}",
+    "disconnect" : "Bağlantıyı Kes",
+    "switch" : "Hesabı değiştir",
+    "saved" : "Kayıtlı Hesap: {{account}}",
+    "needed" : "En az bir mevcut hesabınız olmalı",
+    "add" : "Hesap ekle"
+  },
+  "connect" : {
+    "cta" : "Bağlan",
+    "scanQRCode" : "Bağlanmak için bir QR kodunu tarayın",
+    "copyURI" : "Bağlanmak için bir URI kopyalayın",
+    "pasteUrl" : "URL'yi yapıştırın",
+    "switchToText" : "Metne Geç",
+    "switchToScanner" : "Tarayıcıya Geç",
+    "waiting" : "DApp bekleniyor",
+    "cancel" : "İptal et",
+    "accept" : "Kabul et",
+    "decline" : "Reddet"
+  },
+  "session" : {
+    "connected" : "[{{appName}}] bağlantısı kuruldu",
+    "connecting" : "[{{appName}}] bağlanmaya çalışıyor"
+  },
+  "goToWalletConnectV2" : "WalletConnect v2'ye gidin"
 }
