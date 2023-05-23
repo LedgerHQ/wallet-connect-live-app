@@ -43,6 +43,7 @@ export function PendingRequest({
 					Icon={CheckAloneRegular}
 					outline
 					onClick={onAccept}
+					data-test="connect-accept-button"
 				>
 					<Text>{t('connect.accept')}</Text>
 				</Button>
@@ -52,6 +53,7 @@ export function PendingRequest({
 					Icon={CloseRegular}
 					outline
 					onClick={onDecline}
+					data-test="connect-decline-button"
 				>
 					<Text>{t('connect.decline')}</Text>
 				</Button>
@@ -71,6 +73,7 @@ export function PendingRequest({
 					m={3}
 					Icon={RedelegateRegular}
 					onClick={onSwitchAccount}
+					data-test="account-switch-button"
 				>
 					<Text>{t('account.switch')}</Text>
 				</Button>
