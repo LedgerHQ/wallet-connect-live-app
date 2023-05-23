@@ -39,6 +39,7 @@ export function Connected({
 					m={3}
 					Icon={QuitRegular}
 					onClick={onDisconnect}
+					data-test="account-disconnect-button"
 				>
 					<Text>{t('account.disconnect')}</Text>
 				</Button>
@@ -48,6 +49,7 @@ export function Connected({
 					m={3}
 					Icon={RedelegateRegular}
 					onClick={onSwitchAccount}
+					data-test="account-switch-button"
 				>
 					<Text>{t('account.switch')}</Text>
 				</Button>
