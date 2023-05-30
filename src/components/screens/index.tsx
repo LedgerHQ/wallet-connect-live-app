@@ -21,6 +21,7 @@ export type WalletConnectProps = {
 	accounts: Account[]
 	userId: string
 	walletInfo: WalletInfo['result']
+	isFromLedgerLive: boolean
 }
 
 export default function WalletConnect({
@@ -32,6 +33,7 @@ export default function WalletConnect({
 	networks,
 	userId,
 	walletInfo,
+	isFromLedgerLive,
 	...rest
 }: WalletConnectProps) {
 	const [uri, setUri] = useState<string | undefined>(initialURI)
@@ -39,6 +41,7 @@ export default function WalletConnect({
 	const addAccounts = useAccountsStore(accountSelector.addAccounts)
 	const clearAccounts = useAccountsStore(accountSelector.clearAccounts)
 	const addNetworks = useAppStore(appSelector.addNetworks)
+	const setFromLedgerLive = useAppStore(appSelector.setFromLedgerLive)
 	const clearAppStore = useAppStore(appSelector.clearAppStore)
 	const setLastSessionVisited = useSessionsStore(
 		sessionSelector.setLastSessionVisited,
@@ -50,6 +53,7 @@ export default function WalletConnect({
 		clearAppStore()
 		clearAccounts()
 		setLastSessionVisited(null)
+		setFromLedgerLive(isFromLedgerLive)
 		if (accounts.length > 0) {
 			addAccounts(accounts)
 		}

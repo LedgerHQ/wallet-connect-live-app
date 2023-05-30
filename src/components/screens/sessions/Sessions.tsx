@@ -15,6 +15,7 @@ import styled from 'styled-components'
 import { useSessionsStore, sessionSelector } from '@/storage/sessions.store'
 import { ArrowRightMedium } from '@ledgerhq/react-ui/assets/icons'
 import useAnalytics from 'src/shared/useAnalytics'
+import { useAppStore, appSelector } from '@/storage/app.store'
 
 export type SessionsProps = {
 	goToConnect: () => void
@@ -29,6 +30,7 @@ export default function Sessions({ goToConnect }: SessionsProps) {
 	const clearSessions = useSessionsStore(sessionSelector.clearSessions)
 	const sessions = useSessionsStore(sessionSelector.selectSessions)
 	const analytics = useAnalytics()
+	const isFromLedgerLive = useAppStore(appSelector.selectIsFromLedgerLive)
 
 	useEffect(() => {
 		analytics.page('Wallet Connect Sessions', {
@@ -105,15 +107,17 @@ export default function Sessions({ goToConnect }: SessionsProps) {
 				justifyContent="center"
 				my={6}
 			>
-				<Link
-					onClick={onGoToWalletConnectV1}
-					Icon={ArrowRightMedium}
-					position="absolute"
-					top="84px"
-					right="16px"
-				>
-					{t('goToWalletConnectV1')}
-				</Link>
+				{isFromLedgerLive && (
+					<Link
+						onClick={onGoToWalletConnectV1}
+						Icon={ArrowRightMedium}
+						position="absolute"
+						top="84px"
+						right="16px"
+					>
+						{t('goToWalletConnectV1')}
+					</Link>
+				)}
 				<Text variant="h2" fontWeight="medium" textAlign="center">
 					{t('sessions.emptyState.title')}
 				</Text>
@@ -146,15 +150,18 @@ export default function Sessions({ goToConnect }: SessionsProps) {
 
 	return (
 		<Flex flexDirection="column" width="100%" height="100%" mt={6}>
-			<Link
-				onClick={onGoToWalletConnectV1}
-				Icon={ArrowRightMedium}
-				top="10px"
-				right="10px"
-				alignSelf="flex-end"
-			>
-				{t('goToWalletConnectV1')}
-			</Link>
+			{isFromLedgerLive && (
+				<Link
+					onClick={onGoToWalletConnectV1}
+					Icon={ArrowRightMedium}
+					top="10px"
+					right="10px"
+					alignSelf="flex-end"
+				>
+					{t('goToWalletConnectV1')}
+				</Link>
+			)}
+
 			<CustomList>
 				{sessions.map((session) => (
 					<Box key={session.topic} mt={3}>

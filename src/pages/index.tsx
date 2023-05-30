@@ -33,6 +33,8 @@ const Index: NextPage = () => {
 			: initialParams
 			? JSON.parse(initialParams)
 			: {}
+
+	const isFromLedgerLive = !!params.isFromLedgerLive
 	const networkConfigs: NetworkConfig[] = params.networks ?? networks
 
 	const uri = rawURI && typeof rawURI === 'string' ? rawURI : undefined
@@ -72,6 +74,8 @@ const Index: NextPage = () => {
 							accounts={accounts}
 							userId={userId}
 							walletInfo={walletInfo}
+							// TODO -Remove when V1 deprecated
+							isFromLedgerLive={isFromLedgerLive}
 						/>
 					)}
 				</WalletApiClientProvider>
