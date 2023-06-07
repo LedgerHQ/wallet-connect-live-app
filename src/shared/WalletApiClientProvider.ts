@@ -10,7 +10,6 @@ import { NetworkConfig } from './types/types'
 type WalletApiClientProviderProps = {
 	networks: NetworkConfig[]
 	children: (
-		walletApiClient: WalletAPIClient,
 		accounts: Account[],
 		userId: string,
 		walletInfo: WalletInfo['result'],
@@ -64,12 +63,7 @@ export function WalletApiClientProvider({
 	}, [])
 
 	if (walletApiClientRef.current && accounts && userId && walletInfo) {
-		return children(
-			walletApiClientRef.current,
-			accounts,
-			userId,
-			walletInfo,
-		)
+		return children(accounts, userId, walletInfo)
 	}
 	return null
 }

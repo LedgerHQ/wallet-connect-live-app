@@ -1,15 +1,10 @@
 import { InputMode, NetworkConfig } from '@/types/types'
-import {
-	Account,
-	WalletAPIClient,
-	WalletInfo,
-} from '@ledgerhq/wallet-api-client'
+import { Account, WalletInfo } from '@ledgerhq/wallet-api-client'
 import { useEffect, useState } from 'react'
 import { accountSelector, useAccountsStore } from '@/storage/accounts.store'
 import { appSelector, useAppStore } from '@/storage/app.store'
 import { sessionSelector, useSessionsStore } from '@/storage/sessions.store'
 import Home from './Home'
-import { useLedgerLive } from '@/hooks/common/useLedgerLive'
 import useAnalytics from 'src/shared/useAnalytics'
 
 export type WalletConnectProps = {
@@ -17,7 +12,6 @@ export type WalletConnectProps = {
 	initialAccountId?: string
 	initialURI?: string
 	networks: NetworkConfig[]
-	walletApiClient: WalletAPIClient
 	accounts: Account[]
 	userId: string
 	walletInfo: WalletInfo['result']
@@ -29,7 +23,6 @@ export default function WalletConnect({
 	initialAccountId,
 	initialMode,
 	accounts,
-	walletApiClient,
 	networks,
 	userId,
 	walletInfo,
@@ -47,7 +40,6 @@ export default function WalletConnect({
 		sessionSelector.setLastSessionVisited,
 	)
 	const analytics = useAnalytics()
-	useLedgerLive(walletApiClient)
 
 	useEffect(() => {
 		clearAppStore()
@@ -60,7 +52,7 @@ export default function WalletConnect({
 		if (networks.length > 0) {
 			addNetworks(networks)
 		}
-	}, [walletApiClient])
+	}, [])
 
 	useEffect(() => {
 		clearAccounts()
@@ -75,7 +67,6 @@ export default function WalletConnect({
 		<Home
 			initialMode={initialMode}
 			setUri={setUri}
-			walletApiClient={walletApiClient}
 			accounts={accounts}
 			initialURI={uri}
 			networks={networks}

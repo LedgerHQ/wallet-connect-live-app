@@ -64,13 +64,12 @@ const Index: NextPage = () => {
 			</Head>
 			{isMounted ? (
 				<WalletApiClientProvider networks={networkConfigs}>
-					{(walletApiClient, accounts, userId, walletInfo) => (
+					{(accounts, userId, walletInfo) => (
 						<WalletConnect
 							initialMode={initialMode}
 							initialAccountId={initialAccountId}
 							networks={networkConfigs}
 							initialURI={uri}
-							walletApiClient={walletApiClient}
 							accounts={accounts}
 							userId={userId}
 							walletInfo={walletInfo}
