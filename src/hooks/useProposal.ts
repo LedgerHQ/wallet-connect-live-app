@@ -185,11 +185,11 @@ export function useProposal({ proposal }: Props) {
 		const walletApiClient = initWalletApiClient()
 		try {
 			const walletApiClient = initWalletApiClient()
-
+			console.log('walletApiClient', walletApiClient)
 			const newAccount = await walletApiClient.account.request({
 				currencyIds: [currency],
 			})
-
+			console.log('newAccount', newAccount)
 			addAccount(newAccount)
 			closeTransport()
 		} catch (error) {
