@@ -1,9 +1,9 @@
 import { Proposal } from '@/types/types'
-import { Account } from '@ledgerhq/wallet-api-client'
+import { Account, WalletAPIClient } from '@ledgerhq/wallet-api-client'
 import { SessionTypes } from '@walletconnect/types'
 
 import router from 'next/router'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import useNavigation from '@/hooks/common/useNavigation'
 import { sessionSelector, useSessionsStore } from '@/storage/sessions.store'
 import { accountSelector, useAccountsStore } from '@/storage/accounts.store'
@@ -184,14 +184,12 @@ export function useProposal({ proposal }: Props) {
 	const addNewAccount = useCallback(async (currency: string) => {
 		const walletApiClient = initWalletApiClient()
 		try {
-			const walletApiClient = initWalletApiClient()
 			console.log('walletApiClient', walletApiClient)
 			const newAccount = await walletApiClient.account.request({
 				currencyIds: [currency],
 			})
 			console.log('newAccount', newAccount)
 			addAccount(newAccount)
-			closeTransport()
 		} catch (error) {
 			console.error('request account canceled by user')
 		}
