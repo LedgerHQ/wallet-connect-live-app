@@ -25,6 +25,7 @@ type AccountsInChain = {
 	accounts: Account[]
 }
 
+// TO UPDATE WHEN SUPPORTING NEW CHAIN
 const getNamespace = (chain: string) => {
 	switch (chain) {
 		case 'ethereum':
@@ -38,6 +39,8 @@ const getNamespace = (chain: string) => {
 			return 'eip155:10'
 		case 'arbitrum':
 			return 'eip155:42161'
+		case 'ethereum_goerli':
+			return 'eip155:5'
 	}
 }
 

@@ -43,6 +43,8 @@ Use of [Zustand](https://github.com/pmndrs/zustand) and `persist` middleware to 
 
 ## Add new Chain support
 
+Look at => `// TO UPDATE WHEN SUPPORTING NEW CHAIN` in code base
+
 1 - Update `localManifest.json` by adding new entry in network
 
 ```json

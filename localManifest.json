@@ -23,6 +23,10 @@
 			{
 				"currency": "arbitrum",
 				"chainId": 42161
+			},
+			{
+				"currency": "ethereum_goerli",
+				"chainId": 5
 			}
 		]
 	},
@@ -33,7 +37,14 @@
 	"manifestVersion": "1",
 	"branch": "stable",
 	"categories": ["bridge", "defi"],
-	"currencies": ["ethereum", "polygon", "bsc", "optimism", "arbitrum"],
+	"currencies": [
+		"ethereum",
+		"polygon",
+		"bsc",
+		"optimism",
+		"arbitrum",
+		"ethereum_goerli"
+	],
 	"content": {
 		"shortDescription": {
 			"en": "WalletConnect is an open source protocol for connecting decentralised applications to mobile wallets with QR code scanning or deep linking. V2 introduces new features, including the ability to connect to multiple dapps in parallel with multiple accounts. It's important to note that not all dapps currently support V2"
