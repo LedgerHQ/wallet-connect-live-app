@@ -5,7 +5,7 @@ import {
 } from '@/helpers/walletConnect.util'
 import { ResponsiveContainer } from '@/styles/styles'
 import { NetworkConfig, InputMode } from '@/types/types'
-import { Account, WalletAPIClient } from '@ledgerhq/wallet-api-client'
+import { Account } from '@ledgerhq/wallet-api-client'
 import { Flex } from '@ledgerhq/react-ui'
 import { useTranslation } from 'next-i18next'
 import { Dispatch, SetStateAction, useState, useCallback, useMemo } from 'react'
@@ -43,7 +43,6 @@ export type WalletConnectProps = {
 	initialAccountId?: string
 	initialURI?: string
 	networks: NetworkConfig[]
-	walletApiClient: WalletAPIClient
 	accounts: Account[]
 	initialMode?: InputMode
 	setUri: Dispatch<SetStateAction<string | undefined>>

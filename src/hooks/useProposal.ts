@@ -5,7 +5,6 @@ import { SessionTypes } from '@walletconnect/types'
 import router from 'next/router'
 import { useCallback, useState } from 'react'
 import useNavigation from '@/hooks/common/useNavigation'
-import { walletApiClient } from './common/useLedgerLive'
 import { sessionSelector, useSessionsStore } from '@/storage/sessions.store'
 import { accountSelector, useAccountsStore } from '@/storage/accounts.store'
 import { useAppStore, appSelector } from '@/storage/app.store'
@@ -13,6 +12,7 @@ import { formatChainName } from '@/helpers/helper.util'
 import { EIP155_SIGNING_METHODS } from '@/data/EIP155Data'
 import { web3wallet } from '@/helpers/walletConnect.util'
 import useAnalytics from 'src/shared/useAnalytics'
+import { useLedgerLive } from './common/useLedgerLive'
 
 type Props = {
 	proposal: Proposal
@@ -37,6 +37,8 @@ export function useProposal({ proposal }: Props) {
 	const accounts = useAccountsStore(accountSelector.selectAccounts)
 	const addAccount = useAccountsStore(accountSelector.addAccount)
 	const analytics = useAnalytics()
+
+	const { initWalletApiClient, closeTransport } = useLedgerLive()
 
 	const [selectedAccounts, setSelectedAccounts] = useState<string[]>([])
 
@@ -176,6 +178,7 @@ export function useProposal({ proposal }: Props) {
 	}, [proposal])
 
 	const addNewAccount = useCallback(async (currency: string) => {
+		const walletApiClient = initWalletApiClient()
 		try {
 			const newAccount = await walletApiClient.account.request({
 				currencyIds: [currency],
@@ -184,6 +187,7 @@ export function useProposal({ proposal }: Props) {
 		} catch (error) {
 			console.log('request account canceled by user')
 		}
+		closeTransport()
 	}, [])
 
 	return {

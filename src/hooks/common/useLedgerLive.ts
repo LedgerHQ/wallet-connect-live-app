@@ -1,15 +1,19 @@
-import { WalletAPIClient } from '@ledgerhq/wallet-api-client'
-import { useState, useEffect } from 'react'
+import {
+	WalletAPIClient,
+	WindowMessageTransport,
+} from '@ledgerhq/wallet-api-client'
+export function useLedgerLive() {
+	let transport: WindowMessageTransport
+	const initWalletApiClient = () => {
+		transport = new WindowMessageTransport()
+		transport.connect()
+		const walletApiClient = new WalletAPIClient(transport)
+		return walletApiClient
+	}
+	const closeTransport = () => transport.disconnect()
 
-export let walletApiClient: WalletAPIClient
-
-export function useLedgerLive(walletApiClientParam: WalletAPIClient) {
-	const [initialized, setInitialized] = useState(false)
-
-	useEffect(() => {
-		if (!initialized) {
-			walletApiClient = walletApiClientParam
-			setInitialized(true)
-		}
-	}, [initialized])
+	return {
+		initWalletApiClient,
+		closeTransport,
+	}
 }

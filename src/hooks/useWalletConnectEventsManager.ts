@@ -6,7 +6,7 @@ import { Web3WalletTypes } from '@walletconnect/web3wallet'
 import useNavigation from '@/hooks/common/useNavigation'
 import { hasETHAddress } from '@/helpers/generic'
 import { stripHexPrefix } from '@/utils/currencyFormatter/helpers'
-import { walletApiClient } from './common/useLedgerLive'
+import { useLedgerLive } from './common/useLedgerLive'
 import { convertEthToLiveTX } from '@/helpers/converters'
 import { accountSelector, useAccountsStore } from '@/storage/accounts.store'
 import { EIP155_SIGNING_METHODS } from '@/data/EIP155Data'
@@ -23,6 +23,8 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 	const { navigate, routes, tabsIndexes } = useNavigation()
 	const removeSession = useSessionsStore(sessionSelector.removeSession)
 	const accounts = useAccountsStore(accountSelector.selectAccounts)
+
+	const { initWalletApiClient, closeTransport } = useLedgerLive()
 	/******************************************************************************
 	 * 1. Open session proposal modal for confirmation / rejection
 	 *****************************************************************************/
@@ -61,6 +63,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 					)
 					if (!!accountSign) {
 						try {
+							const walletApiClient = initWalletApiClient()
 							const message = stripHexPrefix(
 								isPersonaLSign
 									? request.params[0]
@@ -76,6 +79,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 						} catch (error) {
 							rejectRequest(topic, id, Errors.userDecline)
 						}
+						closeTransport()
 						break
 					}
 
@@ -88,6 +92,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 					)
 					if (!!accountSignTyped) {
 						try {
+							const walletApiClient = initWalletApiClient()
 							const message = stripHexPrefix(request.params[1])
 
 							const signedMessage =
@@ -99,6 +104,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 						} catch (error) {
 							rejectRequest(topic, id, Errors.msgDecline)
 						}
+						closeTransport()
 						break
 					}
 				case EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION:
@@ -107,6 +113,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 					const accountTX = hasETHAddress(accounts, ethTX.from)
 					if (!!accountTX) {
 						try {
+							const walletApiClient = initWalletApiClient()
 							const liveTX = convertEthToLiveTX(ethTX)
 							const hash =
 								await walletApiClient.transaction.signAndBroadcast(
@@ -117,6 +124,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 						} catch (error) {
 							rejectRequest(topic, id, Errors.txDeclined)
 						}
+						closeTransport()
 					}
 
 				default:
