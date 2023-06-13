@@ -6,7 +6,6 @@ import { PasteMedium } from '@ledgerhq/react-ui/assets/icons'
 import { QRScanner } from './QRScanner'
 import { InputMode } from '@/types/types'
 import { useTranslation } from 'next-i18next'
-import { goToWalletConnectV1, isV1 } from '@/helpers/walletConnect.util'
 import useAnalytics from 'src/shared/useAnalytics'
 
 const QRScannerContainer = styled.div`
@@ -73,15 +72,6 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 
 	useEffect(() => {
 		if (initialURI) {
-			if (isV1(initialURI)) {
-				analytics.track('event_triggered', {
-					event: 'WC-Initial redirection to WC v1',
-					uri: initialURI,
-					page: 'Connect',
-				})
-				goToWalletConnectV1(initialURI)
-				return
-			}
 			onConnect(initialURI)
 		}
 		analytics.page('Wallet Connect')

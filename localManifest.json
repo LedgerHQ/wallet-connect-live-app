@@ -3,7 +3,6 @@
 	"name": "Wallet Connect v2",
 	"url": "http://localhost:3000/",
 	"params": {
-		"isFromLedgerLive": true,
 		"networks": [
 			{
 				"currency": "ethereum",

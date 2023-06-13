@@ -3,8 +3,8 @@ import { GenericRow, RowType } from '@/components/atoms/GenericRow'
 import { ImageWithPlaceholder } from '@/components/atoms/images/ImageWithPlaceholder'
 import { WalletConnectPopin } from '@/components/atoms/popin/WalletConnectPopin'
 import { formatUrl } from '@/helpers/helper.util'
-import { goToWalletConnectV1, web3wallet } from '@/helpers/walletConnect.util'
-import { Flex, Button, Box, Text, Link } from '@ledgerhq/react-ui'
+import { web3wallet } from '@/helpers/walletConnect.util'
+import { Flex, Button, Box, Text } from '@ledgerhq/react-ui'
 
 import { useTranslation } from 'next-i18next'
 import { useCallback, useEffect, useMemo } from 'react'
@@ -13,9 +13,7 @@ import useWalletConnectPopin from '@/hooks/useWalletConnectPopin'
 
 import styled from 'styled-components'
 import { useSessionsStore, sessionSelector } from '@/storage/sessions.store'
-import { ArrowRightMedium } from '@ledgerhq/react-ui/assets/icons'
 import useAnalytics from 'src/shared/useAnalytics'
-import { useAppStore, appSelector } from '@/storage/app.store'
 
 export type SessionsProps = {
 	goToConnect: () => void
@@ -30,7 +28,6 @@ export default function Sessions({ goToConnect }: SessionsProps) {
 	const clearSessions = useSessionsStore(sessionSelector.clearSessions)
 	const sessions = useSessionsStore(sessionSelector.selectSessions)
 	const analytics = useAnalytics()
-	const isFromLedgerLive = useAppStore(appSelector.selectIsFromLedgerLive)
 
 	useEffect(() => {
 		analytics.page('Wallet Connect Sessions', {
@@ -66,14 +63,6 @@ export default function Sessions({ goToConnect }: SessionsProps) {
 		goToConnect()
 	}, [])
 
-	const onGoToWalletConnectV1 = useCallback(() => {
-		analytics.track('button_clicked', {
-			button: 'Go To Wallet Connect v1',
-			page: 'Wallet Connect Sessions',
-		})
-		goToWalletConnectV1()
-	}, [])
-
 	const disconnect = useCallback(async () => {
 		await Promise.all(
 			sessions.map((session) =>
@@ -107,17 +96,6 @@ export default function Sessions({ goToConnect }: SessionsProps) {
 				justifyContent="center"
 				my={6}
 			>
-				{isFromLedgerLive && (
-					<Link
-						onClick={onGoToWalletConnectV1}
-						Icon={ArrowRightMedium}
-						position="absolute"
-						top="84px"
-						right="16px"
-					>
-						{t('goToWalletConnectV1')}
-					</Link>
-				)}
 				<Text variant="h2" fontWeight="medium" textAlign="center">
 					{t('sessions.emptyState.title')}
 				</Text>
@@ -150,18 +128,6 @@ export default function Sessions({ goToConnect }: SessionsProps) {
 
 	return (
 		<Flex flexDirection="column" width="100%" height="100%" mt={6}>
-			{isFromLedgerLive && (
-				<Link
-					onClick={onGoToWalletConnectV1}
-					Icon={ArrowRightMedium}
-					top="10px"
-					right="10px"
-					alignSelf="flex-end"
-				>
-					{t('goToWalletConnectV1')}
-				</Link>
-			)}
-
 			<CustomList>
 				{sessions.map((session) => (
 					<Box key={session.topic} mt={3}>

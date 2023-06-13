@@ -1,18 +1,7 @@
 {
 	"error": {
-		"timeout": "No connection request received in the allowed time.\nTry refreshing the DApp webpage and try again.",
 		"noInput": "No input value",
 		"invalidUri": "Invalid URI"
-	},
-	"info": {
-		"connection": "Leaving this page will not disconnect you from {{appName}},\nbut will prevent any further interaction with this wallet."
-	},
-	"account": {
-		"current": "Current Account: {{account}}",
-		"disconnect": "Disconnect",
-		"switch": "Switch account",
-		"saved": "Saved Account: {{account}}",
-		"needed": "You need at least one available account"
 	},
 	"connect": {
 		"title": "Connect",
@@ -20,13 +9,8 @@
 		"scanQRCode": "Scan QR code",
 		"useWalletConnectUrl": "Or use a WalletConnect URL",
 		"pasteUrl": "Paste URL",
-		"copyURI": "Copy an URI to connect",
 		"switchToText": "Switch to Text",
-		"switchToScanner": "Switch to Scanner",
-		"waiting": "Waiting for DApp",
-		"cancel": "Cancel",
-		"accept": "Accept",
-		"decline": "Decline"
+		"switchToScanner": "Switch to Scanner"
 	},
 	"sessionProposal": {
 		"connectTo": "Connect to {{name}}",
@@ -70,8 +54,6 @@
 			"title": "No active session, yet",
 			"desc": "Get started by connecting to an app.",
 			"goToConnect": "Connect"
-		},
-		"switch": "Switch"
-	},
-	"goToWalletConnectV1": "Go to Wallet Connect v1"
+		}
+	}
 }
