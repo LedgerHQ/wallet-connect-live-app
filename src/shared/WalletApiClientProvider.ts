@@ -44,7 +44,6 @@ export function WalletApiClientProvider({
 		transport.connect()
 		const walletApiClient = new WalletAPIClient(transport)
 		walletApiClient.account.list().then((allAccounts) => {
-			console.log('allAccounts', allAccounts)
 			const filteredAccounts = filterAccountsForNetworks(
 				allAccounts,
 				networks,
