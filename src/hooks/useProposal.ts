@@ -18,6 +18,29 @@ type Props = {
 	proposal: Proposal
 }
 
+type AccountsInChain = {
+	chain: string
+	isSupported: boolean
+	isRequired: boolean
+	accounts: Account[]
+}
+
+const getNamespace = (chain: string) => {
+	switch (chain) {
+		case 'ethereum':
+		default:
+			return 'eip155:1'
+		case 'polygon':
+			return 'eip155:137'
+		case 'bsc':
+			return 'eip155:56'
+		case 'optimism':
+			return 'eip155:10'
+		case 'arbitrum':
+			return 'eip155:42161'
+	}
+}
+
 export function useProposal({ proposal }: Props) {
 	const { navigate, routes, tabsIndexes } = useNavigation()
 	const networks = useAppStore(appSelector.selectNetworks)
@@ -94,16 +117,27 @@ export function useProposal({ proposal }: Props) {
 		return mappedChains
 	}
 
+	const hasChain = (chain: string, accountsByChain: AccountsInChain[]) =>
+		accountsByChain.some((acc) => acc.chain === chain)
+
+	const createChains = (accountsByChain: AccountsInChain[]) => {
+		return networks.map((network) => {
+			const hasChainInAccount = hasChain(
+				network.currency,
+				accountsByChain,
+			)
+			if (hasChainInAccount) {
+				return getNamespace(network.currency)
+			} else {
+				return ''
+			}
+		})
+	}
 	const createNamespaces = (): Record<string, SessionTypes.BaseNamespace> => {
 		const accountsByChain = formatAccountsByChain(
 			proposal,
 			accounts,
 		).filter((a) => a.accounts.length > 0 && a.isSupported)
-		const hasETH = accountsByChain.find((acc) => acc.chain === 'ethereum')
-		const hasPolygon = accountsByChain.find(
-			(acc) => acc.chain === 'polygon',
-		)
-		const hasBSC = accountsByChain.find((acc) => acc.chain === 'bsc')
 
 		const accountsToSend = accountsByChain.reduce<string[]>(
 			(accum, elem) =>
@@ -122,11 +156,7 @@ export function useProposal({ proposal }: Props) {
 		return {
 			eip155: {
 				methods: [...new Set(methods)],
-				chains: [
-					hasETH ? 'eip155:1' : '',
-					hasBSC ? 'eip155:56' : '',
-					hasPolygon ? 'eip155:137' : '',
-				].filter((e) => e.length),
+				chains: createChains(accountsByChain).filter((e) => e.length),
 				events: proposal.params.requiredNamespaces['eip155'].events,
 				accounts: accountsToSend,
 			},

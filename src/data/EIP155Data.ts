@@ -40,6 +40,13 @@ export const EIP155_MAINNET_CHAINS = {
 		rgb: '235, 0, 25',
 		rpc: 'https://mainnet.optimism.io',
 	},
+	'eip155:42161': {
+		chainId: 42161,
+		name: 'Arbitrum',
+		logo: '/chain-logos/eip155-42161.png',
+		rgb: '235, 0, 25',
+		rpc: 'https://arbitrum.io/',
+	},
 }
 
 export const EIP155_TEST_CHAINS = {

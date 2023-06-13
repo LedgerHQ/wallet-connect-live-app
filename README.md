@@ -41,6 +41,25 @@ This live app need parameters to be defined in the manifest file
 
 Use of [Zustand](https://github.com/pmndrs/zustand) and `persist` middleware to have a persistent store via the `localStorage`
 
+## Add new Chain support
+
+1 - Update `localManifest.json` by adding new entry in network
+
+```json
+{
+	"currency": "arbitrum",
+	"chainId": 42161
+}
+```
+
+2 - Update `EIP155Data` or other file if not in this family. If this is a new family, create new file and apply same logic as `EIP155Data`.
+
+3 - Update `useProposal` hook
+
+Modify somes methods :
+
+- `getNamespace`
+
 ## Getting Started
 
 ### Proto
