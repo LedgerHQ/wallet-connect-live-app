@@ -55,17 +55,17 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 			switch (request.method) {
 				case EIP155_SIGNING_METHODS.ETH_SIGN:
 				case EIP155_SIGNING_METHODS.PERSONAL_SIGN:
-					const isPersonaLSign =
+					const isPersonalSign =
 						request.method === EIP155_SIGNING_METHODS.PERSONAL_SIGN
 					const accountSign = hasETHAddress(
 						accounts,
-						isPersonaLSign ? request.params[1] : request.params[0],
+						isPersonalSign ? request.params[1] : request.params[0],
 					)
 					if (!!accountSign) {
 						try {
 							const walletApiClient = initWalletApiClient()
 							const message = stripHexPrefix(
-								isPersonaLSign
+								isPersonalSign
 									? request.params[0]
 									: request.params[1],
 							)
@@ -75,7 +75,11 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 									accountSign.id,
 									Buffer.from(message, 'hex'),
 								)
-							acceptRequest(topic, id, signedMessage.toString())
+							acceptRequest(
+								topic,
+								id,
+								formatMessage(signedMessage),
+							)
 						} catch (error) {
 							rejectRequest(topic, id, Errors.userDecline)
 						}
@@ -100,7 +104,11 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 									accountSignTyped.id,
 									Buffer.from(message),
 								)
-							acceptRequest(topic, id, signedMessage.toString())
+							acceptRequest(
+								topic,
+								id,
+								formatMessage(signedMessage),
+							)
 						} catch (error) {
 							rejectRequest(topic, id, Errors.msgDecline)
 						}
@@ -171,6 +179,9 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 	/******************************************************************************
 	 * Util functions
 	 *****************************************************************************/
+
+	const formatMessage = (buffer: Buffer) => '0x' + buffer.toString('hex')
+
 	const acceptRequest = (
 		topic: string,
 		id: number,
