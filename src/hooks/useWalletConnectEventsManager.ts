@@ -181,7 +181,10 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 	 * Util functions
 	 *****************************************************************************/
 
-	const formatMessage = (buffer: Buffer) => buffer.toString()
+	const formatMessage = (buffer: Buffer) => {
+		const message = stripHexPrefix(buffer.toString())
+		return '0x' + message
+	}
 
 	const acceptRequest = (
 		topic: string,
