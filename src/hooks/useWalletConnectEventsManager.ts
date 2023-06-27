@@ -79,6 +79,12 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 								topic,
 								id,
 								formatMessage(signedMessage),
+								() =>
+									acceptRequest(
+										topic,
+										id,
+										formatMessage(signedMessage, true),
+									),
 							)
 						} catch (error) {
 							rejectRequest(topic, id, Errors.userDecline)
@@ -109,6 +115,12 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 								topic,
 								id,
 								formatMessage(signedMessage),
+								() =>
+									acceptRequest(
+										topic,
+										id,
+										formatMessage(signedMessage, true),
+									),
 							)
 						} catch (error) {
 							rejectRequest(topic, id, Errors.msgDecline)
@@ -181,21 +193,25 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 	 * Util functions
 	 *****************************************************************************/
 
-	const formatMessage = (buffer: Buffer) => buffer.toString()
+	const formatMessage = (buffer: Buffer, withHex = false) =>
+		withHex ? '0x' + buffer.toString('hex') : buffer.toString()
 
 	const acceptRequest = (
 		topic: string,
 		id: number,
 		signedMessage: string,
+		retry?: () => void,
 	) => {
-		web3wallet.respondSessionRequest({
-			topic,
-			response: {
-				id,
-				jsonrpc: '2.0',
-				result: signedMessage,
-			},
-		})
+		web3wallet
+			.respondSessionRequest({
+				topic,
+				response: {
+					id,
+					jsonrpc: '2.0',
+					result: signedMessage,
+				},
+			})
+			.catch(retry)
 	}
 
 	const rejectRequest = (topic: string, id: number, message: Errors) => {
