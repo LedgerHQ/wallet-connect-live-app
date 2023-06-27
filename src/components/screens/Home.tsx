@@ -1,8 +1,4 @@
-import {
-	goToWalletConnectV1,
-	isV1,
-	startProposal,
-} from '@/helpers/walletConnect.util'
+import { startProposal } from '@/helpers/walletConnect.util'
 import { ResponsiveContainer } from '@/styles/styles'
 import { NetworkConfig, InputMode } from '@/types/types'
 import { Account } from '@ledgerhq/wallet-api-client'
@@ -85,15 +81,6 @@ export default function Home({
 	const handleConnect = useCallback(
 		async (inputValue: string) => {
 			try {
-				if (isV1(inputValue)) {
-					analytics.track('event_triggered', {
-						event: 'WC-Redirection to WC v1',
-						uri: inputValue,
-						page: 'Connect',
-					})
-					goToWalletConnectV1(inputValue)
-					return
-				}
 				setUri(inputValue)
 				const uri = new URL(inputValue)
 				await startProposal(uri.toString())

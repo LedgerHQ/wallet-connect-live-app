@@ -104,6 +104,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 									accountSignTyped.id,
 									Buffer.from(message),
 								)
+
 							acceptRequest(
 								topic,
 								id,
@@ -180,7 +181,10 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 	 * Util functions
 	 *****************************************************************************/
 
-	const formatMessage = (buffer: Buffer) => '0x' + buffer.toString('hex')
+	const formatMessage = (buffer: Buffer) => {
+		const message = stripHexPrefix(buffer.toString())
+		return '0x' + message
+	}
 
 	const acceptRequest = (
 		topic: string,

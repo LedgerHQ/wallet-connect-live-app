@@ -28,15 +28,6 @@ async function pair(uri: string) {
 	return await core.pairing.pair({ uri })
 }
 
-export const isV1 = (uri: string) => uri?.includes('@1?')
-
-export const goToWalletConnectV1 = (uri?: string) => {
-	const uriParam = `?uri=${uri ? encodeURIComponent(uri) : ''}`
-	window.location.assign(
-		`ledgerlive://discover/ledger-wallet-connect${uriParam}`,
-	)
-}
-
 export async function startProposal(uri: string) {
 	try {
 		const url = new URL(uri)
