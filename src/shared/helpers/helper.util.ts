@@ -117,6 +117,10 @@ export function getTicker(chain: string) {
 			return 'MATIC'
 		case 'bsc':
 			return 'BNB'
+		case 'arbitrum':
+			return 'ARB'
+		case 'optimism':
+			return 'OP'
 	}
 }
 
