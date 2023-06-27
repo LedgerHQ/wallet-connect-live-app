@@ -1,6 +1,6 @@
 {
-	"id": "ledger-wallet-connect-v2",
-	"name": "Wallet Connect v2",
+	"id": "ledger-wallet-connect",
+	"name": "Wallet Connect",
 	"url": "http://localhost:3000/",
 	"params": {
 		"networks": [
