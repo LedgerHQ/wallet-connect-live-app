@@ -51,7 +51,7 @@
 		"@types/uuid": "^8.3.4",
 		"@typescript-eslint/eslint-plugin": "^5.26.0",
 		"@typescript-eslint/parser": "^5.26.0",
-		"@walletconnect/types": "^2.4.0",
+		"@walletconnect/types": "^2.8.3",
 		"babel-plugin-styled-components": "^2.0.7",
 		"babel-plugin-transform-remove-console": "^6.9.4",
 		"eslint": "8.16.0",
