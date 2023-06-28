@@ -26,7 +26,7 @@ const getNamespace = (chain: string) => {
 		case 'polygon':
 			return 'eip155:137'
 		case 'bsc':
-			return ' eip155:56'
+			return 'eip155:56'
 	}
 }
 
