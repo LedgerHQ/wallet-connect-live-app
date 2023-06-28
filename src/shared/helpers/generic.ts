@@ -1,4 +1,5 @@
 import { Account } from '@ledgerhq/wallet-api-client'
+import { getCurrencyByChainId } from './helper.util'
 
 export const getDefaultLanguage = (
 	fallbackLang: string,
@@ -14,5 +15,16 @@ export const getDefaultLanguage = (
 export const compareETHAddresses = (addr1: string, addr2: string) =>
 	addr1.toLowerCase() === addr2.toLowerCase()
 
-export const hasETHAddress = (account: Account[], addr: string) =>
+export const getAccountWithAddress = (account: Account[], addr: string) =>
 	account.find((a) => a.address.toLowerCase() === addr.toLowerCase())
+
+export const getAccountWithAddressAndChainId = (
+	account: Account[],
+	addr: string,
+	chainId: string,
+) =>
+	account.find(
+		(a) =>
+			a.address.toLowerCase() === addr.toLowerCase() &&
+			a.currency === getCurrencyByChainId(chainId),
+	)
