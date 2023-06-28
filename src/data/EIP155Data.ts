@@ -71,6 +71,13 @@ export const EIP155_TEST_CHAINS = {
 		rgb: '235, 0, 25',
 		rpc: 'https://goerli.optimism.io',
 	},
+	'eip155:56': {
+		chainId: 56,
+		name: 'bsc',
+		logo: '/chain-logos/eip155-1.png',
+		rgb: '99, 125, 234',
+		rpc: 'https://rpc.ankr.com/bsc',
+	},
 }
 
 export const EIP155_CHAINS = { ...EIP155_MAINNET_CHAINS, ...EIP155_TEST_CHAINS }
