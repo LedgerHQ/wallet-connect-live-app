@@ -1,3 +1,4 @@
+import { Account } from '@ledgerhq/wallet-api-client'
 import { ButtonsContainer, List } from '@/components/atoms/containers/Elements'
 import { GenericRow, RowType } from '@/components/atoms/GenericRow'
 import LogoContainer from '@/components/atoms/logoContainers/LedgerLogoContainer'
@@ -16,6 +17,7 @@ import {
 	CircledCrossSolidMedium,
 } from '@ledgerhq/react-ui/assets/icons'
 import Image from 'next/image'
+import { accountSelector, useAccountsStore } from '@/storage/accounts.store'
 import { space } from '@ledgerhq/react-ui/styles/theme'
 import { useTranslation } from 'next-i18next'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -65,6 +67,9 @@ export default function SessionProposal() {
 	const { t } = useTranslation()
 	const { hydrated } = useHydratation()
 	const proposal = JSON.parse(router.query.data as string) as Proposal
+	const setAccountsConnected = useAccountsStore(
+		accountSelector.setAccountsConnected,
+	)
 	const {
 		handleClick,
 		handleClose,
@@ -93,6 +98,16 @@ export default function SessionProposal() {
 			url: proposer?.metadata?.url,
 		})
 		approveSession()
+		setAccountsConnected(
+			selectedAccounts
+				.map((id) => {
+					const acc: Account | undefined = accounts.find(
+						(a) => a.id === id,
+					)
+					return acc
+				})
+				.filter((acc): acc is Account => !!acc),
+		)
 	}
 
 	const onReject = useCallback(() => {

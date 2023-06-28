@@ -22,7 +22,7 @@ enum Errors {
 export default function useWalletConnectEventsManager(initialized: boolean) {
 	const { navigate, routes, tabsIndexes } = useNavigation()
 	const removeSession = useSessionsStore(sessionSelector.removeSession)
-	const accounts = useAccountsStore(accountSelector.selectAccounts)
+	const accounts = useAccountsStore(accountSelector.selectAccountsConnected)
 
 	const { initWalletApiClient, closeTransport } = useLedgerLive()
 	/******************************************************************************
