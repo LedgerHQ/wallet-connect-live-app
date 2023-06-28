@@ -119,3 +119,27 @@ export function getTicker(chain: string) {
 			return 'BNB'
 	}
 }
+
+export const getNamespace = (chain: string) => {
+	switch (chain) {
+		case 'ethereum':
+		default:
+			return 'eip155:1'
+		case 'polygon':
+			return 'eip155:137'
+		case 'bsc':
+			return 'eip155:56'
+	}
+}
+
+export const getCurrencyByChainId = (chainId: string) => {
+	switch (chainId) {
+		case 'eip155:1':
+		default:
+			return 'ethereum'
+		case 'eip155:137':
+			return 'polygon'
+		case 'eip155:56':
+			return 'bsc'
+	}
+}

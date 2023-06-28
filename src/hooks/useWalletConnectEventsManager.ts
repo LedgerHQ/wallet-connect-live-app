@@ -4,7 +4,10 @@ import { SignClientTypes } from '@walletconnect/types'
 import { useCallback, useEffect } from 'react'
 import { Web3WalletTypes } from '@walletconnect/web3wallet'
 import useNavigation from '@/hooks/common/useNavigation'
-import { hasETHAddress } from '@/helpers/generic'
+import {
+	getAccountWithAddress,
+	getAccountWithAddressAndChainId,
+} from '@/helpers/generic'
 import { stripHexPrefix } from '@/utils/currencyFormatter/helpers'
 import { useLedgerLive } from './common/useLedgerLive'
 import { convertEthToLiveTX } from '@/helpers/converters'
@@ -50,16 +53,17 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 			requestEvent: SignClientTypes.EventArguments['session_request'],
 		) => {
 			const { topic, params, id } = requestEvent
-			const { request } = params
+			const { request, chainId } = params
 
 			switch (request.method) {
 				case EIP155_SIGNING_METHODS.ETH_SIGN:
 				case EIP155_SIGNING_METHODS.PERSONAL_SIGN:
 					const isPersonalSign =
 						request.method === EIP155_SIGNING_METHODS.PERSONAL_SIGN
-					const accountSign = hasETHAddress(
+					const accountSign = getAccountWithAddressAndChainId(
 						accounts,
 						isPersonalSign ? request.params[1] : request.params[0],
+						chainId,
 					)
 					if (!!accountSign) {
 						try {
@@ -90,9 +94,10 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 				case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA:
 				case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V3:
 				case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V4:
-					const accountSignTyped = hasETHAddress(
+					const accountSignTyped = getAccountWithAddressAndChainId(
 						accounts,
 						request.params[0],
+						chainId,
 					)
 					if (!!accountSignTyped) {
 						try {
@@ -119,7 +124,10 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 				case EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION:
 				case EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION:
 					const ethTX = request.params[0]
-					const accountTX = hasETHAddress(accounts, ethTX.from)
+					const accountTX = getAccountWithAddress(
+						accounts,
+						ethTX.from,
+					)
 					if (!!accountTX) {
 						try {
 							const walletApiClient = initWalletApiClient()
