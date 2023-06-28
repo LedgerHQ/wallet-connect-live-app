@@ -145,7 +145,6 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 
 	const onSessionDeleted = useCallback(
 		async (session: SignClientTypes.EventArguments['session_delete']) => {
-			removeSession(session.topic)
 			await web3wallet.disconnectSession({
 				topic: session.topic,
 				reason: {
@@ -153,6 +152,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 					message: 'Session has been disconnected',
 				},
 			})
+			removeSession(session.topic)
 			navigate(routes.home, { tab: tabsIndexes.sessions })
 		},
 		[],

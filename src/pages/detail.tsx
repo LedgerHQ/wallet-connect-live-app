@@ -151,9 +151,13 @@ export default function SessionDetail() {
 		[fullAddresses, accounts],
 	)
 
-	if (!hydrated || !session) {
+	if (!hydrated) {
 		// Returns null on first render, so the client and server match
 		return null
+	}
+
+	if (!session) {
+		navigateToSessionsHomeTab()
 	}
 
 	return (
@@ -255,19 +259,20 @@ export default function SessionDetail() {
 								>
 									{t('sessions.detail.expires')}
 								</Text>
-
-								<Text
-									variant="small"
-									fontWeight="medium"
-									color="neutral.c70"
-								>
-									{
-										//https://stackoverflow.com/a/37001827
-										new Date(
-											session.expiry * 1000,
-										).toDateString()
-									}
-								</Text>
+								{session && (
+									<Text
+										variant="small"
+										fontWeight="medium"
+										color="neutral.c70"
+									>
+										{
+											//https://stackoverflow.com/a/37001827
+											new Date(
+												session.expiry * 1000,
+											).toDateString()
+										}
+									</Text>
+								)}
 							</Row>
 						</DetailContainer>
 						<Text variant="h4" mt={8} mb={6} color="neutral.c100">
