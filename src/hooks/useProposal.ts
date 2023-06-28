@@ -8,7 +8,7 @@ import useNavigation from '@/hooks/common/useNavigation'
 import { sessionSelector, useSessionsStore } from '@/storage/sessions.store'
 import { accountSelector, useAccountsStore } from '@/storage/accounts.store'
 import { useAppStore, appSelector } from '@/storage/app.store'
-import { formatChainName } from '@/helpers/helper.util'
+import { formatChainName, getNamespace } from '@/helpers/helper.util'
 import { EIP155_SIGNING_METHODS } from '@/data/EIP155Data'
 import { web3wallet } from '@/helpers/walletConnect.util'
 import useAnalytics from 'src/shared/useAnalytics'
@@ -16,18 +16,6 @@ import { useLedgerLive } from './common/useLedgerLive'
 
 type Props = {
 	proposal: Proposal
-}
-
-const getNamespace = (chain: string) => {
-	switch (chain) {
-		case 'ethereum':
-		default:
-			return 'eip155:1'
-		case 'polygon':
-			return 'eip155:137'
-		case 'bsc':
-			return 'eip155:56'
-	}
 }
 
 export function useProposal({ proposal }: Props) {
