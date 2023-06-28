@@ -133,6 +133,12 @@ export const getNamespace = (chain: string) => {
 			return 'eip155:137'
 		case 'bsc':
 			return 'eip155:56'
+		case 'optimism':
+			return 'eip155:10'
+		case 'arbitrum':
+			return 'eip155:42161'
+		case 'ethereum_goerli':
+			return 'eip155:5'
 	}
 }
 
@@ -145,5 +151,11 @@ export const getCurrencyByChainId = (chainId: string) => {
 			return 'polygon'
 		case 'eip155:56':
 			return 'bsc'
+		case 'eip155:10':
+			return 'optimism'
+		case 'eip155:42161':
+			return 'arbitrum'
+		case 'eip155:5':
+			return 'ethereum_goerli'
 	}
 }

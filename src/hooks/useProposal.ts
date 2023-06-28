@@ -25,25 +25,6 @@ type AccountsInChain = {
 	accounts: Account[]
 }
 
-// TO UPDATE WHEN SUPPORTING NEW CHAIN
-const getNamespace = (chain: string) => {
-	switch (chain) {
-		case 'ethereum':
-		default:
-			return 'eip155:1'
-		case 'polygon':
-			return 'eip155:137'
-		case 'bsc':
-			return 'eip155:56'
-		case 'optimism':
-			return 'eip155:10'
-		case 'arbitrum':
-			return 'eip155:42161'
-		case 'ethereum_goerli':
-			return 'eip155:5'
-	}
-}
-
 export function useProposal({ proposal }: Props) {
 	const { navigate, routes, tabsIndexes } = useNavigation()
 	const networks = useAppStore(appSelector.selectNetworks)

@@ -45,7 +45,9 @@ Use of [Zustand](https://github.com/pmndrs/zustand) and `persist` middleware to 
 
 Look at => `// TO UPDATE WHEN SUPPORTING NEW CHAIN` in code base
 
-1 - Update `localManifest.json` by adding new entry in network
+1 - Update `localManifest.json` by adding new entry in :
+
+- network
 
 ```json
 {
@@ -54,13 +56,18 @@ Look at => `// TO UPDATE WHEN SUPPORTING NEW CHAIN` in code base
 }
 ```
 
+- currencies
+  `"arbitrum"`
+
 2 - Update `EIP155Data` or other file if not in this family. If this is a new family, create new file and apply same logic as `EIP155Data`.
 
-3 - Update `useProposal` hook
+3 - Update functions in `@/shared/helpers/helper.util.ts` hook
 
 Modify somes methods :
 
 - `getNamespace`
+- `getCurrencyByChainId`
+- `getTicker`
 
 ## Getting Started
 
