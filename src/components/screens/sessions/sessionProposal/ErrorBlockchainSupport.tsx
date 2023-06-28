@@ -32,7 +32,11 @@ export function ErrorBlockchainSupport({ appName, chains }: Props) {
 	useEffect(() => {
 		analytics.page('Wallet Connect Error Unsupported Blockchains', {
 			dapp: appName,
-			chains,
+			chains: chains.map((chain) => ({
+				chain: chain.chain,
+				isSupported: chain.isSupported,
+				isRequired: chain.isRequired,
+			})),
 		})
 	}, [])
 
