@@ -3,6 +3,8 @@
  * @url https://chainlist.org
  */
 
+import { ChainMetadata } from './types'
+
 /**
  * Types
  */
@@ -19,21 +21,10 @@ interface NearTestChains {
 	[key: string]: ChainMetadata
 }
 
-type ChainMetadata = {
-	chainId: string
-	name: string
-	logo: string
-	rgb: string
-	rpc: string
-}
-
 export const NEAR_TEST_CHAINS: NearTestChains = {
 	'near:testnet': {
 		chainId: 'testnet',
 		name: 'NEAR Testnet',
-		logo: '/chain-logos/near.png',
-		rgb: '99, 125, 234',
-		rpc: 'https://rpc.testnet.near.org',
 	},
 }
 
