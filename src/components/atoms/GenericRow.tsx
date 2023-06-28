@@ -21,9 +21,7 @@ export enum RowType {
 const Row = styled(Flex)`
 	border-radius: 12px;
 	background-color: ${(props) => props.theme.colors.neutral.c20};
-	height: 60px;
-	padding-left: 12px;
-	padding-right: 12px;
+	padding: 12px;
 `
 
 export function GenericRow({
