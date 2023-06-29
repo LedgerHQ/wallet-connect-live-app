@@ -1,5 +1,3 @@
-// import ModalStore from '@/store/ModalStore'
-
 import { SignClientTypes } from '@walletconnect/types'
 import { useCallback, useEffect } from 'react'
 import { Web3WalletTypes } from '@walletconnect/web3wallet'

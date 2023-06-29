@@ -121,6 +121,10 @@ export function getTicker(chain: string) {
 			return 'ARB'
 		case 'optimism':
 			return 'OP'
+		case 'ethereum_goerli':
+			return 'GETH'
+		case 'optimism_goerli':
+			return 'OP'
 	}
 }
 
@@ -139,6 +143,8 @@ export const getNamespace = (chain: string) => {
 			return 'eip155:42161'
 		case 'ethereum_goerli':
 			return 'eip155:5'
+		case 'optimism_goerli':
+			return 'eip155:420'
 	}
 }
 
@@ -157,5 +163,7 @@ export const getCurrencyByChainId = (chainId: string) => {
 			return 'arbitrum'
 		case 'eip155:5':
 			return 'ethereum_goerli'
+		case 'eip155:420':
+			return 'optimism_goerli'
 	}
 }

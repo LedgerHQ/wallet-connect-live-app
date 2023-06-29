@@ -27,6 +27,10 @@
 			{
 				"currency": "ethereum_goerli",
 				"chainId": 5
+			},
+			{
+				"currency": "optimism_goerli",
+				"chainId": 420
 			}
 		]
 	},
@@ -43,7 +47,8 @@
 		"bsc",
 		"optimism",
 		"arbitrum",
-		"ethereum_goerli"
+		"ethereum_goerli",
+		"optimism_goerli"
 	],
 	"content": {
 		"shortDescription": {

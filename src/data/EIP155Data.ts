@@ -28,6 +28,10 @@ export const EIP155_MAINNET_CHAINS: Chains = {
 		chainId: 137,
 		name: 'Polygon',
 	},
+	'eip155:56': {
+		chainId: 56,
+		name: 'bsc',
+	},
 	'eip155:10': {
 		chainId: 10,
 		name: 'Optimism',
@@ -45,22 +49,15 @@ export const EIP155_TEST_CHAINS: Chains = {
 	},
 	'eip155:43113': {
 		chainId: 43113,
-		name: 'Avalanche Fuji',
+		name: 'avalanche_fuji',
 	},
 	'eip155:80001': {
 		chainId: 80001,
-		name: 'Polygon Mumbai',
+		name: 'polygon_mumbai',
 	},
 	'eip155:420': {
 		chainId: 420,
-		name: 'Optimism Goerli',
-	},
-	'eip155:56': {
-		chainId: 56,
-		name: 'bsc',
-		logo: '/chain-logos/eip155-1.png',
-		rgb: '99, 125, 234',
-		rpc: 'https://rpc.ankr.com/bsc',
+		name: 'optimism_goerli',
 	},
 }
 
