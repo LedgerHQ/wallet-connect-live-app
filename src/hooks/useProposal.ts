@@ -9,6 +9,7 @@ import { sessionSelector, useSessionsStore } from '@/storage/sessions.store'
 import { accountSelector, useAccountsStore } from '@/storage/accounts.store'
 import { useAppStore, appSelector } from '@/storage/app.store'
 import { formatChainName, getNamespace } from '@/helpers/helper.util'
+import { EIP155_SIGNING_METHODS } from '@/data/EIP155Data'
 import { web3wallet } from '@/helpers/walletConnect.util'
 import useAnalytics from 'src/shared/useAnalytics'
 import { useLedgerLive } from './common/useLedgerLive'
@@ -114,9 +115,13 @@ export function useProposal({ proposal }: Props) {
 			[],
 		)
 
+		const methods = proposal.params.requiredNamespaces[
+			'eip155'
+		].methods.concat(Object.values(EIP155_SIGNING_METHODS))
+
 		return {
 			eip155: {
-				methods: proposal.params.requiredNamespaces['eip155'].methods,
+				methods: [...new Set(methods)],
 				chains: [
 					hasETH ? 'eip155:1' : '',
 					hasBSC ? 'eip155:56' : '',
