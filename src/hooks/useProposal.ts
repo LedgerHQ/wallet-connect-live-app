@@ -115,23 +115,19 @@ export function useProposal({ proposal }: Props) {
 			[],
 		)
 
+		const methods = proposal.params.requiredNamespaces[
+			'eip155'
+		].methods.concat(Object.values(EIP155_SIGNING_METHODS))
+
 		return {
 			eip155: {
-				methods: [
-					EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION,
-					EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION,
-					EIP155_SIGNING_METHODS.ETH_SIGN,
-					EIP155_SIGNING_METHODS.PERSONAL_SIGN,
-					EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA,
-					EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V3,
-					EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V4,
-				],
+				methods: [...new Set(methods)],
 				chains: [
 					hasETH ? 'eip155:1' : '',
 					hasBSC ? 'eip155:56' : '',
 					hasPolygon ? 'eip155:137' : '',
 				].filter((e) => e.length),
-				events: ['chainChanged', 'accountsChanged'],
+				events: proposal.params.requiredNamespaces['eip155'].events,
 				accounts: accountsToSend,
 			},
 		}
