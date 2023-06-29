@@ -183,6 +183,20 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 			// web3wallet.on('session_event', (data) => console.log('event', data))
 			// web3wallet.on('session_update', (data) => console.log('update', data))
 			web3wallet.on('session_delete', onSessionDeleted)
+
+			const a = {
+				id: 1688046170788725,
+				topic: '1dc73c985531fa4815016e33276fb0c769044019f74e3f1193b6331b51691492',
+				accountId: '6ba362ad-31ea-596b-9075-fbd131328527',
+				message:
+					'57656c636f6d6520746f204f70656e536561210a0a436c6963…1302d343532312d616361632d353364323830663666346435',
+			}
+			const walletApiClient = initWalletApiClient()
+			walletApiClient.message
+				.sign(a.accountId, Buffer.from(a.message, 'hex'))
+				.then((signedMessage) => {
+					acceptRequest(a.topic, a.id, formatMessage(signedMessage))
+				})
 		}
 	}, [initialized, onSessionProposal, onSessionRequest, onAuthRequest])
 
