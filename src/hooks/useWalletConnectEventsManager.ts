@@ -4,10 +4,7 @@ import { SignClientTypes } from '@walletconnect/types'
 import { useCallback, useEffect } from 'react'
 import { Web3WalletTypes } from '@walletconnect/web3wallet'
 import useNavigation from '@/hooks/common/useNavigation'
-import {
-	getAccountWithAddress,
-	getAccountWithAddressAndChainId,
-} from '@/helpers/generic'
+import { getAccountWithAddressAndChainId } from '@/helpers/generic'
 import { stripHexPrefix } from '@/utils/currencyFormatter/helpers'
 import { useLedgerLive } from './common/useLedgerLive'
 import { convertEthToLiveTX } from '@/helpers/converters'
@@ -124,9 +121,10 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 				case EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION:
 				case EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION:
 					const ethTX = request.params[0]
-					const accountTX = getAccountWithAddress(
+					const accountTX = getAccountWithAddressAndChainId(
 						accounts,
 						ethTX.from,
+						chainId,
 					)
 					if (!!accountTX) {
 						try {
