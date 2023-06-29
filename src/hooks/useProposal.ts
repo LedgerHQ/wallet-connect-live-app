@@ -9,7 +9,6 @@ import { sessionSelector, useSessionsStore } from '@/storage/sessions.store'
 import { accountSelector, useAccountsStore } from '@/storage/accounts.store'
 import { useAppStore, appSelector } from '@/storage/app.store'
 import { formatChainName, getNamespace } from '@/helpers/helper.util'
-import { EIP155_SIGNING_METHODS } from '@/data/EIP155Data'
 import { web3wallet } from '@/helpers/walletConnect.util'
 import useAnalytics from 'src/shared/useAnalytics'
 import { useLedgerLive } from './common/useLedgerLive'
@@ -117,21 +116,13 @@ export function useProposal({ proposal }: Props) {
 
 		return {
 			eip155: {
-				methods: [
-					EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION,
-					EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION,
-					EIP155_SIGNING_METHODS.ETH_SIGN,
-					EIP155_SIGNING_METHODS.PERSONAL_SIGN,
-					EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA,
-					EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V3,
-					EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V4,
-				],
+				methods: proposal.params.requiredNamespaces['eip155'].methods,
 				chains: [
 					hasETH ? 'eip155:1' : '',
 					hasBSC ? 'eip155:56' : '',
 					hasPolygon ? 'eip155:137' : '',
 				].filter((e) => e.length),
-				events: ['chainChanged', 'accountsChanged'],
+				events: proposal.params.requiredNamespaces['eip155'].events,
 				accounts: accountsToSend,
 			},
 		}
