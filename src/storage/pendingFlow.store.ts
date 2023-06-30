@@ -6,7 +6,8 @@ type PendingFlow = {
 	id: number
 	topic: string
 	accountId: string
-	message?: Buffer
+	message?: string
+	isHex?: boolean
 	liveTx?: EthereumTransaction
 }
 

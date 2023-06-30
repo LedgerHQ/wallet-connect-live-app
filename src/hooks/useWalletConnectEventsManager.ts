@@ -88,7 +88,8 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 								id,
 								topic,
 								accountId: accountSign.id,
-								message: Buffer.from(message, 'hex'),
+								message,
+								isHex: true,
 							})
 							const signedMessage =
 								await walletApiClient.message.sign(
@@ -125,7 +126,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 								id,
 								topic,
 								accountId: accountSignTyped.id,
-								message: Buffer.from(message),
+								message,
 							})
 							const signedMessage =
 								await walletApiClient.message.sign(
@@ -208,7 +209,9 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 				if (pendingFlow.message) {
 					const signedMessage = await walletApiClient.message.sign(
 						pendingFlow.accountId,
-						pendingFlow.message,
+						pendingFlow.isHex
+							? Buffer.from(pendingFlow.message, 'hex')
+							: Buffer.from(pendingFlow.message),
 					)
 					acceptRequest(
 						pendingFlow.topic,
