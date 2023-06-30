@@ -12,6 +12,10 @@ import { accountSelector, useAccountsStore } from '@/storage/accounts.store'
 import { EIP155_SIGNING_METHODS } from '@/data/EIP155Data'
 import { web3wallet } from '@/helpers/walletConnect.util'
 import { sessionSelector, useSessionsStore } from '@/storage/sessions.store'
+import {
+	pendingFlowSelector,
+	usePendingFlowStore,
+} from '@/storage/pendingFlow.store'
 
 enum Errors {
 	userDecline = 'User rejected',
@@ -23,6 +27,15 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 	const { navigate, routes, tabsIndexes } = useNavigation()
 	const removeSession = useSessionsStore(sessionSelector.removeSession)
 	const accounts = useAccountsStore(accountSelector.selectAccounts)
+	const pendingFlow = usePendingFlowStore(
+		pendingFlowSelector.selectPendingFlow,
+	)
+	const addPendingFlow = usePendingFlowStore(
+		pendingFlowSelector.addPendingFlow,
+	)
+	const clearPendingFlow = usePendingFlowStore(
+		pendingFlowSelector.clearPendingFlow,
+	)
 
 	const { initWalletApiClient, closeTransport } = useLedgerLive()
 	/******************************************************************************
@@ -71,6 +84,13 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 									: request.params[1],
 							)
 
+							addPendingFlow({
+								id,
+								topic,
+								accountId: accountSign.id,
+								message,
+								isHex: true,
+							})
 							const signedMessage =
 								await walletApiClient.message.sign(
 									accountSign.id,
@@ -84,6 +104,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 						} catch (error) {
 							rejectRequest(topic, id, Errors.userDecline)
 						}
+						clearPendingFlow()
 						closeTransport()
 						break
 					}
@@ -101,12 +122,17 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 							const walletApiClient = initWalletApiClient()
 							const message = stripHexPrefix(request.params[1])
 
+							addPendingFlow({
+								id,
+								topic,
+								accountId: accountSignTyped.id,
+								message,
+							})
 							const signedMessage =
 								await walletApiClient.message.sign(
 									accountSignTyped.id,
 									Buffer.from(message),
 								)
-
 							acceptRequest(
 								topic,
 								id,
@@ -115,6 +141,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 						} catch (error) {
 							rejectRequest(topic, id, Errors.msgDecline)
 						}
+						clearPendingFlow()
 						closeTransport()
 						break
 					}
@@ -129,16 +156,23 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 					if (!!accountTX) {
 						try {
 							const walletApiClient = initWalletApiClient()
-							const liveTX = convertEthToLiveTX(ethTX)
+							const liveTx = convertEthToLiveTX(ethTX)
+							addPendingFlow({
+								id,
+								topic,
+								accountId: accountTX.id,
+								liveTx,
+							})
 							const hash =
 								await walletApiClient.transaction.signAndBroadcast(
 									accountTX.id,
-									liveTX,
+									liveTx,
 								)
 							acceptRequest(topic, id, hash)
 						} catch (error) {
 							rejectRequest(topic, id, Errors.txDeclined)
 						}
+						clearPendingFlow()
 						closeTransport()
 					}
 
@@ -167,6 +201,42 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 		[],
 	)
 
+	const triggerPendingFlow = useCallback(async () => {
+		if (pendingFlow) {
+			try {
+				clearPendingFlow()
+				const walletApiClient = initWalletApiClient()
+				if (pendingFlow.message) {
+					const signedMessage = await walletApiClient.message.sign(
+						pendingFlow.accountId,
+						pendingFlow.isHex
+							? Buffer.from(pendingFlow.message, 'hex')
+							: Buffer.from(pendingFlow.message),
+					)
+					acceptRequest(
+						pendingFlow.topic,
+						pendingFlow.id,
+						formatMessage(signedMessage),
+					)
+				} else if (pendingFlow.liveTx) {
+					const hash =
+						await walletApiClient.transaction.signAndBroadcast(
+							pendingFlow.accountId,
+							pendingFlow.liveTx,
+						)
+					acceptRequest(pendingFlow.topic, pendingFlow.id, hash)
+				}
+			} catch (error) {
+				rejectRequest(
+					pendingFlow.topic,
+					pendingFlow.id,
+					Errors.userDecline,
+				)
+			}
+			closeTransport()
+		}
+	}, [initWalletApiClient, closeTransport, pendingFlow, clearPendingFlow])
+
 	/******************************************************************************
 	 * Set up WalletConnect event listeners
 	 *****************************************************************************/
@@ -184,7 +254,19 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 			// web3wallet.on('session_update', (data) => console.log('update', data))
 			web3wallet.on('session_delete', onSessionDeleted)
 		}
-	}, [initialized, onSessionProposal, onSessionRequest, onAuthRequest])
+	}, [
+		initialized,
+		onSessionProposal,
+		onSessionRequest,
+		onAuthRequest,
+		onSessionDeleted,
+	])
+
+	useEffect(() => {
+		if (initialized && web3wallet && pendingFlow) {
+			triggerPendingFlow()
+		}
+	}, [initialized])
 
 	/******************************************************************************
 	 * Util functions
