@@ -1,4 +1,8 @@
 {
+	"applicationDisabled": {
+		"title": "We are currently experiencing a temporary issue with WalletConnect v2 integration.",
+		"desc": "We are actively working to identify and implement a solution to restore the functionality as soon as possible. Thank you for your understanding."
+	},
 	"error": {
 		"noInput": "No input value",
 		"invalidUri": "Invalid URI"
