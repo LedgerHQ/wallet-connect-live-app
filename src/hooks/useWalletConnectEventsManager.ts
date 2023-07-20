@@ -103,6 +103,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 							)
 						} catch (error) {
 							rejectRequest(topic, id, Errors.userDecline)
+							throw new Error(String(error))
 						}
 						clearPendingFlow()
 						closeTransport()
@@ -140,6 +141,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 							)
 						} catch (error) {
 							rejectRequest(topic, id, Errors.msgDecline)
+							throw new Error(String(error))
 						}
 						clearPendingFlow()
 						closeTransport()
@@ -171,6 +173,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 							acceptRequest(topic, id, hash)
 						} catch (error) {
 							rejectRequest(topic, id, Errors.txDeclined)
+							throw new Error(String(error))
 						}
 						clearPendingFlow()
 						closeTransport()
@@ -192,6 +195,9 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 						code: 3,
 						message: 'Session has been disconnected',
 					},
+				})
+				.catch((err) => {
+					throw new Error(String(err))
 				})
 				.finally(() => {
 					removeSession(session.topic)
@@ -232,6 +238,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 					pendingFlow.id,
 					Errors.userDecline,
 				)
+				throw new Error(String(error))
 			}
 			closeTransport()
 		}

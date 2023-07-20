@@ -147,6 +147,7 @@ export function useProposal({ proposal }: Props) {
 				console.log(error)
 				// TODO : display error toast
 				navigate(routes.home, { tab: tabsIndexes.connect })
+				throw new Error(error)
 			})
 	}, [proposal])
 
@@ -170,6 +171,7 @@ export function useProposal({ proposal }: Props) {
 			addAccount(newAccount)
 		} catch (error) {
 			console.log('request account canceled by user')
+			throw new Error(String(error))
 		}
 		closeTransport()
 	}, [])

@@ -97,6 +97,7 @@ export default function SessionDetail() {
 			})
 		} catch (error) {
 			console.error(error)
+			throw new Error(String(error))
 		}
 		removeSession(session.topic)
 		navigateToSessionsHomeTab()

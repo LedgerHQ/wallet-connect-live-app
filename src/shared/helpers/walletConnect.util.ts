@@ -54,6 +54,6 @@ export async function startProposal(uri: string) {
 		if (error instanceof TypeError) {
 			return
 		}
-		throw error
+		throw new Error(String(error))
 	}
 }
