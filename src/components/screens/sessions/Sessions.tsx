@@ -76,7 +76,6 @@ export default function Sessions({ goToConnect }: SessionsProps) {
 			),
 		)
 			.catch((err) => {
-				console.error(err)
 				throw new Error(String(err))
 			})
 			.finally(() => {

@@ -144,7 +144,6 @@ export function useProposal({ proposal }: Props) {
 				navigate(routes.sessionDetails, res.topic)
 			})
 			.catch((error) => {
-				console.log(error)
 				// TODO : display error toast
 				navigate(routes.home, { tab: tabsIndexes.connect })
 				throw new Error(error)

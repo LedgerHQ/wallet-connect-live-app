@@ -94,7 +94,6 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 				page: 'Connect',
 			})
 		} catch (err) {
-			console.error(err)
 			throw new Error(String(err))
 		}
 	}, [])
