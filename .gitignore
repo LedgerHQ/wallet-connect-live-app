@@ -39,3 +39,5 @@ yarn-error.log*
 
 # manifest
 manifest.json
+# Sentry Auth Token
+.sentryclirc
