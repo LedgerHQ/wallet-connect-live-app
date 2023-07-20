@@ -147,22 +147,22 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 					}
 				case EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION:
 				case EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION:
-					const ethTX = request.params[0]
+					const ethTx = request.params[0]
 					const accountTX = getAccountWithAddressAndChainId(
 						accounts,
-						ethTX.from,
+						ethTx.from,
 						chainId,
 					)
 					if (!!accountTX) {
 						try {
 							const walletApiClient = initWalletApiClient()
-							const liveTx = convertEthToLiveTX(ethTX)
 							addPendingFlow({
 								id,
 								topic,
 								accountId: accountTX.id,
-								liveTx,
+								ethTx,
 							})
+							const liveTx = convertEthToLiveTX(ethTx)
 							const hash =
 								await walletApiClient.transaction.signAndBroadcast(
 									accountTX.id,
@@ -218,11 +218,12 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 						pendingFlow.id,
 						formatMessage(signedMessage),
 					)
-				} else if (pendingFlow.liveTx) {
+				} else if (pendingFlow.ethTx) {
+					const liveTx = convertEthToLiveTX(pendingFlow.ethTx)
 					const hash =
 						await walletApiClient.transaction.signAndBroadcast(
 							pendingFlow.accountId,
-							pendingFlow.liveTx,
+							liveTx,
 						)
 					acceptRequest(pendingFlow.topic, pendingFlow.id, hash)
 				}

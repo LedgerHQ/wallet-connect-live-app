@@ -1,4 +1,4 @@
-import { EthereumTransaction } from '@ledgerhq/wallet-api-client'
+import { EthTransaction } from '@/helpers/converters'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
@@ -8,7 +8,7 @@ type PendingFlow = {
 	accountId: string
 	message?: string
 	isHex?: boolean
-	liveTx?: EthereumTransaction
+	ethTx?: EthTransaction
 }
 
 interface PendingFlowState {
