@@ -76,7 +76,7 @@ export default function Sessions({ goToConnect }: SessionsProps) {
 			),
 		)
 			.catch((err) => {
-				console.log(err)
+				console.error(err)
 			})
 			.finally(() => {
 				clearSessions()
