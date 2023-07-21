@@ -2,7 +2,7 @@ import { BigNumber } from 'bignumber.js'
 import eip55 from 'eip55'
 import { EthereumTransaction } from '@ledgerhq/wallet-api-client'
 
-type EthTransaction = {
+export type EthTransaction = {
 	value: string
 	to: string
 	gasPrice: string

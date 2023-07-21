@@ -194,10 +194,10 @@ export default function SessionProposal() {
 												{proposer.metadata.icons
 													.length > 0 ? (
 													<Image
-														src={
+														src={decodeURI(
 															proposer.metadata
-																.icons[0]
-														}
+																.icons[0],
+														)}
 														alt="Picture of the proposer"
 														width={60}
 														style={{

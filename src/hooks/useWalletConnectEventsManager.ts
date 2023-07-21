@@ -16,11 +16,19 @@ import {
 	pendingFlowSelector,
 	usePendingFlowStore,
 } from '@/storage/pendingFlow.store'
+import { captureException } from '@sentry/nextjs'
 
 enum Errors {
 	userDecline = 'User rejected',
 	txDeclined = 'Transaction declined',
 	msgDecline = 'Message signed declined',
+}
+
+function isDataInvalid(data: Buffer | undefined) {
+	return (
+		!data ||
+		Buffer.from(data.toString('hex'), 'hex').toString('hex').length === 0
+	)
 }
 
 export default function useWalletConnectEventsManager(initialized: boolean) {
@@ -103,6 +111,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 							)
 						} catch (error) {
 							rejectRequest(topic, id, Errors.userDecline)
+							console.error(error)
 						}
 						clearPendingFlow()
 						closeTransport()
@@ -140,6 +149,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 							)
 						} catch (error) {
 							rejectRequest(topic, id, Errors.msgDecline)
+							console.error(error)
 						}
 						clearPendingFlow()
 						closeTransport()
@@ -147,21 +157,23 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 					}
 				case EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION:
 				case EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION:
-					const ethTX = request.params[0]
+					const ethTx = request.params[0]
 					const accountTX = getAccountWithAddressAndChainId(
 						accounts,
-						ethTX.from,
+						ethTx.from,
 						chainId,
 					)
 					if (!!accountTX) {
 						try {
 							const walletApiClient = initWalletApiClient()
-							const liveTx = convertEthToLiveTX(ethTX)
+							const liveTx = convertEthToLiveTX(ethTx)
 							addPendingFlow({
 								id,
 								topic,
 								accountId: accountTX.id,
-								liveTx,
+								ethTx,
+								txHadSomeData:
+									ethTx.data && ethTx.data.length > 0,
 							})
 							const hash =
 								await walletApiClient.transaction.signAndBroadcast(
@@ -171,6 +183,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 							acceptRequest(topic, id, hash)
 						} catch (error) {
 							rejectRequest(topic, id, Errors.txDeclined)
+							console.error(error)
 						}
 						clearPendingFlow()
 						closeTransport()
@@ -192,6 +205,9 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 						code: 3,
 						message: 'Session has been disconnected',
 					},
+				})
+				.catch((err) => {
+					console.error(err)
 				})
 				.finally(() => {
 					removeSession(session.topic)
@@ -218,11 +234,24 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 						pendingFlow.id,
 						formatMessage(signedMessage),
 					)
-				} else if (pendingFlow.liveTx) {
+				} else if (pendingFlow.ethTx) {
+					const liveTx = convertEthToLiveTX(pendingFlow.ethTx)
+					// If the transaction initally had some data and we somehow lost them
+					// then we don't signAndBroadcast the transaction to protect our users funds
+					if (
+						pendingFlow.txHadSomeData &&
+						isDataInvalid(liveTx.data)
+					) {
+						const error = new Error(
+							'The pending transaction triggered was expected to have some data but its data was empty',
+						)
+						captureException(error)
+						throw error
+					}
 					const hash =
 						await walletApiClient.transaction.signAndBroadcast(
 							pendingFlow.accountId,
-							pendingFlow.liveTx,
+							liveTx,
 						)
 					acceptRequest(pendingFlow.topic, pendingFlow.id, hash)
 				}
@@ -232,6 +261,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 					pendingFlow.id,
 					Errors.userDecline,
 				)
+				console.error(error)
 			}
 			closeTransport()
 		}
