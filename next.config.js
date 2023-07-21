@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /** @type {import('next').NextConfig} */
+
+const { withSentryConfig } = require('@sentry/nextjs')
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
 	enabled: process.env.ANALYZE === 'true',
 })
@@ -26,3 +28,14 @@ const nextConfig = {
 }
 
 module.exports = withBundleAnalyzer(nextConfig)
+
+module.exports = withSentryConfig(module.exports, {
+	// For all available options, see:
+	// https://github.com/getsentry/sentry-webpack-plugin#options
+
+	// Suppresses source map uploading logs during build
+	silent: true,
+
+	org: 'ledger',
+	project: 'wallet-connect-live-app',
+})

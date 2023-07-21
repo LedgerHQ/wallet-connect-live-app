@@ -85,7 +85,7 @@ export default function Home({
 				const uri = new URL(inputValue)
 				await startProposal(uri.toString())
 			} catch (error: unknown) {
-				console.log(error)
+				console.error(error)
 			} finally {
 				setUri('')
 			}
