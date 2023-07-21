@@ -33,6 +33,7 @@ export default function ProtocolNotSupported() {
 			flex={1}
 			height={'100%'}
 			width={'100%'}
+			px={6}
 		>
 			<LogoContainer>
 				<CloseMedium size={32} color="background.main" />
