@@ -134,6 +134,7 @@ export function useProposal({ proposal }: Props) {
 	}
 
 	const approveSession = useCallback(async () => {
+		throw new Error('ERROR Approve')
 		web3wallet
 			.approveSession({
 				id: proposal.id,
