@@ -103,7 +103,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 							)
 						} catch (error) {
 							rejectRequest(topic, id, Errors.userDecline)
-							throw new Error(String(error))
+							console.error(error)
 						}
 						clearPendingFlow()
 						closeTransport()
@@ -141,7 +141,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 							)
 						} catch (error) {
 							rejectRequest(topic, id, Errors.msgDecline)
-							throw new Error(String(error))
+							console.error(error)
 						}
 						clearPendingFlow()
 						closeTransport()
@@ -173,7 +173,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 							acceptRequest(topic, id, hash)
 						} catch (error) {
 							rejectRequest(topic, id, Errors.txDeclined)
-							throw new Error(String(error))
+							console.error(error)
 						}
 						clearPendingFlow()
 						closeTransport()
@@ -238,7 +238,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 					pendingFlow.id,
 					Errors.userDecline,
 				)
-				throw new Error(String(error))
+				console.error(error)
 			}
 			closeTransport()
 		}

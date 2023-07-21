@@ -24,7 +24,7 @@ export function QRScanner({ onQRScan }: QRScannerProps) {
 				delay={500}
 				onError={(error) => {
 					if (!!error) {
-						throw new Error(error)
+						console.error(error)
 					}
 				}}
 				onScan={(result) => {

@@ -96,7 +96,7 @@ export default function SessionDetail() {
 				page: 'Wallet Connect Session Detail',
 			})
 		} catch (error) {
-			throw new Error(String(error))
+			console.error(error)
 		}
 		removeSession(session.topic)
 		navigateToSessionsHomeTab()

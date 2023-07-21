@@ -135,12 +135,6 @@ export function useProposal({ proposal }: Props) {
 	}
 
 	const approveSession = useCallback(async () => {
-		console.log('approveSession')
-		captureException(new Error('ERROR Approve'))
-		captureMessage('ERROR Approve')
-
-		throw new Error('ERROR ON APPROVE')
-
 		web3wallet
 			.approveSession({
 				id: proposal.id,
@@ -151,9 +145,9 @@ export function useProposal({ proposal }: Props) {
 				navigate(routes.sessionDetails, res.topic)
 			})
 			.catch((error) => {
+				console.error(error)
 				// TODO : display error toast
 				navigate(routes.home, { tab: tabsIndexes.connect })
-				throw new Error(error)
 			})
 	}, [proposal])
 
@@ -176,8 +170,7 @@ export function useProposal({ proposal }: Props) {
 			})
 			addAccount(newAccount)
 		} catch (error) {
-			console.log('request account canceled by user')
-			throw new Error(String(error))
+			console.error('request account canceled by user')
 		}
 		closeTransport()
 	}, [])

@@ -17,7 +17,7 @@ export default function useInitialization() {
 
 			setInitialized(true)
 		} catch (err: unknown) {
-			throw new Error(String(err))
+			console.error(err)
 		}
 	}, [relayerRegionURL])
 
