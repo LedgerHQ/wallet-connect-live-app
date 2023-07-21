@@ -3,6 +3,8 @@
 		"title": "We are currently experiencing a temporary issue with WalletConnect v2 integration.",
 		"desc": "We are actively working to identify and implement a solution to restore the functionality as soon as possible. Thank you for your understanding."
 	},
+	"back": "Back",
+	"close": "Close",
 	"error": {
 		"noInput": "No input value",
 		"invalidUri": "Invalid URI"
@@ -14,7 +16,11 @@
 		"useWalletConnectUrl": "Or use a WalletConnect URL",
 		"pasteUrl": "Paste URL",
 		"switchToText": "Switch to Text",
-		"switchToScanner": "Switch to Scanner"
+		"switchToScanner": "Switch to Scanner",
+		"errorProtocol": {
+			"title": "The app you’re trying to connect to isn’t up to date",
+			"desc": "WalletConnect V1 is not supported anymore. Dapp needs to upgrade to Wallet Connect V2."
+		}
 	},
 	"sessionProposal": {
 		"connectTo": "Connect to {{name}}",
