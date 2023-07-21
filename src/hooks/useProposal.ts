@@ -169,15 +169,14 @@ export function useProposal({ proposal }: Props) {
 
 	const addNewAccount = useCallback(async (currency: string) => {
 		const walletApiClient = initWalletApiClient()
-		try {
-			const newAccount = await walletApiClient.account.request({
+
+		await walletApiClient.account
+			.request({
 				currencyIds: [currency],
 			})
-			addAccount(newAccount)
-		} catch (error) {
-			console.log('request account canceled by user')
-			throw new Error(String(error))
-		}
+			.then((acc) => addAccount(acc))
+			.catch((err: Error) => captureError(err))
+
 		closeTransport()
 	}, [])
 

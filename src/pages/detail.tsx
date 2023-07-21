@@ -27,6 +27,7 @@ import useHydratation from 'src/hooks/useHydratation'
 import { web3wallet } from '@/helpers/walletConnect.util'
 import { ImageWithPlaceholder } from '@/components/atoms/images/ImageWithPlaceholder'
 import useAnalytics from '@/hooks/useAnalytics'
+import { useErrors } from '@/hooks/useErrors'
 
 export { getServerSideProps } from '../lib/serverProps'
 
@@ -64,6 +65,7 @@ export default function SessionDetail() {
 		navigate(routes.home, { tab: tabsIndexes.sessions })
 	}, [routes, tabsIndexes])
 	const analytics = useAnalytics()
+	const { captureError } = useErrors()
 
 	useEffect(() => {
 		analytics.page('Wallet Connect Session Detail', {
@@ -83,23 +85,23 @@ export default function SessionDetail() {
 
 	const handleDelete = useCallback(async () => {
 		if (!session) return
-		try {
-			web3wallet.disconnectSession({
+
+		await web3wallet
+			.disconnectSession({
 				topic: session.topic,
 				reason: {
 					code: 3,
 					message: 'Disconnect Session',
 				},
 			})
-			analytics.track('button_clicked', {
-				button: 'WC-Disconnect Session',
-				page: 'Wallet Connect Session Detail',
-			})
-		} catch (error) {
-			throw new Error(String(error))
-		}
-		removeSession(session.topic)
-		navigateToSessionsHomeTab()
+			.then(() => removeSession(session.topic))
+			.catch((err: Error) => captureError(err))
+			.finally(() => navigateToSessionsHomeTab())
+
+		analytics.track('button_clicked', {
+			button: 'WC-Disconnect Session',
+			page: 'Wallet Connect Session Detail',
+		})
 	}, [session])
 
 	const onGoBack = useCallback(() => {

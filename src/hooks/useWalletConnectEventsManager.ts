@@ -16,6 +16,7 @@ import {
 	pendingFlowSelector,
 	usePendingFlowStore,
 } from '@/storage/pendingFlow.store'
+import { useErrors } from './useErrors'
 
 enum Errors {
 	userDecline = 'User rejected',
@@ -25,6 +26,7 @@ enum Errors {
 
 export default function useWalletConnectEventsManager(initialized: boolean) {
 	const { navigate, routes, tabsIndexes } = useNavigation()
+	const { captureError } = useErrors()
 	const removeSession = useSessionsStore(sessionSelector.removeSession)
 	const accounts = useAccountsStore(accountSelector.selectAccounts)
 	const pendingFlow = usePendingFlowStore(
@@ -76,35 +78,35 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 						chainId,
 					)
 					if (!!accountSign) {
-						try {
-							const walletApiClient = initWalletApiClient()
-							const message = stripHexPrefix(
-								isPersonalSign
-									? request.params[0]
-									: request.params[1],
-							)
+						const walletApiClient = initWalletApiClient()
+						const message = stripHexPrefix(
+							isPersonalSign
+								? request.params[0]
+								: request.params[1],
+						)
 
-							addPendingFlow({
-								id,
-								topic,
-								accountId: accountSign.id,
-								message,
-								isHex: true,
-							})
-							const signedMessage =
-								await walletApiClient.message.sign(
-									accountSign.id,
-									Buffer.from(message, 'hex'),
-								)
-							acceptRequest(
-								topic,
-								id,
-								formatMessage(signedMessage),
+						addPendingFlow({
+							id,
+							topic,
+							accountId: accountSign.id,
+							message,
+							isHex: true,
+						})
+
+						await walletApiClient.message
+							.sign(accountSign.id, Buffer.from(message, 'hex'))
+							.then((signedMessage) =>
+								acceptRequest(
+									topic,
+									id,
+									formatMessage(signedMessage),
+								),
 							)
-						} catch (error) {
-							rejectRequest(topic, id, Errors.userDecline)
-							throw new Error(String(error))
-						}
+							.catch((error: Error) => {
+								rejectRequest(topic, id, Errors.userDecline),
+									captureError(error)
+							})
+
 						clearPendingFlow()
 						closeTransport()
 						break
@@ -119,30 +121,29 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 						chainId,
 					)
 					if (!!accountSignTyped) {
-						try {
-							const walletApiClient = initWalletApiClient()
-							const message = stripHexPrefix(request.params[1])
+						const walletApiClient = initWalletApiClient()
+						const message = stripHexPrefix(request.params[1])
 
-							addPendingFlow({
-								id,
-								topic,
-								accountId: accountSignTyped.id,
-								message,
-							})
-							const signedMessage =
-								await walletApiClient.message.sign(
-									accountSignTyped.id,
-									Buffer.from(message),
-								)
-							acceptRequest(
-								topic,
-								id,
-								formatMessage(signedMessage),
+						addPendingFlow({
+							id,
+							topic,
+							accountId: accountSignTyped.id,
+							message,
+						})
+						await walletApiClient.message
+							.sign(accountSignTyped.id, Buffer.from(message))
+							.then((signedMessage) =>
+								acceptRequest(
+									topic,
+									id,
+									formatMessage(signedMessage),
+								),
 							)
-						} catch (error) {
-							rejectRequest(topic, id, Errors.msgDecline)
-							throw new Error(String(error))
-						}
+							.catch((error: Error) => {
+								rejectRequest(topic, id, Errors.msgDecline)
+								captureError(error)
+							})
+
 						clearPendingFlow()
 						closeTransport()
 						break
@@ -156,25 +157,23 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 						chainId,
 					)
 					if (!!accountTX) {
-						try {
-							const walletApiClient = initWalletApiClient()
-							const liveTx = convertEthToLiveTX(ethTX)
-							addPendingFlow({
-								id,
-								topic,
-								accountId: accountTX.id,
-								liveTx,
+						const walletApiClient = initWalletApiClient()
+						const liveTx = convertEthToLiveTX(ethTX)
+						addPendingFlow({
+							id,
+							topic,
+							accountId: accountTX.id,
+							liveTx,
+						})
+
+						await walletApiClient.transaction
+							.signAndBroadcast(accountTX.id, liveTx)
+							.then((hash) => acceptRequest(topic, id, hash))
+							.catch((error: Error) => {
+								rejectRequest(topic, id, Errors.txDeclined)
+								captureError(error)
 							})
-							const hash =
-								await walletApiClient.transaction.signAndBroadcast(
-									accountTX.id,
-									liveTx,
-								)
-							acceptRequest(topic, id, hash)
-						} catch (error) {
-							rejectRequest(topic, id, Errors.txDeclined)
-							throw new Error(String(error))
-						}
+
 						clearPendingFlow()
 						closeTransport()
 					}
@@ -196,8 +195,8 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 						message: 'Session has been disconnected',
 					},
 				})
-				.catch((err) => {
-					throw new Error(String(err))
+				.catch((err: Error) => {
+					captureError(err)
 				})
 				.finally(() => {
 					removeSession(session.topic)
@@ -209,37 +208,36 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 
 	const triggerPendingFlow = useCallback(async () => {
 		if (pendingFlow) {
-			try {
-				clearPendingFlow()
-				const walletApiClient = initWalletApiClient()
-				if (pendingFlow.message) {
-					const signedMessage = await walletApiClient.message.sign(
-						pendingFlow.accountId,
-						pendingFlow.isHex
-							? Buffer.from(pendingFlow.message, 'hex')
-							: Buffer.from(pendingFlow.message),
-					)
-					acceptRequest(
-						pendingFlow.topic,
-						pendingFlow.id,
-						formatMessage(signedMessage),
-					)
-				} else if (pendingFlow.liveTx) {
-					const hash =
-						await walletApiClient.transaction.signAndBroadcast(
-							pendingFlow.accountId,
-							pendingFlow.liveTx,
-						)
-					acceptRequest(pendingFlow.topic, pendingFlow.id, hash)
-				}
-			} catch (error) {
-				rejectRequest(
+			clearPendingFlow()
+			const walletApiClient = initWalletApiClient()
+			if (pendingFlow.message) {
+				const signedMessage = await walletApiClient.message.sign(
+					pendingFlow.accountId,
+					pendingFlow.isHex
+						? Buffer.from(pendingFlow.message, 'hex')
+						: Buffer.from(pendingFlow.message),
+				)
+				acceptRequest(
 					pendingFlow.topic,
 					pendingFlow.id,
-					Errors.userDecline,
+					formatMessage(signedMessage),
 				)
-				throw new Error(String(error))
+			} else if (pendingFlow.liveTx) {
+				await walletApiClient.transaction
+					.signAndBroadcast(pendingFlow.accountId, pendingFlow.liveTx)
+					.then((hash) =>
+						acceptRequest(pendingFlow.topic, pendingFlow.id, hash),
+					)
+					.catch((error: Error) => {
+						rejectRequest(
+							pendingFlow.topic,
+							pendingFlow.id,
+							Errors.userDecline,
+						)
+						captureError(error)
+					})
 			}
+
 			closeTransport()
 		}
 	}, [initWalletApiClient, closeTransport, pendingFlow, clearPendingFlow])
