@@ -30,8 +30,8 @@ export default function ProtocolNotSupported() {
 			alignItems="center"
 			justifyContent="center"
 			flexDirection="column"
-			flex={1}
-			height={'100%'}
+			height="100%"
+			width="100%"
 			px={6}
 		>
 			<LogoContainer>
