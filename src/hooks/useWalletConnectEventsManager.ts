@@ -197,7 +197,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 					},
 				})
 				.catch((err) => {
-					throw new Error(String(err))
+					console.error(err)
 				})
 				.finally(() => {
 					removeSession(session.topic)
