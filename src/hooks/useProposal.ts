@@ -13,6 +13,7 @@ import { EIP155_SIGNING_METHODS } from '@/data/EIP155Data'
 import { web3wallet } from '@/helpers/walletConnect.util'
 import useAnalytics from 'src/shared/useAnalytics'
 import { useLedgerLive } from './common/useLedgerLive'
+import { captureException } from '@sentry/nextjs'
 
 type Props = {
 	proposal: Proposal
@@ -134,7 +135,8 @@ export function useProposal({ proposal }: Props) {
 	}
 
 	const approveSession = useCallback(async () => {
-		throw new Error('ERROR Approve')
+		captureException(new Error('ERROR Approve'))
+		console.log('approveSession')
 		web3wallet
 			.approveSession({
 				id: proposal.id,
