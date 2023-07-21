@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 import useAnalytics from 'src/shared/useAnalytics'
 import styled from 'styled-components'
 import router from 'next/router'
+import { ResponsiveContainer } from '@/styles/styles'
 
 export { getServerSideProps } from '../lib/serverProps'
 
@@ -32,45 +33,46 @@ export default function ProtocolNotSupported() {
 			flexDirection="column"
 			height="100%"
 			width="100%"
-			px={6}
 		>
-			<LogoContainer>
-				<CloseMedium size={32} color="background.main" />
-			</LogoContainer>
-			<Text
-				variant="h4"
-				fontWeight="medium"
-				color="neutral.c100"
-				mt={10}
-				textAlign="center"
-			>
-				{t('connect.errorProtocol.title')}
-			</Text>
-			<Text
-				variant="bodyLineHeight"
-				fontWeight="medium"
-				color="neutral.c80"
-				mt={10}
-				textAlign="center"
-			>
-				{t('connect.errorProtocol.desc')}
-			</Text>
-
-			<Button
-				mt={12}
-				onClick={() => router.push('/')}
-				data-test="connect-button"
-				variant="main"
-				size="large"
-			>
+			<ResponsiveContainer>
+				<LogoContainer>
+					<CloseMedium size={32} color="background.main" />
+				</LogoContainer>
 				<Text
-					fontSize="body"
-					fontWeight="semiBold"
-					color={'neutral.c00'}
+					variant="h4"
+					fontWeight="medium"
+					color="neutral.c100"
+					mt={10}
+					textAlign="center"
 				>
-					{t('close')}
+					{t('connect.errorProtocol.title')}
 				</Text>
-			</Button>
+				<Text
+					variant="bodyLineHeight"
+					fontWeight="medium"
+					color="neutral.c80"
+					mt={10}
+					textAlign="center"
+				>
+					{t('connect.errorProtocol.desc')}
+				</Text>
+
+				<Button
+					mt={12}
+					onClick={() => router.push('/')}
+					data-test="connect-button"
+					variant="main"
+					size="large"
+				>
+					<Text
+						fontSize="body"
+						fontWeight="semiBold"
+						color={'neutral.c00'}
+					>
+						{t('close')}
+					</Text>
+				</Button>
+			</ResponsiveContainer>
 		</Flex>
 	)
 }
