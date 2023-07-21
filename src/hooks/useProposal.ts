@@ -11,9 +11,9 @@ import { useAppStore, appSelector } from '@/storage/app.store'
 import { formatChainName, getNamespace } from '@/helpers/helper.util'
 import { EIP155_SIGNING_METHODS } from '@/data/EIP155Data'
 import { web3wallet } from '@/helpers/walletConnect.util'
-import useAnalytics from 'src/shared/useAnalytics'
+import useAnalytics from '@/hooks/useAnalytics'
 import { useLedgerLive } from './common/useLedgerLive'
-import { captureException, captureMessage } from '@sentry/nextjs'
+import { useErrors } from '@/hooks/useErrors'
 
 type Props = {
 	proposal: Proposal
@@ -26,6 +26,7 @@ export function useProposal({ proposal }: Props) {
 	const accounts = useAccountsStore(accountSelector.selectAccounts)
 	const addAccount = useAccountsStore(accountSelector.addAccount)
 	const analytics = useAnalytics()
+	const { captureError } = useErrors()
 
 	const { initWalletApiClient, closeTransport } = useLedgerLive()
 
@@ -135,12 +136,6 @@ export function useProposal({ proposal }: Props) {
 	}
 
 	const approveSession = useCallback(async () => {
-		console.log('approveSession')
-		captureException(new Error('ERROR Approve'))
-		captureMessage('ERROR Approve')
-
-		throw new Error('ERROR ON APPROVE')
-
 		web3wallet
 			.approveSession({
 				id: proposal.id,
@@ -150,22 +145,26 @@ export function useProposal({ proposal }: Props) {
 				addSession(res)
 				navigate(routes.sessionDetails, res.topic)
 			})
-			.catch((error) => {
+			.catch((error: Error) => {
 				// TODO : display error toast
+				captureError(error)
 				navigate(routes.home, { tab: tabsIndexes.connect })
-				throw new Error(error)
 			})
 	}, [proposal])
 
 	const rejectSession = useCallback(async () => {
-		await web3wallet.rejectSession({
-			id: proposal.id,
-			reason: {
-				code: 5000,
-				message: 'USER_REJECTED_METHODS',
-			},
-		})
-		navigate(routes.home)
+		await web3wallet
+			.rejectSession({
+				id: proposal.id,
+				reason: {
+					code: 5000,
+					message: 'USER_REJECTED_METHODS',
+				},
+			})
+			.catch((err: Error) => captureError(err))
+			.finally(() => {
+				navigate(routes.home)
+			})
 	}, [proposal])
 
 	const addNewAccount = useCallback(async (currency: string) => {

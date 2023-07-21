@@ -6,7 +6,8 @@ import { PasteMedium } from '@ledgerhq/react-ui/assets/icons'
 import { QRScanner } from './QRScanner'
 import { InputMode } from '@/types/types'
 import { useTranslation } from 'next-i18next'
-import useAnalytics from 'src/shared/useAnalytics'
+import useAnalytics from '@/hooks/useAnalytics'
+import { useErrors } from '@/hooks/useErrors'
 
 const QRScannerContainer = styled.div`
 	display: flex;
@@ -46,6 +47,7 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 	const [errorValue, setErrorValue] = useState<string | undefined>(undefined)
 	const [scanner, setScanner] = useState(mode === 'scan')
 	const analytics = useAnalytics()
+	const { captureInfoMessage } = useErrors()
 
 	const handleConnect = useCallback(() => {
 		try {
@@ -93,8 +95,8 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 				button: 'WC-Paste Url',
 				page: 'Connect',
 			})
-		} catch (err) {
-			throw new Error(String(err))
+		} catch {
+			captureInfoMessage('COPY/PASTE FAILED')
 		}
 	}, [])
 

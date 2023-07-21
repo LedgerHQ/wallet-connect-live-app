@@ -21,7 +21,7 @@ import { useTranslation } from 'next-i18next'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Logo } from 'src/icons/LedgerLiveLogo'
 import styled, { useTheme } from 'styled-components'
-import useAnalytics from 'src/shared/useAnalytics'
+import useAnalytics from '@/hooks/useAnalytics'
 
 export { getServerSideProps } from '../lib/serverProps'
 

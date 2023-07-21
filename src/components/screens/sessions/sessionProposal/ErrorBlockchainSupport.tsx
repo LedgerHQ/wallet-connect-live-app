@@ -3,7 +3,7 @@ import { Flex, Text } from '@ledgerhq/react-ui'
 import { CloseMedium } from '@ledgerhq/react-ui/assets/icons'
 import { useTranslation } from 'next-i18next'
 import { useEffect } from 'react'
-import useAnalytics from 'src/shared/useAnalytics'
+import useAnalytics from '@/hooks/useAnalytics'
 import styled from 'styled-components'
 
 const LogoContainer = styled(Flex)`

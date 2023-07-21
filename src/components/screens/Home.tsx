@@ -13,7 +13,8 @@ import styled from 'styled-components'
 import { Connect } from './Connect'
 import Sessions from './sessions/Sessions'
 import Tabs from './Tabs'
-import useAnalytics from 'src/shared/useAnalytics'
+import useAnalytics from '@/hooks/useAnalytics'
+import { useErrors } from '@/hooks/useErrors'
 
 const WalletConnectContainer = styled.div`
 	display: flex;
@@ -58,6 +59,7 @@ export default function Home({
 
 	const sessions = useSessionsStore(sessionSelector.selectSessions)
 	const analytics = useAnalytics()
+	const { captureError } = useErrors()
 
 	const { t } = useTranslation()
 
@@ -83,7 +85,7 @@ export default function Home({
 			try {
 				setUri(inputValue)
 				const uri = new URL(inputValue)
-				await startProposal(uri.toString())
+				await startProposal(uri.toString(), captureError)
 			} catch (error: unknown) {
 				console.log(error)
 			} finally {

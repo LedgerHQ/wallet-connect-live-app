@@ -24,18 +24,23 @@ export async function createWeb3Wallet(relayerRegionURL: string) {
 	})
 }
 
-async function pair(uri: string) {
-	return await core.pairing.pair({ uri })
+async function pair(uri: string, captureError: (err: Error) => void) {
+	return await core.pairing
+		.pair({ uri })
+		.catch((err: Error) => captureError(err))
 }
 
-export async function startProposal(uri: string) {
+export async function startProposal(
+	uri: string,
+	captureError: (err: Error) => void,
+) {
 	try {
 		const url = new URL(uri)
 
 		switch (url.protocol) {
 			// handle usual wallet connect URIs
 			case 'wc:': {
-				await pair(uri)
+				await pair(uri, captureError)
 				break
 			}
 
@@ -44,7 +49,7 @@ export async function startProposal(uri: string) {
 				const uriParam = url.searchParams.get('uri')
 
 				if (url.pathname === '//wc' && uriParam) {
-					await startProposal(uriParam)
+					await startProposal(uriParam, captureError)
 				}
 				break
 			}

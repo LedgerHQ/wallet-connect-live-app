@@ -13,7 +13,8 @@ import useWalletConnectPopin from '@/hooks/useWalletConnectPopin'
 
 import styled from 'styled-components'
 import { useSessionsStore, sessionSelector } from '@/storage/sessions.store'
-import useAnalytics from 'src/shared/useAnalytics'
+import useAnalytics from '@/hooks/useAnalytics'
+import { useErrors } from '@/hooks/useErrors'
 
 export type SessionsProps = {
 	goToConnect: () => void
@@ -28,6 +29,7 @@ export default function Sessions({ goToConnect }: SessionsProps) {
 	const clearSessions = useSessionsStore(sessionSelector.clearSessions)
 	const sessions = useSessionsStore(sessionSelector.selectSessions)
 	const analytics = useAnalytics()
+	const { captureError } = useErrors()
 
 	useEffect(() => {
 		analytics.page('Wallet Connect Sessions', {
@@ -75,8 +77,8 @@ export default function Sessions({ goToConnect }: SessionsProps) {
 				}),
 			),
 		)
-			.catch((err) => {
-				throw new Error(String(err))
+			.catch((err: Error) => {
+				captureError(err)
 			})
 			.finally(() => {
 				clearSessions()
