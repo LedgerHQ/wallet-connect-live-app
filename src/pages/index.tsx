@@ -8,7 +8,6 @@ import { NetworkConfig } from '@/types/types'
 import { WalletApiClientProvider } from 'src/shared/WalletApiClientProvider'
 import { appSelector, useAppStore } from '@/storage/app.store'
 import WalletConnect from '@/components/screens'
-import { ApplicationDisabled } from '@/components/ApplicationDisabled'
 
 export { getServerSideProps } from '../lib/serverProps'
 
@@ -61,8 +60,7 @@ const Index: NextPage = () => {
 					content="Ledger Wallet Connect"
 				/>
 			</Head>
-			<ApplicationDisabled />
-			{/* {isMounted ? (
+			{isMounted ? (
 				<WalletApiClientProvider networks={networkConfigs}>
 					{(accounts, userId, walletInfo) => (
 						<WalletConnect
@@ -76,7 +74,7 @@ const Index: NextPage = () => {
 						/>
 					)}
 				</WalletApiClientProvider>
-			) : null} */}
+			) : null}
 		</Container>
 	)
 }
