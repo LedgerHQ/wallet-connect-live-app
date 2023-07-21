@@ -6,6 +6,7 @@ import Head from 'next/head'
 import { Container } from '@/styles/styles'
 import { WalletApiClientProvider } from 'src/shared/WalletApiClientProvider'
 import WalletConnect from '@/components/screens'
+import { ApplicationDisabled } from '@/components/screens/ApplicationDisabled'
 
 export { getServerSideProps } from '../lib/serverProps'
 
@@ -36,8 +37,9 @@ const Index: NextPage = () => {
 					content="Ledger WalletConnect"
 				/>
 			</Head>
-			{isMounted ? (
-				<WalletApiClientProvider>
+			<ApplicationDisabled />
+			{/* {isMounted ? (
+				<WalletApiClientProvider networks={networkConfigs}>
 					{(accounts, userId, walletInfo) => (
 						<WalletConnect
 							initialMode={initialMode}
@@ -48,7 +50,7 @@ const Index: NextPage = () => {
 						/>
 					)}
 				</WalletApiClientProvider>
-			) : null}
+			) : null} */}
 		</Container>
 	)
 }
