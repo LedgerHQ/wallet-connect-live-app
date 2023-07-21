@@ -4,9 +4,16 @@
 
 import * as Sentry from '@sentry/nextjs'
 
-Sentry.init({
-	dsn: process.env.SENTRY_DNS,
-	tracesSampleRate: 0, // https://docs.sentry.io/platforms/javascript/performance
-	autoSessionTracking: false, // https://docs.sentry.io/platforms/javascript/configuration/options/#auto-session-tracking
-	sendClientReports: false, // https://docs.sentry.io/platforms/javascript/configuration/options/#send-client-reports
-})
+const SENTRY_DNS = process.env.SENTRY_DNS
+
+if (!!SENTRY_DNS) {
+	Sentry.init({
+		dsn: SENTRY_DNS,
+
+		tracesSampleRate: 0, // https://docs.sentry.io/platforms/javascript/performance
+		autoSessionTracking: false, // https://docs.sentry.io/platforms/javascript/configuration/options/#auto-session-tracking
+		sendClientReports: false, // https://docs.sentry.io/platforms/javascript/configuration/options/#send-client-reports
+	})
+} else {
+	console.error('NO CONFIG FOR SENTRY (S)')
+}
