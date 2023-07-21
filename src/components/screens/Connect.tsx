@@ -47,7 +47,7 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 	const [errorValue, setErrorValue] = useState<string | undefined>(undefined)
 	const [scanner, setScanner] = useState(mode === 'scan')
 	const analytics = useAnalytics()
-	const { captureInfoMessage } = useErrors()
+	const { captureInfoMessage, captureError } = useErrors()
 
 	const handleConnect = useCallback(() => {
 		try {
@@ -143,7 +143,10 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 			<Flex justifyContent="center" width="100%" my={14}>
 				<QRScannerContainer>
 					{scanner ? (
-						<QRScanner onQRScan={tryConnect} />
+						<QRScanner
+							onQRScan={tryConnect}
+							onError={captureError}
+						/>
 					) : (
 						<>
 							<QrCodeMedium size={32} color="neutral.c100" />

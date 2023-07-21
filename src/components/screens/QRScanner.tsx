@@ -15,16 +15,17 @@ const QRScannerContainer = styled.div`
 
 type QRScannerProps = {
 	onQRScan: (data: string) => void
+	onError: (error: Error) => void
 }
 
-export function QRScanner({ onQRScan }: QRScannerProps) {
+export function QRScanner({ onQRScan, onError }: QRScannerProps) {
 	return (
 		<QRScannerContainer>
 			<QrReader
 				delay={500}
-				onError={(error) => {
+				onError={(error: Error) => {
 					if (!!error) {
-						throw new Error(error)
+						onError(error)
 					}
 				}}
 				onScan={(result) => {
