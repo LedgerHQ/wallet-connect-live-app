@@ -156,13 +156,15 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 					if (!!accountTX) {
 						try {
 							const walletApiClient = initWalletApiClient()
+							const liveTx = convertEthToLiveTX(ethTx)
 							addPendingFlow({
 								id,
 								topic,
 								accountId: accountTX.id,
 								ethTx,
+								txHadSomeData:
+									ethTx.data && ethTx.data.length > 0,
 							})
-							const liveTx = convertEthToLiveTX(ethTx)
 							const hash =
 								await walletApiClient.transaction.signAndBroadcast(
 									accountTX.id,
@@ -220,6 +222,16 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 					)
 				} else if (pendingFlow.ethTx) {
 					const liveTx = convertEthToLiveTX(pendingFlow.ethTx)
+					// If the transaction initally had some data and we somehow lost them
+					// then we don't signAndBroadcast the transaction to protect our users funds
+					if (
+						pendingFlow.txHadSomeData &&
+						(!liveTx.data || liveTx.data.toString().length === 0)
+					) {
+						throw new Error(
+							'The pending transaction triggered was expected to have some data but its data is now empty',
+						)
+					}
 					const hash =
 						await walletApiClient.transaction.signAndBroadcast(
 							pendingFlow.accountId,

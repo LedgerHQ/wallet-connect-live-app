@@ -9,6 +9,10 @@ type PendingFlow = {
 	message?: string
 	isHex?: boolean
 	ethTx?: EthTransaction
+	// Boolean set to true if the tx had some data before storing it in the localStorage
+	// We can then check if we still have some data once we retrieve it from the storage
+	// and only trigger the signAndBroadcast transaction flow if the data is still there
+	txHadSomeData?: boolean
 }
 
 interface PendingFlowState {
