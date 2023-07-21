@@ -16,11 +16,19 @@ import {
 	pendingFlowSelector,
 	usePendingFlowStore,
 } from '@/storage/pendingFlow.store'
+import { captureException } from '@sentry/nextjs'
 
 enum Errors {
 	userDecline = 'User rejected',
 	txDeclined = 'Transaction declined',
 	msgDecline = 'Message signed declined',
+}
+
+function isDataInvalid(data: Buffer | undefined) {
+	return (
+		!data ||
+		Buffer.from(data.toString('hex'), 'hex').toString('hex').length === 0
+	)
 }
 
 export default function useWalletConnectEventsManager(initialized: boolean) {
@@ -232,11 +240,13 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 					// then we don't signAndBroadcast the transaction to protect our users funds
 					if (
 						pendingFlow.txHadSomeData &&
-						(!liveTx.data || liveTx.data.toString().length === 0)
+						isDataInvalid(liveTx.data)
 					) {
-						throw new Error(
-							'The pending transaction triggered was expected to have some data but its data is now empty',
+						const error = new Error(
+							'The pending transaction triggered was expected to have some data but its data was empty',
 						)
+						captureException(error)
+						throw error
 					}
 					const hash =
 						await walletApiClient.transaction.signAndBroadcast(
