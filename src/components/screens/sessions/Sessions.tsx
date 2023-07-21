@@ -139,7 +139,9 @@ export default function Sessions({ goToConnect }: SessionsProps) {
 							subtitle={formatUrl(session.peer.metadata.url)}
 							LeftIcon={
 								<ImageWithPlaceholder
-									icon={session.peer.metadata.icons[0]}
+									icon={decodeURI(
+										session.peer.metadata.icons[0],
+									)}
 								/>
 							}
 							rowType={RowType.Detail}

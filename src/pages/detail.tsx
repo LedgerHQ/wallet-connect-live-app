@@ -202,7 +202,9 @@ export default function SessionDetail() {
 									alignItems="center"
 								>
 									<ImageWithPlaceholder
-										icon={metadata?.icons[0]}
+										icon={decodeURI(
+											metadata?.icons[0] ?? '',
+										)}
 									/>
 
 									<Flex flexDirection="column" ml={5}>
