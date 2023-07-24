@@ -6,7 +6,7 @@ import { PasteMedium } from '@ledgerhq/react-ui/assets/icons'
 import { QRScanner } from './QRScanner'
 import { InputMode } from '@/types/types'
 import { useTranslation } from 'next-i18next'
-import useAnalytics from 'src/shared/useAnalytics'
+import useAnalytics from '@/hooks/common/useAnalytics'
 
 const QRScannerContainer = styled.div`
 	display: flex;

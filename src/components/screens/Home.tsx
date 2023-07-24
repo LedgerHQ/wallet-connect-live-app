@@ -13,7 +13,7 @@ import styled from 'styled-components'
 import { Connect } from './Connect'
 import Sessions from './sessions/Sessions'
 import Tabs from './Tabs'
-import useAnalytics from 'src/shared/useAnalytics'
+import useAnalytics from '@/hooks/common/useAnalytics'
 
 const WalletConnectContainer = styled.div`
 	display: flex;

@@ -11,7 +11,7 @@ import { useAppStore, appSelector } from '@/storage/app.store'
 import { formatChainName, getNamespace } from '@/helpers/helper.util'
 import { EIP155_SIGNING_METHODS } from '@/data/EIP155Data'
 import { web3wallet } from '@/helpers/walletConnect.util'
-import useAnalytics from 'src/shared/useAnalytics'
+import useAnalytics from '@/hooks/common/useAnalytics'
 import { useLedgerLive } from './common/useLedgerLive'
 
 type Props = {
