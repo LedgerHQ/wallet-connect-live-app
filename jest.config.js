@@ -8,7 +8,10 @@ const createJestConfig = nextJest({
 
 // Add any custom config to be passed to Jest
 const customJestConfig = {
-	setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+	setupFilesAfterEnv: [
+		'<rootDir>/jest.setup.js',
+		'@testing-library/jest-dom/extend-expect',
+	],
 	moduleNameMapper: {
 		// Handle module aliases (this will be automatically configured for you soon)
 		'^@/components/(.*)$': '<rootDir>/src/components/$1',
@@ -23,12 +26,16 @@ const customJestConfig = {
 		'^@/mappers/(.*)$': '<rootDir>/src/shared/mappers/$1',
 		'^@/types/(.*)$': '<rootDir>/src/shares/types/$1',
 	},
-	testEnvironment: 'jest-environment-jsdom',
+	testEnvironment: 'jsdom',
 	collectCoverageFrom: [
 		'src/**/*.{ts,tsx}',
 		'!src/pages/*.{ts,tsx}',
 		'!src/styles/**',
 		'!src/components/**/styles.ts',
+	],
+	testMatch: [
+		'**/__tests__/**/*.test.ts?(x)',
+		'!**/__tests__/**/*.integration.test.ts',
 	],
 }
 
