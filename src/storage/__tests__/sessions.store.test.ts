@@ -1,6 +1,5 @@
 import { act, renderHook } from '@testing-library/react'
 
-import { PENDING_FLOW_MOCK } from './mocks/pendingFlow'
 import { useSessionsStore } from '../sessions.store'
 import { SESSION_MOCK } from './mocks/session'
 

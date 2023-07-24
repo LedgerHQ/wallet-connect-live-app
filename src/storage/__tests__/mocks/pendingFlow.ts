@@ -1,4 +1,3 @@
-import { EthTransaction } from '@/helpers/converters'
 import { PendingFlow } from '@/types/types'
 
 export const PENDING_FLOW_MOCK: PendingFlow = {
