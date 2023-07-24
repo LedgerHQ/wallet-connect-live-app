@@ -7,7 +7,6 @@ import { QRScanner } from './QRScanner'
 import { InputMode } from '@/types/types'
 import { useTranslation } from 'next-i18next'
 import useAnalytics from 'src/shared/useAnalytics'
-import useNavigation from '@/hooks/common/useNavigation'
 
 const QRScannerContainer = styled.div`
 	display: flex;
@@ -48,21 +47,16 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 	const [scanner, setScanner] = useState(mode === 'scan')
 	const analytics = useAnalytics()
 
-	const { routes, router } = useNavigation()
-
 	const handleConnect = useCallback(() => {
 		try {
 			const uri = new URL(inputValue)
 			setInputValue('')
-			if (uri.toString().includes('@1')) {
-				router.push(routes.protocolNotSupported)
-			} else {
-				onConnect(uri.toString())
-				analytics.track('button_clicked', {
-					button: 'WC-Connect',
-					page: 'Connect',
-				})
-			}
+
+			onConnect(uri.toString())
+			analytics.track('button_clicked', {
+				button: 'WC-Connect',
+				page: 'Connect',
+			})
 		} catch (error) {
 			console.log('invalid uri: ', error)
 			setErrorValue(t('error.invalidUri'))
