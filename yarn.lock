@@ -905,10 +905,10 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
-"@ledgerhq/crypto-icons-ui@^0.2.1":
-  version "0.2.2"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/crypto-icons-ui/-/crypto-icons-ui-0.2.2.tgz#512eb1287b1f2fd632343f84c19d46706b9298a9"
-  integrity sha512-S2Kk/miUSyaMrRfYVOBHoIl9Ns1YIsvMTCgSkSrQ5KnGFBdSWuDEFUvhN0UjcNbm+5COsVyYDigPDV6Dv+2zRA==
+"@ledgerhq/crypto-icons-ui@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/crypto-icons-ui/-/crypto-icons-ui-0.4.0.tgz#c428946bccbd45dbe69657cf49f5a76e9c0fc1af"
+  integrity sha512-2gTWXSXt5+riUlkuFr4naP8bU0dqkPdAcu0XOU71yZcfK12cS9SJatMOHXohR+gH7vAL3uLxChhXDaGNAQRgKQ==
 
 "@ledgerhq/devices@^8.0.5":
   version "8.0.5"
@@ -934,28 +934,28 @@
     "@ledgerhq/errors" "^6.13.0"
     events "^3.3.0"
 
-"@ledgerhq/icons-ui@^0.3.4":
-  version "0.3.5"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/icons-ui/-/icons-ui-0.3.5.tgz#a4452b3341cb5e35d69923880819f4280b7bdc69"
-  integrity sha512-wX+EJibYvLQ7IjajSC19HtPWkhq5An/yAPnNHewYZkmBCguG5Swc3NX7lUhGvH1sRO7MRqb0o7PA9FDcM3xDEg==
+"@ledgerhq/icons-ui@^0.4.1":
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/icons-ui/-/icons-ui-0.4.1.tgz#efecf30adf8b54abf69cd78cea687b80bf667cb2"
+  integrity sha512-tpgr1hKNSlsAS2TOe30n42vs+d+g2BFIry1RZag2zBq39iC195fC5jryOK1J5YwgJEvPcbfTbuEU2RM3CMAq6g==
 
 "@ledgerhq/logs@^6.10.1":
   version "6.10.1"
   resolved "https://registry.yarnpkg.com/@ledgerhq/logs/-/logs-6.10.1.tgz#5bd16082261d7364eabb511c788f00937dac588d"
   integrity sha512-z+ILK8Q3y+nfUl43ctCPuR4Y2bIxk/ooCQFwZxhtci1EhAtMDzMAx2W25qx8G1PPL9UUOdnUax19+F0OjXoj4w==
 
-"@ledgerhq/react-ui@^0.11.0":
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/react-ui/-/react-ui-0.11.0.tgz#38b44531706d9ebb13fdf2465f988c4407154316"
-  integrity sha512-9FjvnIwJtMV6MZ/v1aQYOXwYS4KB/vbsOsXd/3WjyArmfOQewi4Ja1nbcvs9rlyzwMMwjF//dqdlPDeg9MTFJA==
+"@ledgerhq/react-ui@^0.14.3":
+  version "0.14.3"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/react-ui/-/react-ui-0.14.3.tgz#c197e33e833e0792877c9d46ee817f9c208893b9"
+  integrity sha512-P6jI6hE3CRgo+WXGFwqV50Hbq3sAgtiw/HF0qSjtwx3Yc8XmtWeuBiLsHrk4blx4ySjmXpF6fKOBhMGLamormw==
   dependencies:
     "@floating-ui/react-dom" "^0.4.0"
-    "@ledgerhq/crypto-icons-ui" "^0.2.1"
-    "@ledgerhq/icons-ui" "^0.3.4"
-    "@ledgerhq/ui-shared" "^0.1.10"
+    "@ledgerhq/crypto-icons-ui" "^0.4.0"
+    "@ledgerhq/icons-ui" "^0.4.1"
+    "@ledgerhq/ui-shared" "^0.2.0"
     "@tippyjs/react" "^4.2.6"
     "@types/color" "^3.0.2"
-    "@types/react" "~17.0.37"
+    "@types/react" "~17.0.53"
     "@types/react-dom" "^17.0.11"
     "@types/react-transition-group" "^4.4.2"
     "@types/react-window" "^1.8.5"
@@ -972,10 +972,10 @@
     react-window "^1.8.6"
     styled-system "^5.1.5"
 
-"@ledgerhq/ui-shared@^0.1.10":
-  version "0.1.10"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/ui-shared/-/ui-shared-0.1.10.tgz#702263ea33d7385f86a5cc714dbf3c35fe96af7a"
-  integrity sha512-QDqNB6c9f4KUV6x5mfQ36r8T5Kd6ud2UBg/G6VtZsWK9MEolXHj1REscL5i2ssSk96bDOrwTZG13xdSXxaV7IA==
+"@ledgerhq/ui-shared@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/ui-shared/-/ui-shared-0.2.0.tgz#8960337acd5b5531b66625e92357a1394366449c"
+  integrity sha512-IO9NVxJqUiKVdFeeu8pvjILHJOnufE+mlUw1TN3OEd7lXxZJH5GZtmglPeHSuc+AHo0a45OGuiushdoFSxXPcQ==
 
 "@ledgerhq/wallet-api-client@^0.15.5":
   version "0.15.5"
@@ -2727,7 +2727,7 @@
     "@types/scheduler" "*"
     csstype "^3.0.2"
 
-"@types/react@^17", "@types/react@~17.0.37":
+"@types/react@^17", "@types/react@~17.0.53":
   version "17.0.62"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.62.tgz#2efe8ddf8533500ec44b1334dd1a97caa2f860e3"
   integrity sha512-eANCyz9DG8p/Vdhr0ZKST8JV12PhH2ACCDYlFw6DIO+D+ca+uP4jtEDEpVqXZrh/uZdXQGwk7whJa3ah5DtyLw==
