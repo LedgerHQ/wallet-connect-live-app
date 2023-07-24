@@ -25,25 +25,8 @@ jest.mock('next/router', () => ({
 }))
 
 describe('Application Disable Screen', () => {
-	beforeAll(() => {
-		const useRouter = jest.spyOn(require('next/router'), 'useRouter')
-		useRouter.mockImplementation(() => ({
-			route: '/',
-			pathname: '',
-			query: '',
-			asPath: '',
-			push: jest.fn(),
-			events: {
-				on: jest.fn(),
-				off: jest.fn(),
-			},
-			beforePopState: jest.fn(() => null),
-			prefetch: jest.fn(() => null),
-		}))
-
-		renderHook(() => useAnalytics())
-	})
 	it('Page should appears', () => {
+		renderHook(() => useAnalytics())
 		render(<ApplicationDisabled />)
 
 		const page = screen.getByTestId('application-disabled-container')
@@ -52,6 +35,7 @@ describe('Application Disable Screen', () => {
 	})
 
 	it('Page should have correct DOM', () => {
+		renderHook(() => useAnalytics())
 		render(<ApplicationDisabled />)
 
 		const logo = screen.getByTestId('application-disabled-logo')

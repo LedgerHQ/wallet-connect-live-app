@@ -15,7 +15,7 @@ describe('Accounts Store', () => {
 		expect(useAccountsStore.getState().accounts.length).toEqual(1)
 	})
 
-	it('should add an Account', () => {
+	it('should add multiple Accounts', () => {
 		useAccountsStore
 			.getState()
 			.addAccounts([
