@@ -35,7 +35,7 @@ module.exports = withSentryConfig(module.exports, {
 
 	// Suppresses source map uploading logs during build
 	silent: true,
-
+	hideSourceMaps: false,
 	org: 'ledger',
 	project: 'wallet-connect-live-app',
 })
