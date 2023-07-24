@@ -96,6 +96,16 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
 
+### Testing
+
+The live-app contains unit tests and integration tests.
+To run the unit tests : `yarn test:unit`
+
+To run integration tests: `yarn test:integration`
+
+To create a simple unit test, use the `*.test.ts(x)` pattern.
+To create an integration test, use the `*.integration.test.ts` pattern.
+
 ## Manifest
 
 All Live apps are defined with a manifest. Here is one that can be used for local development:
