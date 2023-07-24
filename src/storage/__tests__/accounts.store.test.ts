@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react'
+import { act, renderHook } from '@testing-library/react'
 
 import { useAccountsStore } from '../accounts.store'
 import { ACCOUNT_MOCK } from './mocks/account'
@@ -11,29 +11,37 @@ describe('Accounts Store', () => {
 	})
 
 	it('should add an Account', () => {
-		useAccountsStore.getState().addAccount(ACCOUNT_MOCK)
-		expect(useAccountsStore.getState().accounts.length).toEqual(1)
+		const { result } = renderHook(() => useAccountsStore())
+
+		act(() => result.current.addAccount(ACCOUNT_MOCK))
+		expect(result.current.accounts.length).toEqual(1)
 	})
 
 	it('should add multiple Accounts', () => {
-		useAccountsStore
-			.getState()
-			.addAccounts([
+		const { result } = renderHook(() => useAccountsStore())
+
+		act(() =>
+			result.current.addAccounts([
 				ACCOUNT_MOCK,
 				{ ...ACCOUNT_MOCK, id: 'Mock2', name: 'Mock_2' },
 				{ ...ACCOUNT_MOCK, id: 'Mock3', name: 'Mock_3' },
-			])
-		expect(useAccountsStore.getState().accounts.length).toEqual(3)
+			]),
+		)
+		expect(result.current.accounts.length).toEqual(3)
 	})
 	it('should clear accounts', () => {
-		useAccountsStore
-			.getState()
-			.addAccounts([
+		const { result } = renderHook(() => useAccountsStore())
+
+		act(() =>
+			result.current.addAccounts([
 				ACCOUNT_MOCK,
 				{ ...ACCOUNT_MOCK, id: 'Mock2', name: 'Mock_2' },
 				{ ...ACCOUNT_MOCK, id: 'Mock3', name: 'Mock_3' },
-			])
-		useAccountsStore.getState().clearAccounts()
-		expect(useAccountsStore.getState().accounts.length).toEqual(0)
+			]),
+		)
+
+		expect(result.current.accounts.length).toEqual(3)
+		act(() => result.current.clearAccounts())
+		expect(result.current.accounts.length).toEqual(0)
 	})
 })
