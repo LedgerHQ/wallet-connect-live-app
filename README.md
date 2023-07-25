@@ -134,9 +134,23 @@ We use [`Jest`](https://jestjs.io/) and
 #### Launch tests
 
 The live-app contains unit tests and integration tests.
-To run the unit tests : `yarn test:unit`
+To run the unit tests :
 
-To run integration tests : `yarn test:integration`
+```bash
+yarn test:unit
+```
+
+To run integration tests :
+
+```bash
+yarn test:integration
+```
+
+To run the tests and obtain coverage, simply run
+
+```bash
+yarn test:coverage
+```
 
 #### Naming convention
 

@@ -1,6 +1,5 @@
 import { ApplicationDisabled } from '@/components/screens/ApplicationDisabled'
-import useAnalytics from '@/hooks/common/useAnalytics'
-import { render, renderHook, screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 
 jest.mock('react-i18next', () => ({
 	useTranslation: () => ({ t: (key: string) => key }),
@@ -26,7 +25,6 @@ jest.mock('next/router', () => ({
 
 describe('Application Disable Screen', () => {
 	it('Page should appears', () => {
-		renderHook(() => useAnalytics())
 		render(<ApplicationDisabled />)
 
 		const page = screen.getByTestId('application-disabled-container')
@@ -35,7 +33,6 @@ describe('Application Disable Screen', () => {
 	})
 
 	it('Page should have correct DOM', () => {
-		renderHook(() => useAnalytics())
 		render(<ApplicationDisabled />)
 
 		const logo = screen.getByTestId('application-disabled-logo')
