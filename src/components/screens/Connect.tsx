@@ -148,7 +148,7 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 							<Flex position="absolute" bottom={6}>
 								<Button
 									onClick={startScanning}
-									data-test="connect-button"
+									data-testid="scan-button"
 									variant="main"
 									size="medium"
 								>
@@ -179,7 +179,7 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 					value={inputValue}
 					onChange={setInputValue}
 					error={errorValue}
-					data-test="input-uri"
+					data-testid="input-uri"
 					renderRight={
 						!isRunningInAndroidWebview() ? (
 							<QrCodeButton
@@ -195,7 +195,7 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 				<Button
 					mt={6}
 					onClick={handleConnect}
-					data-test="connect-button"
+					data-testid="connect-button"
 					variant="main"
 					size="large"
 					disabled={!inputValue}

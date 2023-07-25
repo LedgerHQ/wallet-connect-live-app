@@ -28,7 +28,8 @@
 			"@/mocks/*": ["src/__mocks__/*"],
 			"@/helpers/*": ["src/shared/helpers/*"],
 			"@/mappers/*": ["src/shared/mappers/*"],
-			"@/types/*": ["src/shared/types/*"]
+			"@/types/*": ["src/shared/types/*"],
+			"@/tests-tools/*": ["src/tests-tools/*"]
 		}
 	},
 	"include": [

@@ -20,4 +20,8 @@ global.TextDecoder = TextDecoder
 import { setConfig } from 'next/config'
 import config from './next.config'
 
+jest.mock('react-i18next', () => ({
+	useTranslation: () => ({ t: (key) => key }),
+}))
+
 setConfig(config)
