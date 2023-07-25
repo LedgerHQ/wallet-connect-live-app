@@ -72,16 +72,6 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
 
-### Testing
-
-The live-app contains unit tests and integration tests.
-To run the unit tests : `yarn test:unit`
-
-To run integration tests: `yarn test:integration`
-
-To create a simple unit test, use the `*.test.ts(x)` pattern.
-To create an integration test, use the `*.integration.test.ts` pattern.
-
 ## Manifest
 
 All Live apps are defined with a manifest. Here is one that can be used for local development:
@@ -135,3 +125,34 @@ All Live apps are defined with a manifest. Here is one that can be used for loca
 	"domains": ["http://*", "https://*"]
 }
 ```
+
+### Testing Strategy & Prerequisites
+
+We use [`Jest`](https://jestjs.io/) and
+[`React Testing Library`](https://testing-library.com/docs/react-testing-library/intro/)
+
+#### Launch tests
+
+The live-app contains unit tests and integration tests.
+To run the unit tests : `yarn test:unit`
+
+To run integration tests : `yarn test:integration`
+
+#### Naming convention
+
+To create a simple unit test, use the `*.test.ts(x)` pattern.
+To create an integration test, use the `*.integration.test.ts` pattern.
+
+#### Rules
+
+- **Storage Folder**
+
+  Each new file must have its own test file. As the management of the store is important to the correct running of the app, it's necessary to test the different states of the store after manipulation.
+
+- **Utilities files** (helper,util,generic,etc)
+
+  The functions written in these files need to be tested as much as possible, as they can be used in several files.
+
+- **Screens**
+
+  When a new screen is added, a unit test can be added to check that it is displayed correctly. Specifically if there is conditional display
