@@ -30,7 +30,7 @@ export const AddAccountPlaceholder = ({ onClick }: Props) => {
 	const { t } = useTranslation()
 
 	return (
-		<AddAccountButton onClick={onClick}>
+		<AddAccountButton onClick={onClick} data-testid="add-account-button">
 			<PlusMedium />
 			<Text ml={2} variant="bodyLineHeight" color="neutral.c100">
 				{t('sessionProposal.addAccount')}
