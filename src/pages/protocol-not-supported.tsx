@@ -77,7 +77,7 @@ export default function ProtocolNotSupported() {
 				>
 					{t('connect.errorProtocol.desc')}
 				</Text>
-				<ButtonsContainer>
+				<ButtonsContainer mb={6}>
 					<Button
 						flex={1}
 						mt={12}
