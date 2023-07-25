@@ -56,6 +56,7 @@ export function ErrorBlockchainSupport({ appName, chains }: Props) {
 				color="neutral.c100"
 				mt={10}
 				textAlign="center"
+				data-testid="error-title-blockchain-support"
 			>
 				{t('sessionProposal.error.title', { appName })}
 			</Text>
