@@ -50,7 +50,7 @@ export default function Home({
 	setUri,
 }: WalletConnectProps) {
 	const { initialized } = useHydratation()
-	const { router, tabsIndexes } = useNavigation()
+	const { router, tabsIndexes, routes } = useNavigation()
 	const routerQueryData = router?.query?.data
 	const initialTab = routerQueryData
 		? JSON.parse(String(routerQueryData))?.tab
@@ -83,7 +83,11 @@ export default function Home({
 			try {
 				setUri(inputValue)
 				const uri = new URL(inputValue)
-				await startProposal(uri.toString())
+				if (uri.toString().includes('@1')) {
+					router.push(routes.protocolNotSupported)
+				} else {
+					await startProposal(uri.toString())
+				}
 			} catch (error: unknown) {
 				console.error(error)
 			} finally {

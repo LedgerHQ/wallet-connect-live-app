@@ -9,6 +9,7 @@ enum routes {
 	home = '/',
 	sessionProposal = '/proposal',
 	sessionDetails = '/detail',
+	protocolNotSupported = '/protocol-not-supported',
 }
 
 export default function useNavigation() {

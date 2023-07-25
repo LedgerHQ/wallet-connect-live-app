@@ -51,6 +51,7 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 		try {
 			const uri = new URL(inputValue)
 			setInputValue('')
+
 			onConnect(uri.toString())
 			analytics.track('button_clicked', {
 				button: 'WC-Connect',
