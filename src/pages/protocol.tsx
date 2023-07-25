@@ -6,6 +6,7 @@ import useAnalytics from 'src/shared/useAnalytics'
 import styled from 'styled-components'
 import router from 'next/router'
 import { ResponsiveContainer } from '@/styles/styles'
+import { device } from '@/styles/breakpoints'
 
 export { getServerSideProps } from '../lib/serverProps'
 
@@ -16,6 +17,27 @@ const LogoContainer = styled(Flex)`
 	background-color: ${(p) => p.theme.colors.error.c50};
 	height: 50px;
 	width: 50px;
+`
+const ButtonsContainer = styled(Flex)`
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+	position: fixed;
+	bottom: 0;
+	@media ${device.mobile} {
+		width: calc(100% - 32px);
+		padding-left: 16px;
+		padding-right: 16px;
+	}
+	@media ${device.tablet} {
+		width: 100%;
+		max-width: 465px;
+	}
+	@media ${device.desktop} {
+		width: 100%;
+		max-width: 465px;
+	}
 `
 
 export default function ProtocolNotSupported() {
@@ -29,7 +51,6 @@ export default function ProtocolNotSupported() {
 	return (
 		<Flex
 			alignItems="center"
-			justifyContent="center"
 			flexDirection="column"
 			height="100%"
 			width="100%"
@@ -56,22 +77,24 @@ export default function ProtocolNotSupported() {
 				>
 					{t('connect.errorProtocol.desc')}
 				</Text>
-
-				<Button
-					mt={12}
-					onClick={() => router.push('/')}
-					data-test="connect-button"
-					variant="main"
-					size="large"
-				>
-					<Text
-						fontSize="body"
-						fontWeight="semiBold"
-						color={'neutral.c00'}
+				<ButtonsContainer>
+					<Button
+						flex={1}
+						mt={12}
+						onClick={() => router.push('/')}
+						data-test="connect-button"
+						variant="main"
+						size="large"
 					>
-						{t('close')}
-					</Text>
-				</Button>
+						<Text
+							fontSize="body"
+							fontWeight="semiBold"
+							color={'neutral.c00'}
+						>
+							{t('close')}
+						</Text>
+					</Button>
+				</ButtonsContainer>
 			</ResponsiveContainer>
 		</Flex>
 	)
