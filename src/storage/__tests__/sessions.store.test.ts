@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react'
 
 import { useSessionsStore } from '../sessions.store'
-import { SESSION_MOCK } from './mocks/session'
+import { SESSION_MOCK } from './mocks/session.mock'
 
 describe('Sessions Store', () => {
 	it('Should have initial state ok', () => {

@@ -1,7 +1,7 @@
 import { renderHook, act } from '@testing-library/react'
 
 import { useAppStore } from '../app.store'
-import { NETWORK_MOCK } from './mocks/network'
+import { NETWORK_MOCK } from './mocks/network.mock'
 
 describe('App Store', () => {
 	it('Should have initial state ok', () => {

@@ -19,11 +19,11 @@ export const getAccountWithAddress = (account: Account[], addr: string) =>
 	account.find((a) => a.address.toLowerCase() === addr.toLowerCase())
 
 export const getAccountWithAddressAndChainId = (
-	account: Account[],
+	accounts: Account[],
 	addr: string,
 	chainId: string,
 ) =>
-	account.find(
+	accounts.find(
 		(a) =>
 			a.address.toLowerCase() === addr.toLowerCase() &&
 			a.currency === getCurrencyByChainId(chainId),

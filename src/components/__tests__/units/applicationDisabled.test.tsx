@@ -1,10 +1,6 @@
 import { ApplicationDisabled } from '@/components/screens/ApplicationDisabled'
 import { render, screen } from '@testing-library/react'
 
-jest.mock('react-i18next', () => ({
-	useTranslation: () => ({ t: (key: string) => key }),
-}))
-
 jest.mock('next/router', () => ({
 	useRouter() {
 		return {
