@@ -41,33 +41,41 @@ This live app need parameters to be defined in the manifest file
 
 Use of [Zustand](https://github.com/pmndrs/zustand) and `persist` middleware to have a persistent store via the `localStorage`
 
-## Add new Chain support
+## Support new Chain/Network
 
-Look at => `// TO UPDATE WHEN SUPPORTING NEW CHAIN` in code base
-
-1 - Update `localManifest.json` by adding new entry in :
-
-- network
+1 - Update `localManifest.json` by adding new entry in currencies:
 
 ```json
-{
-	"currency": "arbitrum",
-	"chainId": 42161
+"currencies": [
+		"ethereum",
+		"polygon",
+		....
+		"arbitrum",
+	],
+```
+
+2 - Update `@/data/config.ts` by adding in `EIP155_CHAINS` as a `<key,value>` format the new chain with this specific skeleton :
+`key` is the currency name (Same as point 1)
+
+```ts
+"string": {
+	chainId: number
+	namespace: string
+	ticker: string
+	displayName: string
 }
 ```
 
-- currencies
-  `"arbitrum"`
+Example to add ethereum
 
-2 - Update `EIP155Data` or other file if not in this family. If this is a new family, create new file and apply same logic as `EIP155Data`.
-
-3 - Update functions in `@/shared/helpers/helper.util.ts` hook
-
-Modify somes methods :
-
-- `getNamespace`
-- `getCurrencyByChainId`
-- `getTicker`
+```ts
+ethereum: {
+		chainId: 1,
+		namespace: 'eip155:1',
+		ticker: 'ETH',
+		displayName: 'Ethereum',
+	},
+```
 
 ## Getting Started
 

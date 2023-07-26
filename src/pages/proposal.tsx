@@ -259,7 +259,7 @@ export default function SessionProposal() {
 															colors.neutral.c70
 														}
 													>
-														{entry.chain}
+														{entry.displayName}
 														{entry.isRequired ? (
 															<Text
 																color="error.c80"

@@ -6,7 +6,7 @@ export type TabContent = {
 	index: number
 	title: string
 	disabled?: boolean
-	badge?: string | number
+	badge?: number
 	Component: React.ReactNode
 }
 
@@ -26,7 +26,7 @@ type HeaderElementProps = {
 	title: string
 	selected: boolean
 	disabled: boolean
-	badge?: string | number
+	badge?: number
 	onClick: () => void
 }
 

@@ -14,15 +14,10 @@ export type TEIP155Chain = keyof typeof EIP155_CHAINS
  * Chains
  */
 
-// TO UPDATE WHEN SUPPORTING NEW CHAIN
 export const EIP155_MAINNET_CHAINS: Chains = {
 	'eip155:1': {
 		chainId: 1,
 		name: 'Ethereum',
-	},
-	'eip155:43114': {
-		chainId: 43114,
-		name: 'Avalanche C-Chain',
 	},
 	'eip155:137': {
 		chainId: 137,
@@ -40,12 +35,20 @@ export const EIP155_MAINNET_CHAINS: Chains = {
 		chainId: 42161,
 		name: 'Arbitrum',
 	},
+	'eip155:43114': {
+		chainId: 43114,
+		name: 'Avalanche C-Chain',
+	},
 }
 
 export const EIP155_TEST_CHAINS: Chains = {
 	'eip155:5': {
 		chainId: 5,
 		name: 'ethereum_goerli',
+	},
+	'eip155:420': {
+		chainId: 420,
+		name: 'optimism_goerli',
 	},
 	'eip155:43113': {
 		chainId: 43113,
@@ -54,10 +57,6 @@ export const EIP155_TEST_CHAINS: Chains = {
 	'eip155:80001': {
 		chainId: 80001,
 		name: 'polygon_mumbai',
-	},
-	'eip155:420': {
-		chainId: 420,
-		name: 'optimism_goerli',
 	},
 }
 

@@ -5,10 +5,8 @@ import {
 	WindowMessageTransport,
 	WalletAPIClient,
 } from '@ledgerhq/wallet-api-client'
-import { NetworkConfig } from './types/types'
 
 type WalletApiClientProviderProps = {
-	networks: NetworkConfig[]
 	children: (
 		accounts: Account[],
 		userId: string,
@@ -16,19 +14,7 @@ type WalletApiClientProviderProps = {
 	) => React.ReactElement
 }
 
-function filterAccountsForNetworks(
-	accounts: Account[],
-	networks: NetworkConfig[],
-): Account[] {
-	const supportedCurrencies = networks.map((network) => network.currency)
-
-	return accounts.filter((account) => {
-		return supportedCurrencies.includes(account.currency)
-	})
-}
-
 export function WalletApiClientProvider({
-	networks,
 	children,
 }: WalletApiClientProviderProps) {
 	const walletApiClientRef = useRef<WalletAPIClient | null>(null)
@@ -44,11 +30,7 @@ export function WalletApiClientProvider({
 		transport.connect()
 		const walletApiClient = new WalletAPIClient(transport)
 		walletApiClient.account.list().then((allAccounts) => {
-			const filteredAccounts = filterAccountsForNetworks(
-				allAccounts,
-				networks,
-			)
-			setAccounts(filteredAccounts)
+			setAccounts(allAccounts)
 		})
 
 		walletApiClient.wallet.userId().then((userId) => setUserId(userId))

@@ -1,6 +1,6 @@
 import { startProposal } from '@/helpers/walletConnect.util'
 import { ResponsiveContainer } from '@/styles/styles'
-import { NetworkConfig, InputMode } from '@/types/types'
+import { InputMode } from '@/types/types'
 import { Account } from '@ledgerhq/wallet-api-client'
 import { Flex } from '@ledgerhq/react-ui'
 import { useTranslation } from 'next-i18next'
@@ -38,7 +38,6 @@ const WalletConnectInnerContainer = styled(TransitionGroup)`
 export type WalletConnectProps = {
 	initialAccountId?: string
 	initialURI?: string
-	networks: NetworkConfig[]
 	accounts: Account[]
 	initialMode?: InputMode
 	setUri: Dispatch<SetStateAction<string | undefined>>
