@@ -1,9 +1,9 @@
-export type Network = {
-	chainId: number
-	namespace: string
-	ticker: string
-	displayName: string
-}
+/**
+ * @desc Refference list of eip155 chains
+ * @url https://chainlist.org
+ */
+
+import { Network } from './types'
 
 const EIP155_CHAINS = {
 	ethereum: {
@@ -52,4 +52,8 @@ const EIP155_CHAINS = {
 
 export const SUPPORTED_NETWORK: Record<string, Network> = {
 	...EIP155_CHAINS,
+}
+
+export enum SUPPORTED_NAMESPACE {
+	eip155 = 'eip155',
 }

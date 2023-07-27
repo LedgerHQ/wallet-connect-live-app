@@ -13,11 +13,11 @@ import {
 	getDisplayName,
 	getNamespace,
 } from '@/helpers/helper.util'
-import { EIP155_SIGNING_METHODS } from '@/data/EIP155Data'
+import { EIP155_SIGNING_METHODS } from '@/data/methods/EIP155Data.methods'
 import { web3wallet } from '@/helpers/walletConnect.util'
 import useAnalytics from 'src/shared/useAnalytics'
 import { useLedgerLive } from './common/useLedgerLive'
-import { SUPPORTED_NETWORK } from '@/data/config'
+import { SUPPORTED_NAMESPACE, SUPPORTED_NETWORK } from '@/data/network.config'
 
 type Props = {
 	proposal: Proposal
@@ -137,16 +137,19 @@ export function useProposal({ proposal }: Props) {
 		)
 
 		const methods = proposal.params.requiredNamespaces[
-			'eip155'
+			SUPPORTED_NAMESPACE.eip155
 		].methods.concat(Object.values(EIP155_SIGNING_METHODS))
 
 		return {
 			eip155: {
 				methods: [...new Set(methods)],
 				chains: createChains(accountsByChain).filter((e) => e.length),
-				events: proposal.params.requiredNamespaces['eip155'].events,
+				events: proposal.params.requiredNamespaces[
+					SUPPORTED_NAMESPACE.eip155
+				].events,
 				accounts: accountsToSend,
 			},
+			// For new namespace other than eip155 add new object here with same skeleton
 		}
 	}
 

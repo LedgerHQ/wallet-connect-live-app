@@ -1,4 +1,4 @@
-import { SUPPORTED_NETWORK } from '@/data/config'
+import { SUPPORTED_NETWORK } from '@/data/network.config'
 
 /**
  * Truncates string (in the middle) via given lenght value

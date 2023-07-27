@@ -3,7 +3,7 @@
  * @url https://chainlist.org
  */
 
-import { ChainMetadata } from './types'
+import { ChainMetadata } from '../types'
 
 /**
  * Types
