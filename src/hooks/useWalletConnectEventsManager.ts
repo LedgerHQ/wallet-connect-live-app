@@ -15,19 +15,12 @@ import {
 	usePendingFlowStore,
 } from '@/storage/pendingFlow.store'
 import { captureException } from '@sentry/nextjs'
-import { isEIP155Chain } from '@/helpers/helper.util'
+import { isEIP155Chain, isDataInvalid } from '@/helpers/helper.util'
 
 enum Errors {
 	userDecline = 'User rejected',
 	txDeclined = 'Transaction declined',
 	msgDecline = 'Message signed declined',
-}
-
-function isDataInvalid(data: Buffer | undefined) {
-	return (
-		!data ||
-		Buffer.from(data.toString('hex'), 'hex').toString('hex').length === 0
-	)
 }
 
 export default function useWalletConnectEventsManager(initialized: boolean) {
