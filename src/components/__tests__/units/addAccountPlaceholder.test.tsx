@@ -6,12 +6,13 @@ const onClickMock = jest.fn()
 
 describe('Add Account Placeholder Screen', () => {
 	it('Page should appears and on click triggers action', async () => {
+		userEvent.setup()
 		render(
 			<MockTheme>
 				<AddAccountPlaceholder onClick={onClickMock} />
 			</MockTheme>,
 		)
-		const button = screen.getByTestId('add-account-button')
+		const button = screen.getByRole('button')
 
 		expect(button).toBeInTheDocument()
 
