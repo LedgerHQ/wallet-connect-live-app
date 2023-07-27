@@ -7,7 +7,7 @@ import { stripHexPrefix } from '@/utils/currencyFormatter/helpers'
 import { useLedgerLive } from './common/useLedgerLive'
 import { convertEthToLiveTX } from '@/helpers/converters'
 import { accountSelector, useAccountsStore } from '@/storage/accounts.store'
-import { EIP155_SIGNING_METHODS } from '@/data/EIP155Data'
+import { EIP155_SIGNING_METHODS } from '@/data/methods/EIP155Data.methods'
 import { web3wallet } from '@/helpers/walletConnect.util'
 import { sessionSelector, useSessionsStore } from '@/storage/sessions.store'
 import {
@@ -15,18 +15,12 @@ import {
 	usePendingFlowStore,
 } from '@/storage/pendingFlow.store'
 import { captureException } from '@sentry/nextjs'
+import { isEIP155Chain, isDataInvalid } from '@/helpers/helper.util'
 
 enum Errors {
 	userDecline = 'User rejected',
 	txDeclined = 'Transaction declined',
 	msgDecline = 'Message signed declined',
-}
-
-function isDataInvalid(data: Buffer | undefined) {
-	return (
-		!data ||
-		Buffer.from(data.toString('hex'), 'hex').toString('hex').length === 0
-	)
 }
 
 export default function useWalletConnectEventsManager(initialized: boolean) {
@@ -71,124 +65,10 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 			const { topic, params, id } = requestEvent
 			const { request, chainId } = params
 
-			switch (request.method) {
-				case EIP155_SIGNING_METHODS.ETH_SIGN:
-				case EIP155_SIGNING_METHODS.PERSONAL_SIGN:
-					const isPersonalSign =
-						request.method === EIP155_SIGNING_METHODS.PERSONAL_SIGN
-					const accountSign = getAccountWithAddressAndChainId(
-						accounts,
-						isPersonalSign ? request.params[1] : request.params[0],
-						chainId,
-					)
-					if (!!accountSign) {
-						try {
-							const walletApiClient = initWalletApiClient()
-							const message = stripHexPrefix(
-								isPersonalSign
-									? request.params[0]
-									: request.params[1],
-							)
-
-							addPendingFlow({
-								id,
-								topic,
-								accountId: accountSign.id,
-								message,
-								isHex: true,
-							})
-							const signedMessage =
-								await walletApiClient.message.sign(
-									accountSign.id,
-									Buffer.from(message, 'hex'),
-								)
-							acceptRequest(
-								topic,
-								id,
-								formatMessage(signedMessage),
-							)
-						} catch (error) {
-							rejectRequest(topic, id, Errors.userDecline)
-							console.error(error)
-						}
-						clearPendingFlow()
-						closeTransport()
-						break
-					}
-
-				case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA:
-				case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V3:
-				case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V4:
-					const accountSignTyped = getAccountWithAddressAndChainId(
-						accounts,
-						request.params[0],
-						chainId,
-					)
-					if (!!accountSignTyped) {
-						try {
-							const walletApiClient = initWalletApiClient()
-							const message = stripHexPrefix(request.params[1])
-
-							addPendingFlow({
-								id,
-								topic,
-								accountId: accountSignTyped.id,
-								message,
-							})
-							const signedMessage =
-								await walletApiClient.message.sign(
-									accountSignTyped.id,
-									Buffer.from(message),
-								)
-							acceptRequest(
-								topic,
-								id,
-								formatMessage(signedMessage),
-							)
-						} catch (error) {
-							rejectRequest(topic, id, Errors.msgDecline)
-							console.error(error)
-						}
-						clearPendingFlow()
-						closeTransport()
-						break
-					}
-				case EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION:
-				case EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION:
-					const ethTx = request.params[0]
-					const accountTX = getAccountWithAddressAndChainId(
-						accounts,
-						ethTx.from,
-						chainId,
-					)
-					if (!!accountTX) {
-						try {
-							const walletApiClient = initWalletApiClient()
-							const liveTx = convertEthToLiveTX(ethTx)
-							addPendingFlow({
-								id,
-								topic,
-								accountId: accountTX.id,
-								ethTx,
-								txHadSomeData:
-									ethTx.data && ethTx.data.length > 0,
-							})
-							const hash =
-								await walletApiClient.transaction.signAndBroadcast(
-									accountTX.id,
-									liveTx,
-								)
-							acceptRequest(topic, id, hash)
-						} catch (error) {
-							rejectRequest(topic, id, Errors.txDeclined)
-							console.error(error)
-						}
-						clearPendingFlow()
-						closeTransport()
-					}
-
-				default:
-					return // ModalStore.open('SessionUnsuportedMethodModal', { requestEvent, requestSession })
+			if (isEIP155Chain(chainId)) {
+				handleEIP155Request(request, topic, id, chainId)
+			} else {
+				console.error('Not Supported Chain')
 			}
 		},
 		[],
@@ -336,5 +216,128 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 				},
 			},
 		})
+	}
+
+	/******************************************************************************
+	 * EIP155
+	 *****************************************************************************/
+
+	async function handleEIP155Request(
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		request: { method: string; params: any },
+		topic: string,
+		id: number,
+		chainId: string,
+	) {
+		switch (request.method) {
+			case EIP155_SIGNING_METHODS.ETH_SIGN:
+			case EIP155_SIGNING_METHODS.PERSONAL_SIGN:
+				const isPersonalSign =
+					request.method === EIP155_SIGNING_METHODS.PERSONAL_SIGN
+				const accountSign = getAccountWithAddressAndChainId(
+					accounts,
+					isPersonalSign ? request.params[1] : request.params[0],
+					chainId,
+				)
+				if (!!accountSign) {
+					try {
+						const walletApiClient = initWalletApiClient()
+						const message = stripHexPrefix(
+							isPersonalSign
+								? request.params[0]
+								: request.params[1],
+						)
+
+						addPendingFlow({
+							id,
+							topic,
+							accountId: accountSign.id,
+							message,
+							isHex: true,
+						})
+						const signedMessage =
+							await walletApiClient.message.sign(
+								accountSign.id,
+								Buffer.from(message, 'hex'),
+							)
+						acceptRequest(topic, id, formatMessage(signedMessage))
+					} catch (error) {
+						rejectRequest(topic, id, Errors.userDecline)
+						console.error(error)
+					}
+					clearPendingFlow()
+					closeTransport()
+					break
+				}
+
+			case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA:
+			case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V3:
+			case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V4:
+				const accountSignTyped = getAccountWithAddressAndChainId(
+					accounts,
+					request.params[0],
+					chainId,
+				)
+				if (!!accountSignTyped) {
+					try {
+						const walletApiClient = initWalletApiClient()
+						const message = stripHexPrefix(request.params[1])
+
+						addPendingFlow({
+							id,
+							topic,
+							accountId: accountSignTyped.id,
+							message,
+						})
+						const signedMessage =
+							await walletApiClient.message.sign(
+								accountSignTyped.id,
+								Buffer.from(message),
+							)
+						acceptRequest(topic, id, formatMessage(signedMessage))
+					} catch (error) {
+						rejectRequest(topic, id, Errors.msgDecline)
+						console.error(error)
+					}
+					clearPendingFlow()
+					closeTransport()
+					break
+				}
+			case EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION:
+			case EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION:
+				const ethTx = request.params[0]
+				const accountTX = getAccountWithAddressAndChainId(
+					accounts,
+					ethTx.from,
+					chainId,
+				)
+				if (!!accountTX) {
+					try {
+						const walletApiClient = initWalletApiClient()
+						const liveTx = convertEthToLiveTX(ethTx)
+						addPendingFlow({
+							id,
+							topic,
+							accountId: accountTX.id,
+							ethTx,
+							txHadSomeData: ethTx.data && ethTx.data.length > 0,
+						})
+						const hash =
+							await walletApiClient.transaction.signAndBroadcast(
+								accountTX.id,
+								liveTx,
+							)
+						acceptRequest(topic, id, hash)
+					} catch (error) {
+						rejectRequest(topic, id, Errors.txDeclined)
+						console.error(error)
+					}
+					clearPendingFlow()
+					closeTransport()
+				}
+
+			default:
+				return // ModalStore.open('SessionUnsuportedMethodModal', { requestEvent, requestSession })
+		}
 	}
 }

@@ -9,3 +9,9 @@ export type ChainMetadata = {
 interface Chains {
 	[key: string]: ChainMetadata
 }
+export type Network = {
+	chainId: number
+	namespace: string
+	ticker: string
+	displayName: string
+}
