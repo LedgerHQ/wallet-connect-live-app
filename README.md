@@ -161,3 +161,8 @@ All Live apps are defined with a manifest. Here is one that can be used for loca
 	"domains": ["http://*", "https://*"]
 }
 ```
+
+## More Resources
+
+- Wallet Connect [Github](https://github.com/walletconnect/walletconnect-monorepo/)
+- Wallet Connect [Doc](https://docs.walletconnect.com/2.0)
