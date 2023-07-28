@@ -27,7 +27,7 @@ import { useAccountsStore, accountSelector } from '@/storage/accounts.store'
 import useHydratation from 'src/hooks/useHydratation'
 import { web3wallet } from '@/helpers/walletConnect.util'
 import { ImageWithPlaceholder } from '@/components/atoms/images/ImageWithPlaceholder'
-import useAnalytics from 'src/shared/useAnalytics'
+import useAnalytics from '@/hooks/common/useAnalytics'
 
 export { getServerSideProps } from '../lib/serverProps'
 

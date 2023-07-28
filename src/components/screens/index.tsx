@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { accountSelector, useAccountsStore } from '@/storage/accounts.store'
 import { sessionSelector, useSessionsStore } from '@/storage/sessions.store'
 import Home from './Home'
-import useAnalytics from 'src/shared/useAnalytics'
+import useAnalytics from '@/hooks/common/useAnalytics'
 
 export type WalletConnectProps = {
 	initialMode?: InputMode

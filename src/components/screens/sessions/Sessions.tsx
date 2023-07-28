@@ -13,7 +13,7 @@ import useWalletConnectPopin from '@/hooks/useWalletConnectPopin'
 
 import styled from 'styled-components'
 import { useSessionsStore, sessionSelector } from '@/storage/sessions.store'
-import useAnalytics from 'src/shared/useAnalytics'
+import useAnalytics from '@/hooks/common/useAnalytics'
 
 export type SessionsProps = {
 	goToConnect: () => void
