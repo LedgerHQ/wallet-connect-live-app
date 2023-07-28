@@ -13,11 +13,11 @@ import {
 	getDisplayName,
 	getNamespace,
 } from '@/helpers/helper.util'
-import { EIP155_SIGNING_METHODS } from '@/data/methods/EIP155Data.methods'
 import { web3wallet } from '@/helpers/walletConnect.util'
 import useAnalytics from 'src/shared/useAnalytics'
 import { useLedgerLive } from './common/useLedgerLive'
 import { SUPPORTED_NAMESPACE, SUPPORTED_NETWORK } from '@/data/network.config'
+import { SUPPORTED_NAMESPACE_METHODS } from '@/data/methods/methods.index'
 
 type Props = {
 	proposal: Proposal
@@ -110,15 +110,17 @@ export function useProposal({ proposal }: Props) {
 	const hasChain = (chain: string, accountsByChain: AccountsInChain[]) =>
 		accountsByChain.some((acc) => acc.chain === chain)
 
-	const createChains = (accountsByChain: AccountsInChain[]) => {
-		return Object.keys(SUPPORTED_NETWORK).map((network) => {
-			const hasChainInAccount = hasChain(network, accountsByChain)
-			if (hasChainInAccount) {
-				return getNamespace(network)
-			} else {
-				return ''
-			}
-		})
+	const createChainsByFamily = (
+		accountsByChain: AccountsInChain[],
+		family: SUPPORTED_NAMESPACE,
+	) => {
+		return Object.entries(SUPPORTED_NETWORK)
+			.filter(
+				([key, v]) =>
+					v.namespace.includes(family) &&
+					hasChain(key, accountsByChain),
+			)
+			.map(([network]) => getNamespace(network))
 	}
 	const createNamespaces = (): Record<string, SessionTypes.BaseNamespace> => {
 		const accountsByChain = formatAccountsByChain(
@@ -136,24 +138,44 @@ export function useProposal({ proposal }: Props) {
 			[],
 		)
 
-		const methods = proposal.params.requiredNamespaces[
-			SUPPORTED_NAMESPACE.eip155
-		].methods.concat(Object.values(EIP155_SIGNING_METHODS))
+		let res: Record<string, SessionTypes.BaseNamespace> = {}
 
-		return {
-			eip155: {
-				methods: [...new Set(methods)],
-				chains: createChains(accountsByChain).filter((e) => e.length),
-				events: proposal.params.requiredNamespaces[
-					SUPPORTED_NAMESPACE.eip155
-				].events,
-				accounts: accountsToSend,
-			},
-			// For new namespace other than eip155 add new object here with same skeleton
-		}
+		Object.keys(proposal.params.requiredNamespaces).map((namespace) => {
+			const methods = proposal.params.requiredNamespaces[
+				namespace
+			].methods.concat(
+				Object.values(
+					SUPPORTED_NAMESPACE_METHODS[
+						namespace as keyof typeof SUPPORTED_NAMESPACE_METHODS
+					],
+				),
+			)
+			res = {
+				...res,
+				[namespace]: {
+					methods: [...new Set(methods)],
+					chains: createChainsByFamily(
+						accountsByChain,
+						SUPPORTED_NAMESPACE[
+							namespace as keyof typeof SUPPORTED_NAMESPACE
+						],
+					),
+					events: proposal.params.requiredNamespaces[
+						namespace as keyof typeof SUPPORTED_NAMESPACE
+					].events,
+					accounts: accountsToSend.filter((acc) =>
+						acc.includes(namespace),
+					),
+				},
+				// For new namespace other than eip155 add new object here with same skeleton
+			}
+		})
+
+		return res
 	}
 
 	const approveSession = useCallback(async () => {
+		console.log(createNamespaces())
 		web3wallet
 			.approveSession({
 				id: proposal.id,

@@ -18,7 +18,8 @@
 		"arbitrum",
 		"avalanche_c_chain",
 		"ethereum_goerli",
-		"optimism_goerli"
+		"optimism_goerli",
+		"cosmos"
 	],
 	"content": {
 		"shortDescription": {

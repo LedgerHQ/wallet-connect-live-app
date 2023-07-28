@@ -56,21 +56,21 @@ const EIP155_CHAINS = {
 	},
 }
 
-// const COSMOS_MAINNET_CHAINS = {
-// 	cosmos: {
-// 		chainId: 'cosmoshub-4',
-// 		displayName: 'Cosmos Hub',
-// 		namespace: 'cosmos:cosmoshub-4',
-// 		ticker: 'ATOM',
-// 	},
-// }
+const COSMOS_MAINNET_CHAINS = {
+	cosmos: {
+		chainId: 'cosmoshub-4',
+		displayName: 'Cosmos Hub',
+		namespace: 'cosmos:cosmoshub-4',
+		ticker: 'ATOM',
+	},
+}
 
 export const SUPPORTED_NETWORK: Record<string, Network> = {
 	...EIP155_CHAINS,
-	// ...COSMOS_MAINNET_CHAINS,
+	...COSMOS_MAINNET_CHAINS,
 }
 
 export enum SUPPORTED_NAMESPACE {
 	eip155 = 'eip155',
-	// cosmos = 'cosmos',
+	cosmos = 'cosmos',
 }
