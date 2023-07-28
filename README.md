@@ -14,21 +14,6 @@ Behavior of the live app can be influenced by navigating to it with the followin
 - `initialAccountId`: Defines the account selected by default.
 - `uri`: Defines the WalletConnect URI the live app will attempt to connect to at startup.
 
-## Params
-
-This live app need parameters to be defined in the manifest file
-
-```json
-"params": {
-      "networks": [
-        {
-          "currency": "ethereum", // currency id
-          "chainId": 1 // evm network chain id
-        }
-      ]
-    }
-```
-
 ## Architecture
 
 - Pages 📝 (All the main screens)
@@ -44,6 +29,8 @@ Use of [Zustand](https://github.com/pmndrs/zustand) and `persist` middleware to 
 ## Support new Chain/Network
 
 1 - Update `localManifest.json` by adding new entry in currencies:
+
+Check name with Wallet Api Tool
 
 ```json
 "currencies": [

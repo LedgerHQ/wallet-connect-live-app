@@ -36,6 +36,12 @@ const EIP155_CHAINS = {
 		ticker: 'ARB',
 		displayName: 'Arbitrum',
 	},
+	avalanche_c_chain: {
+		chainId: 43114,
+		namespace: 'eip155:43114',
+		ticker: 'AVAX',
+		displayName: 'Avalanche C-Chain',
+	},
 	ethereum_goerli: {
 		chainId: 5,
 		namespace: 'eip155:5',
@@ -50,10 +56,21 @@ const EIP155_CHAINS = {
 	},
 }
 
+// const COSMOS_MAINNET_CHAINS = {
+// 	cosmos: {
+// 		chainId: 'cosmoshub-4',
+// 		displayName: 'Cosmos Hub',
+// 		namespace: 'cosmos:cosmoshub-4',
+// 		ticker: 'ATOM',
+// 	},
+// }
+
 export const SUPPORTED_NETWORK: Record<string, Network> = {
 	...EIP155_CHAINS,
+	// ...COSMOS_MAINNET_CHAINS,
 }
 
 export enum SUPPORTED_NAMESPACE {
 	eip155 = 'eip155',
+	// cosmos = 'cosmos',
 }
