@@ -13,13 +13,8 @@
 					"personal_sign",
 					"eth_signTypedData"
 				],
-				"chains": ["eip155:1", "eip155:10", "eip155:137"],
+				"chains": ["eip155:1"],
 				"events": ["chainChanged", "accountsChanged"]
-			},
-			"cosmos": {
-				"methods": ["cosmos_signDirect", "cosmos_signAmino"],
-				"chains": ["cosmos:cosmoshub-4"],
-				"events": []
 			}
 		},
 		"relays": [

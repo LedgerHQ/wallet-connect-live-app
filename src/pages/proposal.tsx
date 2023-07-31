@@ -19,7 +19,7 @@ import Image from 'next/image'
 import { space } from '@ledgerhq/react-ui/styles/theme'
 import { useTranslation } from 'next-i18next'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Logo } from 'src/icons/LedgerLiveLogo'
+import { Logo } from '@/icons/LedgerLiveLogo'
 import styled, { useTheme } from 'styled-components'
 import useAnalytics from '@/hooks/common/useAnalytics'
 

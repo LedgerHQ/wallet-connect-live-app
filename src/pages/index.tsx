@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import Head from 'next/head'
 
 import { Container } from '@/styles/styles'
-import { WalletApiClientProvider } from 'src/shared/WalletApiClientProvider'
+import { WalletApiClientProvider } from '@/shared/WalletApiClientProvider'
 import WalletConnect from '@/components/screens'
 import { ApplicationDisabled } from '@/components/screens/ApplicationDisabled'
 
