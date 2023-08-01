@@ -1,3 +1,4 @@
+/* eslint-disable testing-library/no-debugging-utils */
 import '@testing-library/react/dont-cleanup-after-each'
 import { render, screen, waitFor, act, cleanup } from '@testing-library/react'
 import AppScreen from '@/pages/index'
@@ -6,6 +7,7 @@ import sessionProposal from '@/data/sessionProposal.payload.json'
 import userEvent from '@testing-library/user-event'
 import SessionProposal from '@/pages/proposal'
 import { useNavigation } from '@/hooks/common/useNavigation'
+import SessionDetail from '@/pages/detail'
 
 const initialParamsHomePage = {
 	theme: 'dark',
@@ -32,7 +34,11 @@ jest.mock('@/hooks/common/useNavigation', () => {
 					push: mockPush,
 				},
 				tabsIndexes: { connect: 0 },
-				routes: { sessionProposal: '/proposal', home: '/' },
+				routes: {
+					sessionProposal: '/proposal',
+					home: '/',
+					sessionDetails: '/details',
+				},
 				navigate: jest.fn(),
 			}
 		}),
@@ -66,6 +72,9 @@ jest.mock('@walletconnect/core', () => {
 const mockRejectSession = jest.fn(
 	() => new Promise((resolve) => resolve(() => console.log('REJECT DONE'))),
 )
+const mockAcceptSession = jest.fn(
+	() => new Promise((resolve) => resolve(() => console.log('ACCEPT DONE'))),
+)
 
 jest.mock('@walletconnect/web3wallet', () => {
 	return {
@@ -77,6 +86,7 @@ jest.mock('@walletconnect/web3wallet', () => {
 					window.addEventListener(eventName, callback)
 				}),
 				rejectSession: mockRejectSession,
+				acceptSession: mockAcceptSession,
 			})),
 		},
 	}
@@ -117,7 +127,7 @@ jest.mock('@ledgerhq/wallet-api-client', () => {
 	}
 })
 
-const mockPush = jest.fn((params) =>
+const mockPush = jest.fn(() =>
 	console.log('ROUTER PUSH', {
 		pathname: '/proposal',
 		query: {
@@ -133,8 +143,17 @@ beforeAll(() => {
 afterEach(() => jest.clearAllMocks())
 afterAll(() => cleanup())
 
+const proposalRouter = () =>
+	(useNavigation as jest.Mock).mockReturnValue({
+		router: {
+			query: { data: JSON.stringify(sessionProposal) },
+		},
+		routes: { sessionProposal: '/proposal', home: '/' },
+		navigate: jest.fn(),
+		tabsIndexes: { connect: 0, sessions: 1 },
+	})
 describe('Pending Flow tests', () => {
-	it('Should connect throught an uri, initialize Session proposal Screen ', async () => {
+	it('Should connect throught an uri, initialize Session proposal Screen', async () => {
 		render(
 			<MockTheme>
 				<AppScreen />
@@ -155,14 +174,7 @@ describe('Pending Flow tests', () => {
 		)
 
 		cleanup()
-		;(useNavigation as jest.Mock).mockReturnValue({
-			router: {
-				query: { data: JSON.stringify(sessionProposal) },
-			},
-			routes: { sessionProposal: '/proposal', home: '/' },
-			navigate: jest.fn(),
-			tabsIndexes: { connect: 0, sessions: 1 },
-		})
+		proposalRouter()
 		render(
 			<MockTheme>
 				<SessionProposal />
@@ -176,6 +188,14 @@ describe('Pending Flow tests', () => {
 						name: /sessionProposal.connect/i,
 					}),
 				).toBeInTheDocument()
+			},
+			{
+				timeout: 3000,
+			},
+		)
+
+		await waitFor(
+			() => {
 				expect(
 					screen.getByRole('button', {
 						name: /sessionProposal.reject/i,
@@ -221,6 +241,46 @@ describe('Pending Flow tests', () => {
 				timeout: 3000,
 			},
 		)
+	})
+
+	it('Should accept proposal and display Session details', async () => {
+		await userEvent.click(
+			screen.getByRole('button', { name: /connect.cta/i }),
+		)
+		cleanup()
+		proposalRouter()
+
+		render(
+			<MockTheme>
+				<SessionProposal />
+			</MockTheme>,
+		)
+
+		await userEvent.click(
+			screen.getByRole('button', {
+				name: /sessionProposal.connect/i,
+			}),
+		)
+
+		cleanup()
+		render(
+			<MockTheme>
+				<SessionDetail />
+			</MockTheme>,
+		)
+
+		expect(screen.getByText(/sessions\.detail\.title/i)).toBeInTheDocument()
+		expect(
+			screen.getByText(/sessions\.detail\.connected/i),
+		).toBeInTheDocument()
+		expect(
+			screen.getByText(/sessions\.detail\.expires/i),
+		).toBeInTheDocument()
+		expect(
+			screen.getByRole('button', {
+				name: /sessions.detail.disconnect/i,
+			}),
+		).toBeInTheDocument()
 
 		screen.logTestingPlaygroundURL()
 	})
