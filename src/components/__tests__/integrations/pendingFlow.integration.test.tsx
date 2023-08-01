@@ -1,7 +1,43 @@
-import { render, screen, waitFor, act } from '@testing-library/react'
+import '@testing-library/react/dont-cleanup-after-each'
+import { render, screen, waitFor, act, cleanup } from '@testing-library/react'
 import AppScreen from '@/pages/index'
 import { MockTheme } from '@/tests-tools/theme.mock'
 import sessionProposal from '@/data/sessionProposal.payload.json'
+import userEvent from '@testing-library/user-event'
+import SessionProposal from '@/pages/proposal'
+import { useNavigation } from '@/hooks/common/useNavigation'
+
+const initialParamsHomePage = {
+	theme: 'dark',
+	lang: 'en',
+	uri: 'wc:63d3add7e715d3abcd9ebf5fec7482aa9f7a851ed0a8202a461d495e1512f9af@2?relay-protocol=irn&symKey=816d9a3e209bc4e4af45dafb4975b7ffd65a7c2413662f60d4d468455e6823bf',
+	params: '{"networks":[{"currency":"ethereum","chainId":1},{"currency":"bsc","chainId":56},{"currency":"polygon","chainId":137}]}',
+}
+
+// mock useRouter
+jest.mock('next/router', () => ({
+	useRouter: jest.fn(() => ({
+		query: {},
+		push: jest.fn(),
+	})),
+}))
+
+jest.mock('@/hooks/common/useNavigation', () => {
+	return {
+		useNavigation: jest.fn(() => {
+			return {
+				router: {
+					...jest.requireActual('next/router'),
+					query: initialParamsHomePage,
+					push: mockPush,
+				},
+				tabsIndexes: { connect: 0 },
+				routes: { sessionProposal: '/proposal', home: '/' },
+				navigate: jest.fn(),
+			}
+		}),
+	}
+})
 
 jest.mock('@walletconnect/core', () => {
 	return {
@@ -27,6 +63,10 @@ jest.mock('@walletconnect/core', () => {
 	}
 })
 
+const mockRejectSession = jest.fn(
+	() => new Promise((resolve) => resolve(() => console.log('REJECT DONE'))),
+)
+
 jest.mock('@walletconnect/web3wallet', () => {
 	return {
 		Web3Wallet: {
@@ -36,6 +76,7 @@ jest.mock('@walletconnect/web3wallet', () => {
 					console.log('Add event listener', eventName, callback)
 					window.addEventListener(eventName, callback)
 				}),
+				rejectSession: mockRejectSession,
 			})),
 		},
 	}
@@ -76,27 +117,30 @@ jest.mock('@ledgerhq/wallet-api-client', () => {
 	}
 })
 
-jest.mock('next/router', () => ({
-	useRouter: jest.fn(() => ({
+const mockPush = jest.fn((params) =>
+	console.log('ROUTER PUSH', {
+		pathname: '/proposal',
 		query: {
-			theme: 'dark',
-			lang: 'en',
-			uri: 'wc:63d3add7e715d3abcd9ebf5fec7482aa9f7a851ed0a8202a461d495e1512f9af@2?relay-protocol=irn&symKey=816d9a3e209bc4e4af45dafb4975b7ffd65a7c2413662f60d4d468455e6823bf',
-			params: '{"networks":[{"currency":"ethereum","chainId":1},{"currency":"bsc","chainId":56},{"currency":"polygon","chainId":137}]}',
+			data: sessionProposal,
 		},
-		push: jest.fn((params) => console.log('ROUTER PUSH', params)),
-	})),
-}))
+	}),
+)
+
+beforeAll(() => {
+	userEvent.setup()
+})
 
 afterEach(() => jest.clearAllMocks())
+afterAll(() => cleanup())
 
-describe('useWalletConnectEventsManager tests', () => {
-	it('useWalletConnectEventsManager when the app is not fully initialized', async () => {
+describe('Pending Flow tests', () => {
+	it('Should connect throught an uri, initialize Session proposal Screen ', async () => {
 		render(
 			<MockTheme>
 				<AppScreen />
 			</MockTheme>,
 		)
+
 		await waitFor(
 			() => {
 				expect(screen.getByRole('textbox')).toBeInTheDocument()
@@ -105,12 +149,76 @@ describe('useWalletConnectEventsManager tests', () => {
 				timeout: 3000,
 			},
 		)
+
+		await userEvent.click(
+			screen.getByRole('button', { name: /connect.cta/i }),
+		)
+
+		cleanup()
+		;(useNavigation as jest.Mock).mockReturnValue({
+			router: {
+				query: { data: JSON.stringify(sessionProposal) },
+			},
+			routes: { sessionProposal: '/proposal', home: '/' },
+			navigate: jest.fn(),
+			tabsIndexes: { connect: 0, sessions: 1 },
+		})
+		render(
+			<MockTheme>
+				<SessionProposal />
+			</MockTheme>,
+		)
+
 		await waitFor(
 			() => {
-				expect(screen.getByTestId('textbox')).toBeInTheDocument()
+				expect(
+					screen.getByRole('button', {
+						name: /sessionProposal.connect/i,
+					}),
+				).toBeInTheDocument()
+				expect(
+					screen.getByRole('button', {
+						name: /sessionProposal.reject/i,
+					}),
+				).toBeInTheDocument()
 			},
 			{
-				timeout: 1000,
+				timeout: 3000,
+			},
+		)
+	})
+
+	it('Should reject proposal', async () => {
+		await userEvent.click(
+			screen.getByRole('button', {
+				name: /sessionProposal.reject/i,
+			}),
+		)
+		;(useNavigation as jest.Mock).mockReturnValue({
+			router: {
+				query: initialParamsHomePage,
+			},
+			routes: { sessionProposal: '/proposal', home: '/' },
+			navigate: jest.fn(),
+			tabsIndexes: { connect: 0, sessions: 1 },
+		})
+
+		cleanup()
+
+		render(
+			<MockTheme>
+				<AppScreen />
+			</MockTheme>,
+		)
+
+		await waitFor(
+			() => {
+				expect(
+					screen.getByRole('button', { name: /connect.cta/i }),
+				).toBeInTheDocument()
+			},
+			{
+				timeout: 3000,
 			},
 		)
 

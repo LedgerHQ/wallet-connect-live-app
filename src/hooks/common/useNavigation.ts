@@ -5,14 +5,14 @@ enum tabsIndexes {
 	sessions = 1,
 }
 
-enum routes {
+export enum routes {
 	home = '/',
 	sessionProposal = '/proposal',
 	sessionDetails = '/detail',
 	protocolNotSupported = '/protocol-not-supported',
 }
 
-export default function useNavigation() {
+export function useNavigation() {
 	const router = useRouter()
 
 	function navigate(route: routes, params?: unknown) {

@@ -1,7 +1,7 @@
 import { SignClientTypes } from '@walletconnect/types'
 import { useCallback, useEffect } from 'react'
 import { Web3WalletTypes } from '@walletconnect/web3wallet'
-import useNavigation from '@/hooks/common/useNavigation'
+import { useNavigation } from '@/hooks/common/useNavigation'
 import { getAccountWithAddressAndChainId } from '@/helpers/generic'
 import { stripHexPrefix } from '@/utils/currencyFormatter/helpers'
 import { useLedgerLive } from './common/useLedgerLive'

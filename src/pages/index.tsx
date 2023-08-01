@@ -1,17 +1,18 @@
 import { useState, useEffect } from 'react'
 import type { NextPage } from 'next'
-import { useRouter } from 'next/router'
 import Head from 'next/head'
 
 import { Container } from '@/styles/styles'
 import { WalletApiClientProvider } from '@/shared/WalletApiClientProvider'
 import WalletConnect from '@/components/screens'
 import { ApplicationDisabled } from '@/components/screens/ApplicationDisabled'
+import { useNavigation } from '@/hooks/common/useNavigation'
 
 export { getServerSideProps } from '../lib/serverProps'
 
 const Index: NextPage = () => {
-	const router = useRouter()
+	const { router } = useNavigation()
+	console.log('Index ROUTER :', router)
 
 	const isApplicationDisabled = Boolean(
 		process.env.NEXT_PUBLIC_APPLICATION_DISABLED === 'true',
