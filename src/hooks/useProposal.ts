@@ -56,7 +56,7 @@ export function useProposal({ proposal }: Props) {
 	)
 
 	const handleClose = useCallback(() => {
-		router.push('/')
+		router.push(routes.home)
 		analytics.track('button_clicked', {
 			button: 'Close',
 			page: 'Wallet Connect Error Unsupported Blockchains',

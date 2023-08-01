@@ -1,0 +1,35 @@
+{
+	"id": 1676021246769876,
+	"params": {
+		"id": 1676021246769876,
+		"pairingTopic": "a2ab25c47c8fe26c5f35f0ce190d0d9831442cf7c0c60c66cccec6c68417f518",
+		"expiry": 1676021551,
+		"requiredNamespaces": {
+			"eip155": {
+				"methods": [
+					"eth_sendTransaction",
+					"eth_signTransaction",
+					"eth_sign",
+					"personal_sign",
+					"eth_signTypedData"
+				],
+				"chains": ["eip155:1", "eip155:230"],
+				"events": ["chainChanged", "accountsChanged"]
+			}
+		},
+		"relays": [
+			{
+				"protocol": "irn"
+			}
+		],
+		"proposer": {
+			"publicKey": "ebef128d9cdf5f022f7b0c81d90d4e86ebb56292622dda81fc80a272abb91e56",
+			"metadata": {
+				"description": "React App for WalletConnect",
+				"url": "https://react-app.walletconnect.com",
+				"icons": ["https://avatars.githubusercontent.com/u/37784886"],
+				"name": "React App"
+			}
+		}
+	}
+}
