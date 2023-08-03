@@ -7,20 +7,32 @@ import { useCallback, useState } from 'react'
 import useNavigation from '@/hooks/common/useNavigation'
 import { sessionSelector, useSessionsStore } from '@/storage/sessions.store'
 import { accountSelector, useAccountsStore } from '@/storage/accounts.store'
-import { useAppStore, appSelector } from '@/storage/app.store'
-import { formatChainName, getNamespace } from '@/helpers/helper.util'
-import { EIP155_SIGNING_METHODS } from '@/data/EIP155Data'
+
+import {
+	getCurrencyByChainId,
+	getDisplayName,
+	getNamespace,
+} from '@/helpers/helper.util'
+import { EIP155_SIGNING_METHODS } from '@/data/methods/EIP155Data.methods'
 import { web3wallet } from '@/helpers/walletConnect.util'
 import useAnalytics from 'src/shared/useAnalytics'
 import { useLedgerLive } from './common/useLedgerLive'
+import { SUPPORTED_NAMESPACE, SUPPORTED_NETWORK } from '@/data/network.config'
 
 type Props = {
 	proposal: Proposal
 }
 
+type AccountsInChain = {
+	chain: string
+	isSupported: boolean
+	isRequired: boolean
+	accounts: Account[]
+}
+
 export function useProposal({ proposal }: Props) {
 	const { navigate, routes, tabsIndexes } = useNavigation()
-	const networks = useAppStore(appSelector.selectNetworks)
+
 	const addSession = useSessionsStore(sessionSelector.addSession)
 	const accounts = useAccountsStore(accountSelector.selectAccounts)
 	const addAccount = useAccountsStore(accountSelector.addAccount)
@@ -74,13 +86,14 @@ export function useProposal({ proposal }: Props) {
 		const chainsDeduplicated = [...Array.from(new Set(chains))]
 
 		const mappedChains = chainsDeduplicated.map((chain) => {
-			const formatedChain = formatChainName(chain).toLowerCase()
+			const formatedChain = getCurrencyByChainId(chain)
 
 			return {
 				chain: formatedChain,
-				isSupported: networks
-					.map((n) => n.currency)
-					.includes(formatedChain),
+				displayName: getDisplayName(formatedChain),
+				isSupported: Boolean(
+					SUPPORTED_NETWORK[formatedChain] !== undefined,
+				),
 				isRequired: families.some(
 					(family) =>
 						family.required && family.chains.includes(chain),
@@ -94,16 +107,24 @@ export function useProposal({ proposal }: Props) {
 		return mappedChains
 	}
 
+	const hasChain = (chain: string, accountsByChain: AccountsInChain[]) =>
+		accountsByChain.some((acc) => acc.chain === chain)
+
+	const createChains = (accountsByChain: AccountsInChain[]) => {
+		return Object.keys(SUPPORTED_NETWORK).map((network) => {
+			const hasChainInAccount = hasChain(network, accountsByChain)
+			if (hasChainInAccount) {
+				return getNamespace(network)
+			} else {
+				return ''
+			}
+		})
+	}
 	const createNamespaces = (): Record<string, SessionTypes.BaseNamespace> => {
 		const accountsByChain = formatAccountsByChain(
 			proposal,
 			accounts,
 		).filter((a) => a.accounts.length > 0 && a.isSupported)
-		const hasETH = accountsByChain.find((acc) => acc.chain === 'ethereum')
-		const hasPolygon = accountsByChain.find(
-			(acc) => acc.chain === 'polygon',
-		)
-		const hasBSC = accountsByChain.find((acc) => acc.chain === 'bsc')
 
 		const accountsToSend = accountsByChain.reduce<string[]>(
 			(accum, elem) =>
@@ -116,20 +137,19 @@ export function useProposal({ proposal }: Props) {
 		)
 
 		const methods = proposal.params.requiredNamespaces[
-			'eip155'
+			SUPPORTED_NAMESPACE.eip155
 		].methods.concat(Object.values(EIP155_SIGNING_METHODS))
 
 		return {
 			eip155: {
 				methods: [...new Set(methods)],
-				chains: [
-					hasETH ? 'eip155:1' : '',
-					hasBSC ? 'eip155:56' : '',
-					hasPolygon ? 'eip155:137' : '',
-				].filter((e) => e.length),
-				events: proposal.params.requiredNamespaces['eip155'].events,
+				chains: createChains(accountsByChain).filter((e) => e.length),
+				events: proposal.params.requiredNamespaces[
+					SUPPORTED_NAMESPACE.eip155
+				].events,
 				accounts: accountsToSend,
 			},
+			// For new namespace other than eip155 add new object here with same skeleton
 		}
 	}
 

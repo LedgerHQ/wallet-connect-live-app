@@ -10,9 +10,6 @@ export const ELROND_MAINNET_CHAINS = {
 	'elrond:1': {
 		chainId: '1',
 		name: 'Elrond',
-		logo: '/chain-logos/elrond-1.png',
-		rgb: '43, 45, 46',
-		rpc: '',
 	},
 }
 
@@ -20,9 +17,6 @@ export const ELROND_TEST_CHAINS = {
 	'elrond:D': {
 		chainId: 'D',
 		name: 'Elrond Devnet',
-		logo: '/chain-logos/elrond-1.png',
-		rgb: '43, 45, 46',
-		rpc: '',
 	},
 }
 

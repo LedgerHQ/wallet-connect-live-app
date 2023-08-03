@@ -1,8 +1,9 @@
 import {
-	formatChainName,
+	getCurrencyByChainId,
 	formatUrl,
 	getTicker,
 	truncate,
+	getDisplayName,
 } from '@/helpers/helper.util'
 import { Box, Button, CryptoIcon, Flex, Text } from '@ledgerhq/react-ui'
 import { ArrowLeftMedium } from '@ledgerhq/react-ui/assets/icons'
@@ -123,22 +124,19 @@ export default function SessionDetail() {
 
 		addresses.forEach((addr) => {
 			const addrSplitted = addr.split(':')
-
-			const formatedChain = formatChainName(
+			const chain = getCurrencyByChainId(
 				`${addrSplitted[0]}:${addrSplitted[1]}`,
-			).toLowerCase()
+			)
 
-			const existingEntry = accountsByChain.get(formatedChain)
+			const existingEntry = accountsByChain.get(chain)
 
 			const account = accounts.find(
-				(a) =>
-					a.address === addrSplitted[2] &&
-					formatedChain === a.currency,
+				(a) => a.address === addrSplitted[2] && chain === a.currency,
 			)
 
 			if (account) {
 				accountsByChain.set(
-					formatedChain,
+					chain,
 					existingEntry ? [...existingEntry, account] : [account],
 				)
 			}
@@ -291,7 +289,7 @@ export default function SessionDetail() {
 													variant="subtitle"
 													color="neutral.c70"
 												>
-													{chain}
+													{getDisplayName(chain)}
 												</Text>
 											</Box>
 

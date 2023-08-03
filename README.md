@@ -14,21 +14,6 @@ Behavior of the live app can be influenced by navigating to it with the followin
 - `initialAccountId`: Defines the account selected by default.
 - `uri`: Defines the WalletConnect URI the live app will attempt to connect to at startup.
 
-## Params
-
-This live app need parameters to be defined in the manifest file
-
-```json
-"params": {
-      "networks": [
-        {
-          "currency": "ethereum", // currency id
-          "chainId": 1 // evm network chain id
-        }
-      ]
-    }
-```
-
 ## Architecture
 
 - Pages 📝 (All the main screens)
@@ -40,6 +25,44 @@ This live app need parameters to be defined in the manifest file
 ## Store Management
 
 Use of [Zustand](https://github.com/pmndrs/zustand) and `persist` middleware to have a persistent store via the `localStorage`
+
+## Support new Chain/Network
+
+1 - Update `localManifest.json` by adding new entry in currencies:
+
+Check name with Wallet Api Tool
+
+```json
+"currencies": [
+		"ethereum",
+		"polygon",
+		....
+		"arbitrum",
+	],
+```
+
+2 - Update `@/data/config.ts` by adding in `EIP155_CHAINS` as a `<key,value>` format the new chain with this specific skeleton :
+`key` is the currency name (Same as point 1)
+
+```ts
+"string": {
+	chainId: number
+	namespace: string
+	ticker: string
+	displayName: string
+}
+```
+
+Example to add ethereum
+
+```ts
+ethereum: {
+		chainId: 1,
+		namespace: 'eip155:1',
+		ticker: 'ETH',
+		displayName: 'Ethereum',
+	},
+```
 
 ## Getting Started
 
@@ -125,3 +148,8 @@ All Live apps are defined with a manifest. Here is one that can be used for loca
 	"domains": ["http://*", "https://*"]
 }
 ```
+
+## More Resources
+
+- Wallet Connect [Github](https://github.com/walletconnect/walletconnect-monorepo/)
+- Wallet Connect [Doc](https://docs.walletconnect.com/2.0)

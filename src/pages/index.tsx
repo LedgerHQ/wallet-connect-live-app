@@ -4,9 +4,7 @@ import { useRouter } from 'next/router'
 import Head from 'next/head'
 
 import { Container } from '@/styles/styles'
-import { NetworkConfig } from '@/types/types'
 import { WalletApiClientProvider } from 'src/shared/WalletApiClientProvider'
-import { appSelector, useAppStore } from '@/storage/app.store'
 import WalletConnect from '@/components/screens'
 
 export { getServerSideProps } from '../lib/serverProps'
@@ -16,7 +14,7 @@ let initialParams: any
 
 const Index: NextPage = () => {
 	const router = useRouter()
-	const networks = useAppStore(appSelector.selectNetworks)
+
 	const {
 		params: rawParams,
 		uri: rawURI,
@@ -27,13 +25,6 @@ const Index: NextPage = () => {
 	if (!initialParams) {
 		initialParams = rawParams
 	}
-	const params =
-		rawParams && typeof rawParams === 'string'
-			? JSON.parse(rawParams)
-			: initialParams
-			? JSON.parse(initialParams)
-			: {}
-	const networkConfigs: NetworkConfig[] = params.networks ?? networks
 
 	const uri = rawURI && typeof rawURI === 'string' ? rawURI : undefined
 	const initialAccountId =
@@ -61,12 +52,11 @@ const Index: NextPage = () => {
 				/>
 			</Head>
 			{isMounted ? (
-				<WalletApiClientProvider networks={networkConfigs}>
+				<WalletApiClientProvider>
 					{(accounts, userId, walletInfo) => (
 						<WalletConnect
 							initialMode={initialMode}
 							initialAccountId={initialAccountId}
-							networks={networkConfigs}
 							initialURI={uri}
 							accounts={accounts}
 							userId={userId}
