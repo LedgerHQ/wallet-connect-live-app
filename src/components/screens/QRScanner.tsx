@@ -29,6 +29,7 @@ export function QRScanner({ onQRScan }: QRScannerProps) {
 				}}
 				onScan={(result) => {
 					if (!!result) {
+						console.log('result')
 						onQRScan(result)
 					}
 				}}

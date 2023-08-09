@@ -103,7 +103,7 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 		(rawURI: string) => {
 			try {
 				const url = new URL(rawURI)
-
+				alert(url)
 				switch (url.protocol) {
 					// handle usual wallet connect URIs
 					case 'wc:': {
