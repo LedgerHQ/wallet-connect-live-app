@@ -9,28 +9,13 @@ import WalletConnect from '@/components/screens'
 
 export { getServerSideProps } from '../lib/serverProps'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let initialParams: any
-
 const Index: NextPage = () => {
 	const router = useRouter()
 
-	const {
-		params: rawParams,
-		uri: rawURI,
-		initialAccountId: rawInitialAccountId,
-		mode: rawInitialMode,
-	} = router.query
-
-	if (!initialParams) {
-		initialParams = rawParams
-	}
+	const { uri: rawURI, mode: rawInitialMode } = router.query
 
 	const uri = rawURI && typeof rawURI === 'string' ? rawURI : undefined
-	const initialAccountId =
-		rawInitialAccountId && typeof rawInitialAccountId === 'string'
-			? rawInitialAccountId
-			: undefined
+
 	const initialMode =
 		rawInitialMode === 'scan' || rawInitialMode === 'text'
 			? rawInitialMode
@@ -45,10 +30,10 @@ const Index: NextPage = () => {
 	return (
 		<Container>
 			<Head>
-				<title>Ledger Wallet Connect</title>
+				<title>Ledger WalletConnect</title>
 				<meta
-					name="Ledger Wallet Connect"
-					content="Ledger Wallet Connect"
+					name="Ledger WalletConnect"
+					content="Ledger WalletConnect"
 				/>
 			</Head>
 			{isMounted ? (
@@ -56,7 +41,6 @@ const Index: NextPage = () => {
 					{(accounts, userId, walletInfo) => (
 						<WalletConnect
 							initialMode={initialMode}
-							initialAccountId={initialAccountId}
 							initialURI={uri}
 							accounts={accounts}
 							userId={userId}

@@ -27,7 +27,7 @@ export function ApplicationDisabled() {
 	)
 
 	useEffect(() => {
-		analytics.page('Wallet Connect Has Been Disabled')
+		analytics.page('WalletConnect Has Been Disabled')
 	}, [])
 
 	return (

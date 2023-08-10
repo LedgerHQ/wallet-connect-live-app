@@ -1,4 +1,4 @@
-# Wallet Connect Live App
+# WalletConnect Live App
 
 This is a web application that uses [Next.js](https://nextjs.org/)
 and is intended to be integrated within ledger products, enabling users to seamlessly connect to dapps supporting the walletconnect wallet adapter.
@@ -11,8 +11,8 @@ This live app is currently hosted at https://wc.apps.ledger.com
 
 Behavior of the live app can be influenced by navigating to it with the following query parameters:
 
-- `initialAccountId`: Defines the account selected by default.
 - `uri`: Defines the WalletConnect URI the live app will attempt to connect to at startup.
+- `mode`: Used to define the initial mode: `scan` to scan a QR Code or `text` to fill the field with a uri.
 
 ## Architecture
 
@@ -21,6 +21,7 @@ Behavior of the live app can be influenced by navigating to it with the followin
 - Hooks 🎣 (All the reusable logic)
 - Storage 🛒 (All the stored (persistent or not) data to manage the running of the app )
 - Data 📈 (All the types for each chain and some payloads)
+- Shared 🖖 (All the useful functions shared throughout the app)
 
 ## Store Management
 
@@ -34,11 +35,11 @@ Check name with Wallet Api Tool
 
 ```json
 "currencies": [
-		"ethereum",
-		"polygon",
-		....
-		"arbitrum",
-	],
+	"ethereum",
+	"polygon",
+	....
+	"arbitrum",
+],
 ```
 
 2 - Update `@/data/config.ts` by adding in `EIP155_CHAINS` as a `<key,value>` format the new chain with this specific skeleton :
@@ -57,11 +58,11 @@ Example to add ethereum
 
 ```ts
 ethereum: {
-		chainId: 1,
-		namespace: 'eip155:1',
-		ticker: 'ETH',
-		displayName: 'Ethereum',
-	},
+	chainId: 1,
+	namespace: 'eip155:1',
+	ticker: 'ETH',
+	displayName: 'Ethereum',
+},
 ```
 
 ## Getting Started
@@ -101,25 +102,10 @@ All Live apps are defined with a manifest. Here is one that can be used for loca
 
 ```json
 {
-	"id": "ledger-wallet-connect-v2",
-	"name": "Wallet Connect v2",
+	"id": "ledger-wallet-connect",
+	"name": "WalletConnect",
 	"url": "http://localhost:3000/",
-	"params": {
-		"networks": [
-			{
-				"currency": "ethereum",
-				"chainId": 1
-			},
-			{
-				"currency": "bsc",
-				"chainId": 56
-			},
-			{
-				"currency": "polygon",
-				"chainId": 137
-			}
-		]
-	},
+	"params": {},
 	"homepageUrl": "https://walletconnect.com/",
 	"icon": "https://forum.zeroqode.com/uploads/default/original/2X/e/e363c6521db27335d44c1134d230b8992792dde4.png",
 	"platform": "all",
@@ -127,7 +113,16 @@ All Live apps are defined with a manifest. Here is one that can be used for loca
 	"manifestVersion": "1",
 	"branch": "stable",
 	"categories": ["bridge", "defi"],
-	"currencies": ["ethereum", "polygon", "bsc"],
+	"currencies": [
+		"ethereum",
+		"polygon",
+		"bsc",
+		"optimism",
+		"arbitrum",
+		"avalanche_c_chain",
+		"ethereum_goerli",
+		"optimism_goerli"
+	],
 	"content": {
 		"shortDescription": {
 			"en": "WalletConnect is an open source protocol for connecting decentralised applications to mobile wallets with QR code scanning or deep linking. V2 introduces new features, including the ability to connect to multiple dapps in parallel with multiple accounts. It's important to note that not all dapps currently support V2"
@@ -151,5 +146,5 @@ All Live apps are defined with a manifest. Here is one that can be used for loca
 
 ## More Resources
 
-- Wallet Connect [Github](https://github.com/walletconnect/walletconnect-monorepo/)
-- Wallet Connect [Doc](https://docs.walletconnect.com/2.0)
+- WalletConnect [Github](https://github.com/walletconnect/walletconnect-monorepo/)
+- WalletConnect [Doc](https://docs.walletconnect.com/2.0)

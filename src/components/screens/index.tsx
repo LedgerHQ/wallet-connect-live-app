@@ -8,7 +8,6 @@ import useAnalytics from 'src/shared/useAnalytics'
 
 export type WalletConnectProps = {
 	initialMode?: InputMode
-	initialAccountId?: string
 	initialURI?: string
 	accounts: Account[]
 	userId: string
@@ -17,7 +16,6 @@ export type WalletConnectProps = {
 
 export default function WalletConnect({
 	initialURI,
-	initialAccountId,
 	initialMode,
 	accounts,
 	userId,
@@ -57,7 +55,6 @@ export default function WalletConnect({
 			setUri={setUri}
 			accounts={accounts}
 			initialURI={uri}
-			initialAccountId={initialAccountId}
 			{...rest}
 		/>
 	)
