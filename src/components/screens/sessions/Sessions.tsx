@@ -8,12 +8,12 @@ import { Flex, Button, Box, Text } from '@ledgerhq/react-ui'
 
 import { useTranslation } from 'next-i18next'
 import { useCallback, useEffect, useMemo } from 'react'
-import useNavigation from '@/hooks/common/useNavigation'
 import useWalletConnectPopin from '@/hooks/useWalletConnectPopin'
 
 import styled from 'styled-components'
 import { useSessionsStore, sessionSelector } from '@/storage/sessions.store'
 import useAnalytics from '@/hooks/common/useAnalytics'
+import { useNavigation } from '@/hooks/common/useNavigation'
 
 export type SessionsProps = {
 	goToConnect: () => void
