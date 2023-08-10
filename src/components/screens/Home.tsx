@@ -36,7 +36,6 @@ const WalletConnectInnerContainer = styled(TransitionGroup)`
 `
 
 export type WalletConnectProps = {
-	initialAccountId?: string
 	initialURI?: string
 	accounts: Account[]
 	initialMode?: InputMode
