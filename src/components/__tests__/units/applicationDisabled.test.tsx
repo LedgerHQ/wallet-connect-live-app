@@ -32,8 +32,8 @@ describe('Application Disable Screen', () => {
 		render(<ApplicationDisabled />)
 
 		const logo = screen.getByTestId('application-disabled-logo')
-		const title = screen.getByTestId('application-disabled-title')
-		const subtitle = screen.getByTestId('application-disabled-subtitle')
+		const title = screen.getByText(/applicationDisabled.title/)
+		const subtitle = screen.getByText(/applicationDisabled.desc/)
 		expect(logo).toBeVisible()
 		expect(title).toBeVisible()
 		expect(subtitle).toBeVisible()
