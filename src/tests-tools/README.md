@@ -12,7 +12,7 @@ import { render, screen, renderHook } from '@/tests-tools/test.utils'
 describe('Your test suits', () => {
 	it('What you want to test', async () => {
 		renderHook(() => useYourHook()) // if you want to render a hook
-		render(<Component />) // render comonent with custom render function
+		render(<Component />) // render component with custom render function
 		const text = screen.getByRole('generic')
 		expect(text).toBeInTheDocument()
 	})
@@ -28,7 +28,7 @@ const onClickMock = jest.fn()
 
 describe('Your test suits', () => {
 	it('What you want to test', async () => {
-		const { user } = render(<Component />) // render comonent with custom render function
+		const { user } = render(<Component />) // render component with custom render function and use userEvent
 		const button = screen.getByRole('button')
 		expect(button).toBeInTheDocument()
 
