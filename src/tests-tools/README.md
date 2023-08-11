@@ -18,3 +18,22 @@ describe('Your test suits', () => {
 	})
 })
 ```
+
+### With userEvent
+
+```ts
+import { render, screen } from '@/tests-tools/test.utils'
+
+const onClickMock = jest.fn()
+
+describe('Your test suits', () => {
+	it('What you want to test', async () => {
+		const { user } = render(<Component />) // render comonent with custom render function
+		const button = screen.getByRole('button')
+		expect(button).toBeInTheDocument()
+
+		await user.click(button)
+		expect(onClickMock).toHaveBeenCalled()
+	})
+})
+```
