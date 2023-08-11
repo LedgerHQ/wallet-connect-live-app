@@ -28,9 +28,17 @@
 			"@/mocks/*": ["src/__mocks__/*"],
 			"@/helpers/*": ["src/shared/helpers/*"],
 			"@/mappers/*": ["src/shared/mappers/*"],
-			"@/types/*": ["src/shared/types/*"]
+			"@/types/*": ["src/shared/types/*"],
+			"@/tests-tools/*": ["src/tests-tools/*"]
 		}
 	},
-	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+	"include": [
+		"next-env.d.ts",
+		"**/*.ts",
+		"**/*.tsx",
+		"jest.integration.config.js",
+		"jest.config.js",
+		"jest.setup.js"
+	],
 	"exclude": ["node_modules"]
 }

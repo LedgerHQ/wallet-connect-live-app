@@ -4,7 +4,7 @@ import { useTranslation } from 'next-i18next'
 import React from 'react'
 import styled from 'styled-components'
 
-const AddAccountButton = styled.div`
+const AddAccountButton = styled.button`
 	border: 1px dashed rgba(153, 153, 153, 0.3);
 	cursor: pointer;
 	border-radius: 4px;
@@ -16,6 +16,8 @@ const AddAccountButton = styled.div`
 	display: flex;
 	flex-direction: row;
 	height: auto;
+	width: 100%;
+	background-color: transparent;
 
 	&:hover {
 		cursor: pointer;

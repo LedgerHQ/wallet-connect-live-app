@@ -3,7 +3,7 @@ import { Flex, Text } from '@ledgerhq/react-ui'
 import { CloseMedium } from '@ledgerhq/react-ui/assets/icons'
 import { useTranslation } from 'next-i18next'
 import { useEffect } from 'react'
-import useAnalytics from 'src/shared/useAnalytics'
+import useAnalytics from '@/hooks/common/useAnalytics'
 import styled from 'styled-components'
 
 const LogoContainer = styled(Flex)`
@@ -56,6 +56,7 @@ export function ErrorBlockchainSupport({ appName, chains }: Props) {
 				color="neutral.c100"
 				mt={10}
 				textAlign="center"
+				data-testid="error-title-blockchain-support"
 			>
 				{t('sessionProposal.error.title', { appName })}
 			</Text>

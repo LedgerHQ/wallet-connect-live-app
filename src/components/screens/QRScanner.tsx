@@ -19,7 +19,7 @@ type QRScannerProps = {
 
 export function QRScanner({ onQRScan }: QRScannerProps) {
 	return (
-		<QRScannerContainer>
+		<QRScannerContainer data-testid="qr-scanner">
 			<QrReader
 				delay={500}
 				onError={(error) => {

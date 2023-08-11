@@ -2,11 +2,11 @@ import { Flex, Text, Button } from '@ledgerhq/react-ui'
 import { CloseMedium } from '@ledgerhq/react-ui/assets/icons'
 import { useTranslation } from 'next-i18next'
 import { useEffect } from 'react'
-import useAnalytics from 'src/shared/useAnalytics'
 import styled from 'styled-components'
 import router from 'next/router'
 import { ResponsiveContainer } from '@/styles/styles'
 import { device } from '@/styles/breakpoints'
+import useAnalytics from '@/hooks/common/useAnalytics'
 
 export { getServerSideProps } from '../lib/serverProps'
 

@@ -4,7 +4,7 @@ import { ThemeNames } from '@ledgerhq/react-ui/styles'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo } from 'react'
-import useAnalytics from 'src/shared/useAnalytics'
+import useAnalytics from '@/hooks/common/useAnalytics'
 import styled from 'styled-components'
 
 const LogoContainer = styled(Flex)`
@@ -40,8 +40,9 @@ export function ApplicationDisabled() {
 				justifyContent="center"
 				flexDirection="column"
 				flex={1}
+				data-testid="application-disabled-container"
 			>
-				<LogoContainer>
+				<LogoContainer data-testid="application-disabled-logo">
 					<CloseMedium size={32} color="background.main" />
 				</LogoContainer>
 				<Text
@@ -50,6 +51,7 @@ export function ApplicationDisabled() {
 					color="neutral.c100"
 					mt={10}
 					textAlign="center"
+					data-testid="application-disabled-title"
 				>
 					{t('applicationDisabled.title')}
 				</Text>
@@ -59,6 +61,7 @@ export function ApplicationDisabled() {
 					color="neutral.c80"
 					mt={10}
 					textAlign="center"
+					data-testid="application-disabled-subtitle"
 				>
 					{t('applicationDisabled.desc')}
 				</Text>
