@@ -8,8 +8,13 @@ type PropsTheme = {
 	theme?: 'dark' | 'light'
 }
 
+/**
+ *
+ * @param children Your component you want to render
+ * @param theme Theme of your app, by default it's dark
+ * @returns Your component wrapped with LedgerLive's StyleProvider
+ */
 const AllProviders = ({ children, theme = 'dark' }: PropsTheme) => {
-	userEvent.setup()
 	return (
 		<StyleProvider selectedPalette={theme} fontsPath="/fonts">
 			{children}
@@ -22,5 +27,19 @@ const customRender = (
 	options?: Omit<RenderOptions, 'wrapper'>,
 ) => render(ui, { wrapper: AllProviders, ...options })
 
+/**
+ *
+ * @param ui your ReactElement you want to render during test
+ * @param options
+ * @returns your component wrapped with theme and userEvent setuped
+ */
+const setupUserEventWithRender = (
+	ui: ReactElement,
+	options?: Omit<RenderOptions, 'wrapper'>,
+) => ({
+	user: userEvent.setup(),
+	...customRender(ui, options),
+})
+
 export * from '@testing-library/react'
-export { customRender as render }
+export { setupUserEventWithRender as render }
