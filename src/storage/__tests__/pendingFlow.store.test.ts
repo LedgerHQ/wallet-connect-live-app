@@ -1,8 +1,7 @@
 import { act, renderHook } from '@testing-library/react'
 
 import { usePendingFlowStore } from '../pendingFlow.store'
-
-import { PENDING_FLOW_MOCK } from './mocks/pendingFlow.mock'
+import { PENDING_FLOW_MOCK } from '@/tests-tools/mocks/pendingFlow.mock'
 
 describe('PendingFlow Store', () => {
 	it('Should have initial state ok', () => {

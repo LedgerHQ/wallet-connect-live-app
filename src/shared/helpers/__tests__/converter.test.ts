@@ -1,19 +1,10 @@
 import BigNumber from 'bignumber.js'
 import { EthTransaction, convertEthToLiveTX } from '../converters'
 import eip55 from 'eip55'
-
-const to = '0x98BD1afBf1775A1FA55Cbb34B42AC482aA15Ff6E'
+import { ethTx, to } from '@/tests-tools/mocks/eth-transaction.mock'
 
 describe('Converter File', () => {
 	it('convertEthToLiveTX correclty formatted', async () => {
-		const ethTx: EthTransaction = {
-			value: '0x00300202020202',
-			to,
-			gasPrice: '0x00300202',
-			gas: '0x0030020',
-			data: '0x00FD33eeeeeeeeeeeeee2eEFDFFEE33eeeeeeeeeeee9903KDD',
-		}
-
 		const expected = {
 			family: 'ethereum',
 			amount: new BigNumber(ethTx.value.replace('0x', ''), 16),
@@ -30,7 +21,7 @@ describe('Converter File', () => {
 	it('convertEthToLiveTX wrongly formatted', async () => {
 		const ethTx: EthTransaction = {
 			value: '',
-			to,
+			to: to,
 			gasPrice: '',
 			gas: '',
 			data: '',

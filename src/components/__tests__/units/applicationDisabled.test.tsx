@@ -1,5 +1,5 @@
 import { ApplicationDisabled } from '@/components/screens/ApplicationDisabled'
-import { render, screen } from '@testing-library/react'
+import { render, screen } from '@/tests-tools/test.utils'
 
 jest.mock('next/router', () => ({
 	useRouter() {

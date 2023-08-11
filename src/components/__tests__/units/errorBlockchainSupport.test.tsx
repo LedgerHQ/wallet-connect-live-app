@@ -1,5 +1,4 @@
-import { render, renderHook, screen } from '@testing-library/react'
-import { MockTheme } from '@/tests-tools/theme.mock'
+import { render, screen, renderHook } from '@/tests-tools/test.utils'
 import { ErrorBlockchainSupport } from '@/components/screens/sessions/sessionProposal/ErrorBlockchainSupport'
 import useAnalytics from '@/hooks/common/useAnalytics'
 
@@ -23,11 +22,7 @@ const CHAINS = [
 describe('Error BlockChian Support Screen', () => {
 	it('Page should appears and on click triggers action', async () => {
 		renderHook(() => useAnalytics())
-		render(
-			<MockTheme>
-				<ErrorBlockchainSupport appName={APP_NAME} chains={CHAINS} />
-			</MockTheme>,
-		)
+		render(<ErrorBlockchainSupport appName={APP_NAME} chains={CHAINS} />)
 		const text = screen.getByTestId('error-title-blockchain-support')
 
 		expect(text).toBeInTheDocument()

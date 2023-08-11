@@ -1,4 +1,4 @@
-import { ACCOUNT_MOCK } from '@/storage/__tests__/mocks/account.mock'
+import { ACCOUNT_MOCK } from '@/tests-tools/mocks/account.mock'
 import {
 	compareETHAddresses,
 	getAccountWithAddress,

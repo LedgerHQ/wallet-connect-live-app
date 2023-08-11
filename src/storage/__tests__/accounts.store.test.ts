@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react'
 
 import { useAccountsStore } from '../accounts.store'
-import { ACCOUNT_MOCK } from './mocks/account.mock'
+import { ACCOUNT_MOCK } from '@/tests-tools/mocks/account.mock'
 
 describe('Accounts Store', () => {
 	it('Should have initial state ok', () => {
