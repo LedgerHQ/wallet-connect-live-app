@@ -29,7 +29,8 @@
 			"@/helpers/*": ["src/shared/helpers/*"],
 			"@/mappers/*": ["src/shared/mappers/*"],
 			"@/types/*": ["src/shared/types/*"],
-			"@/tests-tools/*": ["src/tests-tools/*"]
+			"@/tests-tools/*": ["src/tests-tools/*"],
+			"react": ["./node_modules/@types/react"]
 		}
 	},
 	"include": [
