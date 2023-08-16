@@ -1,57 +1,27 @@
 import { useState, useEffect } from 'react'
-import type { GetServerSideProps, NextPage } from 'next'
+import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { getDefaultLanguage } from '@/helpers/generic'
 
 import { Container } from '@/styles/styles'
-import { WalletConnect } from '@/components/WalletConnect'
-import { NetworkConfig } from '@/types/types'
-import { SDKProvider } from 'src/shared/SDKProvider'
-import { Flex } from '@ledgerhq/react-ui'
-import { useTranslation } from 'next-i18next'
+import { WalletApiClientProvider } from 'src/shared/WalletApiClientProvider'
+import WalletConnect from '@/components/screens'
 
-export const getServerSideProps: GetServerSideProps = async ({
-	query,
-	locale,
-	locales,
-}) => ({
-	props: {
-		...(await serverSideTranslations(
-			getDefaultLanguage('en', locales, query.lang as string, locale),
-		)),
-	},
-})
+export { getServerSideProps } from '../lib/serverProps'
 
 const Index: NextPage = () => {
 	const router = useRouter()
 
-	const {
-		params: rawParams,
-		uri: rawURI,
-		initialAccountId: rawInitialAccountId,
-		mode: rawInitialMode,
-	} = router.query
-
-	const params =
-		rawParams && typeof rawParams === 'string' ? JSON.parse(rawParams) : {}
-	const networkConfigs: NetworkConfig[] = params.networks
-	const isFromLedgerLive = !!params.isFromLedgerLive
+	const { uri: rawURI, mode: rawInitialMode } = router.query
 
 	const uri = rawURI && typeof rawURI === 'string' ? rawURI : undefined
-	const initialAccountId =
-		rawInitialAccountId && typeof rawInitialAccountId === 'string'
-			? rawInitialAccountId
-			: undefined
+
 	const initialMode =
 		rawInitialMode === 'scan' || rawInitialMode === 'text'
 			? rawInitialMode
 			: undefined
 
 	const [isMounted, setMounted] = useState<boolean>(false)
-
-	const { t } = useTranslation()
 
 	useEffect(() => {
 		setMounted(true)
@@ -60,26 +30,24 @@ const Index: NextPage = () => {
 	return (
 		<Container>
 			<Head>
-				<title>Ledger Wallet Connect</title>
+				<title>Ledger WalletConnect</title>
 				<meta
-					name="Ledger Wallet Connect"
-					content="Ledger Wallet Connect"
+					name="Ledger WalletConnect"
+					content="Ledger WalletConnect"
 				/>
 			</Head>
 			{isMounted ? (
-				<SDKProvider networks={networkConfigs}>
-					{(platformSDK, accounts) => (
+				<WalletApiClientProvider>
+					{(accounts, userId, walletInfo) => (
 						<WalletConnect
 							initialMode={initialMode}
-							initialAccountId={initialAccountId}
-							networks={networkConfigs}
 							initialURI={uri}
-							platformSDK={platformSDK}
 							accounts={accounts}
-							isFromLedgerLive={isFromLedgerLive}
+							userId={userId}
+							walletInfo={walletInfo}
 						/>
 					)}
-				</SDKProvider>
+				</WalletApiClientProvider>
 			) : null}
 		</Container>
 	)

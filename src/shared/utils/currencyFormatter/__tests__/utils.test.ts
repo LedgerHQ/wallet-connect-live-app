@@ -35,7 +35,7 @@ describe('getLocaleSeparators tests', () => {
 	})
 })
 
-describe('getLocaleSeparators tests', () => {
+describe('getNumberWithOptions tests', () => {
 	it('should use useGrouping option correctly', () => {
 		const n = 123456789
 		expect(getNumberWithOptions(n, { useGrouping: false })).toBe(

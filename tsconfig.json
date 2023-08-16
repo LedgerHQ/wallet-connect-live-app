@@ -1,6 +1,6 @@
 {
 	"compilerOptions": {
-		"target": "es5",
+		"target": "es6",
 		"lib": ["dom", "dom.iterable", "esnext"],
 		"allowJs": true,
 		"skipLibCheck": true,
@@ -18,17 +18,27 @@
 		"paths": {
 			"@/components/*": ["src/components/*"],
 			"@/pages/*": ["src/pages/*"],
+			"@/data/*": ["src/data/*"],
+			"@/hooks/*": ["src/hooks/*"],
+			"@/storage/*": ["src/storage/*"],
 			"@/styles/*": ["src/styles/*"],
 			"@/utils/*": ["src/shared/utils/*"],
-			"@/hooks/*": ["src/shared/hooks/*"],
 			"@/constants/*": ["src/shared/constants/*"],
 			"@/context/*": ["src/shared/context/*"],
 			"@/mocks/*": ["src/__mocks__/*"],
 			"@/helpers/*": ["src/shared/helpers/*"],
 			"@/mappers/*": ["src/shared/mappers/*"],
-			"@/types/*": ["src/shared/types/*"]
+			"@/types/*": ["src/shared/types/*"],
+			"@/tests-tools/*": ["src/tests-tools/*"]
 		}
 	},
-	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+	"include": [
+		"next-env.d.ts",
+		"**/*.ts",
+		"**/*.tsx",
+		"jest.integration.config.js",
+		"jest.config.js",
+		"jest.setup.js"
+	],
 	"exclude": ["node_modules"]
 }
