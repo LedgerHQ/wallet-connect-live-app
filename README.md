@@ -189,6 +189,10 @@ To create an integration test, use the `*.integration.test.ts` pattern.
 
   When a new screen is added, a unit test can be added to check that it is displayed correctly. Specifically if there is conditional display
 
+## 🚨 Shutdown WalletConnect LiveApp Process 🚨
+
+You can follow [this procress](https://docs.google.com/document/d/179QyFKLyTYlwJ1yKStZkbKPTlgHUuQkCx5JPsdAcHZc/edit#heading=h.jrc5acxc22wf)
+
 ## More Resources
 
 - WalletConnect [Github](https://github.com/walletconnect/walletconnect-monorepo/)

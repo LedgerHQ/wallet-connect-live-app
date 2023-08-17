@@ -6,11 +6,16 @@ import Head from 'next/head'
 import { Container } from '@/styles/styles'
 import { WalletApiClientProvider } from 'src/shared/WalletApiClientProvider'
 import WalletConnect from '@/components/screens'
+import { ApplicationDisabled } from '@/components/screens/ApplicationDisabled'
 
 export { getServerSideProps } from '../lib/serverProps'
 
 const Index: NextPage = () => {
 	const router = useRouter()
+
+	const isApplicationDisabled = Boolean(
+		process.env.NEXT_PUBLIC_APPLICATION_DISABLED === 'true',
+	)
 
 	const { uri: rawURI, mode: rawInitialMode } = router.query
 
@@ -36,7 +41,10 @@ const Index: NextPage = () => {
 					content="Ledger WalletConnect"
 				/>
 			</Head>
-			{isMounted ? (
+
+			{isApplicationDisabled ? (
+				<ApplicationDisabled />
+			) : isMounted ? (
 				<WalletApiClientProvider>
 					{(accounts, userId, walletInfo) => (
 						<WalletConnect
