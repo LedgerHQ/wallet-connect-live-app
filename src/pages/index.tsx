@@ -12,7 +12,6 @@ export { getServerSideProps } from '../lib/serverProps'
 
 const Index: NextPage = () => {
 	const { router } = useNavigation()
-	console.log('Index ROUTER :', router)
 
 	const isApplicationDisabled = Boolean(
 		process.env.NEXT_PUBLIC_APPLICATION_DISABLED === 'true',

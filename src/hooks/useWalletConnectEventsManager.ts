@@ -43,7 +43,6 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 	 *****************************************************************************/
 	const onSessionProposal = useCallback(
 		(proposal: SignClientTypes.EventArguments['session_proposal']) => {
-			console.log('ON SESSION PROPOSAL', JSON.stringify(proposal))
 			navigate(routes.sessionProposal, proposal)
 		},
 		[],

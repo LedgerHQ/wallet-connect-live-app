@@ -176,7 +176,6 @@ export function useProposal({ proposal }: Props) {
 				message: 'USER_REJECTED_METHODS',
 			},
 		})
-		console.log('rejectSession', routes)
 		navigate(routes.home)
 	}, [proposal])
 

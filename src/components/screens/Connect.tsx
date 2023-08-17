@@ -58,7 +58,6 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
 				page: 'Connect',
 			})
 		} catch (error) {
-			console.log('invalid uri: ', error)
 			setErrorValue(t('error.invalidUri'))
 		}
 	}, [onConnect, inputValue])
