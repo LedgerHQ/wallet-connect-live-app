@@ -3,7 +3,7 @@ import '@testing-library/react/dont-cleanup-after-each'
 import { act, cleanup, render, waitFor, screen } from '@/tests-tools/test.utils'
 import AppScreen from '@/pages/index'
 import sessionProposalNotSupported from '@/data/mocks/sessionProposalNotSupported.example.json'
-import userEvent from '@testing-library/user-event'
+
 import SessionProposal from '@/pages/proposal'
 import { useNavigation } from '@/hooks/common/useNavigation'
 
@@ -129,10 +129,6 @@ const mockPush = jest.fn(() =>
 	}),
 )
 
-beforeAll(() => {
-	userEvent.setup()
-})
-
 afterEach(() => jest.clearAllMocks())
 afterAll(() => cleanup())
 
@@ -149,7 +145,7 @@ const proposalRouter = () =>
 
 describe('Network Support tests', () => {
 	it('Should connect throught an uri and redirect to Error Support screen, then go back to Index Page', async () => {
-		render(<AppScreen />)
+		const { user: userApp } = render(<AppScreen />)
 
 		await waitFor(
 			() => {
@@ -160,14 +156,14 @@ describe('Network Support tests', () => {
 			},
 		)
 
-		await userEvent.click(
+		await userApp.click(
 			screen.getByRole('button', { name: /connect.cta/i }),
 		)
 
 		cleanup()
 		proposalRouter()
 
-		render(<SessionProposal />)
+		const { user: userProposal } = render(<SessionProposal />)
 
 		expect(
 			screen.getByText(/sessionProposal.error.title/i),
@@ -177,7 +173,7 @@ describe('Network Support tests', () => {
 			screen.getByText(/sessionProposal.error.desc/i),
 		).toBeInTheDocument()
 
-		await userEvent.click(
+		await userProposal.click(
 			screen.getByRole('button', { name: /sessionProposal.close/i }),
 		)
 

@@ -3,10 +3,10 @@ import '@testing-library/react/dont-cleanup-after-each'
 import { act, cleanup, render, waitFor, screen } from '@/tests-tools/test.utils'
 import AppScreen from '@/pages/index'
 import sessionProposal from '@/data/mocks/sessionProposal.example.json'
-import userEvent from '@testing-library/user-event'
 import SessionProposal from '@/pages/proposal'
 import { useNavigation } from '@/hooks/common/useNavigation'
 import SessionDetail from '@/pages/detail'
+import userEvent from '@testing-library/user-event'
 
 const initialParamsHomePage = {
 	theme: 'dark',
@@ -151,9 +151,9 @@ const proposalRouter = () =>
 		navigate: jest.fn(),
 		tabsIndexes: { connect: 0, sessions: 1 },
 	})
-describe('Pending Flow tests', () => {
+describe('Proposal Flow tests', () => {
 	it('Should connect throught an uri, initialize Session proposal Screen', async () => {
-		render(<AppScreen />)
+		const { user } = render(<AppScreen />)
 
 		await waitFor(
 			() => {
@@ -164,9 +164,7 @@ describe('Pending Flow tests', () => {
 			},
 		)
 
-		await userEvent.click(
-			screen.getByRole('button', { name: /connect.cta/i }),
-		)
+		await user.click(screen.getByRole('button', { name: /connect.cta/i }))
 
 		cleanup()
 		proposalRouter()
@@ -237,9 +235,9 @@ describe('Pending Flow tests', () => {
 		cleanup()
 		proposalRouter()
 
-		render(<SessionProposal />)
+		const { user: userProposal } = render(<SessionProposal />)
 
-		await userEvent.click(
+		await userProposal.click(
 			screen.getByRole('button', {
 				name: /sessionProposal.connect/i,
 			}),
