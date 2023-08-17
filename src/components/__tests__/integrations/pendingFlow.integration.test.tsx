@@ -1,8 +1,7 @@
 /* eslint-disable testing-library/no-debugging-utils */
 import '@testing-library/react/dont-cleanup-after-each'
-import { render, screen, waitFor, act, cleanup } from '@testing-library/react'
+import { act, cleanup, render, waitFor, screen } from '@/tests-tools/test.utils'
 import AppScreen from '@/pages/index'
-import { MockTheme } from '@/tests-tools/theme.mock'
 import sessionProposal from '@/data/mocks/sessionProposal.example.json'
 import userEvent from '@testing-library/user-event'
 import SessionProposal from '@/pages/proposal'
@@ -154,11 +153,7 @@ const proposalRouter = () =>
 	})
 describe('Pending Flow tests', () => {
 	it('Should connect throught an uri, initialize Session proposal Screen', async () => {
-		render(
-			<MockTheme>
-				<AppScreen />
-			</MockTheme>,
-		)
+		render(<AppScreen />)
 
 		await waitFor(
 			() => {
@@ -175,11 +170,7 @@ describe('Pending Flow tests', () => {
 
 		cleanup()
 		proposalRouter()
-		render(
-			<MockTheme>
-				<SessionProposal />
-			</MockTheme>,
-		)
+		render(<SessionProposal />)
 
 		await waitFor(
 			() => {
@@ -225,11 +216,7 @@ describe('Pending Flow tests', () => {
 
 		cleanup()
 
-		render(
-			<MockTheme>
-				<AppScreen />
-			</MockTheme>,
-		)
+		render(<AppScreen />)
 
 		await waitFor(
 			() => {
@@ -250,11 +237,7 @@ describe('Pending Flow tests', () => {
 		cleanup()
 		proposalRouter()
 
-		render(
-			<MockTheme>
-				<SessionProposal />
-			</MockTheme>,
-		)
+		render(<SessionProposal />)
 
 		await userEvent.click(
 			screen.getByRole('button', {
@@ -263,11 +246,7 @@ describe('Pending Flow tests', () => {
 		)
 
 		cleanup()
-		render(
-			<MockTheme>
-				<SessionDetail />
-			</MockTheme>,
-		)
+		render(<SessionDetail />)
 
 		expect(screen.getByText(/sessions\.detail\.title/i)).toBeInTheDocument()
 		expect(

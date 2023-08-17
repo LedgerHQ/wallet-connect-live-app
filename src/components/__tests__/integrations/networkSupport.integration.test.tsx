@@ -1,8 +1,7 @@
 /* eslint-disable testing-library/no-debugging-utils */
 import '@testing-library/react/dont-cleanup-after-each'
-import { render, screen, waitFor, act, cleanup } from '@testing-library/react'
+import { act, cleanup, render, waitFor, screen } from '@/tests-tools/test.utils'
 import AppScreen from '@/pages/index'
-import { MockTheme } from '@/tests-tools/theme.mock'
 import sessionProposalNotSupported from '@/data/mocks/sessionProposalNotSupported.example.json'
 import userEvent from '@testing-library/user-event'
 import SessionProposal from '@/pages/proposal'
@@ -150,11 +149,7 @@ const proposalRouter = () =>
 
 describe('Network Support tests', () => {
 	it('Should connect throught an uri and redirect to Error Support screen, then go back to Index Page', async () => {
-		render(
-			<MockTheme>
-				<AppScreen />
-			</MockTheme>,
-		)
+		render(<AppScreen />)
 
 		await waitFor(
 			() => {
@@ -172,11 +167,7 @@ describe('Network Support tests', () => {
 		cleanup()
 		proposalRouter()
 
-		render(
-			<MockTheme>
-				<SessionProposal />
-			</MockTheme>,
-		)
+		render(<SessionProposal />)
 
 		expect(
 			screen.getByText(/sessionProposal.error.title/i),
@@ -192,10 +183,6 @@ describe('Network Support tests', () => {
 
 		cleanup()
 
-		render(
-			<MockTheme>
-				<AppScreen />
-			</MockTheme>,
-		)
+		render(<AppScreen />)
 	})
 })
