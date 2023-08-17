@@ -44,23 +44,19 @@ const Index: NextPage = () => {
 
 			{isApplicationDisabled ? (
 				<ApplicationDisabled />
-			) : (
-				<>
-					{isMounted ? (
-						<WalletApiClientProvider>
-							{(accounts, userId, walletInfo) => (
-								<WalletConnect
-									initialMode={initialMode}
-									initialURI={uri}
-									accounts={accounts}
-									userId={userId}
-									walletInfo={walletInfo}
-								/>
-							)}
-						</WalletApiClientProvider>
-					) : null}
-				</>
-			)}
+			) : isMounted ? (
+				<WalletApiClientProvider>
+					{(accounts, userId, walletInfo) => (
+						<WalletConnect
+							initialMode={initialMode}
+							initialURI={uri}
+							accounts={accounts}
+							userId={userId}
+							walletInfo={walletInfo}
+						/>
+					)}
+				</WalletApiClientProvider>
+			) : null}
 		</Container>
 	)
 }
