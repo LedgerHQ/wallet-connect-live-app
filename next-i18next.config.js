@@ -17,6 +17,6 @@ module.exports = {
 			'tr',
 			'zh',
 		],
-		localePath: path.resolve('./public/locales'),
 	},
+	localePath: path.resolve('./public/locales'),
 }
