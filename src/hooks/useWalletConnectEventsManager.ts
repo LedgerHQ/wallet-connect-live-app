@@ -1,6 +1,5 @@
 import { SignClientTypes } from "@walletconnect/types"
 import { useCallback, useEffect } from "react"
-import { Web3WalletTypes } from "@walletconnect/web3wallet"
 import { useNavigation } from "@/hooks/common/useNavigation"
 import { getAccountWithAddressAndChainId } from "@/helpers/generic"
 import { stripHexPrefix } from "@/utils/currencyFormatter/helpers"
@@ -41,9 +40,9 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
     [],
   )
 
-  const onAuthRequest = useCallback((_request: Web3WalletTypes.AuthRequest) => {
-    // ModalStore.open('AuthRequestModal', { request })
-  }, [])
+  // const onAuthRequest = useCallback((_request: Web3WalletTypes.AuthRequest) => {
+  //   // ModalStore.open('AuthRequestModal', { request })
+  // }, [])
 
   /******************************************************************************
    * 3. Open request handling modal based on method that was used
@@ -56,7 +55,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
       if (isEIP155Chain(chainId)) {
         handleEIP155Request(request, topic, id, chainId)
       } else if (isCosmosChain(chainId)) {
-        handleCosmosRequest(request, topic, id, chainId)
+        handleCosmosRequest(request)
       } else {
         console.error("Not Supported Chain")
       }
@@ -132,7 +131,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
       web3wallet.on("session_proposal", onSessionProposal)
       web3wallet.on("session_request", onSessionRequest)
       // auth
-      web3wallet.on("auth_request", onAuthRequest)
+      // web3wallet.on("auth_request", onAuthRequest)
 
       // TODOs
       // web3wallet.on('session_ping', (data) => console.log('ping', data))
@@ -140,7 +139,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
       // web3wallet.on('session_update', (data) => console.log('update', data))
       web3wallet.on("session_delete", onSessionDeleted)
     }
-  }, [initialized, onSessionProposal, onSessionRequest, onAuthRequest, onSessionDeleted])
+  }, [initialized, onSessionProposal, onSessionRequest, onSessionDeleted])
 
   useEffect(() => {
     if (initialized && web3wallet && pendingFlow) {
@@ -199,14 +198,14 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
   ) {
     switch (request.method) {
       case EIP155_SIGNING_METHODS.ETH_SIGN:
-      case EIP155_SIGNING_METHODS.PERSONAL_SIGN:
+      case EIP155_SIGNING_METHODS.PERSONAL_SIGN: {
         const isPersonalSign = request.method === EIP155_SIGNING_METHODS.PERSONAL_SIGN
         const accountSign = getAccountWithAddressAndChainId(
           accounts,
           isPersonalSign ? request.params[1] : request.params[0],
           chainId,
         )
-        if (!!accountSign) {
+        if (accountSign) {
           try {
             const walletApiClient = initWalletApiClient()
             const message = stripHexPrefix(isPersonalSign ? request.params[0] : request.params[1])
@@ -229,18 +228,18 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
           }
           clearPendingFlow()
           closeTransport()
-          break
         }
-
+        break
+      }
       case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA:
       case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V3:
-      case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V4:
+      case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V4: {
         const accountSignTyped = getAccountWithAddressAndChainId(
           accounts,
           request.params[0],
           chainId,
         )
-        if (!!accountSignTyped) {
+        if (accountSignTyped) {
           try {
             const walletApiClient = initWalletApiClient()
             const message = stripHexPrefix(request.params[1])
@@ -262,13 +261,14 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
           }
           clearPendingFlow()
           closeTransport()
-          break
         }
+        break
+      }
       case EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION:
-      case EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION:
+      case EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION: {
         const ethTx = request.params[0]
         const accountTX = getAccountWithAddressAndChainId(accounts, ethTx.from, chainId)
-        if (!!accountTX) {
+        if (accountTX) {
           try {
             const walletApiClient = initWalletApiClient()
             const liveTx = convertEthToLiveTX(ethTx)
@@ -288,7 +288,8 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
           clearPendingFlow()
           closeTransport()
         }
-
+        break
+      }
       default:
         return // ModalStore.open('SessionUnsuportedMethodModal', { requestEvent, requestSession })
     }
@@ -301,9 +302,9 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
   async function handleCosmosRequest(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     request: { method: string; params: any },
-    topic: string,
-    id: number,
-    chainId: string,
+    // topic: string,
+    // id: number,
+    // chainId: string,
   ) {
     switch (request.method) {
       case COSMOS_SIGNING_METHODS.COSMOS_SIGN_AMINO:
@@ -311,6 +312,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
         break
       case COSMOS_SIGNING_METHODS.COSMOS_SIGN_DIRECT:
         console.log("Method :", COSMOS_SIGNING_METHODS.COSMOS_SIGN_DIRECT)
+        break
       default:
         return // ModalStore.open('SessionUnsuportedMethodModal', { requestEvent, requestSession })
     }

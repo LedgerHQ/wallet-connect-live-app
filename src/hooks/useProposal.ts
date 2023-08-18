@@ -11,6 +11,7 @@ import { web3wallet } from "@/helpers/walletConnect.util"
 import useAnalytics from "@/hooks/common/useAnalytics"
 import { useLedgerLive } from "./common/useLedgerLive"
 import { SUPPORTED_NAMESPACE, SUPPORTED_NETWORK } from "@/data/network.config"
+import { SUPPORTED_NAMESPACE_METHODS } from "@/data/methods/methods.index"
 
 type Props = {
   proposal: Proposal

@@ -4,8 +4,9 @@
     "next/core-web-vitals",
     "plugin:@typescript-eslint/recommended",
     "plugin:jest/recommended",
-    "prettier",
-    "next"
+    "next",
+    "eslint:recommended",
+    "prettier"
   ],
   "rules": {
     "@typescript-eslint/no-unused-vars": [
@@ -27,5 +28,9 @@
       "files": ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],
       "extends": ["plugin:testing-library/react"]
     }
-  ]
+  ],
+  "globals": {
+    "React": true,
+    "JSX": true
+  }
 }

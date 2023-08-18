@@ -1,12 +1,14 @@
+import React, { ReactNode } from "react"
 import { Flex, Text, Checkbox } from "@ledgerhq/react-ui"
 import { ChevronRightMedium } from "@ledgerhq/react-ui/assets/icons"
+
 import styled from "styled-components"
 
 type Props = {
   title: string
   subtitle: string
-  LeftIcon: React.ReactNode
-  rightElement?: React.ReactNode
+  LeftIcon: ReactNode
+  rightElement?: ReactNode
   isSelected?: boolean
   onClick?: () => void
   rowType: RowType
