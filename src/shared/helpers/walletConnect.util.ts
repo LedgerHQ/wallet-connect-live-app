@@ -9,7 +9,7 @@ export let core: ICore
 export async function createWeb3Wallet(relayerRegionURL: string) {
   core = new Core({
     logger: "debug",
-    projectId: "7e793b3396bb2e7b840a29f309ecabcd",
+    projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
     relayUrl: relayerRegionURL ?? "wss://relay.walletconnect.com",
   })
 

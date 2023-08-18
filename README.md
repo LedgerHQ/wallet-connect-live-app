@@ -67,6 +67,13 @@ ethereum: {
 
 ## Getting Started
 
+### Environment
+
+First, create an `.env.local` file locally at the root of the repository. You can duplicate `.env.example` and name the new copy `.env.local`.
+
+You will need to replace the value of the `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` variable with a working WalletConnect project id. You can find one in the environment variables of the wallet-connect-live-app project in [Vercel](https://vercel.com/ledgerhq/wallet-connect-live-app/settings/environment-variables).
+
+
 ### Proto
 
 **⚠️ Important**: In order to use install the right version of the tools you will need to install the [`proto`](https://moonrepo.dev/proto) toolchain manager.
