@@ -1,3 +1,3 @@
-import { formatCurrencyUnit } from './formatCurrency'
+import { formatCurrencyUnit } from "./formatCurrency"
 
 export default formatCurrencyUnit
