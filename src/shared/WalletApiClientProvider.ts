@@ -1,51 +1,47 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from "react"
 import {
-	Account,
-	WalletInfo,
-	WindowMessageTransport,
-	WalletAPIClient,
-} from '@ledgerhq/wallet-api-client'
+  Account,
+  WalletInfo,
+  WindowMessageTransport,
+  WalletAPIClient,
+} from "@ledgerhq/wallet-api-client"
 
 type WalletApiClientProviderProps = {
-	children: (
-		accounts: Account[],
-		userId: string,
-		walletInfo: WalletInfo['result'],
-	) => React.ReactElement
+  children: (
+    accounts: Account[],
+    userId: string,
+    walletInfo: WalletInfo["result"],
+  ) => React.ReactElement
 }
 
-export function WalletApiClientProvider({
-	children,
-}: WalletApiClientProviderProps) {
-	const walletApiClientRef = useRef<WalletAPIClient | null>(null)
+export function WalletApiClientProvider({ children }: WalletApiClientProviderProps) {
+  const walletApiClientRef = useRef<WalletAPIClient | null>(null)
 
-	const [accounts, setAccounts] = useState<Account[] | undefined>(undefined)
-	const [userId, setUserId] = useState<string | undefined>(undefined)
-	const [walletInfo, setWalletInfo] = useState<
-		WalletInfo['result'] | undefined
-	>(undefined)
+  const [accounts, setAccounts] = useState<Account[] | undefined>(undefined)
+  const [userId, setUserId] = useState<string | undefined>(undefined)
+  const [walletInfo, setWalletInfo] = useState<WalletInfo["result"] | undefined>(undefined)
 
-	useEffect(() => {
-		const transport = new WindowMessageTransport()
-		transport.connect()
-		const walletApiClient = new WalletAPIClient(transport)
-		walletApiClient.account.list().then((allAccounts) => {
-			setAccounts(allAccounts)
-		})
+  useEffect(() => {
+    const transport = new WindowMessageTransport()
+    transport.connect()
+    const walletApiClient = new WalletAPIClient(transport)
+    walletApiClient.account.list().then((allAccounts) => {
+      setAccounts(allAccounts)
+    })
 
-		walletApiClient.wallet.userId().then((userId) => setUserId(userId))
+    walletApiClient.wallet.userId().then((userId) => setUserId(userId))
 
-		walletApiClient.wallet.info().then((info) => setWalletInfo(info))
+    walletApiClient.wallet.info().then((info) => setWalletInfo(info))
 
-		walletApiClientRef.current = walletApiClient
+    walletApiClientRef.current = walletApiClient
 
-		return () => {
-			transport.disconnect()
-		}
-	}, [])
+    return () => {
+      transport.disconnect()
+    }
+  }, [])
 
-	if (walletApiClientRef.current && accounts && userId && walletInfo) {
-		return children(accounts, userId, walletInfo)
-	}
-	return null
+  if (walletApiClientRef.current && accounts && userId && walletInfo) {
+    return children(accounts, userId, walletInfo)
+  }
+  return null
 }
