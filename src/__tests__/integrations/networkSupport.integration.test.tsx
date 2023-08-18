@@ -113,9 +113,7 @@ const proposalRouter = () =>
       query: { data: JSON.stringify(sessionProposalNotSupported) },
       push: jest.fn(),
     },
-    routes: { sessionProposal: '/proposal', home: '/' },
     navigate: jest.fn(),
-    tabsIndexes: { connect: 0, sessions: 1 },
   })
 
 describe('Network Support tests', () => {

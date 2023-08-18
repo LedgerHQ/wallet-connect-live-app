@@ -128,9 +128,7 @@ const proposalRouter = () =>
     router: {
       query: { data: JSON.stringify(sessionProposal) },
     },
-    routes: { sessionProposal: '/proposal', home: '/' },
     navigate: jest.fn(),
-    tabsIndexes: { connect: 0, sessions: 1 },
   })
 describe('Proposal Flow tests', () => {
   it('Should connect throught an uri, initialize Session proposal Screen', async () => {
@@ -188,9 +186,7 @@ describe('Proposal Flow tests', () => {
       router: {
         query: initialParamsHomePage,
       },
-      routes: { sessionProposal: '/proposal', home: '/' },
       navigate: jest.fn(),
-      tabsIndexes: { connect: 0, sessions: 1 },
     })
 
     cleanup()
