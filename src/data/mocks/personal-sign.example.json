@@ -1,21 +1,21 @@
 {
-	"id": 1688027007492031,
-	"topic": "160468ffb9ea044ae9a5caa8ee03e0a15494c1a0f872bcbf7f09038d3bdc893f",
-	"params": {
-		"request": {
-			"method": "personal_sign",
-			"params": [
-				"0x4d7920656d61696c206973206a6f686e40646f652e636f6d202d2031363838303237303037343838",
-				"0x98BD1afBf1775A1FA55Cbb84B42AC482aA15Ff6E"
-			]
-		},
-		"chainId": "eip155:1"
-	},
-	"verifyContext": {
-		"verified": {
-			"verifyUrl": "",
-			"validation": "VALID",
-			"origin": "https://react-app.walletconnect.com"
-		}
-	}
+  "id": 1688027007492031,
+  "topic": "160468ffb9ea044ae9a5caa8ee03e0a15494c1a0f872bcbf7f09038d3bdc893f",
+  "params": {
+    "request": {
+      "method": "personal_sign",
+      "params": [
+        "0x4d7920656d61696c206973206a6f686e40646f652e636f6d202d2031363838303237303037343838",
+        "0x98BD1afBf1775A1FA55Cbb84B42AC482aA15Ff6E"
+      ]
+    },
+    "chainId": "eip155:1"
+  },
+  "verifyContext": {
+    "verified": {
+      "verifyUrl": "",
+      "validation": "VALID",
+      "origin": "https://react-app.walletconnect.com"
+    }
+  }
 }
