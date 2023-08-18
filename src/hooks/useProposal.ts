@@ -1,10 +1,8 @@
 import { Proposal } from '@/types/types'
 import { Account } from '@ledgerhq/wallet-api-client'
 import { SessionTypes } from '@walletconnect/types'
-
-import router from 'next/router'
 import { useCallback, useState } from 'react'
-import useNavigation from '@/hooks/common/useNavigation'
+import { useNavigation } from '@/hooks/common/useNavigation'
 import { sessionSelector, useSessionsStore } from '@/storage/sessions.store'
 import { accountSelector, useAccountsStore } from '@/storage/accounts.store'
 
@@ -31,7 +29,7 @@ type AccountsInChain = {
 }
 
 export function useProposal({ proposal }: Props) {
-	const { navigate, routes, tabsIndexes } = useNavigation()
+	const { navigate, routes, tabsIndexes, router } = useNavigation()
 
 	const addSession = useSessionsStore(sessionSelector.addSession)
 	const accounts = useAccountsStore(accountSelector.selectAccounts)
@@ -58,7 +56,7 @@ export function useProposal({ proposal }: Props) {
 	)
 
 	const handleClose = useCallback(() => {
-		router.push('/')
+		router.push(routes.home)
 		analytics.track('button_clicked', {
 			button: 'Close',
 			page: 'Wallet Connect Error Unsupported Blockchains',
