@@ -1,11 +1,13 @@
-import React, { ReactElement } from 'react'
-import { render, RenderOptions } from '@testing-library/react'
 import { StyleProvider } from '@ledgerhq/react-ui'
+import type { RenderOptions } from '@testing-library/react'
+import { render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import type { ReactElement } from 'react'
+import React from 'react'
 
 type PropsTheme = {
-	children: React.ReactNode
-	theme?: 'dark' | 'light'
+  children: React.ReactNode
+  theme?: 'dark' | 'light'
 }
 
 /**
@@ -15,16 +17,16 @@ type PropsTheme = {
  * @returns Your component wrapped with LedgerLive's StyleProvider
  */
 const AllProviders = ({ children, theme = 'dark' }: PropsTheme) => {
-	return (
-		<StyleProvider selectedPalette={theme} fontsPath="/fonts">
-			{children}
-		</StyleProvider>
-	)
+  return (
+    <StyleProvider selectedPalette={theme} fontsPath="/fonts">
+      {children}
+    </StyleProvider>
+  )
 }
 
 const customRender = (
-	ui: ReactElement,
-	options?: Omit<RenderOptions, 'wrapper'>,
+  ui: ReactElement,
+  options?: Omit<RenderOptions, 'wrapper'>,
 ) => render(ui, { wrapper: AllProviders, ...options })
 
 /**
@@ -34,11 +36,11 @@ const customRender = (
  * @returns your component wrapped with theme and userEvent setuped
  */
 const setupUserEventWithRender = (
-	ui: ReactElement,
-	options?: Omit<RenderOptions, 'wrapper'>,
+  ui: ReactElement,
+  options?: Omit<RenderOptions, 'wrapper'>,
 ) => ({
-	user: userEvent.setup(),
-	...customRender(ui, options),
+  user: userEvent.setup(),
+  ...customRender(ui, options),
 })
 
 export * from '@testing-library/react'

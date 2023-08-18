@@ -8,10 +8,10 @@ import { styleSheetSerializer } from 'jest-styled-components'
 import { TextEncoder, TextDecoder } from 'util'
 
 styleSheetSerializer.setStyleSheetSerializerOptions({
-	addStyles: false,
-	classNameFormatter: (idx) => {
-		return `class${idx}`
-	},
+  addStyles: false,
+  classNameFormatter: (idx) => {
+    return `class${idx}`
+  },
 })
 
 global.TextEncoder = TextEncoder
@@ -21,7 +21,7 @@ import { setConfig } from 'next/config'
 import config from './next.config'
 
 jest.mock('react-i18next', () => ({
-	useTranslation: () => ({ t: (key) => key }),
+  useTranslation: () => ({ t: (key) => key }),
 }))
 
 setConfig(config)

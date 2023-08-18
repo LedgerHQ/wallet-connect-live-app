@@ -1,372 +1,319 @@
-import {
-	getCurrencyByChainId,
-	formatUrl,
-	getTicker,
-	truncate,
-	getDisplayName,
-} from '@/helpers/helper.util'
 import { Box, Button, CryptoIcon, Flex, Text } from '@ledgerhq/react-ui'
 import { ArrowLeftMedium } from '@ledgerhq/react-ui/assets/icons'
+import { space } from '@ledgerhq/react-ui/styles/theme'
+import type { Account } from '@ledgerhq/wallet-api-client'
+import Link from 'next/link'
+import { useTranslation } from 'next-i18next'
 import { useCallback, useEffect, useMemo } from 'react'
 import styled from 'styled-components'
-import { useTranslation } from 'next-i18next'
-import { useNavigation } from '@/hooks/common/useNavigation'
-import Link from 'next/link'
-import { Account } from '@ledgerhq/wallet-api-client'
-import { GenericRow, RowType } from '@/components/atoms/GenericRow'
-import { InfoSessionProposal } from '@/components/screens/sessions/sessionProposal/InfoSessionProposal'
-import { space } from '@ledgerhq/react-ui/styles/theme'
+
 import {
-	ButtonsContainer,
-	List,
-	Row,
+  ButtonsContainer,
+  List,
+  Row,
 } from '@/components/atoms/containers/Elements'
-import { ResponsiveContainer } from '@/styles/styles'
-import { sessionSelector, useSessionsStore } from '@/storage/sessions.store'
-import { useAccountsStore, accountSelector } from '@/storage/accounts.store'
-import useHydratation from '@/hooks/useHydratation'
-import { web3wallet } from '@/helpers/walletConnect.util'
+import { GenericRow, RowType } from '@/components/atoms/GenericRow'
 import { ImageWithPlaceholder } from '@/components/atoms/images/ImageWithPlaceholder'
+import { InfoSessionProposal } from '@/components/screens/sessions/sessionProposal/InfoSessionProposal'
+import {
+  formatUrl,
+  getCurrencyByChainId,
+  getDisplayName,
+  getTicker,
+  truncate,
+} from '@/helpers/helper.util'
+import { web3wallet } from '@/helpers/walletConnect.util'
 import useAnalytics from '@/hooks/common/useAnalytics'
+import { useNavigation } from '@/hooks/common/useNavigation'
+import useHydratation from '@/hooks/useHydratation'
+import { routes, tabsIndexes } from '@/shared/navigation'
+import { accountSelector, useAccountsStore } from '@/storage/accounts.store'
+import { sessionSelector, useSessionsStore } from '@/storage/sessions.store'
+import { ResponsiveContainer } from '@/styles/styles'
 
 export { getServerSideProps } from '../lib/serverProps'
 
 const DetailContainer = styled(Flex)`
-	border-radius: 12px;
-	background-color: ${(props) => props.theme.colors.neutral.c20};
-	padding: 12px;
-	flex-direction: column;
+  border-radius: 12px;
+  background-color: ${(props) => props.theme.colors.neutral.c20};
+  padding: 12px;
+  flex-direction: column;
 `
 const BackButton = styled(Flex)`
-	cursor: pointer;
-	&:hover {
-		opacity: 0.7;
-	}
+  cursor: pointer;
+  &:hover {
+    opacity: 0.7;
+  }
 `
 
 const CustomList = styled(Flex)`
-	flex-direction: column;
+  flex-direction: column;
 `
 
 export default function SessionDetail() {
-	const { hydrated } = useHydratation()
-	const { t } = useTranslation()
-	const { router, routes, navigate, tabsIndexes } = useNavigation()
+  const { hydrated } = useHydratation()
+  const { t } = useTranslation()
+  const { router, navigate } = useNavigation()
 
-	const accounts = useAccountsStore(accountSelector.selectAccounts)
-	const sessions = useSessionsStore(sessionSelector.selectSessions)
-	const removeSession = useSessionsStore(sessionSelector.removeSession)
-	const setLastSessionVisited = useSessionsStore(
-		sessionSelector.setLastSessionVisited,
-	)
-	const session = useSessionsStore(sessionSelector.selectLastSession)
+  const accounts = useAccountsStore(accountSelector.selectAccounts)
+  const sessions = useSessionsStore(sessionSelector.selectSessions)
+  const removeSession = useSessionsStore(sessionSelector.removeSession)
+  const setLastSessionVisited = useSessionsStore(
+    sessionSelector.setLastSessionVisited,
+  )
+  const session = useSessionsStore(sessionSelector.selectLastSession)
 
-	const navigateToSessionsHomeTab = useCallback(() => {
-		navigate(routes.home, { tab: tabsIndexes.sessions })
-	}, [routes, tabsIndexes])
-	const analytics = useAnalytics()
+  const navigateToSessionsHomeTab = useCallback(() => {
+    navigate(routes.home, { tab: tabsIndexes.sessions })
+  }, [navigate])
 
-	useEffect(() => {
-		analytics.page('Wallet Connect Session Detail', {
-			dapp: session?.peer?.metadata?.name,
-			url: session?.peer?.metadata?.url,
-		})
-	}, [])
+  const analytics = useAnalytics()
 
-	useEffect(() => {
-		if (!!router.query.data) {
-			const session = sessions.find(
-				(elem) => elem.topic === JSON.parse(String(router.query?.data)),
-			)
-			setLastSessionVisited(session || null)
-		}
-	}, [router.query])
+  useEffect(() => {
+    analytics.page('Wallet Connect Session Detail', {
+      dapp: session?.peer?.metadata?.name,
+      url: session?.peer?.metadata?.url,
+    })
+  }, [analytics, session])
 
-	const handleDelete = useCallback(async () => {
-		if (!session) return
-		try {
-			web3wallet.disconnectSession({
-				topic: session.topic,
-				reason: {
-					code: 3,
-					message: 'Disconnect Session',
-				},
-			})
-			analytics.track('button_clicked', {
-				button: 'WC-Disconnect Session',
-				page: 'Wallet Connect Session Detail',
-			})
-		} catch (error) {
-			console.error(error)
-		}
-		removeSession(session.topic)
-		navigateToSessionsHomeTab()
-	}, [session])
+  useEffect(() => {
+    if (!!router.query.data) {
+      const session = sessions.find(
+        (elem) => elem.topic === JSON.parse(String(router.query?.data)),
+      )
+      setLastSessionVisited(session || null)
+    }
+  }, [router.query, sessions, setLastSessionVisited])
 
-	const onGoBack = useCallback(() => {
-		navigateToSessionsHomeTab()
-		analytics.track('button_clicked', {
-			button: 'WC-Back',
-			page: 'Wallet Connect Session Detail',
-		})
-	}, [])
+  const handleDelete = useCallback(async () => {
+    if (!session) return
+    try {
+      web3wallet.disconnectSession({
+        topic: session.topic,
+        reason: {
+          code: 3,
+          message: 'Disconnect Session',
+        },
+      })
+      analytics.track('button_clicked', {
+        button: 'WC-Disconnect Session',
+        page: 'Wallet Connect Session Detail',
+      })
+    } catch (error) {
+      console.error(error)
+    }
+    removeSession(session.topic)
+    navigateToSessionsHomeTab()
+  }, [analytics, navigateToSessionsHomeTab, removeSession, session])
 
-	const metadata = session?.peer.metadata
-	const fullAddresses = !session
-		? []
-		: Object.entries(session.namespaces).reduce(
-				(acc, elem) => acc.concat(elem[1].accounts),
-				[] as string[],
-		  )
+  const onGoBack = useCallback(() => {
+    navigateToSessionsHomeTab()
+    analytics.track('button_clicked', {
+      button: 'WC-Back',
+      page: 'Wallet Connect Session Detail',
+    })
+  }, [analytics, navigateToSessionsHomeTab])
 
-	const getAccountsFromAddresses = (addresses: string[]) => {
-		const accountsByChain = new Map<string, Account[]>()
+  const metadata = session?.peer.metadata
+  const fullAddresses = useMemo(
+    () =>
+      !session
+        ? []
+        : Object.entries(session.namespaces).reduce(
+            (acc, elem) => acc.concat(elem[1].accounts),
+            [] as string[],
+          ),
+    [session],
+  )
 
-		addresses.forEach((addr) => {
-			const addrSplitted = addr.split(':')
-			const chain = getCurrencyByChainId(
-				`${addrSplitted[0]}:${addrSplitted[1]}`,
-			)
+  const getAccountsFromAddresses = useCallback(
+    (addresses: string[]) => {
+      const accountsByChain = new Map<string, Account[]>()
 
-			const existingEntry = accountsByChain.get(chain)
+      addresses.forEach((addr) => {
+        const addrSplitted = addr.split(':')
+        const chain = getCurrencyByChainId(
+          `${addrSplitted[0]}:${addrSplitted[1]}`,
+        )
 
-			const account = accounts.find(
-				(a) => a.address === addrSplitted[2] && chain === a.currency,
-			)
+        const existingEntry = accountsByChain.get(chain)
 
-			if (account) {
-				accountsByChain.set(
-					chain,
-					existingEntry ? [...existingEntry, account] : [account],
-				)
-			}
-		})
-		return accountsByChain
-	}
+        const account = accounts.find(
+          (a) => a.address === addrSplitted[2] && chain === a.currency,
+        )
 
-	const sessionAccounts = useMemo(
-		() => getAccountsFromAddresses(fullAddresses),
-		[fullAddresses, accounts],
-	)
+        if (account) {
+          accountsByChain.set(
+            chain,
+            existingEntry ? [...existingEntry, account] : [account],
+          )
+        }
+      })
+      return accountsByChain
+    },
+    [accounts],
+  )
 
-	if (!hydrated) {
-		// Returns null on first render, so the client and server match
-		return null
-	}
+  const sessionAccounts = useMemo(
+    () => getAccountsFromAddresses(fullAddresses),
+    [getAccountsFromAddresses, fullAddresses],
+  )
 
-	if (!session) {
-		navigateToSessionsHomeTab()
-	}
+  if (!hydrated) {
+    // Returns null on first render, so the client and server match
+    return null
+  }
 
-	return (
-		<Flex
-			flex={1}
-			alignItems="center"
-			justifyContent="center"
-			width="100%"
-			height="auto"
-		>
-			<ResponsiveContainer>
-				<Flex
-					width="100%"
-					height="100%"
-					flex={1}
-					flexDirection="column"
-					alignItems="center"
-					justifyContent="space-between"
-				>
-					<Flex flexDirection="column" width="100%">
-						<BackButton onClick={onGoBack}>
-							<Flex mt={8} mb={8}>
-								<ArrowLeftMedium
-									size={24}
-									color="neutral.c100"
-								/>
-							</Flex>
-						</BackButton>
+  if (!session) {
+    navigateToSessionsHomeTab()
+  }
 
-						<Text variant="h4" mb={8} color="neutral.c100">
-							{t('sessions.detail.title')}
-						</Text>
+  return (
+    <Flex
+      flex={1}
+      alignItems="center"
+      justifyContent="center"
+      width="100%"
+      height="auto"
+    >
+      <ResponsiveContainer>
+        <Flex
+          width="100%"
+          height="100%"
+          flex={1}
+          flexDirection="column"
+          alignItems="center"
+          justifyContent="space-between"
+        >
+          <Flex flexDirection="column" width="100%">
+            <BackButton onClick={onGoBack}>
+              <Flex mt={8} mb={8}>
+                <ArrowLeftMedium size={24} color="neutral.c100" />
+              </Flex>
+            </BackButton>
 
-						<DetailContainer>
-							<Row
-								justifyContent="space-between"
-								alignItems="center"
-							>
-								<Flex
-									flexDirection="row"
-									justifyContent="space-between"
-									alignItems="center"
-								>
-									<ImageWithPlaceholder
-										icon={decodeURI(
-											metadata?.icons[0] ?? '',
-										)}
-									/>
+            <Text variant="h4" mb={8} color="neutral.c100">
+              {t('sessions.detail.title')}
+            </Text>
 
-									<Flex flexDirection="column" ml={5}>
-										<Text
-											variant="body"
-											fontWeight="semiBold"
-											color="neutral.c100"
-										>
-											{metadata?.name}
-										</Text>
+            <DetailContainer>
+              <Row justifyContent="space-between" alignItems="center">
+                <Flex
+                  flexDirection="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <ImageWithPlaceholder
+                    icon={decodeURI(metadata?.icons[0] ?? '')}
+                  />
 
-										<Text
-											variant="small"
-											fontWeight="medium"
-											color="neutral.c70"
-											mt={1}
-										>
-											{formatUrl(metadata?.url ?? '')}
-										</Text>
-									</Flex>
-								</Flex>
-							</Row>
+                  <Flex flexDirection="column" ml={5}>
+                    <Text
+                      variant="body"
+                      fontWeight="semiBold"
+                      color="neutral.c100"
+                    >
+                      {metadata?.name}
+                    </Text>
 
-							<Row
-								mt={10}
-								justifyContent="space-between"
-								alignItems="center"
-							>
-								<Text
-									variant="small"
-									fontWeight="medium"
-									color="neutral.c100"
-								>
-									{t('sessions.detail.connected')}
-								</Text>
+                    <Text
+                      variant="small"
+                      fontWeight="medium"
+                      color="neutral.c70"
+                      mt={1}
+                    >
+                      {formatUrl(metadata?.url ?? '')}
+                    </Text>
+                  </Flex>
+                </Flex>
+              </Row>
 
-								<Text
-									variant="small"
-									fontWeight="medium"
-									color="neutral.c70"
-								>
-									{new Date().toDateString()}
-								</Text>
-							</Row>
-							<Row
-								mt={6}
-								justifyContent="space-between"
-								alignItems="center"
-							>
-								<Text
-									variant="small"
-									fontWeight="medium"
-									color="neutral.c100"
-								>
-									{t('sessions.detail.expires')}
-								</Text>
-								{session && (
-									<Text
-										variant="small"
-										fontWeight="medium"
-										color="neutral.c70"
-									>
-										{
-											//https://stackoverflow.com/a/37001827
-											new Date(
-												session.expiry * 1000,
-											).toDateString()
-										}
-									</Text>
-								)}
-							</Row>
-						</DetailContainer>
-						<Text variant="h4" mt={8} mb={6} color="neutral.c100">
-							{t('sessions.detail.accounts')}
-						</Text>
+              <Row mt={10} justifyContent="space-between" alignItems="center">
+                <Text variant="small" fontWeight="medium" color="neutral.c100">
+                  {t('sessions.detail.connected')}
+                </Text>
 
-						<CustomList>
-							{Array.from(sessionAccounts).map(
-								([chain, accounts]) => {
-									return (
-										<Box key={chain} mb={6} flex={1}>
-											<Box mb={6}>
-												<Text
-													variant="subtitle"
-													color="neutral.c70"
-												>
-													{getDisplayName(chain)}
-												</Text>
-											</Box>
+                <Text variant="small" fontWeight="medium" color="neutral.c70">
+                  {new Date().toDateString()}
+                </Text>
+              </Row>
+              <Row mt={6} justifyContent="space-between" alignItems="center">
+                <Text variant="small" fontWeight="medium" color="neutral.c100">
+                  {t('sessions.detail.expires')}
+                </Text>
+                {session && (
+                  <Text variant="small" fontWeight="medium" color="neutral.c70">
+                    {
+                      //https://stackoverflow.com/a/37001827
+                      new Date(session.expiry * 1000).toDateString()
+                    }
+                  </Text>
+                )}
+              </Row>
+            </DetailContainer>
+            <Text variant="h4" mt={8} mb={6} color="neutral.c100">
+              {t('sessions.detail.accounts')}
+            </Text>
 
-											<List>
-												{accounts.map(
-													(
-														account: Account,
-														index: number,
-													) => (
-														<li
-															key={account.id}
-															style={{
-																marginBottom:
-																	index !==
-																	accounts.length -
-																		1
-																		? space[3]
-																		: 0,
-															}}
-														>
-															<GenericRow
-																title={
-																	account.name
-																}
-																subtitle={truncate(
-																	account.address,
-																	30,
-																)}
-																LeftIcon={
-																	<CryptoIcon
-																		name={getTicker(
-																			chain,
-																		)}
-																		circleIcon
-																		size={
-																			24
-																		}
-																	/>
-																}
-																rowType={
-																	RowType.Default
-																}
-															/>
-														</li>
-													),
-												)}
-											</List>
-										</Box>
-									)
-								},
-							)}
+            <CustomList>
+              {Array.from(sessionAccounts).map(([chain, accounts]) => {
+                return (
+                  <Box key={chain} mb={6} flex={1}>
+                    <Box mb={6}>
+                      <Text variant="subtitle" color="neutral.c70">
+                        {getDisplayName(chain)}
+                      </Text>
+                    </Box>
 
-							<Box mt={6}>
-								<InfoSessionProposal isInSessionDetails />
-							</Box>
-						</CustomList>
-					</Flex>
-					<ButtonsContainer mt={5}>
-						<Button
-							variant="shade"
-							size="large"
-							flex={1}
-							onClick={handleDelete}
-						>
-							<Link href={routes.home}>
-								<Text
-									variant="body"
-									fontWeight="semiBold"
-									color="neutral.c100"
-								>
-									{t('sessions.detail.disconnect')}
-								</Text>
-							</Link>
-						</Button>
-					</ButtonsContainer>
-				</Flex>
-			</ResponsiveContainer>
-		</Flex>
-	)
+                    <List>
+                      {accounts.map((account: Account, index: number) => (
+                        <li
+                          key={account.id}
+                          style={{
+                            marginBottom:
+                              index !== accounts.length - 1 ? space[3] : 0,
+                          }}
+                        >
+                          <GenericRow
+                            title={account.name}
+                            subtitle={truncate(account.address, 30)}
+                            LeftIcon={
+                              <CryptoIcon
+                                name={getTicker(chain)}
+                                circleIcon
+                                size={24}
+                              />
+                            }
+                            rowType={RowType.Default}
+                          />
+                        </li>
+                      ))}
+                    </List>
+                  </Box>
+                )
+              })}
+
+              <Box mt={6}>
+                <InfoSessionProposal isInSessionDetails />
+              </Box>
+            </CustomList>
+          </Flex>
+          <ButtonsContainer mt={5}>
+            <Button
+              variant="shade"
+              size="large"
+              flex={1}
+              onClick={handleDelete}
+            >
+              <Link href={routes.home}>
+                <Text variant="body" fontWeight="semiBold" color="neutral.c100">
+                  {t('sessions.detail.disconnect')}
+                </Text>
+              </Link>
+            </Button>
+          </ButtonsContainer>
+        </Flex>
+      </ResponsiveContainer>
+    </Flex>
+  )
 }

@@ -1,6 +1,6 @@
-import { NetworkConfig } from '@/types/types'
+import type { NetworkConfig } from '@/types/types'
 
 export const NETWORK_MOCK: NetworkConfig = {
-	currency: 'ethereum',
-	chainId: 1,
+  currency: 'ethereum',
+  chainId: 1,
 }

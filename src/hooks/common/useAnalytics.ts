@@ -1,8 +1,9 @@
-import { useCallback, useMemo } from 'react'
-import { WalletInfo } from '@ledgerhq/wallet-api-client'
+import type { WalletInfo } from '@ledgerhq/wallet-api-client'
 import { AnalyticsBrowser } from '@segment/analytics-next'
-import { sessionSelector, useSessionsStore } from '@/storage/sessions.store'
 import getConfig from 'next/config'
+import { useCallback, useMemo } from 'react'
+
+import { sessionSelector, useSessionsStore } from '@/storage/sessions.store'
 
 const { publicRuntimeConfig } = getConfig()
 
@@ -12,78 +13,78 @@ let analytics: AnalyticsBrowser | undefined
 let userId: string | undefined
 
 export default function useAnalytics() {
-	const sessions = useSessionsStore(sessionSelector.selectSessions)
-	const version = publicRuntimeConfig?.version
+  const sessions = useSessionsStore(sessionSelector.selectSessions)
+  const version = publicRuntimeConfig?.version
 
-	const userProperties = useMemo(() => {
-		return {
-			sessionsConnected: sessions?.length || 0,
-			live_app: 'Wallet Connect v2',
-			live_app_version: version,
-			userId,
-		}
-	}, [sessions?.length, userId, version])
+  const userProperties = useMemo(() => {
+    return {
+      sessionsConnected: sessions?.length || 0,
+      live_app: 'Wallet Connect v2',
+      live_app_version: version,
+      userId,
+    }
+  }, [sessions?.length, version])
 
-	const start = useCallback(
-		(userIdReceived?: string, walletInfo?: WalletInfo['result']) => {
-			if (analytics || !userIdReceived || !walletInfo) return
-			userId = userIdReceived
+  const identify = useCallback(() => {
+    if (!analytics) return
 
-			const walletName = walletInfo.wallet.name
+    analytics.identify(userId, userProperties, analyticsOptions)
+  }, [userProperties])
 
-			let writeKey: string | undefined = undefined
-			if (walletName === 'ledger-live-desktop') {
-				writeKey = process.env.NEXT_PUBLIC_SEGMENT_API_KEY_DESKTOP
-			} else if (walletName === 'ledger-live-mobile') {
-				writeKey = process.env.NEXT_PUBLIC_SEGMENT_API_KEY_MOBILE
-			}
+  const start = useCallback(
+    (userIdReceived?: string, walletInfo?: WalletInfo['result']) => {
+      if (analytics || !userIdReceived || !walletInfo) return
+      userId = userIdReceived
 
-			if (walletInfo.tracking && writeKey) {
-				analytics = AnalyticsBrowser.load({ writeKey })
-				identify()
-			}
-		},
-		[],
-	)
+      const walletName = walletInfo.wallet.name
 
-	const identify = useCallback(() => {
-		if (!analytics) return
+      let writeKey: string | undefined = undefined
+      if (walletName === 'ledger-live-desktop') {
+        writeKey = process.env.NEXT_PUBLIC_SEGMENT_API_KEY_DESKTOP
+      } else if (walletName === 'ledger-live-mobile') {
+        writeKey = process.env.NEXT_PUBLIC_SEGMENT_API_KEY_MOBILE
+      }
 
-		analytics.identify(userId, userProperties, analyticsOptions)
-	}, [userId, userProperties])
+      if (walletInfo.tracking && writeKey) {
+        analytics = AnalyticsBrowser.load({ writeKey })
+        identify()
+      }
+    },
+    [identify],
+  )
 
-	const track = useCallback(
-		(eventName: string, eventProperties?: Record<string, unknown>) => {
-			if (!analytics) return
+  const track = useCallback(
+    (eventName: string, eventProperties?: Record<string, unknown>) => {
+      if (!analytics) return
 
-			const allProperties = {
-				...userProperties,
-				...eventProperties,
-			}
-			analytics.track(eventName, allProperties, analyticsOptions)
-		},
-		[userProperties],
-	)
+      const allProperties = {
+        ...userProperties,
+        ...eventProperties,
+      }
+      analytics.track(eventName, allProperties, analyticsOptions)
+    },
+    [userProperties],
+  )
 
-	const page = useCallback(
-		(pageName: string, eventProperties?: Record<string, unknown>) => {
-			if (!analytics) return
+  const page = useCallback(
+    (pageName: string, eventProperties?: Record<string, unknown>) => {
+      if (!analytics) return
 
-			const category = 'Wallet Connect v2'
+      const category = 'Wallet Connect v2'
 
-			const allProperties = {
-				...userProperties,
-				...eventProperties,
-			}
-			analytics.page(category, pageName, allProperties, analyticsOptions)
-		},
-		[userProperties],
-	)
+      const allProperties = {
+        ...userProperties,
+        ...eventProperties,
+      }
+      analytics.page(category, pageName, allProperties, analyticsOptions)
+    },
+    [userProperties],
+  )
 
-	return {
-		start,
-		identify,
-		track,
-		page,
-	}
+  return {
+    start,
+    identify,
+    track,
+    page,
+  }
 }

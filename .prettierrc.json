@@ -1,22 +1,21 @@
 {
-	"semi": false,
-	"singleQuote": true,
-	"useTabs": true,
-	"tabWidth": 4,
-	"trailingComma": "all",
-	"arrowParens": "always",
-	"overrides": [
-		{
-			"files": "*.css",
-			"options": {
-				"parser": "css"
-			}
-		},
-		{
-			"files": "*.md",
-			"options": {
-				"tabWidth": 1
-			}
-		}
-	]
+  "semi": false,
+  "singleQuote": true,
+  "printWidth": 80,
+  "trailingComma": "all",
+  "arrowParens": "always",
+  "overrides": [
+    {
+      "files": "*.css",
+      "options": {
+        "parser": "css"
+      }
+    },
+    {
+      "files": "*.md",
+      "options": {
+        "tabWidth": 1
+      }
+    }
+  ]
 }
