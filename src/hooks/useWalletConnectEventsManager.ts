@@ -13,6 +13,7 @@ import { sessionSelector, useSessionsStore } from "@/storage/sessions.store"
 import { pendingFlowSelector, usePendingFlowStore } from "@/storage/pendingFlow.store"
 import { captureException } from "@sentry/nextjs"
 import { isEIP155Chain, isDataInvalid } from "@/helpers/helper.util"
+import { routes, tabsIndexes } from "@/shared/navigation"
 
 enum Errors {
   userDecline = "User rejected",
@@ -21,7 +22,7 @@ enum Errors {
 }
 
 export default function useWalletConnectEventsManager(initialized: boolean) {
-  const { navigate, routes, tabsIndexes } = useNavigation()
+  const { navigate } = useNavigation()
   const removeSession = useSessionsStore(sessionSelector.removeSession)
   const accounts = useAccountsStore(accountSelector.selectAccounts)
   const pendingFlow = usePendingFlowStore(pendingFlowSelector.selectPendingFlow)

@@ -24,6 +24,7 @@ import useHydratation from "@/hooks/useHydratation"
 import { web3wallet } from "@/helpers/walletConnect.util"
 import { ImageWithPlaceholder } from "@/components/atoms/images/ImageWithPlaceholder"
 import useAnalytics from "@/hooks/common/useAnalytics"
+import { routes, tabsIndexes } from "@/shared/navigation"
 
 export { getServerSideProps } from "../lib/serverProps"
 
@@ -47,7 +48,7 @@ const CustomList = styled(Flex)`
 export default function SessionDetail() {
   const { hydrated } = useHydratation()
   const { t } = useTranslation()
-  const { router, routes, navigate, tabsIndexes } = useNavigation()
+  const { router, navigate } = useNavigation()
 
   const accounts = useAccountsStore(accountSelector.selectAccounts)
   const sessions = useSessionsStore(sessionSelector.selectSessions)
@@ -57,7 +58,8 @@ export default function SessionDetail() {
 
   const navigateToSessionsHomeTab = useCallback(() => {
     navigate(routes.home, { tab: tabsIndexes.sessions })
-  }, [routes, tabsIndexes])
+  }, [])
+
   const analytics = useAnalytics()
 
   useEffect(() => {

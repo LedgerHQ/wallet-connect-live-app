@@ -25,12 +25,6 @@ jest.mock("@/hooks/common/useNavigation", () => {
           query: initialParamsHomePage,
           push: mockPush,
         },
-        tabsIndexes: { connect: 0 },
-        routes: {
-          sessionProposal: "/proposal",
-          home: "/",
-          sessionDetails: "/details",
-        },
         navigate: jest.fn(),
       }
     }),
@@ -115,9 +109,7 @@ const proposalRouter = () =>
       query: { data: JSON.stringify(sessionProposalNotSupported) },
       push: jest.fn(),
     },
-    routes: { sessionProposal: "/proposal", home: "/" },
     navigate: jest.fn(),
-    tabsIndexes: { connect: 0, sessions: 1 },
   })
 
 describe("Network Support tests", () => {

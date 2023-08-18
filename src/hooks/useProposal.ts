@@ -12,6 +12,7 @@ import { web3wallet } from "@/helpers/walletConnect.util"
 import useAnalytics from "@/hooks/common/useAnalytics"
 import { useLedgerLive } from "./common/useLedgerLive"
 import { SUPPORTED_NAMESPACE, SUPPORTED_NETWORK } from "@/data/network.config"
+import { routes, tabsIndexes } from "@/shared/navigation"
 
 type Props = {
   proposal: Proposal
@@ -25,7 +26,7 @@ type AccountsInChain = {
 }
 
 export function useProposal({ proposal }: Props) {
-  const { navigate, routes, tabsIndexes, router } = useNavigation()
+  const { navigate, router } = useNavigation()
 
   const addSession = useSessionsStore(sessionSelector.addSession)
   const accounts = useAccountsStore(accountSelector.selectAccounts)

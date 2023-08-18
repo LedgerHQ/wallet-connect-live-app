@@ -14,6 +14,7 @@ import styled from "styled-components"
 import { useSessionsStore, sessionSelector } from "@/storage/sessions.store"
 import useAnalytics from "@/hooks/common/useAnalytics"
 import { useNavigation } from "@/hooks/common/useNavigation"
+import { routes } from "@/shared/navigation"
 
 export type SessionsProps = {
   goToConnect: () => void
@@ -23,7 +24,7 @@ const CustomList = styled(List)``
 
 export default function Sessions({ goToConnect }: SessionsProps) {
   const { t } = useTranslation()
-  const { navigate, routes } = useNavigation()
+  const { navigate } = useNavigation()
   const { openModal, closeModal, isModalOpen } = useWalletConnectPopin()
   const clearSessions = useSessionsStore(sessionSelector.clearSessions)
   const sessions = useSessionsStore(sessionSelector.selectSessions)

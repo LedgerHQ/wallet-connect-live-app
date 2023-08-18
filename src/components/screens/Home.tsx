@@ -14,6 +14,7 @@ import { Connect } from "./Connect"
 import Sessions from "./sessions/Sessions"
 import Tabs from "./Tabs"
 import useAnalytics from "@/hooks/common/useAnalytics"
+import { tabsIndexes, routes } from "@/shared/navigation"
 
 const WalletConnectContainer = styled.div`
   display: flex;
@@ -44,7 +45,7 @@ export type WalletConnectProps = {
 
 export default function Home({ initialURI, initialMode, setUri }: WalletConnectProps) {
   const { initialized } = useHydratation()
-  const { router, tabsIndexes, routes } = useNavigation()
+  const { router } = useNavigation()
   const routerQueryData = router?.query?.data
   const initialTab = routerQueryData
     ? JSON.parse(String(routerQueryData))?.tab
