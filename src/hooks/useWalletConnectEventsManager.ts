@@ -14,6 +14,7 @@ import { pendingFlowSelector, usePendingFlowStore } from "@/storage/pendingFlow.
 import { captureException } from "@sentry/nextjs"
 import { isEIP155Chain, isDataInvalid } from "@/helpers/helper.util"
 import { isCosmosChain } from "@/shared/helpers/helper.util"
+import { COSMOS_SIGNING_METHODS } from "@/data/methods/COSMOSData.methods"
 
 enum Errors {
   userDecline = "User rejected",
@@ -54,9 +55,9 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
 
       if (isEIP155Chain(chainId)) {
         handleEIP155Request(request, topic, id, chainId)
-      } else if(isCosmosChain(chainId)){
-		handleCosmosRequest(request, topic, id, chainId)
-	  }else {
+      } else if (isCosmosChain(chainId)) {
+        handleCosmosRequest(request, topic, id, chainId)
+      } else {
         console.error("Not Supported Chain")
       }
     },
@@ -294,29 +295,24 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
   }
 
   /******************************************************************************
-	 * Cosmos
-	 *****************************************************************************/
+   * Cosmos
+   *****************************************************************************/
 
-	async function handleCosmosRequest(
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		request: { method: string; params: any },
-		topic: string,
-		id: number,
-		chainId: string,
-	) {
-		switch (request.method) {
-			case COSMOS_SIGNING_METHODS.COSMOS_SIGN_AMINO:
-				console.log(
-					'Method :',
-					COSMOS_SIGNING_METHODS.COSMOS_SIGN_AMINO,
-				)
-				break
-			case COSMOS_SIGNING_METHODS.COSMOS_SIGN_DIRECT:
-				console.log(
-					'Method :',
-					COSMOS_SIGNING_METHODS.COSMOS_SIGN_DIRECT,
-				)
-			default:
-				return // ModalStore.open('SessionUnsuportedMethodModal', { requestEvent, requestSession })
-		}
+  async function handleCosmosRequest(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    request: { method: string; params: any },
+    topic: string,
+    id: number,
+    chainId: string,
+  ) {
+    switch (request.method) {
+      case COSMOS_SIGNING_METHODS.COSMOS_SIGN_AMINO:
+        console.log("Method :", COSMOS_SIGNING_METHODS.COSMOS_SIGN_AMINO)
+        break
+      case COSMOS_SIGNING_METHODS.COSMOS_SIGN_DIRECT:
+        console.log("Method :", COSMOS_SIGNING_METHODS.COSMOS_SIGN_DIRECT)
+      default:
+        return // ModalStore.open('SessionUnsuportedMethodModal', { requestEvent, requestSession })
+    }
+  }
 }
