@@ -94,8 +94,6 @@ yarn dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
-
 ## Manifest
 
 All Live apps are defined with a manifest. Here is one that can be used for local development:
@@ -144,7 +142,14 @@ All Live apps are defined with a manifest. Here is one that can be used for loca
 }
 ```
 
-### Testing Strategy & Prerequisites
+## Committing to the LiveApp
+
+Before commit on your branch please run :
+`yarn pre-commit`
+
+In order to launch ESlint, Prettier et run tests
+
+## Testing Strategy & Prerequisites
 
 We use [`Jest`](https://jestjs.io/) and
 [`React Testing Library`](https://testing-library.com/docs/react-testing-library/intro/)
