@@ -43,13 +43,8 @@ jest.mock('@walletconnect/core', () => {
 			return {
 				pairing: {
 					// TODO : trigger a session_proposal event sending the proposal info
-					pair: jest.fn((data) => {
+					pair: jest.fn(() => {
 						setTimeout(() => {
-							console.log(
-								'PAIRING',
-								data,
-								sessionProposalNotSupported,
-							)
 							act(() =>
 								window.dispatchEvent(
 									new CustomEvent('session_proposal', {
@@ -70,10 +65,9 @@ jest.mock('@walletconnect/web3wallet', () => {
 		Web3Wallet: {
 			init: jest.fn(() => ({
 				getActiveSessions: jest.fn(() => []),
-				on: jest.fn((eventName, callback) => {
-					console.log('Add event listener', eventName, callback)
-					window.addEventListener(eventName, callback)
-				}),
+				on: jest.fn((eventName, callback) =>
+					window.addEventListener(eventName, callback),
+				),
 			})),
 		},
 	}
@@ -114,14 +108,7 @@ jest.mock('@ledgerhq/wallet-api-client', () => {
 	}
 })
 
-const mockPush = jest.fn(() =>
-	console.log('ROUTER PUSH', {
-		pathname: '/proposal',
-		query: {
-			data: sessionProposalNotSupported,
-		},
-	}),
-)
+const mockPush = jest.fn()
 
 afterEach(() => jest.clearAllMocks())
 afterAll(() => cleanup())
