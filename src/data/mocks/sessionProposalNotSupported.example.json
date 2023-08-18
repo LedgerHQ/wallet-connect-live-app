@@ -13,7 +13,7 @@
 					"personal_sign",
 					"eth_signTypedData"
 				],
-				"chains": ["eip155:1"],
+				"chains": ["eip155:1", "eip155:230"],
 				"events": ["chainChanged", "accountsChanged"]
 			}
 		},
