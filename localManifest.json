@@ -17,8 +17,10 @@
     "optimism",
     "arbitrum",
     "avalanche_c_chain",
+    "base",
     "ethereum_goerli",
-    "optimism_goerli"
+    "optimism_goerli",
+    "base_goerli"
   ],
   "content": {
     "shortDescription": {
