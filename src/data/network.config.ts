@@ -64,12 +64,13 @@ const EIP155_CHAINS: Record<string, Network> = {
   },
 }
 
-const COSMOS_MAINNET_CHAINS = {
+const COSMOS_MAINNET_CHAINS: Record<string, Network> = {
   cosmos: {
     chainId: "cosmoshub-4",
     displayName: "Cosmos Hub",
     namespace: "cosmos:cosmoshub-4",
     ticker: "ATOM",
+    color: "#16192f",
   },
 }
 
