@@ -50,6 +50,7 @@ Check name with Wallet Api Tool
 	namespace: string
 	ticker: string
 	displayName: string
+  color: string
 }
 ```
 
@@ -61,6 +62,7 @@ ethereum: {
 	namespace: 'eip155:1',
 	ticker: 'ETH',
 	displayName: 'Ethereum',
+  color: "#0ebdcd",
 },
 ```
 

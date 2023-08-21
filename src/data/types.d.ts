@@ -14,4 +14,5 @@ export type Network = {
   namespace: string
   ticker: string
   displayName: string
+  color: string
 }
