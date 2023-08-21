@@ -51,6 +51,7 @@ Check name with Wallet Api Tool
 	namespace: string
 	ticker: string
 	displayName: string
+  color: string
 }
 ```
 
@@ -62,6 +63,7 @@ ethereum: {
 	namespace: 'eip155:1',
 	ticker: 'ETH',
 	displayName: 'Ethereum',
+  color: "#0ebdcd",
 },
 ```
 
@@ -72,7 +74,6 @@ ethereum: {
 First, create an `.env.local` file locally at the root of the repository. You can duplicate `.env.example` and name the new copy `.env.local`.
 
 You will need to replace the value of the `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` variable with a working WalletConnect project id. You can find one in the environment variables of the wallet-connect-live-app project in [Vercel](https://vercel.com/ledgerhq/wallet-connect-live-app/settings/environment-variables).
-
 
 ### Proto
 

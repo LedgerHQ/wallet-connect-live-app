@@ -4,7 +4,7 @@ import LogoContainer from "@/components/atoms/logoContainers/LedgerLogoContainer
 import { AddAccountPlaceholder } from "@/components/screens/sessions/sessionProposal/AddAccountPlaceholder"
 import { ErrorBlockchainSupport } from "@/components/screens/sessions/sessionProposal/ErrorBlockchainSupport"
 import { InfoSessionProposal } from "@/components/screens/sessions/sessionProposal/InfoSessionProposal"
-import { formatUrl, getTicker, truncate } from "@/helpers/helper.util"
+import { formatUrl, getColor, getTicker, truncate } from "@/helpers/helper.util"
 import useHydratation from "@/hooks/useHydratation"
 import { useNavigation } from "@/hooks/common/useNavigation"
 import { useProposal } from "@/hooks/useProposal"
@@ -245,6 +245,7 @@ export default function SessionProposal() {
                                       name={getTicker(entry.chain)}
                                       circleIcon
                                       size={24}
+                                      color={getColor(entry.chain)}
                                     />
                                   }
                                   rowType={RowType.Select}

@@ -4,6 +4,7 @@ import {
   getTicker,
   truncate,
   getDisplayName,
+  getColor,
 } from "@/helpers/helper.util"
 import { Box, Button, CryptoIcon, Flex, Text } from "@ledgerhq/react-ui"
 import { ArrowLeftMedium } from "@ledgerhq/react-ui/assets/icons"
@@ -230,7 +231,14 @@ export default function SessionDetail() {
                           <GenericRow
                             title={account.name}
                             subtitle={truncate(account.address, 30)}
-                            LeftIcon={<CryptoIcon name={getTicker(chain)} circleIcon size={24} />}
+                            LeftIcon={
+                              <CryptoIcon
+                                name={getTicker(chain)}
+                                circleIcon
+                                size={24}
+                                color={getColor(chain)}
+                              />
+                            }
                             rowType={RowType.Default}
                           />
                         </li>

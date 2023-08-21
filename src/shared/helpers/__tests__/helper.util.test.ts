@@ -1,5 +1,6 @@
 import { SUPPORTED_NETWORK } from "@/data/network.config"
 import {
+  getColor,
   getCurrencyByChainId,
   getDisplayName,
   getNamespace,
@@ -47,5 +48,10 @@ describe("Helper Util", () => {
 
     const arb = getDisplayName("arboretum")
     expect(arb).toEqual("arboretum")
+  })
+
+  it("getColor", async () => {
+    const matic = getColor("polygon")
+    expect(matic).toEqual(SUPPORTED_NETWORK["polygon"].color)
   })
 })
