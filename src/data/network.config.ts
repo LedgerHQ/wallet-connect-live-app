@@ -57,7 +57,7 @@ const EIP155_CHAINS: Record<string, Network> = {
   },
 };
 
-const EIP155_GOERLI_CHAINS = {
+const EIP155_GOERLI_CHAINS: Record<string, Network> = {
   ethereum_goerli: {
     chainId: 5,
     namespace: "eip155:5",
