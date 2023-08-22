@@ -1,13 +1,13 @@
-enum tabsIndexes {
-  connect = 0,
-  sessions = 1,
+enum TabsIndexes {
+  Connect = 0,
+  Sessions = 1,
 }
 
-enum routes {
-  home = "/",
-  sessionProposal = "/proposal",
-  sessionDetails = "/detail",
-  protocolNotSupported = "/protocol-not-supported",
+enum Routes {
+  Home = "/",
+  SessionProposal = "/proposal",
+  SessionDetails = "/detail",
+  ProtocolNotSupported = "/protocol-not-supported",
 }
 
-export { routes, tabsIndexes }
+export { Routes, TabsIndexes }

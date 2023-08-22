@@ -14,7 +14,7 @@ import styled from "styled-components"
 import { useSessionsStore, sessionSelector } from "@/storage/sessions.store"
 import useAnalytics from "@/hooks/common/useAnalytics"
 import { useNavigation } from "@/hooks/common/useNavigation"
-import { routes } from "@/shared/navigation"
+import { Routes } from "@/shared/navigation"
 
 export type SessionsProps = {
   goToConnect: () => void
@@ -49,7 +49,7 @@ export default function Sessions({ goToConnect }: SessionsProps) {
   )
 
   const goToDetailSession = useCallback((topic: string) => {
-    navigate(routes.sessionDetails, topic)
+    navigate(Routes.SessionDetails, topic)
     analytics.track("button_clicked", {
       button: "Session Detail",
       page: "Wallet Connect Sessions",
