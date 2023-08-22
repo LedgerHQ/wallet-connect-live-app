@@ -7,8 +7,8 @@ on:
     branches: [ main ]
 
 jobs:
-    deploy:
-        name: Code checks
+    test-code:
+        name: Test code
         runs-on: ubuntu-latest
         steps:
             - name: Checkout project
