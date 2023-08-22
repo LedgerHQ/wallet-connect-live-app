@@ -1,6 +1,5 @@
 <!--
 Thank you for your contribution! 👍
-Please make sure to read CONTRIBUTING.md if you have not already.
 Disclaimer: Pull Requests that do not comply with the rules will be arbitrarily closed.
 -->
 
