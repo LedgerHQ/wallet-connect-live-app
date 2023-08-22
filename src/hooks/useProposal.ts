@@ -120,15 +120,16 @@ export function useProposal({ proposal }: Props) {
       [],
     )
 
-    const methods = proposal.params.requiredNamespaces[SupportedNamespace.EIP155].methods.concat(
-      Object.values(EIP155_SIGNING_METHODS),
-    )
+    const methods =
+      proposal.params.requiredNamespaces[SupportedNamespace.EIP155]?.methods.concat(
+        Object.values(EIP155_SIGNING_METHODS),
+      ) ?? []
 
     return {
       eip155: {
         methods: [...new Set(methods)],
         chains: createChains(accountsByChain).filter((e) => e.length),
-        events: proposal.params.requiredNamespaces[SupportedNamespace.EIP155].events,
+        events: proposal.params.requiredNamespaces[SupportedNamespace.EIP155]?.events ?? [],
         accounts: accountsToSend,
       },
       // For new namespace other than eip155 add new object here with same skeleton
