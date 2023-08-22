@@ -11,7 +11,8 @@ import { EIP155_SIGNING_METHODS } from "@/data/methods/EIP155Data.methods"
 import { web3wallet } from "@/helpers/walletConnect.util"
 import useAnalytics from "@/hooks/common/useAnalytics"
 import { useLedgerLive } from "./common/useLedgerLive"
-import { SUPPORTED_NAMESPACE, SUPPORTED_NETWORK } from "@/data/network.config"
+import { SupportedNamespace, SUPPORTED_NETWORK } from "@/data/network.config"
+import { Routes, TabsIndexes } from "@/shared/navigation"
 
 type Props = {
   proposal: Proposal
@@ -25,7 +26,7 @@ type AccountsInChain = {
 }
 
 export function useProposal({ proposal }: Props) {
-  const { navigate, routes, tabsIndexes, router } = useNavigation()
+  const { navigate, router } = useNavigation()
 
   const addSession = useSessionsStore(sessionSelector.addSession)
   const accounts = useAccountsStore(accountSelector.selectAccounts)
@@ -50,7 +51,7 @@ export function useProposal({ proposal }: Props) {
   )
 
   const handleClose = useCallback(() => {
-    router.push(routes.home)
+    router.push(Routes.Home)
     analytics.track("button_clicked", {
       button: "Close",
       page: "Wallet Connect Error Unsupported Blockchains",
@@ -118,7 +119,7 @@ export function useProposal({ proposal }: Props) {
       [],
     )
 
-    const methods = proposal.params.requiredNamespaces[SUPPORTED_NAMESPACE.eip155].methods.concat(
+    const methods = proposal.params.requiredNamespaces[SupportedNamespace.EIP155].methods.concat(
       Object.values(EIP155_SIGNING_METHODS),
     )
 
@@ -126,7 +127,7 @@ export function useProposal({ proposal }: Props) {
       eip155: {
         methods: [...new Set(methods)],
         chains: createChains(accountsByChain).filter((e) => e.length),
-        events: proposal.params.requiredNamespaces[SUPPORTED_NAMESPACE.eip155].events,
+        events: proposal.params.requiredNamespaces[SupportedNamespace.EIP155].events,
         accounts: accountsToSend,
       },
       // For new namespace other than eip155 add new object here with same skeleton
@@ -141,12 +142,12 @@ export function useProposal({ proposal }: Props) {
       })
       .then((res) => {
         addSession(res)
-        navigate(routes.sessionDetails, res.topic)
+        navigate(Routes.SessionDetails, res.topic)
       })
       .catch((error) => {
         console.error(error)
         // TODO : display error toast
-        navigate(routes.home, { tab: tabsIndexes.connect })
+        navigate(Routes.Home, { tab: TabsIndexes.Connect })
       })
   }, [proposal])
 
@@ -158,7 +159,7 @@ export function useProposal({ proposal }: Props) {
         message: "USER_REJECTED_METHODS",
       },
     })
-    navigate(routes.home)
+    navigate(Routes.Home)
   }, [proposal])
 
   const addNewAccount = useCallback(async (currency: string) => {

@@ -14,6 +14,7 @@ import styled from "styled-components"
 import { useSessionsStore, sessionSelector } from "@/storage/sessions.store"
 import useAnalytics from "@/hooks/common/useAnalytics"
 import { useNavigation } from "@/hooks/common/useNavigation"
+import { Routes } from "@/shared/navigation"
 
 export type SessionsProps = {
   goToConnect: () => void
@@ -23,7 +24,7 @@ const CustomList = styled(List)``
 
 export default function Sessions({ goToConnect }: SessionsProps) {
   const { t } = useTranslation()
-  const { navigate, routes } = useNavigation()
+  const { navigate } = useNavigation()
   const { openModal, closeModal, isModalOpen } = useWalletConnectPopin()
   const clearSessions = useSessionsStore(sessionSelector.clearSessions)
   const sessions = useSessionsStore(sessionSelector.selectSessions)
@@ -48,7 +49,7 @@ export default function Sessions({ goToConnect }: SessionsProps) {
   )
 
   const goToDetailSession = useCallback((topic: string) => {
-    navigate(routes.sessionDetails, topic)
+    navigate(Routes.SessionDetails, topic)
     analytics.track("button_clicked", {
       button: "Session Detail",
       page: "Wallet Connect Sessions",

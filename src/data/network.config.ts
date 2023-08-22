@@ -78,7 +78,7 @@ export const SUPPORTED_NETWORK: Record<string, Network> = {
   // ...COSMOS_MAINNET_CHAINS,
 }
 
-export enum SUPPORTED_NAMESPACE {
-  eip155 = "eip155",
+export enum SupportedNamespace {
+  EIP155 = "eip155",
   // cosmos = 'cosmos',
 }
