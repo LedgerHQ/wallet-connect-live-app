@@ -11,9 +11,9 @@ import { web3wallet } from "@/helpers/walletConnect.util"
 import { sessionSelector, useSessionsStore } from "@/storage/sessions.store"
 import { pendingFlowSelector, usePendingFlowStore } from "@/storage/pendingFlow.store"
 import { captureException } from "@sentry/nextjs"
-import { isEIP155Chain, isDataInvalid } from "@/helpers/helper.util"
-import { isCosmosChain } from "@/shared/helpers/helper.util"
+import { isEIP155Chain, isDataInvalid, isCosmosChain } from "@/helpers/helper.util"
 import { COSMOS_SIGNING_METHODS } from "@/data/methods/COSMOSData.methods"
+import { Routes, TabsIndexes } from "@/shared/navigation"
 
 enum Errors {
   userDecline = "User rejected",
@@ -22,7 +22,7 @@ enum Errors {
 }
 
 export default function useWalletConnectEventsManager(initialized: boolean) {
-  const { navigate, routes, tabsIndexes } = useNavigation()
+  const { navigate } = useNavigation()
   const removeSession = useSessionsStore(sessionSelector.removeSession)
   const accounts = useAccountsStore(accountSelector.selectAccounts)
   const pendingFlow = usePendingFlowStore(pendingFlowSelector.selectPendingFlow)
@@ -35,7 +35,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
    *****************************************************************************/
   const onSessionProposal = useCallback(
     (proposal: SignClientTypes.EventArguments["session_proposal"]) => {
-      navigate(routes.sessionProposal, proposal)
+      navigate(Routes.SessionProposal, proposal)
     },
     [],
   )
@@ -78,7 +78,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
         })
         .finally(() => {
           removeSession(session.topic)
-          navigate(routes.home, { tab: tabsIndexes.sessions })
+          navigate(Routes.Home, { tab: TabsIndexes.Sessions })
         })
     },
     [],

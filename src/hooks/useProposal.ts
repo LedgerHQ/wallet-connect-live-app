@@ -10,8 +10,9 @@ import { getCurrencyByChainId, getDisplayName, getNamespace } from "@/helpers/he
 import { web3wallet } from "@/helpers/walletConnect.util"
 import useAnalytics from "@/hooks/common/useAnalytics"
 import { useLedgerLive } from "./common/useLedgerLive"
-import { SUPPORTED_NAMESPACE, SUPPORTED_NETWORK } from "@/data/network.config"
+import { SupportedNamespace, SUPPORTED_NETWORK } from "@/data/network.config"
 import { SUPPORTED_NAMESPACE_METHODS } from "@/data/methods/methods.index"
+import { Routes, TabsIndexes } from "@/shared/navigation"
 
 type Props = {
   proposal: Proposal
@@ -25,7 +26,7 @@ type AccountsInChain = {
 }
 
 export function useProposal({ proposal }: Props) {
-  const { navigate, routes, tabsIndexes, router } = useNavigation()
+  const { navigate, router } = useNavigation()
 
   const addSession = useSessionsStore(sessionSelector.addSession)
   const accounts = useAccountsStore(accountSelector.selectAccounts)
@@ -50,7 +51,7 @@ export function useProposal({ proposal }: Props) {
   )
 
   const handleClose = useCallback(() => {
-    router.push(routes.home)
+    router.push(Routes.Home)
     analytics.track("button_clicked", {
       button: "Close",
       page: "Wallet Connect Error Unsupported Blockchains",
@@ -93,10 +94,7 @@ export function useProposal({ proposal }: Props) {
   const hasChain = (chain: string, accountsByChain: AccountsInChain[]) =>
     accountsByChain.some((acc) => acc.chain === chain)
 
-  const createChainsByFamily = (
-    accountsByChain: AccountsInChain[],
-    family: SUPPORTED_NAMESPACE,
-  ) => {
+  const createChainsByFamily = (accountsByChain: AccountsInChain[], family: SupportedNamespace) => {
     return Object.entries(SUPPORTED_NETWORK)
       .filter(([key, v]) => v.namespace.includes(family) && hasChain(key, accountsByChain))
       .map(([network]) => getNamespace(network))
@@ -130,11 +128,10 @@ export function useProposal({ proposal }: Props) {
           methods: [...new Set(methods)],
           chains: createChainsByFamily(
             accountsByChain,
-            SUPPORTED_NAMESPACE[namespace as keyof typeof SUPPORTED_NAMESPACE],
+            SupportedNamespace[namespace as keyof typeof SupportedNamespace],
           ),
           events:
-            proposal.params.requiredNamespaces[namespace as keyof typeof SUPPORTED_NAMESPACE]
-              .events,
+            proposal.params.requiredNamespaces[namespace as keyof typeof SupportedNamespace].events,
           accounts: accountsToSend.filter((acc) => acc.includes(namespace)),
         },
         // For new namespace other than eip155 add new object here with same skeleton
@@ -152,12 +149,12 @@ export function useProposal({ proposal }: Props) {
       })
       .then((res) => {
         addSession(res)
-        navigate(routes.sessionDetails, res.topic)
+        navigate(Routes.SessionDetails, res.topic)
       })
       .catch((error) => {
         console.error(error)
         // TODO : display error toast
-        navigate(routes.home, { tab: tabsIndexes.connect })
+        navigate(Routes.Home, { tab: TabsIndexes.Connect })
       })
   }, [proposal])
 
@@ -169,7 +166,7 @@ export function useProposal({ proposal }: Props) {
         message: "USER_REJECTED_METHODS",
       },
     })
-    navigate(routes.home)
+    navigate(Routes.Home)
   }, [proposal])
 
   const addNewAccount = useCallback(async (currency: string) => {

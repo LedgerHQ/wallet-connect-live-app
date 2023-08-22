@@ -14,6 +14,7 @@ import { Connect } from "./Connect"
 import Sessions from "./sessions/Sessions"
 import Tabs from "./Tabs"
 import useAnalytics from "@/hooks/common/useAnalytics"
+import { TabsIndexes, Routes } from "@/shared/navigation"
 
 const WalletConnectContainer = styled.div`
   display: flex;
@@ -44,11 +45,11 @@ export type WalletConnectProps = {
 
 export default function Home({ initialURI, initialMode, setUri }: WalletConnectProps) {
   const { initialized } = useHydratation()
-  const { router, tabsIndexes, routes } = useNavigation()
+  const { router } = useNavigation()
   const routerQueryData = router?.query?.data
   const initialTab = routerQueryData
     ? JSON.parse(String(routerQueryData))?.tab
-    : tabsIndexes.connect
+    : TabsIndexes.Connect
 
   const sessions = useSessionsStore(sessionSelector.selectSessions)
   const analytics = useAnalytics()
@@ -60,8 +61,8 @@ export default function Home({ initialURI, initialMode, setUri }: WalletConnectP
 
   const onSetActiveTabIndex = useCallback(
     (newActiveTabIndex: number) => {
-      const newTab = newActiveTabIndex === tabsIndexes.connect ? "Connect" : "Sessions"
-      const currentTab = activeTabIndex === tabsIndexes.connect ? "Connect" : "Sessions"
+      const newTab = newActiveTabIndex === TabsIndexes.Connect ? "Connect" : "Sessions"
+      const currentTab = activeTabIndex === TabsIndexes.Connect ? "Connect" : "Sessions"
       analytics.track("tab_clicked", { tab: newTab, page: currentTab })
       setActiveTabIndex(newActiveTabIndex)
     },
@@ -74,7 +75,7 @@ export default function Home({ initialURI, initialMode, setUri }: WalletConnectP
         setUri(inputValue)
         const uri = new URL(inputValue)
         if (uri.toString().includes("@1")) {
-          router.push(routes.protocolNotSupported)
+          router.push(Routes.ProtocolNotSupported)
         } else {
           await startProposal(uri.toString())
         }
@@ -88,13 +89,13 @@ export default function Home({ initialURI, initialMode, setUri }: WalletConnectP
   )
 
   const goToConnect = useCallback(() => {
-    setActiveTabIndex(tabsIndexes.connect)
+    setActiveTabIndex(TabsIndexes.Connect)
   }, [])
 
   const TABS = useMemo(
     () => [
       {
-        index: tabsIndexes.connect,
+        index: TabsIndexes.Connect,
         title: t("connect.title"),
         Component: (
           <WalletConnectInnerContainer>
@@ -105,7 +106,7 @@ export default function Home({ initialURI, initialMode, setUri }: WalletConnectP
         ),
       },
       {
-        index: tabsIndexes.sessions,
+        index: TabsIndexes.Sessions,
         title: t("sessions.title"),
         badge: sessions?.length || undefined,
         Component: (

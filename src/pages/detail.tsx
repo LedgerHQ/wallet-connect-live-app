@@ -25,6 +25,7 @@ import useHydratation from "@/hooks/useHydratation"
 import { web3wallet } from "@/helpers/walletConnect.util"
 import { ImageWithPlaceholder } from "@/components/atoms/images/ImageWithPlaceholder"
 import useAnalytics from "@/hooks/common/useAnalytics"
+import { Routes, TabsIndexes } from "@/shared/navigation"
 
 export { getServerSideProps } from "../lib/serverProps"
 
@@ -48,7 +49,7 @@ const CustomList = styled(Flex)`
 export default function SessionDetail() {
   const { hydrated } = useHydratation()
   const { t } = useTranslation()
-  const { router, routes, navigate, tabsIndexes } = useNavigation()
+  const { router, navigate } = useNavigation()
 
   const accounts = useAccountsStore(accountSelector.selectAccounts)
   const sessions = useSessionsStore(sessionSelector.selectSessions)
@@ -57,8 +58,9 @@ export default function SessionDetail() {
   const session = useSessionsStore(sessionSelector.selectLastSession)
 
   const navigateToSessionsHomeTab = useCallback(() => {
-    navigate(routes.home, { tab: tabsIndexes.sessions })
-  }, [routes, tabsIndexes])
+    navigate(Routes.Home, { tab: TabsIndexes.Sessions })
+  }, [])
+
   const analytics = useAnalytics()
 
   useEffect(() => {
@@ -255,7 +257,7 @@ export default function SessionDetail() {
           </Flex>
           <ButtonsContainer mt={5}>
             <Button variant="shade" size="large" flex={1} onClick={handleDelete}>
-              <Link href={routes.home}>
+              <Link href={Routes.Home}>
                 <Text variant="body" fontWeight="semiBold" color="neutral.c100">
                   {t("sessions.detail.disconnect")}
                 </Text>
