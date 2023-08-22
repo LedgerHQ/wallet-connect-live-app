@@ -8,7 +8,7 @@ import WalletConnect from "@/components/screens"
 import { ApplicationDisabled } from "@/components/screens/ApplicationDisabled"
 import { useNavigation } from "@/hooks/common/useNavigation"
 
-export { getServerSideProps } from "../lib/serverProps"
+export { getServerSideProps } from "@/lib/serverProps"
 
 const Index: NextPage = () => {
   const { router } = useNavigation()

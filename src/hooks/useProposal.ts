@@ -23,6 +23,7 @@ type AccountsInChain = {
   isSupported: boolean
   isRequired: boolean
   accounts: Account[]
+  displayName: string
 }
 
 export function useProposal({ proposal }: Props) {
@@ -76,7 +77,7 @@ export function useProposal({ proposal }: Props) {
 
     const chainsDeduplicated = [...Array.from(new Set(chains))]
 
-    const mappedChains = chainsDeduplicated.map((chain) => {
+    const mappedAccountsByChains: AccountsInChain[] = chainsDeduplicated.map((chain) => {
       const formatedChain = getCurrencyByChainId(chain)
 
       return {
@@ -88,7 +89,7 @@ export function useProposal({ proposal }: Props) {
       }
     })
 
-    return mappedChains
+    return mappedAccountsByChains
   }
 
   const hasChain = (chain: string, accountsByChain: AccountsInChain[]) =>

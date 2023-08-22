@@ -8,7 +8,7 @@ import { ResponsiveContainer } from "@/styles/styles"
 import { device } from "@/styles/breakpoints"
 import useAnalytics from "@/hooks/common/useAnalytics"
 
-export { getServerSideProps } from "../lib/serverProps"
+export { getServerSideProps } from "@/lib/serverProps"
 
 const LogoContainer = styled(Flex)`
   border-radius: 50%;

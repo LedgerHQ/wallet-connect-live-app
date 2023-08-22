@@ -27,7 +27,7 @@ import { ImageWithPlaceholder } from "@/components/atoms/images/ImageWithPlaceho
 import useAnalytics from "@/hooks/common/useAnalytics"
 import { Routes, TabsIndexes } from "@/shared/navigation"
 
-export { getServerSideProps } from "../lib/serverProps"
+export { getServerSideProps } from "@/lib/serverProps"
 
 const DetailContainer = styled(Flex)`
   border-radius: 12px;

@@ -6,11 +6,13 @@ import { Web3Wallet, IWeb3Wallet } from "@walletconnect/web3wallet"
 export let web3wallet: IWeb3Wallet
 export let core: ICore
 
-export async function createWeb3Wallet(relayerRegionURL: string) {
+const relayerURL = "wss://relay.walletconnect.com"
+
+export async function createWeb3Wallet() {
   core = new Core({
     logger: "debug",
     projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
-    relayUrl: relayerRegionURL ?? "wss://relay.walletconnect.com",
+    relayUrl: relayerURL,
   })
 
   web3wallet = await Web3Wallet.init({

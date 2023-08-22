@@ -22,6 +22,7 @@ Behavior of the live app can be influenced by navigating to it with the followin
 - Storage 🛒 (All the stored (persistent or not) data to manage the running of the app )
 - Data 📈 (All the types for each chain and some payloads)
 - Shared 🖖 (All the useful functions shared throughout the app)
+- tests-tools 🧪 (All the tools needed to carry out the tests)
 
 ## Store Management
 
@@ -37,7 +38,6 @@ Check name with Wallet Api Tool
 "currencies": [
 	"ethereum",
 	"polygon",
-	....
 	"arbitrum",
 ],
 ```

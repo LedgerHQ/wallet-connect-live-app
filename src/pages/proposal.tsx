@@ -20,7 +20,7 @@ import { Logo } from "@/icons/LedgerLiveLogo"
 import styled, { useTheme } from "styled-components"
 import useAnalytics from "@/hooks/common/useAnalytics"
 
-export { getServerSideProps } from "../lib/serverProps"
+export { getServerSideProps } from "@/lib/serverProps"
 
 const DAppContainer = styled(Flex).attrs(
   (p: { size: number; borderColor: string; backgroundColor: string }) => ({

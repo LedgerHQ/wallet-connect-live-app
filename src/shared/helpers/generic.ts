@@ -12,7 +12,7 @@ export const getDefaultLanguage = (
   return fallbackLang
 }
 
-export const compareETHAddresses = (addr1: string, addr2: string) =>
+export const compareAddresses = (addr1: string, addr2: string) =>
   addr1.toLowerCase() === addr2.toLowerCase()
 
 export const getAccountWithAddress = (account: Account[], addr: string) =>
