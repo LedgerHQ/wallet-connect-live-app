@@ -1,7 +1,7 @@
 name: Code Checks
 
 on:
-  push:
+  pull_request:
     branches: [ "**" ]
 
 jobs:
