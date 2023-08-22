@@ -1,11 +1,7 @@
 name: Code Checks
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
+on: [push, pull_request]
+  
 jobs:
     test-code:
         name: Test code
