@@ -4,7 +4,6 @@ import { act, cleanup, render, waitFor, screen } from "@/tests-tools/test.utils"
 import { initialParamsHomePage } from "@/tests-tools/mocks/initialParams.mock"
 import AppScreen from "@/pages/index"
 import sessionProposalNotSupported from "@/data/mocks/sessionProposalNotSupported.example.json"
-
 import SessionProposal from "@/pages/proposal"
 import { useNavigation } from "@/hooks/common/useNavigation"
 

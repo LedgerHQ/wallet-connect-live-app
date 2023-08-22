@@ -1,18 +1,18 @@
 import { ACCOUNT_MOCK } from "@/tests-tools/mocks/account.mock"
 import {
-  compareETHAddresses,
+  compareAddresses,
   getAccountWithAddress,
   getAccountWithAddressAndChainId,
 } from "../generic"
 
 describe("Generic File", () => {
-  it("compareETHAddresses", async () => {
+  it("compareAddresses", async () => {
     const adr1 = "0x98BD1afBf1775A1FA55Cbb34B42AC567aA15Ff6E"
     const adr2 = "0x98BD1afBf1775A1FA55Cbb34B42AC567aA15Ff6E"
     const adr3 = "0x98BD1afBf1235A1FA55Cbb34B42AC482aA15Ff6E"
 
-    const compare1 = compareETHAddresses(adr1, adr2)
-    const compare2 = compareETHAddresses(adr1, adr3)
+    const compare1 = compareAddresses(adr1, adr2)
+    const compare2 = compareAddresses(adr1, adr3)
 
     expect(compare1).toBeTruthy()
     expect(compare2).toBeFalsy()

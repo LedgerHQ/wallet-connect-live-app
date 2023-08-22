@@ -1,9 +1,9 @@
 import { Flex } from "@ledgerhq/react-ui"
-import React from "react"
+import React, { ReactNode } from "react"
 import styled from "styled-components"
 
 type Props = {
-  children: React.ReactNode
+  children: ReactNode
 }
 function LogoContainer(props: Props) {
   return <LiveAppLogoContainer data-test-id="logo">{props.children}</LiveAppLogoContainer>

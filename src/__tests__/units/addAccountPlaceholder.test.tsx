@@ -1,5 +1,4 @@
 import { render, screen } from "@/tests-tools/test.utils"
-
 import { AddAccountPlaceholder } from "@/components/screens/sessions/sessionProposal/AddAccountPlaceholder"
 
 const onClickMock = jest.fn()

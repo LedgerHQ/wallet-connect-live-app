@@ -1,12 +1,12 @@
 import { Flex } from "@ledgerhq/react-ui"
 import { CloseMedium } from "@ledgerhq/react-ui/assets/icons"
-import React from "react"
+import React, { ReactNode } from "react"
 import styled from "styled-components"
 import Popin from "./Popin"
 
 type Props = {
   isOpen: boolean
-  children: React.ReactNode
+  children: ReactNode
   onClose: () => void
 }
 

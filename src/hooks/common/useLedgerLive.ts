@@ -1,4 +1,5 @@
 import { WalletAPIClient, WindowMessageTransport } from "@ledgerhq/wallet-api-client"
+
 export function useLedgerLive() {
   let transport: WindowMessageTransport
   const initWalletApiClient = () => {

@@ -21,24 +21,6 @@ export function truncate(value: string, length: number) {
 }
 
 /**
- * Get our address from params checking if params string contains one
- * of our wallet addresses
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function getWalletAddressFromParams(addresses: string[], params: any) {
-  const paramsString = JSON.stringify(params)
-  let address = ""
-
-  addresses.forEach((addr) => {
-    if (paramsString.toLowerCase().includes(addr.toLowerCase())) {
-      address = addr
-    }
-  })
-
-  return address
-}
-
-/**
  * Check if chain is part of EIP155 standard
  */
 export function isEIP155Chain(chain: string) {
