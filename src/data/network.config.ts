@@ -5,17 +5,7 @@
 
 import { Network } from "./types"
 
-type ChainName =
-  | "ethereum"
-  | "bsc"
-  | "polygon"
-  | "optimism"
-  | "arbitrum"
-  | "avalanche_c_chain"
-  | "ethereum_goerli"
-  | "optimism_goerli"
-
-const EIP155_CHAINS: Record<ChainName, Network> = {
+const EIP155_CHAINS: Record<string, Network> = {
   ethereum: {
     chainId: 1,
     namespace: "eip155:1",
@@ -75,7 +65,7 @@ const EIP155_CHAINS: Record<ChainName, Network> = {
 // 	},
 // }
 
-export const SUPPORTED_NETWORK: Record<ChainName, Network> = {
+export const SUPPORTED_NETWORK: Record<string, Network> = {
   ...EIP155_CHAINS,
   // ...COSMOS_MAINNET_CHAINS,
 }
