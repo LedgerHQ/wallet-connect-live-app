@@ -35,7 +35,7 @@ export type Proposal = {
     pairingTopic: string
     expiry: number
     requiredNamespaces: Families
-    optionalNamespaces?: Families
+    optionalNamespaces: Families
     relays: Relay[]
     proposer: Proposer
   }
