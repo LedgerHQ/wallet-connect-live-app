@@ -208,52 +208,56 @@ export default function SessionDetail() {
                 )}
               </Row>
             </DetailContainer>
-            <Text variant="h4" mt={8} mb={6} color="neutral.c100">
-              {t("sessions.detail.accounts")}
-            </Text>
 
-            <CustomList>
-              {Array.from(sessionAccounts).map(([chain, accounts]) => {
-                return (
-                  <Box key={chain} mb={6} flex={1}>
-                    <Box mb={6}>
-                      <Text variant="subtitle" color="neutral.c70">
-                        {getDisplayName(chain)}
-                      </Text>
-                    </Box>
+            {Array.from(sessionAccounts).length > 0 ? (
+              <>
+                <Text variant="h4" mt={8} mb={6} color="neutral.c100">
+                  {t("sessions.detail.accounts")}
+                </Text>
+                <CustomList>
+                  {Array.from(sessionAccounts).map(([chain, accounts]) => {
+                    return (
+                      <Box key={chain} mb={6} flex={1}>
+                        <Box mb={6}>
+                          <Text variant="subtitle" color="neutral.c70">
+                            {getDisplayName(chain)}
+                          </Text>
+                        </Box>
 
-                    <List>
-                      {accounts.map((account: Account, index: number) => (
-                        <li
-                          key={account.id}
-                          style={{
-                            marginBottom: index !== accounts.length - 1 ? space[3] : 0,
-                          }}
-                        >
-                          <GenericRow
-                            title={account.name}
-                            subtitle={truncate(account.address, 30)}
-                            LeftIcon={
-                              <CryptoIcon
-                                name={getTicker(chain)}
-                                circleIcon
-                                size={24}
-                                color={getColor(chain)}
+                        <List>
+                          {accounts.map((account: Account, index: number) => (
+                            <li
+                              key={account.id}
+                              style={{
+                                marginBottom: index !== accounts.length - 1 ? space[3] : 0,
+                              }}
+                            >
+                              <GenericRow
+                                title={account.name}
+                                subtitle={truncate(account.address, 30)}
+                                LeftIcon={
+                                  <CryptoIcon
+                                    name={getTicker(chain)}
+                                    circleIcon
+                                    size={24}
+                                    color={getColor(chain)}
+                                  />
+                                }
+                                rowType={RowType.Default}
                               />
-                            }
-                            rowType={RowType.Default}
-                          />
-                        </li>
-                      ))}
-                    </List>
-                  </Box>
-                )
-              })}
+                            </li>
+                          ))}
+                        </List>
+                      </Box>
+                    )
+                  })}
 
-              <Box mt={6}>
-                <InfoSessionProposal isInSessionDetails />
-              </Box>
-            </CustomList>
+                  <Box mt={6}>
+                    <InfoSessionProposal isInSessionDetails />
+                  </Box>
+                </CustomList>
+              </>
+            ) : null}
           </Flex>
           <ButtonsContainer mt={5}>
             <Button variant="shade" size="large" flex={1} onClick={handleDelete}>
