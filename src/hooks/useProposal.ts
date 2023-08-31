@@ -116,18 +116,29 @@ export function useProposal({ proposal }: Props) {
       [],
     )
 
-    return {
-      [SupportedNamespace.EIP155]: {
-        chains: [...new Set(dataToSend.map((e) => e.chain))],
-        methods: Object.values(EIP155_SIGNING_METHODS),
-        events: [
+    const requiredNamespaces = proposal.params.requiredNamespaces
+    const namespace =
+      requiredNamespaces && Object.keys(requiredNamespaces).length > 0
+        ? requiredNamespaces[SupportedNamespace.EIP155]
+        : { methods: [] as string[], events: [] as string[] }
+
+    const methods = [...new Set(namespace.methods.concat(Object.values(EIP155_SIGNING_METHODS)))]
+    const events = [
+      ...new Set(
+        namespace.events.concat([
           "session_proposal",
           "session_request",
           "auth_request",
           "session_delete",
-          "chainChanged",
-          "accountsChanged",
-        ],
+        ]),
+      ),
+    ]
+
+    return {
+      [SupportedNamespace.EIP155]: {
+        chains: [...new Set(dataToSend.map((e) => e.chain))],
+        methods,
+        events,
         accounts: dataToSend.map((e) => e.account),
       },
     }
