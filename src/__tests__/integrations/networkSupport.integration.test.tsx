@@ -64,6 +64,12 @@ jest.mock("@walletconnect/web3wallet", () => {
   }
 })
 
+jest.mock("@walletconnect/utils", () => {
+  return {
+    buildApprovedNamespaces: jest.fn(() => ({})),
+  }
+})
+
 jest.mock("@ledgerhq/wallet-api-client", () => {
   return {
     WindowMessageTransport: jest.fn(() => {

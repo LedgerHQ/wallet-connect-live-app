@@ -1,17 +1,17 @@
-import { useCallback, useState } from "react"
 import { Proposal } from "@/types/types"
-import { Routes, TabsIndexes } from "@/shared/navigation"
 import { Account } from "@ledgerhq/wallet-api-client"
-import { buildApprovedNamespaces } from "@walletconnect/utils"
+import { useCallback, useState } from "react"
 import { useNavigation } from "@/hooks/common/useNavigation"
-import useAnalytics from "@/hooks/common/useAnalytics"
-import { useLedgerLive } from "@/hooks/common/useLedgerLive"
 import { sessionSelector, useSessionsStore } from "@/storage/sessions.store"
 import { accountSelector, useAccountsStore } from "@/storage/accounts.store"
 import { getCurrencyByChainId, getDisplayName, getNamespace } from "@/helpers/helper.util"
-import { web3wallet } from "@/helpers/walletConnect.util"
 import { EIP155_SIGNING_METHODS } from "@/data/methods/EIP155Data.methods"
+import { web3wallet } from "@/helpers/walletConnect.util"
+import useAnalytics from "@/hooks/common/useAnalytics"
+import { useLedgerLive } from "./common/useLedgerLive"
 import { SupportedNamespace, SUPPORTED_NETWORK } from "@/data/network.config"
+import { Routes, TabsIndexes } from "@/shared/navigation"
+import { buildApprovedNamespaces } from "@walletconnect/utils"
 
 type Props = {
   proposal: Proposal
