@@ -55,6 +55,12 @@ jest.mock("@walletconnect/core", () => {
   }
 })
 
+jest.mock("@walletconnect/utils", () => {
+  return {
+    buildApprovedNamespaces: jest.fn(() => ({})),
+  }
+})
+
 const mockRejectSession = jest.fn(
   () => new Promise((resolve) => resolve(() => console.log("REJECT DONE"))),
 )

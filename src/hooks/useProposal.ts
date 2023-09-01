@@ -1,11 +1,9 @@
 import { Proposal } from "@/types/types"
 import { Account } from "@ledgerhq/wallet-api-client"
-import { SessionTypes } from "@walletconnect/types"
 import { useCallback, useState } from "react"
 import { useNavigation } from "@/hooks/common/useNavigation"
 import { sessionSelector, useSessionsStore } from "@/storage/sessions.store"
 import { accountSelector, useAccountsStore } from "@/storage/accounts.store"
-
 import { getCurrencyByChainId, getDisplayName, getNamespace } from "@/helpers/helper.util"
 import { EIP155_SIGNING_METHODS } from "@/data/methods/EIP155Data.methods"
 import { web3wallet } from "@/helpers/walletConnect.util"
@@ -13,6 +11,7 @@ import useAnalytics from "@/hooks/common/useAnalytics"
 import { useLedgerLive } from "./common/useLedgerLive"
 import { SupportedNamespace, SUPPORTED_NETWORK } from "@/data/network.config"
 import { Routes, TabsIndexes } from "@/shared/navigation"
+import { buildApprovedNamespaces } from "@walletconnect/utils"
 
 type Props = {
   proposal: Proposal
@@ -92,46 +91,56 @@ export function useProposal({ proposal }: Props) {
     return mappedAccountsByChains
   }
 
-  const hasChain = (chain: string, accountsByChain: AccountsInChain[]) =>
-    accountsByChain.some((acc) => acc.chain === chain)
-
-  const createChains = (accountsByChain: AccountsInChain[]) => {
-    return Object.keys(SUPPORTED_NETWORK).map((network) => {
-      const hasChainInAccount = hasChain(network, accountsByChain)
-      if (hasChainInAccount) {
-        return getNamespace(network)
-      } else {
-        return ""
-      }
-    })
-  }
-  const createNamespaces = (): Record<string, SessionTypes.BaseNamespace> => {
+  const buildSupportedNamespaces = (): Record<
+    string,
+    {
+      chains: string[]
+      methods: string[]
+      events: string[]
+      accounts: string[]
+    }
+  > => {
     const accountsByChain = formatAccountsByChain(proposal, accounts).filter(
       (a) => a.accounts.length > 0 && a.isSupported,
     )
-
-    const accountsToSend = accountsByChain.reduce<string[]>(
+    const dataToSend = accountsByChain.reduce<{ account: string; chain: string }[]>(
       (accum, elem) =>
         accum.concat(
           elem.accounts
             .filter((acc) => selectedAccounts.includes(acc.id))
-            .map((a) => `${getNamespace(a.currency)}:${a.address}`),
+            .map((a) => ({
+              account: `${getNamespace(a.currency)}:${a.address}`,
+              chain: getNamespace(a.currency),
+            })),
         ),
       [],
     )
 
-    const methods = proposal.params.requiredNamespaces[SupportedNamespace.EIP155].methods.concat(
-      Object.values(EIP155_SIGNING_METHODS),
-    )
+    const requiredNamespaces = proposal.params.requiredNamespaces
+    const namespace =
+      requiredNamespaces && Object.keys(requiredNamespaces).length > 0
+        ? requiredNamespaces[SupportedNamespace.EIP155]
+        : { methods: [] as string[], events: [] as string[] }
+
+    const methods = [...new Set(namespace.methods.concat(Object.values(EIP155_SIGNING_METHODS)))]
+    const events = [
+      ...new Set(
+        namespace.events.concat([
+          "session_proposal",
+          "session_request",
+          "auth_request",
+          "session_delete",
+        ]),
+      ),
+    ]
 
     return {
-      eip155: {
-        methods: [...new Set(methods)],
-        chains: createChains(accountsByChain).filter((e) => e.length),
-        events: proposal.params.requiredNamespaces[SupportedNamespace.EIP155].events,
-        accounts: accountsToSend,
+      [SupportedNamespace.EIP155]: {
+        chains: [...new Set(dataToSend.map((e) => e.chain))],
+        methods,
+        events,
+        accounts: dataToSend.map((e) => e.account),
       },
-      // For new namespace other than eip155 add new object here with same skeleton
     }
   }
 
@@ -139,7 +148,10 @@ export function useProposal({ proposal }: Props) {
     web3wallet
       .approveSession({
         id: proposal.id,
-        namespaces: createNamespaces(),
+        namespaces: buildApprovedNamespaces({
+          proposal: proposal.params,
+          supportedNamespaces: buildSupportedNamespaces(),
+        }),
       })
       .then((res) => {
         addSession(res)
