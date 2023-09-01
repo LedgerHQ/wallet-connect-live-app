@@ -46,6 +46,24 @@ const CustomList = styled(Flex)`
   flex-direction: column;
 `
 
+const getAccountsFromAddresses = (addresses: string[], accounts: Account[]) => {
+  const accountsByChain = new Map<string, Account[]>()
+
+  addresses.forEach((addr) => {
+    const addrSplitted = addr.split(":")
+    const chain = getCurrencyByChainId(`${addrSplitted[0]}:${addrSplitted[1]}`)
+
+    const existingEntry = accountsByChain.get(chain)
+
+    const account = accounts.find((a) => a.address === addrSplitted[2] && chain === a.currency)
+
+    if (account) {
+      accountsByChain.set(chain, existingEntry ? [...existingEntry, account] : [account])
+    }
+  })
+  return Array.from(accountsByChain)
+}
+
 export default function SessionDetail() {
   const { hydrated } = useHydratation()
   const { t } = useTranslation()
@@ -114,26 +132,8 @@ export default function SessionDetail() {
         [] as string[],
       )
 
-  const getAccountsFromAddresses = (addresses: string[]) => {
-    const accountsByChain = new Map<string, Account[]>()
-
-    addresses.forEach((addr) => {
-      const addrSplitted = addr.split(":")
-      const chain = getCurrencyByChainId(`${addrSplitted[0]}:${addrSplitted[1]}`)
-
-      const existingEntry = accountsByChain.get(chain)
-
-      const account = accounts.find((a) => a.address === addrSplitted[2] && chain === a.currency)
-
-      if (account) {
-        accountsByChain.set(chain, existingEntry ? [...existingEntry, account] : [account])
-      }
-    })
-    return accountsByChain
-  }
-
   const sessionAccounts = useMemo(
-    () => getAccountsFromAddresses(fullAddresses),
+    () => getAccountsFromAddresses(fullAddresses, accounts),
     [fullAddresses, accounts],
   )
 
@@ -209,13 +209,13 @@ export default function SessionDetail() {
               </Row>
             </DetailContainer>
 
-            {Array.from(sessionAccounts).length > 0 ? (
+            {sessionAccounts.length > 0 ? (
               <>
                 <Text variant="h4" mt={8} mb={6} color="neutral.c100">
                   {t("sessions.detail.accounts")}
                 </Text>
                 <CustomList>
-                  {Array.from(sessionAccounts).map(([chain, accounts]) => {
+                  {sessionAccounts.map(([chain, accounts]) => {
                     return (
                       <Box key={chain} mb={6} flex={1}>
                         <Box mb={6}>
