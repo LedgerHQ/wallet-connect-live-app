@@ -31,9 +31,11 @@ const customJestConfig = {
   testEnvironment: "jsdom",
   collectCoverageFrom: [
     "src/**/*.{ts,tsx}",
-    "!src/pages/*.{ts,tsx}",
     "!src/styles/**",
     "!src/components/**/styles.ts",
+    "!src/tests-tools/**",
+    "!src/data/**",
+    "!src/icons/**",
   ],
   testMatch: ["**/__tests__/**/*.test.ts?(x)", "!**/__tests__/**/*.integration.test.ts"],
 }
