@@ -8,7 +8,7 @@ describe("Converter File", () => {
     const expected = {
       family: "ethereum",
       amount: new BigNumber(ethTx.value.replace("0x", ""), 16),
-      recipient: eip55.encode(ethTx.to),
+      recipient: ethTx.to ? eip55.encode(ethTx.to) : "",
       gasPrice: new BigNumber(ethTx.gasPrice.replace("0x", ""), 16),
       gasLimit: new BigNumber(ethTx.gas.replace("0x", ""), 16),
       data: Buffer.from(ethTx.data.replace("0x", ""), "hex"),
@@ -30,7 +30,28 @@ describe("Converter File", () => {
     const expected = {
       family: "ethereum",
       amount: new BigNumber(0),
-      recipient: eip55.encode(ethTx.to),
+      recipient: eip55.encode(to),
+      gasPrice: new BigNumber(0),
+      gasLimit: new BigNumber(0),
+      data: undefined,
+    }
+    const converted = convertEthToLiveTX(ethTx)
+
+    expect(converted).toEqual(expected)
+  })
+
+  it("convertEthToLiveTX should handle TX without recipient", async () => {
+    const ethTx: EthTransaction = {
+      value: "",
+      gasPrice: "",
+      gas: "",
+      data: "",
+    }
+
+    const expected = {
+      family: "ethereum",
+      amount: new BigNumber(0),
+      recipient: "",
       gasPrice: new BigNumber(0),
       gasLimit: new BigNumber(0),
       data: undefined,
