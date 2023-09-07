@@ -9,9 +9,10 @@ jobs:
     name: SonarQube Analysis
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          ref: ${{ inputs.ref }}
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
         env:
