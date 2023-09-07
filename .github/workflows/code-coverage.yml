@@ -4,8 +4,6 @@ on:
   push:
   workflow_dispatch:
 
-
-name: Main Workflow
 jobs:
   sonarqube:
     runs-on: ubuntu-latest
