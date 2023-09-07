@@ -6,6 +6,7 @@ on:
 
 jobs:
   sonarqube:
+    name: SonarQube Analysis
     runs-on: [self-hosted, shared]
     steps:
       - name: Checkout
