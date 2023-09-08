@@ -5,12 +5,15 @@ on:
   workflow_dispatch:
 
 permissions:
-  pull-requests: read # allows SonarQube to decorate PRs with analysis results
+      pull-requests: read # allows SonarQube to decorate PRs with analysis results
 
 jobs:
   sonarqube:
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
     - name: Analyze with SonarQube
       uses: SonarSource/sonarqube-scan-action@7295e71c9583053f5bf40e9d4068a0c974603ec8
       env:
