@@ -5,7 +5,7 @@ on:
   # a pull request.
   push:
     branches:
-      - main
+      - master
   pull_request:
       types: [opened, synchronize, reopened]
 
