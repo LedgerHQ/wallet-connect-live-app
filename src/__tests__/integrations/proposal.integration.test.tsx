@@ -61,12 +61,9 @@ jest.mock("@walletconnect/utils", () => {
   }
 })
 
-const mockRejectSession = jest.fn(
-  () => new Promise((resolve) => resolve(() => console.log("REJECT DONE"))),
-)
-const mockAcceptSession = jest.fn(
-  () => new Promise((resolve) => resolve(() => console.log("ACCEPT DONE"))),
-)
+const mockRejectSession = jest.fn(() => Promise.resolve(() => console.log("REJECT DONE")))
+
+const mockAcceptSession = jest.fn(() => Promise.resolve(() => console.log("ACCEPT DONE")))
 
 jest.mock("@walletconnect/web3wallet", () => {
   return {
@@ -94,21 +91,18 @@ jest.mock("@ledgerhq/wallet-api-client", () => {
     WalletAPIClient: jest.fn(() => {
       return {
         account: {
-          list: jest.fn(() => new Promise((resolve) => resolve([]))),
+          list: jest.fn(() => Promise.resolve([])),
         },
         wallet: {
-          userId: jest.fn(() => new Promise((resolve) => resolve("testUserId"))),
-          info: jest.fn(
-            () =>
-              new Promise((resolve) =>
-                resolve({
-                  tracking: false,
-                  wallet: {
-                    name: "test-wallet",
-                    version: "1.0.0",
-                  },
-                }),
-              ),
+          userId: jest.fn(() => Promise.resolve("testUserId")),
+          info: jest.fn(() =>
+            Promise.resolve({
+              tracking: false,
+              wallet: {
+                name: "test-wallet",
+                version: "1.0.0",
+              },
+            }),
           ),
         },
       }

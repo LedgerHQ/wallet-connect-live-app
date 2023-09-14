@@ -23,12 +23,12 @@ export function QRScanner({ onQRScan }: QRScannerProps) {
       <QrReader
         delay={500}
         onError={(error) => {
-          if (!!error) {
+          if (error) {
             console.error(error)
           }
         }}
         onScan={(result) => {
-          if (!!result) {
+          if (result) {
             onQRScan(result)
           }
         }}

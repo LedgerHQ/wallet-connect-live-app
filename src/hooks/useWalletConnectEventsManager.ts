@@ -203,7 +203,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
           isPersonalSign ? request.params[1] : request.params[0],
           chainId,
         )
-        if (!!accountSign) {
+        if (accountSign) {
           try {
             const walletApiClient = initWalletApiClient()
             const message = stripHexPrefix(isPersonalSign ? request.params[0] : request.params[1])
@@ -237,7 +237,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
           request.params[0],
           chainId,
         )
-        if (!!accountSignTyped) {
+        if (accountSignTyped) {
           try {
             const walletApiClient = initWalletApiClient()
             const message = stripHexPrefix(request.params[1])
@@ -265,7 +265,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
       case EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION:
         const ethTx = request.params[0]
         const accountTX = getAccountWithAddressAndChainId(accounts, ethTx.from, chainId)
-        if (!!accountTX) {
+        if (accountTX) {
           try {
             const walletApiClient = initWalletApiClient()
             const liveTx = convertEthToLiveTX(ethTx)

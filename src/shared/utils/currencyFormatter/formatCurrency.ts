@@ -86,7 +86,6 @@ export function formatCurrencyUnitFragment(
     return []
   }
 
-  // const options: Partial<typeof defaultFormatOptions> = {}
   const options: Partial<typeof defaultFormatOptions> = {}
 
   for (const k in _options) {
