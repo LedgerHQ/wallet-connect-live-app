@@ -17,6 +17,17 @@ jobs:
     name: SonarCloud
     runs-on: ubuntu-latest
     steps:
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+            node-version: 18.x
+
+      - name: Install dependencies
+        run: yarn install --immutable --immutable-cache --check-cache --frozen-lockfile
+
+      - name: Run tests
+        run: yarn test --coverage
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
