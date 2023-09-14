@@ -89,7 +89,7 @@ export default function SessionDetail() {
   }, [])
 
   useEffect(() => {
-    if (!!router.query.data) {
+    if (router.query.data) {
       const session = sessions.find((elem) => elem.topic === JSON.parse(String(router.query?.data)))
       setLastSessionVisited(session || null)
     }

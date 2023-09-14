@@ -111,7 +111,7 @@ export default function Tabs({ tabs, activeTabIndex, setActiveTabIndex, children
         <Flex flex={1} width="100%" alignItems="center">
           {tabs.map((tab, i) => (
             <HeaderElement
-              key={`tab_${i}`}
+              key={`tab_${tab.title}`}
               ref={refs[i]}
               title={tab.title}
               selected={activeTabIndex === tab.index}

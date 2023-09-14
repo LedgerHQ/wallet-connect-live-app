@@ -3,6 +3,8 @@
 This is a web application that uses [Next.js](https://nextjs.org/)
 and is intended to be integrated within ledger products, enabling users to seamlessly connect to dapps supporting the walletconnect wallet adapter.
 
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=ledger_wallet-connect-live-app&token=829bb20298a5473989bdcade21d2ebbe8770a3d3)](https://sonarcloud.io/summary/new_code?id=ledger_wallet-connect-live-app)
+
 ## Hosting
 
 This live app is currently hosted at https://wc.apps.ledger.com

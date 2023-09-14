@@ -6,7 +6,7 @@ import * as Sentry from "@sentry/nextjs"
 
 const SENTRY_DNS = process.env.SENTRY_DNS || process.env.NEXT_PUBLIC_SENTRY_DSN
 
-if (!!SENTRY_DNS) {
+if (SENTRY_DNS) {
   Sentry.init({
     dsn: SENTRY_DNS,
     environment: process.env.NODE_ENV,
