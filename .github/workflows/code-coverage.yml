@@ -28,6 +28,11 @@ jobs:
 
       - name: Run tests
         run: yarn test --coverage
+      - name: Cache coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage_reports
+          path: ./coverage/
         
       - name: SonarCloud
         uses: actions/checkout@v3
