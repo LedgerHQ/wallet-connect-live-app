@@ -17,7 +17,7 @@ export default function useAnalytics() {
 
   const userProperties = useMemo(() => {
     return {
-      sessionsConnected: sessions?.length || 0,
+      sessionsConnected: sessions?.length ?? 0,
       live_app: "Wallet Connect v2",
       live_app_version: version,
       userId,

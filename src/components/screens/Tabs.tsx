@@ -48,7 +48,7 @@ const HeaderElement = forwardRef<HTMLDivElement, HeaderElementProps>((props, ref
       <Text variant="body" fontWeight="semiBold" color={selected ? "neutral.c100" : "neutral.c70"}>
         {title}
       </Text>
-      {badge || badge === 0 ? (
+      {badge && badge > 0 ? (
         <Flex
           width={24}
           height={24}
@@ -89,8 +89,8 @@ export default function Tabs({ tabs, activeTabIndex, setActiveTabIndex, children
     if (refs[0].current) {
       const refIndex = tabs.findIndex((t) => t.index === activeTabIndex)
       const refsToHandle = refs.slice(0, refIndex)
-      const width = refs[refIndex].current?.offsetWidth || 0
-      const left = refsToHandle.reduce((total, ref) => total + (ref.current?.offsetWidth || 0), 0)
+      const width = refs[refIndex].current?.offsetWidth ?? 0
+      const left = refsToHandle.reduce((total, ref) => total + (ref.current?.offsetWidth ?? 0), 0)
       updateBottomBar({
         width,
         left,

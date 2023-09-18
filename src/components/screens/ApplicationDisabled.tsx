@@ -21,7 +21,7 @@ export function ApplicationDisabled() {
   const analytics = useAnalytics()
   const router = useRouter()
 
-  const theme = useMemo(() => router?.query?.theme || "light", [router?.query?.theme])
+  const theme = useMemo(() => router?.query?.theme ?? "light", [router?.query?.theme])
 
   useEffect(() => {
     analytics.page("WalletConnect Has Been Disabled")

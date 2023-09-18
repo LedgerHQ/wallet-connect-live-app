@@ -4,7 +4,7 @@
 
 import * as Sentry from "@sentry/nextjs"
 
-const SENTRY_DNS = process.env.SENTRY_DNS || process.env.NEXT_PUBLIC_SENTRY_DSN
+const SENTRY_DNS = process.env.SENTRY_DNS ?? process.env.NEXT_PUBLIC_SENTRY_DSN
 
 if (SENTRY_DNS) {
   Sentry.init({

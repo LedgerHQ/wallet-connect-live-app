@@ -55,7 +55,7 @@ export function GenericRow({
         </Flex>
       </Flex>
       <Flex alignItems="center">
-        {rightElement || null}
+        {rightElement ?? null}
         {rowType === RowType.Select && onClick && (
           <Checkbox isChecked={isSelected} name={""} onChange={onClick} />
         )}

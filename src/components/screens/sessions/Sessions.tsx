@@ -38,7 +38,7 @@ export default function Sessions({ goToConnect }: SessionsProps) {
 
   useEffect(() => {
     analytics.track("equipment_connected", {
-      sessionsConnected: sessions?.length || 0,
+      sessionsConnected: sessions?.length ?? 0,
     })
     analytics.identify()
   }, [sessions?.length])

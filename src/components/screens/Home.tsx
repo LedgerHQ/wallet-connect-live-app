@@ -108,7 +108,7 @@ export default function Home({ initialURI, initialMode, setUri }: WalletConnectP
       {
         index: TabsIndexes.Sessions,
         title: t("sessions.title"),
-        badge: sessions?.length || undefined,
+        badge: sessions?.length ?? undefined,
         Component: (
           <WalletConnectInnerContainer>
             <ResponsiveContainer>

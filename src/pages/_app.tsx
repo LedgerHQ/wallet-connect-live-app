@@ -15,7 +15,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   const theme = useAppStore(appSelector.selectTheme)
 
   useEffect(() => {
-    setTheme((router?.query?.theme as ThemeNames) || theme)
+    setTheme((router?.query?.theme as ThemeNames) ?? theme)
   }, [router?.query?.theme])
 
   return (

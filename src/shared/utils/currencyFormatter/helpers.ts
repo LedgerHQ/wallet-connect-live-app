@@ -20,7 +20,7 @@ export const getFormattedCurrency = (
 
   return supportsToLocaleString
     ? (10000.2).toLocaleString(locale)
-    : toLocaleStringsMock[locale] || toLocaleStringsMock.en
+    : toLocaleStringsMock[locale] ?? toLocaleStringsMock.en
 }
 
 // Copied from https://www.npmjs.com/package/ethereumjs-util
