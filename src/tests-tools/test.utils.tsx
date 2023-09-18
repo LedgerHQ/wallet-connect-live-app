@@ -1,12 +1,12 @@
-import React, { ReactElement } from "react"
-import { render, RenderOptions } from "@testing-library/react"
-import { StyleProvider } from "@ledgerhq/react-ui"
-import userEvent from "@testing-library/user-event"
+import React, { ReactElement } from "react";
+import { render, RenderOptions } from "@testing-library/react";
+import { StyleProvider } from "@ledgerhq/react-ui";
+import userEvent from "@testing-library/user-event";
 
 type PropsTheme = {
-  children: React.ReactNode
-  theme?: "dark" | "light"
-}
+  children: React.ReactNode;
+  theme?: "dark" | "light";
+};
 
 /**
  *
@@ -19,11 +19,11 @@ const AllProviders = ({ children, theme = "dark" }: PropsTheme) => {
     <StyleProvider selectedPalette={theme} fontsPath="/fonts">
       {children}
     </StyleProvider>
-  )
-}
+  );
+};
 
 const customRender = (ui: ReactElement, options?: Omit<RenderOptions, "wrapper">) =>
-  render(ui, { wrapper: AllProviders, ...options })
+  render(ui, { wrapper: AllProviders, ...options });
 
 /**
  *
@@ -34,7 +34,7 @@ const customRender = (ui: ReactElement, options?: Omit<RenderOptions, "wrapper">
 const setupUserEventWithRender = (ui: ReactElement, options?: Omit<RenderOptions, "wrapper">) => ({
   user: userEvent.setup(),
   ...customRender(ui, options),
-})
+});
 
-export * from "@testing-library/react"
-export { setupUserEventWithRender as render }
+export * from "@testing-library/react";
+export { setupUserEventWithRender as render };

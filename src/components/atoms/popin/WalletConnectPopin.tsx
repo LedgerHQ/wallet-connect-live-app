@@ -1,14 +1,14 @@
-import { Flex } from "@ledgerhq/react-ui"
-import { CloseMedium } from "@ledgerhq/react-ui/assets/icons"
-import React, { ReactNode } from "react"
-import styled from "styled-components"
-import Popin from "./Popin"
+import { Flex } from "@ledgerhq/react-ui";
+import { CloseMedium } from "@ledgerhq/react-ui/assets/icons";
+import React, { ReactNode } from "react";
+import styled from "styled-components";
+import Popin from "./Popin";
 
 type Props = {
-  isOpen: boolean
-  children: ReactNode
-  onClose: () => void
-}
+  isOpen: boolean;
+  children: ReactNode;
+  onClose: () => void;
+};
 
 const CustomPopin = styled(Popin)`
   border-radius: 16px;
@@ -17,7 +17,7 @@ const CustomPopin = styled(Popin)`
   background-color: ${(props) => props.theme.colors.background.drawer};
   align-items: center;
   justify-content: center;
-`
+`;
 
 const CloseButton = styled(Flex)`
   height: 32px;
@@ -32,7 +32,7 @@ const CloseButton = styled(Flex)`
   &:hover {
     opacity: 0.7;
   }
-`
+`;
 export function WalletConnectPopin({ isOpen, children, onClose }: Props) {
   return (
     <CustomPopin isOpen={isOpen}>
@@ -41,5 +41,5 @@ export function WalletConnectPopin({ isOpen, children, onClose }: Props) {
       </CloseButton>
       {children}
     </CustomPopin>
-  )
+  );
 }

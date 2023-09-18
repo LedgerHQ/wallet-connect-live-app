@@ -1,16 +1,16 @@
-import { Flex, Text, Checkbox } from "@ledgerhq/react-ui"
-import { ChevronRightMedium } from "@ledgerhq/react-ui/assets/icons"
-import styled from "styled-components"
+import { Flex, Text, Checkbox } from "@ledgerhq/react-ui";
+import { ChevronRightMedium } from "@ledgerhq/react-ui/assets/icons";
+import styled from "styled-components";
 
 type Props = {
-  title: string
-  subtitle: string
-  LeftIcon: React.ReactNode
-  rightElement?: React.ReactNode
-  isSelected?: boolean
-  onClick?: () => void
-  rowType: RowType
-}
+  title: string;
+  subtitle: string;
+  LeftIcon: React.ReactNode;
+  rightElement?: React.ReactNode;
+  isSelected?: boolean;
+  onClick?: () => void;
+  rowType: RowType;
+};
 
 export enum RowType {
   Select = "select",
@@ -22,7 +22,7 @@ const Row = styled(Flex)`
   border-radius: 12px;
   background-color: ${(props) => props.theme.colors.neutral.c20};
   padding: 12px;
-`
+`;
 
 export function GenericRow({
   LeftIcon,
@@ -55,12 +55,12 @@ export function GenericRow({
         </Flex>
       </Flex>
       <Flex alignItems="center">
-        {rightElement || null}
+        {rightElement ?? null}
         {rowType === RowType.Select && onClick && (
           <Checkbox isChecked={isSelected} name={""} onChange={onClick} />
         )}
         {rowType === RowType.Detail && <ChevronRightMedium size={24} color="neutral.c70" />}
       </Flex>
     </Row>
-  )
+  );
 }

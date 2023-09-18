@@ -10,4 +10,4 @@ enum Routes {
   ProtocolNotSupported = "/protocol-not-supported",
 }
 
-export { Routes, TabsIndexes }
+export { Routes, TabsIndexes };

@@ -1,11 +1,11 @@
 /* eslint-disable testing-library/no-debugging-utils */
-import "@testing-library/react/dont-cleanup-after-each"
-import { act, cleanup, render, waitFor, screen } from "@/tests-tools/test.utils"
-import { initialParamsHomePage } from "@/tests-tools/mocks/initialParams.mock"
-import AppScreen from "@/pages/index"
-import sessionProposalNotSupported from "@/data/mocks/sessionProposalNotSupported.example.json"
-import SessionProposal from "@/pages/proposal"
-import { useNavigation } from "@/hooks/common/useNavigation"
+import "@testing-library/react/dont-cleanup-after-each";
+import { act, cleanup, render, waitFor, screen } from "@/tests-tools/test.utils";
+import { initialParamsHomePage } from "@/tests-tools/mocks/initialParams.mock";
+import AppScreen from "@/pages/index";
+import sessionProposalNotSupported from "@/data/mocks/sessionProposalNotSupported.example.json";
+import SessionProposal from "@/pages/proposal";
+import { useNavigation } from "@/hooks/common/useNavigation";
 
 // mock useRouter
 jest.mock("next/router", () => ({
@@ -13,7 +13,7 @@ jest.mock("next/router", () => ({
     query: {},
     push: jest.fn(),
   })),
-}))
+}));
 
 jest.mock("@/hooks/common/useNavigation", () => {
   return {
@@ -25,10 +25,10 @@ jest.mock("@/hooks/common/useNavigation", () => {
           push: mockPush,
         },
         navigate: jest.fn(),
-      }
+      };
     }),
-  }
-})
+  };
+});
 
 jest.mock("@walletconnect/core", () => {
   return {
@@ -44,14 +44,14 @@ jest.mock("@walletconnect/core", () => {
                     detail: sessionProposalNotSupported,
                   }),
                 ),
-              )
-            }, 200)
+              );
+            }, 200);
           }),
         },
-      }
+      };
     }),
-  }
-})
+  };
+});
 
 jest.mock("@walletconnect/web3wallet", () => {
   return {
@@ -61,14 +61,14 @@ jest.mock("@walletconnect/web3wallet", () => {
         on: jest.fn((eventName, callback) => window.addEventListener(eventName, callback)),
       })),
     },
-  }
-})
+  };
+});
 
 jest.mock("@walletconnect/utils", () => {
   return {
     buildApprovedNamespaces: jest.fn(() => ({})),
-  }
-})
+  };
+});
 
 jest.mock("@ledgerhq/wallet-api-client", () => {
   return {
@@ -76,7 +76,7 @@ jest.mock("@ledgerhq/wallet-api-client", () => {
       return {
         connect: jest.fn(),
         disconnect: jest.fn(),
-      }
+      };
     }),
     WalletAPIClient: jest.fn(() => {
       return {
@@ -95,15 +95,15 @@ jest.mock("@ledgerhq/wallet-api-client", () => {
             }),
           ),
         },
-      }
+      };
     }),
-  }
-})
+  };
+});
 
-const mockPush = jest.fn()
+const mockPush = jest.fn();
 
-afterEach(() => jest.clearAllMocks())
-afterAll(() => cleanup())
+afterEach(() => jest.clearAllMocks());
+afterAll(() => cleanup());
 
 const proposalRouter = () =>
   (useNavigation as jest.Mock).mockReturnValue({
@@ -112,36 +112,36 @@ const proposalRouter = () =>
       push: jest.fn(),
     },
     navigate: jest.fn(),
-  })
+  });
 
 describe("Network Support tests", () => {
   it("Should connect throught an uri and redirect to Error Support screen, then go back to Index Page", async () => {
-    const { user: userApp } = render(<AppScreen />)
+    const { user: userApp } = render(<AppScreen />);
 
     await waitFor(
       () => {
-        expect(screen.getByRole("textbox")).toBeInTheDocument()
+        expect(screen.getByRole("textbox")).toBeInTheDocument();
       },
       {
         timeout: 3000,
       },
-    )
+    );
 
-    await userApp.click(screen.getByRole("button", { name: /connect.cta/i }))
+    await userApp.click(screen.getByRole("button", { name: /connect.cta/i }));
 
-    cleanup()
-    proposalRouter()
+    cleanup();
+    proposalRouter();
 
-    const { user: userProposal } = render(<SessionProposal />)
+    const { user: userProposal } = render(<SessionProposal />);
 
-    expect(screen.getByText(/sessionProposal.error.title/i)).toBeInTheDocument()
+    expect(screen.getByText(/sessionProposal.error.title/i)).toBeInTheDocument();
 
-    expect(screen.getByText(/sessionProposal.error.desc/i)).toBeInTheDocument()
+    expect(screen.getByText(/sessionProposal.error.desc/i)).toBeInTheDocument();
 
-    await userProposal.click(screen.getByRole("button", { name: /sessionProposal.close/i }))
+    await userProposal.click(screen.getByRole("button", { name: /sessionProposal.close/i }));
 
-    cleanup()
+    cleanup();
 
-    render(<AppScreen />)
-  })
-})
+    render(<AppScreen />);
+  });
+});

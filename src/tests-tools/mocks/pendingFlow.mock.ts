@@ -1,4 +1,4 @@
-import { PendingFlow } from "@/types/types"
+import { PendingFlow } from "@/types/types";
 
 export const PENDING_FLOW_MOCK: PendingFlow = {
   id: 12,
@@ -7,4 +7,4 @@ export const PENDING_FLOW_MOCK: PendingFlow = {
   message: "message1",
   isHex: false,
   txHadSomeData: false,
-}
+};

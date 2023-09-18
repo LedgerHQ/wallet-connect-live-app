@@ -1,14 +1,14 @@
-import { Flex, Text, Button } from "@ledgerhq/react-ui"
-import { CloseMedium } from "@ledgerhq/react-ui/assets/icons"
-import { useTranslation } from "next-i18next"
-import { useEffect } from "react"
-import styled from "styled-components"
-import router from "next/router"
-import { ResponsiveContainer } from "@/styles/styles"
-import { device } from "@/styles/breakpoints"
-import useAnalytics from "@/hooks/common/useAnalytics"
+import { Flex, Text, Button } from "@ledgerhq/react-ui";
+import { CloseMedium } from "@ledgerhq/react-ui/assets/icons";
+import { useTranslation } from "next-i18next";
+import { useEffect } from "react";
+import styled from "styled-components";
+import router from "next/router";
+import { ResponsiveContainer } from "@/styles/styles";
+import { device } from "@/styles/breakpoints";
+import useAnalytics from "@/hooks/common/useAnalytics";
 
-export { getServerSideProps } from "@/lib/serverProps"
+export { getServerSideProps } from "@/lib/serverProps";
 
 const LogoContainer = styled(Flex)`
   border-radius: 50%;
@@ -17,7 +17,7 @@ const LogoContainer = styled(Flex)`
   background-color: ${(p) => p.theme.colors.error.c50};
   height: 50px;
   width: 50px;
-`
+`;
 const ButtonsContainer = styled(Flex)`
   flex-direction: row;
   justify-content: space-between;
@@ -38,15 +38,15 @@ const ButtonsContainer = styled(Flex)`
     width: 100%;
     max-width: 465px;
   }
-`
+`;
 
 export default function ProtocolNotSupported() {
-  const { t } = useTranslation()
-  const analytics = useAnalytics()
+  const { t } = useTranslation();
+  const analytics = useAnalytics();
 
   useEffect(() => {
-    analytics.page("Wallet Connect Error Unsupported Protocol V1")
-  }, [])
+    analytics.page("Wallet Connect Error Unsupported Protocol V1");
+  }, []);
 
   return (
     <Flex alignItems="center" flexDirection="column" height="100%" width="100%">
@@ -82,5 +82,5 @@ export default function ProtocolNotSupported() {
         </ButtonsContainer>
       </ResponsiveContainer>
     </Flex>
-  )
+  );
 }

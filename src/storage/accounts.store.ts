@@ -1,12 +1,12 @@
-import { Account } from "@ledgerhq/wallet-api-client"
-import { create } from "zustand"
-import { persist } from "zustand/middleware"
+import { Account } from "@ledgerhq/wallet-api-client";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 interface AccountsState {
-  accounts: Account[]
-  addAccounts: (accounts: Account[]) => void
-  addAccount: (account: Account) => void
-  clearAccounts: () => void
+  accounts: Account[];
+  addAccounts: (accounts: Account[]) => void;
+  addAccount: (account: Account) => void;
+  clearAccounts: () => void;
 }
 
 const useAccountsStore = create<AccountsState>()(
@@ -22,13 +22,13 @@ const useAccountsStore = create<AccountsState>()(
       name: "accounts-storage",
     },
   ),
-)
+);
 
 const accountSelector = {
   selectAccounts: (state: AccountsState): Account[] => state.accounts,
   addAccounts: (state: AccountsState) => state.addAccounts,
   addAccount: (state: AccountsState) => state.addAccount,
   clearAccounts: (state: AccountsState) => state.clearAccounts,
-}
+};
 
-export { useAccountsStore, accountSelector }
+export { useAccountsStore, accountSelector };

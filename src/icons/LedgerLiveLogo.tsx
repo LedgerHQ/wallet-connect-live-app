@@ -11,4 +11,4 @@ export const Logo = ({ size = 16, color = "currentColor" }: { size: number; colo
       fill={color}
     />
   </svg>
-)
+);

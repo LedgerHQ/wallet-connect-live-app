@@ -29,4 +29,4 @@ export const SESSION_MOCK = {
       icons: [],
     },
   },
-}
+};

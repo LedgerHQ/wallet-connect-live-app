@@ -1,26 +1,26 @@
-import { ButtonsContainer, List } from "@/components/atoms/containers/Elements"
-import { GenericRow, RowType } from "@/components/atoms/GenericRow"
-import LogoContainer from "@/components/atoms/logoContainers/LedgerLogoContainer"
-import { AddAccountPlaceholder } from "@/components/screens/sessions/sessionProposal/AddAccountPlaceholder"
-import { ErrorBlockchainSupport } from "@/components/screens/sessions/sessionProposal/ErrorBlockchainSupport"
-import { InfoSessionProposal } from "@/components/screens/sessions/sessionProposal/InfoSessionProposal"
-import { formatUrl, getColor, getTicker, truncate } from "@/helpers/helper.util"
-import useHydratation from "@/hooks/useHydratation"
-import { useNavigation } from "@/hooks/common/useNavigation"
-import { useProposal } from "@/hooks/useProposal"
-import { ResponsiveContainer } from "@/styles/styles"
-import { Proposal } from "@/types/types"
-import { Flex, Button, Box, CryptoIcon, Text } from "@ledgerhq/react-ui"
-import { WalletConnectMedium, CircledCrossSolidMedium } from "@ledgerhq/react-ui/assets/icons"
-import Image from "next/image"
-import { space } from "@ledgerhq/react-ui/styles/theme"
-import { useTranslation } from "next-i18next"
-import { useCallback, useEffect, useMemo, useState } from "react"
-import { Logo } from "@/icons/LedgerLiveLogo"
-import styled, { useTheme } from "styled-components"
-import useAnalytics from "@/hooks/common/useAnalytics"
+import { ButtonsContainer, List } from "@/components/atoms/containers/Elements";
+import { GenericRow, RowType } from "@/components/atoms/GenericRow";
+import LogoContainer from "@/components/atoms/logoContainers/LedgerLogoContainer";
+import { AddAccountPlaceholder } from "@/components/screens/sessions/sessionProposal/AddAccountPlaceholder";
+import { ErrorBlockchainSupport } from "@/components/screens/sessions/sessionProposal/ErrorBlockchainSupport";
+import { InfoSessionProposal } from "@/components/screens/sessions/sessionProposal/InfoSessionProposal";
+import { formatUrl, getColor, getTicker, truncate } from "@/helpers/helper.util";
+import useHydratation from "@/hooks/useHydratation";
+import { useNavigation } from "@/hooks/common/useNavigation";
+import { useProposal } from "@/hooks/useProposal";
+import { ResponsiveContainer } from "@/styles/styles";
+import { Proposal } from "@/types/types";
+import { Flex, Button, Box, CryptoIcon, Text } from "@ledgerhq/react-ui";
+import { WalletConnectMedium, CircledCrossSolidMedium } from "@ledgerhq/react-ui/assets/icons";
+import Image from "next/image";
+import { space } from "@ledgerhq/react-ui/styles/theme";
+import { useTranslation } from "next-i18next";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Logo } from "@/icons/LedgerLiveLogo";
+import styled, { useTheme } from "styled-components";
+import useAnalytics from "@/hooks/common/useAnalytics";
 
-export { getServerSideProps } from "@/lib/serverProps"
+export { getServerSideProps } from "@/lib/serverProps";
 
 const DAppContainer = styled(Flex).attrs(
   (p: { size: number; borderColor: string; backgroundColor: string }) => ({
@@ -35,7 +35,7 @@ const DAppContainer = styled(Flex).attrs(
     backgroundColor: p.backgroundColor,
     zIndex: 0,
   }),
-)<{ size: number }>``
+)<{ size: number }>``;
 
 const Container = styled(Flex).attrs((p: { size: number }) => ({
   heigth: p.size,
@@ -44,24 +44,24 @@ const Container = styled(Flex).attrs((p: { size: number }) => ({
   justifyContent: "center",
   position: "relative",
   left: "-25px",
-}))<{ size: number }>``
+}))<{ size: number }>``;
 
 const ListChains = styled(Flex)`
   flex-direction: column;
-`
+`;
 
 const Header = styled(Flex)`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-`
+`;
 
 export default function SessionProposal() {
-  const { colors } = useTheme()
-  const { router } = useNavigation()
-  const { t } = useTranslation()
-  const { hydrated } = useHydratation()
-  const proposal = JSON.parse(router.query.data as string) as Proposal
+  const { colors } = useTheme();
+  const { router } = useNavigation();
+  const { t } = useTranslation();
+  const { hydrated } = useHydratation();
+  const proposal = JSON.parse(router.query.data as string) as Proposal;
   const {
     handleClick,
     handleClose,
@@ -72,15 +72,15 @@ export default function SessionProposal() {
     selectedAccounts,
     proposer,
     addNewAccount,
-  } = useProposal({ proposal })
-  const analytics = useAnalytics()
+  } = useProposal({ proposal });
+  const analytics = useAnalytics();
 
   useEffect(() => {
     analytics.page("Wallet Connect Session Request", {
       dapp: proposer?.metadata?.name,
       url: proposer?.metadata?.url,
-    })
-  }, [])
+    });
+  }, []);
 
   const onApprove = () => {
     analytics.track("button_clicked", {
@@ -88,9 +88,9 @@ export default function SessionProposal() {
       page: "Wallet Connect Session Request",
       dapp: proposer?.metadata?.name,
       url: proposer?.metadata?.url,
-    })
-    approveSession()
-  }
+    });
+    approveSession();
+  };
 
   const onReject = useCallback(() => {
     analytics.track("button_clicked", {
@@ -98,31 +98,31 @@ export default function SessionProposal() {
       page: "Wallet Connect Session Request",
       dapp: proposer?.metadata?.name,
       url: proposer?.metadata?.url,
-    })
-    rejectSession()
-  }, [])
+    });
+    rejectSession();
+  }, []);
 
-  const [imageLoadingError, setImageLoadingError] = useState(false)
+  const [imageLoadingError, setImageLoadingError] = useState(false);
 
   const accountsByChain = useMemo(
     () => formatAccountsByChain(proposal, accounts),
     [proposal, accounts],
-  )
+  );
 
-  const requiredChains = accountsByChain.filter((entry) => entry.isRequired)
+  const requiredChains = accountsByChain.filter((entry) => entry.isRequired);
 
-  const chainsNotSupported = accountsByChain.filter((entry) => !entry.isSupported)
+  const chainsNotSupported = accountsByChain.filter((entry) => !entry.isSupported);
 
-  const noChainsSupported = !accountsByChain.some((entry) => entry.isSupported)
+  const noChainsSupported = !accountsByChain.some((entry) => entry.isSupported);
 
-  const everyRequiredChainsSupported = requiredChains.every((entry) => entry.isSupported)
+  const everyRequiredChainsSupported = requiredChains.every((entry) => entry.isSupported);
 
   const disabled = !requiredChains.every((entry) =>
     entry.accounts.some((account) => selectedAccounts.includes(account.id)),
-  )
+  );
 
   if (!hydrated) {
-    return null
+    return null;
   }
 
   return (
@@ -257,7 +257,7 @@ export default function SessionProposal() {
                           <AddAccountPlaceholder onClick={() => addNewAccount(entry.chain)} />
                         )}
                       </Box>
-                    )
+                    );
                   })}
                 {chainsNotSupported && chainsNotSupported.length > 0 ? (
                   <GenericRow
@@ -313,5 +313,5 @@ export default function SessionProposal() {
         )}
       </ResponsiveContainer>
     </Flex>
-  )
+  );
 }

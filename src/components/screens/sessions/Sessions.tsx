@@ -1,68 +1,65 @@
-import { List, ButtonsContainer } from "@/components/atoms/containers/Elements"
-import { GenericRow, RowType } from "@/components/atoms/GenericRow"
-import { ImageWithPlaceholder } from "@/components/atoms/images/ImageWithPlaceholder"
-import { WalletConnectPopin } from "@/components/atoms/popin/WalletConnectPopin"
-import { formatUrl } from "@/helpers/helper.util"
-import { web3wallet } from "@/helpers/walletConnect.util"
-import { Flex, Button, Box, Text } from "@ledgerhq/react-ui"
+import { List, ButtonsContainer } from "@/components/atoms/containers/Elements";
+import { GenericRow, RowType } from "@/components/atoms/GenericRow";
+import { ImageWithPlaceholder } from "@/components/atoms/images/ImageWithPlaceholder";
+import { WalletConnectPopin } from "@/components/atoms/popin/WalletConnectPopin";
+import { formatUrl } from "@/helpers/helper.util";
+import { web3wallet } from "@/helpers/walletConnect.util";
+import { Flex, Button, Box, Text } from "@ledgerhq/react-ui";
 
-import { useTranslation } from "next-i18next"
-import { useCallback, useEffect, useMemo } from "react"
-import useWalletConnectPopin from "@/hooks/useWalletConnectPopin"
+import { useTranslation } from "next-i18next";
+import { useCallback, useEffect, useMemo } from "react";
+import useWalletConnectPopin from "@/hooks/useWalletConnectPopin";
 
-import styled from "styled-components"
-import { useSessionsStore, sessionSelector } from "@/storage/sessions.store"
-import useAnalytics from "@/hooks/common/useAnalytics"
-import { useNavigation } from "@/hooks/common/useNavigation"
-import { Routes } from "@/shared/navigation"
+import styled from "styled-components";
+import { useSessionsStore, sessionSelector } from "@/storage/sessions.store";
+import useAnalytics from "@/hooks/common/useAnalytics";
+import { useNavigation } from "@/hooks/common/useNavigation";
+import { Routes } from "@/shared/navigation";
 
 export type SessionsProps = {
-  goToConnect: () => void
-}
+  goToConnect: () => void;
+};
 
-const CustomList = styled(List)``
+const CustomList = styled(List)``;
 
 export default function Sessions({ goToConnect }: SessionsProps) {
-  const { t } = useTranslation()
-  const { navigate } = useNavigation()
-  const { openModal, closeModal, isModalOpen } = useWalletConnectPopin()
-  const clearSessions = useSessionsStore(sessionSelector.clearSessions)
-  const sessions = useSessionsStore(sessionSelector.selectSessions)
-  const analytics = useAnalytics()
+  const { t } = useTranslation();
+  const { navigate } = useNavigation();
+  const { openModal, closeModal, isModalOpen } = useWalletConnectPopin();
+  const clearSessions = useSessionsStore(sessionSelector.clearSessions);
+  const sessions = useSessionsStore(sessionSelector.selectSessions);
+  const analytics = useAnalytics();
 
   useEffect(() => {
     analytics.page("Wallet Connect Sessions", {
       isEmptyState,
-    })
-  }, [])
+    });
+  }, []);
 
   useEffect(() => {
     analytics.track("equipment_connected", {
-      sessionsConnected: sessions?.length || 0,
-    })
-    analytics.identify()
-  }, [sessions?.length])
+      sessionsConnected: sessions?.length ?? 0,
+    });
+    analytics.identify();
+  }, [sessions?.length]);
 
-  const isEmptyState = useMemo(
-    () => !sessions || !sessions.length || sessions.length === 0,
-    [sessions],
-  )
+  const isEmptyState = useMemo(() => sessions.length === 0, [sessions]);
 
   const goToDetailSession = useCallback((topic: string) => {
-    navigate(Routes.SessionDetails, topic)
+    navigate(Routes.SessionDetails, topic);
     analytics.track("button_clicked", {
       button: "Session Detail",
       page: "Wallet Connect Sessions",
-    })
-  }, [])
+    });
+  }, []);
 
   const onGoToConnect = useCallback(() => {
     analytics.track("button_clicked", {
       button: "Connect",
       page: "Wallet Connect Sessions",
-    })
-    goToConnect()
-  }, [])
+    });
+    goToConnect();
+  }, []);
 
   const disconnect = useCallback(async () => {
     await Promise.all(
@@ -77,17 +74,17 @@ export default function Sessions({ goToConnect }: SessionsProps) {
       ),
     )
       .catch((err) => {
-        console.error(err)
+        console.error(err);
       })
       .finally(() => {
-        clearSessions()
-        closeModal()
-      })
+        clearSessions();
+        closeModal();
+      });
     analytics.track("button_clicked", {
       button: "WC-Disconnect All Sessions",
       page: "Wallet Connect Sessions",
-    })
-  }, [sessions])
+    });
+  }, [sessions]);
 
   if (isEmptyState) {
     return (
@@ -117,7 +114,7 @@ export default function Sessions({ goToConnect }: SessionsProps) {
           </Text>
         </Button>
       </Flex>
-    )
+    );
   }
 
   return (
@@ -171,5 +168,5 @@ export default function Sessions({ goToConnect }: SessionsProps) {
         </Flex>
       </WalletConnectPopin>
     </Flex>
-  )
+  );
 }

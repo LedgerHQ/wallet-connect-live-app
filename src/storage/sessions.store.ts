@@ -1,21 +1,21 @@
-import { SessionTypes } from "@walletconnect/types"
-import { create } from "zustand"
-import { persist } from "zustand/middleware"
+import { SessionTypes } from "@walletconnect/types";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
-type Session = SessionTypes.Struct
+type Session = SessionTypes.Struct;
 
 interface SessionsState {
-  sessions: Session[]
-  lastSessionVisited: Session | null
-  addSession: (session: Session) => void
-  addSessions: (sessions: Session[]) => void
-  removeSession: (sessionId: string) => void
-  clearSessions: () => void
-  setLastSessionVisited: (session: Session | null) => void
+  sessions: Session[];
+  lastSessionVisited: Session | null;
+  addSession: (session: Session) => void;
+  addSessions: (sessions: Session[]) => void;
+  removeSession: (sessionId: string) => void;
+  clearSessions: () => void;
+  setLastSessionVisited: (session: Session | null) => void;
 }
 
 const removeSession = (state: SessionsState, sessionId: string): Session[] =>
-  state.sessions.filter((session: Session) => session.topic !== sessionId)
+  state.sessions.filter((session: Session) => session.topic !== sessionId);
 
 const useSessionsStore = create<SessionsState>()(
   persist(
@@ -35,7 +35,7 @@ const useSessionsStore = create<SessionsState>()(
       name: "sessions-storage",
     },
   ),
-)
+);
 
 const sessionSelector = {
   selectSessions: (state: SessionsState): Session[] => state.sessions,
@@ -45,7 +45,7 @@ const sessionSelector = {
   removeSession: (state: SessionsState) => state.removeSession,
   clearSessions: (state: SessionsState) => state.clearSessions,
   setLastSessionVisited: (state: SessionsState) => state.setLastSessionVisited,
-}
+};
 
-export { useSessionsStore, sessionSelector }
-export type { Session }
+export { useSessionsStore, sessionSelector };
+export type { Session };

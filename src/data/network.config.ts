@@ -3,7 +3,7 @@
  * @url https://chainlist.org
  */
 
-import { Network } from "./types"
+import { Network } from "./types";
 
 const EIP155_CHAINS: Record<string, Network> = {
   ethereum: {
@@ -62,7 +62,7 @@ const EIP155_CHAINS: Record<string, Network> = {
     displayName: "Optimism Goerli",
     color: "#00ff00",
   },
-}
+};
 
 // const COSMOS_MAINNET_CHAINS = {
 // 	cosmos: {
@@ -76,7 +76,7 @@ const EIP155_CHAINS: Record<string, Network> = {
 export const SUPPORTED_NETWORK: Record<string, Network> = {
   ...EIP155_CHAINS,
   // ...COSMOS_MAINNET_CHAINS,
-}
+};
 
 export enum SupportedNamespace {
   EIP155 = "eip155",
