@@ -1,16 +1,16 @@
-import { Flex, Text } from "@ledgerhq/react-ui"
-import { CheckAloneMedium } from "@ledgerhq/react-ui/assets/icons"
-import { useTranslation } from "next-i18next"
-import styled from "styled-components"
+import { Flex, Text } from "@ledgerhq/react-ui";
+import { CheckAloneMedium } from "@ledgerhq/react-ui/assets/icons";
+import { useTranslation } from "next-i18next";
+import styled from "styled-components";
 
-const Row = styled(Flex)``
+const Row = styled(Flex)``;
 
 type InfoSessionProposalProps = {
-  isInSessionDetails?: boolean
-}
+  isInSessionDetails?: boolean;
+};
 
 export function InfoSessionProposal({ isInSessionDetails }: InfoSessionProposalProps) {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
   return (
     <Flex flexDirection="column">
       <Text variant="small" fontWeight="medium" color="neutral.c70" mb={6}>
@@ -27,5 +27,5 @@ export function InfoSessionProposal({ isInSessionDetails }: InfoSessionProposalP
         </Row>
       ))}
     </Flex>
-  )
+  );
 }

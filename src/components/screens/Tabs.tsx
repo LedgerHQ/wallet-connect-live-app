@@ -1,34 +1,34 @@
-import { Flex, Text } from "@ledgerhq/react-ui"
-import { createRef, forwardRef, useEffect, useState } from "react"
-import styled from "styled-components"
+import { Flex, Text } from "@ledgerhq/react-ui";
+import { createRef, forwardRef, useEffect, useState } from "react";
+import styled from "styled-components";
 
 export type TabContent = {
-  index: number
-  title: string
-  disabled?: boolean
-  badge?: number
-  Component: React.ReactNode
-}
+  index: number;
+  title: string;
+  disabled?: boolean;
+  badge?: number;
+  Component: React.ReactNode;
+};
 
 export type TabsProps = {
-  tabs: TabContent[]
-  activeTabIndex: number
-  setActiveTabIndex: (newActiveIndex: number) => void
-  children: React.ReactNode
-}
+  tabs: TabContent[];
+  activeTabIndex: number;
+  setActiveTabIndex: (newActiveIndex: number) => void;
+  children: React.ReactNode;
+};
 
 type HeaderBottomBarProps = {
-  left: number
-  width: number
-}
+  left: number;
+  width: number;
+};
 
 type HeaderElementProps = {
-  title: string
-  selected: boolean
-  disabled: boolean
-  badge?: number
-  onClick: () => void
-}
+  title: string;
+  selected: boolean;
+  disabled: boolean;
+  badge?: number;
+  onClick: () => void;
+};
 
 const TabHeaderBox = styled.div<{ disabled: boolean }>`
   display: flex;
@@ -38,10 +38,10 @@ const TabHeaderBox = styled.div<{ disabled: boolean }>`
   text-align: center;
   cursor: ${(p) => (p.disabled ? "default" : "pointer")};
   padding: 8px 12px;
-`
+`;
 
 const HeaderElement = forwardRef<HTMLDivElement, HeaderElementProps>((props, ref) => {
-  const { onClick, badge, disabled, selected, title } = props
+  const { onClick, badge, disabled, selected, title } = props;
 
   return (
     <TabHeaderBox ref={ref} disabled={disabled} onClick={onClick}>
@@ -64,9 +64,9 @@ const HeaderElement = forwardRef<HTMLDivElement, HeaderElementProps>((props, ref
         </Flex>
       ) : null}
     </TabHeaderBox>
-  )
-})
-HeaderElement.displayName = "HeaderElement"
+  );
+});
+HeaderElement.displayName = "HeaderElement";
 
 const HeaderBottomBar = styled.div<HeaderBottomBarProps>`
   position: relative;
@@ -76,34 +76,34 @@ const HeaderBottomBar = styled.div<HeaderBottomBarProps>`
   border-bottom: solid 4px;
   border-bottom-color: ${(p) => p.theme.colors.primary.c80};
   bottom: 3px;
-`
+`;
 
 export default function Tabs({ tabs, activeTabIndex, setActiveTabIndex, children }: TabsProps) {
   const [bottomBar, updateBottomBar] = useState<HeaderBottomBarProps>({
     left: 0,
     width: 0,
-  })
-  const refs = tabs.map(() => createRef<HTMLDivElement>())
+  });
+  const refs = tabs.map(() => createRef<HTMLDivElement>());
 
   useEffect(() => {
     if (refs[0].current) {
-      const refIndex = tabs.findIndex((t) => t.index === activeTabIndex)
-      const refsToHandle = refs.slice(0, refIndex)
-      const width = refs[refIndex].current?.offsetWidth ?? 0
-      const left = refsToHandle.reduce((total, ref) => total + (ref.current?.offsetWidth ?? 0), 0)
+      const refIndex = tabs.findIndex((t) => t.index === activeTabIndex);
+      const refsToHandle = refs.slice(0, refIndex);
+      const width = refs[refIndex].current?.offsetWidth ?? 0;
+      const left = refsToHandle.reduce((total, ref) => total + (ref.current?.offsetWidth ?? 0), 0);
       updateBottomBar({
         width,
         left,
-      })
+      });
     }
-  }, [activeTabIndex])
+  }, [activeTabIndex]);
 
   const onTabClick = (index: number) => {
-    const tab = tabs.find((t) => t.index === index)
+    const tab = tabs.find((t) => t.index === index);
     if (tab && !tab.disabled) {
-      setActiveTabIndex(index)
+      setActiveTabIndex(index);
     }
-  }
+  };
 
   return (
     <>
@@ -127,5 +127,5 @@ export default function Tabs({ tabs, activeTabIndex, setActiveTabIndex, children
       </Flex>
       {children}
     </>
-  )
+  );
 }

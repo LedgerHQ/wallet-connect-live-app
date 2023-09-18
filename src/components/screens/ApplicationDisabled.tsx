@@ -1,11 +1,11 @@
-import { Flex, StyleProvider, Text } from "@ledgerhq/react-ui"
-import { CloseMedium } from "@ledgerhq/react-ui/assets/icons"
-import { ThemeNames } from "@ledgerhq/react-ui/styles"
-import { useTranslation } from "next-i18next"
-import { useRouter } from "next/router"
-import { useEffect, useMemo } from "react"
-import useAnalytics from "@/hooks/common/useAnalytics"
-import styled from "styled-components"
+import { Flex, StyleProvider, Text } from "@ledgerhq/react-ui";
+import { CloseMedium } from "@ledgerhq/react-ui/assets/icons";
+import { ThemeNames } from "@ledgerhq/react-ui/styles";
+import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
+import { useEffect, useMemo } from "react";
+import useAnalytics from "@/hooks/common/useAnalytics";
+import styled from "styled-components";
 
 const LogoContainer = styled(Flex)`
   border-radius: 50%;
@@ -14,18 +14,18 @@ const LogoContainer = styled(Flex)`
   background-color: ${(p) => p.theme.colors.error.c50};
   height: 50px;
   width: 50px;
-`
+`;
 
 export function ApplicationDisabled() {
-  const { t } = useTranslation()
-  const analytics = useAnalytics()
-  const router = useRouter()
+  const { t } = useTranslation();
+  const analytics = useAnalytics();
+  const router = useRouter();
 
-  const theme = useMemo(() => router?.query?.theme ?? "light", [router?.query?.theme])
+  const theme = useMemo(() => router?.query?.theme ?? "light", [router?.query?.theme]);
 
   useEffect(() => {
-    analytics.page("WalletConnect Has Been Disabled")
-  }, [])
+    analytics.page("WalletConnect Has Been Disabled");
+  }, []);
 
   return (
     <StyleProvider selectedPalette={theme as ThemeNames | undefined} fontsPath="/fonts">
@@ -61,5 +61,5 @@ export function ApplicationDisabled() {
         </Text>
       </Flex>
     </StyleProvider>
-  )
+  );
 }

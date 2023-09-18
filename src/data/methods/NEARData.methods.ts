@@ -3,22 +3,22 @@
  * @url https://chainlist.org
  */
 
-import { ChainMetadata } from "../types"
+import { ChainMetadata } from "../types";
 
 /**
  * Types
  */
-export type TNearChain = keyof typeof NEAR_TEST_CHAINS
+export type TNearChain = keyof typeof NEAR_TEST_CHAINS;
 
 /**
  * Chains
  */
 export const NEAR_MAINNET_CHAINS = {
   // TODO: Dev account creation isn't supported on NEAR Mainnet.
-}
+};
 
 interface NearTestChains {
-  [key: string]: ChainMetadata
+  [key: string]: ChainMetadata;
 }
 
 export const NEAR_TEST_CHAINS: NearTestChains = {
@@ -26,9 +26,9 @@ export const NEAR_TEST_CHAINS: NearTestChains = {
     chainId: "testnet",
     name: "NEAR Testnet",
   },
-}
+};
 
-export const NEAR_CHAINS = { ...NEAR_MAINNET_CHAINS, ...NEAR_TEST_CHAINS }
+export const NEAR_CHAINS = { ...NEAR_MAINNET_CHAINS, ...NEAR_TEST_CHAINS };
 
 /**
  * Methods
@@ -42,4 +42,4 @@ export const NEAR_SIGNING_METHODS = {
   NEAR_SIGN_TRANSACTIONS: "near_signTransactions",
   NEAR_SIGN_AND_SEND_TRANSACTIONS: "near_signAndSendTransactions",
   NEAR_VERIFY_OWNER: "near_verifyOwner",
-}
+};

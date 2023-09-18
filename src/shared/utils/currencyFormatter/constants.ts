@@ -1,7 +1,7 @@
-export const prefixFormat = ["sign", "code", "value"]
-export const suffixFormat = ["sign", "value", "separator", "code"]
+export const prefixFormat = ["sign", "code", "value"];
+export const suffixFormat = ["sign", "value", "separator", "code"];
 
-export const nonBreakableSpace = " "
+export const nonBreakableSpace = " ";
 
 export const defaultFormatOptions = {
   locale: "en-EN",
@@ -25,7 +25,7 @@ export const defaultFormatOptions = {
   // discrete mode will hide amounts
   discreet: false,
   joinFragmentsSeparator: "",
-}
+};
 
 /**
  * Checks if browser supports toLocaleString
@@ -36,4 +36,4 @@ export const hasToLocaleStringSupport = !!(
   typeof Intl == "object" &&
   Intl &&
   typeof Intl.NumberFormat == "function"
-)
+);

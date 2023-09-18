@@ -6,4 +6,4 @@ export const ErrorIcon = () => (
       fill="#F57375"
     />
   </svg>
-)
+);

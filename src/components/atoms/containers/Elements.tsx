@@ -1,5 +1,5 @@
-import { Flex } from "@ledgerhq/react-ui"
-import styled from "styled-components"
+import { Flex } from "@ledgerhq/react-ui";
+import styled from "styled-components";
 
 const WalletConnectContainer = styled.div`
   display: flex;
@@ -11,7 +11,7 @@ const WalletConnectContainer = styled.div`
   height: 100%;
   user-select: none;
   background: ${({ theme }) => theme.colors.background.main};
-`
+`;
 
 const ButtonsContainer = styled(Flex)`
   flex-direction: row;
@@ -19,9 +19,9 @@ const ButtonsContainer = styled(Flex)`
   align-items: center;
   height: 80px;
   width: 100%;
-`
+`;
 
-const Row = styled(Flex)``
-const List = styled.ul``
+const Row = styled(Flex)``;
+const List = styled.ul``;
 
-export { ButtonsContainer, Row, List, WalletConnectContainer }
+export { ButtonsContainer, Row, List, WalletConnectContainer };

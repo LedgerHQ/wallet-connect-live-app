@@ -1,5 +1,5 @@
-import styled from "styled-components"
-import { device } from "./breakpoints"
+import styled from "styled-components";
+import { device } from "./breakpoints";
 
 export const Container = styled.div`
   height: 100%;
@@ -7,7 +7,7 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-`
+`;
 
 export const ResponsiveContainer = styled.div`
   display: flex;
@@ -29,4 +29,4 @@ export const ResponsiveContainer = styled.div`
     width: 100%;
     max-width: 465px;
   }
-`
+`;

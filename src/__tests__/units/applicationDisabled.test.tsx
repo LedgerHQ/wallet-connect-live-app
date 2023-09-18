@@ -1,5 +1,5 @@
-import { ApplicationDisabled } from "@/components/screens/ApplicationDisabled"
-import { render, screen } from "@/tests-tools/test.utils"
+import { ApplicationDisabled } from "@/components/screens/ApplicationDisabled";
+import { render, screen } from "@/tests-tools/test.utils";
 
 jest.mock("next/router", () => ({
   useRouter() {
@@ -15,27 +15,27 @@ jest.mock("next/router", () => ({
       },
       beforePopState: jest.fn(() => null),
       prefetch: jest.fn(() => null),
-    }
+    };
   },
-}))
+}));
 
 describe("Application Disable Screen", () => {
   it("Page should appears", () => {
-    render(<ApplicationDisabled />)
+    render(<ApplicationDisabled />);
 
-    const page = screen.getByTestId("application-disabled-container")
-    expect(page).toBeInTheDocument()
-    expect(page.childNodes.length).toEqual(3)
-  })
+    const page = screen.getByTestId("application-disabled-container");
+    expect(page).toBeInTheDocument();
+    expect(page.childNodes.length).toEqual(3);
+  });
 
   it("Page should have correct DOM", () => {
-    render(<ApplicationDisabled />)
+    render(<ApplicationDisabled />);
 
-    const logo = screen.getByTestId("application-disabled-logo")
-    const title = screen.getByText(/applicationDisabled.title/)
-    const subtitle = screen.getByText(/applicationDisabled.desc/)
-    expect(logo).toBeVisible()
-    expect(title).toBeVisible()
-    expect(subtitle).toBeVisible()
-  })
-})
+    const logo = screen.getByTestId("application-disabled-logo");
+    const title = screen.getByText(/applicationDisabled.title/);
+    const subtitle = screen.getByText(/applicationDisabled.desc/);
+    expect(logo).toBeVisible();
+    expect(title).toBeVisible();
+    expect(subtitle).toBeVisible();
+  });
+});

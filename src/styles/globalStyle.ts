@@ -1,5 +1,5 @@
-import { createGlobalStyle } from "styled-components"
-import reset from "./reset"
+import { createGlobalStyle } from "styled-components";
+import reset from "./reset";
 
 const GlobalStyle = createGlobalStyle`
     ${reset}
@@ -34,6 +34,6 @@ const GlobalStyle = createGlobalStyle`
         opacity: 0;
         transition: opacity 200ms;
     }
-`
+`;
 
-export default GlobalStyle
+export default GlobalStyle;

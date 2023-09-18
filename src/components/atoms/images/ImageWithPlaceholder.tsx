@@ -1,14 +1,14 @@
-import { WalletConnectMedium } from "@ledgerhq/react-ui/assets/icons"
-import Image from "next/image"
-import { useState } from "react"
-import { useTheme } from "styled-components"
+import { WalletConnectMedium } from "@ledgerhq/react-ui/assets/icons";
+import Image from "next/image";
+import { useState } from "react";
+import { useTheme } from "styled-components";
 
 type Props = {
-  icon?: string
-}
+  icon?: string;
+};
 export const ImageWithPlaceholder = ({ icon }: Props) => {
-  const [loadingError, setLoadingError] = useState(false)
-  const { colors } = useTheme()
+  const [loadingError, setLoadingError] = useState(false);
+  const { colors } = useTheme();
   return icon && !loadingError ? (
     <Image
       src={icon}
@@ -29,5 +29,5 @@ export const ImageWithPlaceholder = ({ icon }: Props) => {
         color: colors.neutral.c100,
       }}
     />
-  )
-}
+  );
+};
