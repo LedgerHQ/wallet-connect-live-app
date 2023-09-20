@@ -29,6 +29,7 @@ const customJestConfig = {
       "<rootDir>/fileMock.js",
   },
   testEnvironment: "jsdom",
+  coveragePathIgnorePatterns: ["fileMock.js", "jest.*.js", "sentry.*.config.ts"],
   collectCoverageFrom: [
     "src/**/*.{ts,tsx}",
     "!src/styles/**",
