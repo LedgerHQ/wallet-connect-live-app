@@ -74,11 +74,13 @@ export default function SessionProposal() {
     addNewAccount,
   } = useProposal({ proposal });
   const analytics = useAnalytics();
+  const dApp = proposer?.metadata?.name ?? "Dapp name undefined";
+  const dAppUrl = proposer?.metadata?.url ?? "Dapp url undefined";
 
   useEffect(() => {
     analytics.page("Wallet Connect Session Request", {
-      dapp: proposer?.metadata?.name,
-      url: proposer?.metadata?.url,
+      dapp: dApp,
+      url: dAppUrl,
     });
   }, []);
 
@@ -86,8 +88,8 @@ export default function SessionProposal() {
     analytics.track("button_clicked", {
       button: "WC-Connect",
       page: "Wallet Connect Session Request",
-      dapp: proposer?.metadata?.name,
-      url: proposer?.metadata?.url,
+      dapp: dApp,
+      url: dAppUrl,
     });
     approveSession();
   };
@@ -96,8 +98,8 @@ export default function SessionProposal() {
     analytics.track("button_clicked", {
       button: "WC-Reject",
       page: "Wallet Connect Session Request",
-      dapp: proposer?.metadata?.name,
-      url: proposer?.metadata?.url,
+      dapp: dApp,
+      url: dAppUrl,
     });
     rejectSession();
   }, []);

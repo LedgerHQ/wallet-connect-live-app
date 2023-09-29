@@ -83,8 +83,8 @@ export default function SessionDetail() {
 
   useEffect(() => {
     analytics.page("Wallet Connect Session Detail", {
-      dapp: session?.peer?.metadata?.name,
-      url: session?.peer?.metadata?.url,
+      dapp: session?.peer?.metadata?.name ?? "Dapp name undefined",
+      url: session?.peer?.metadata?.url ?? "Dapp url undefined",
     });
   }, []);
 
