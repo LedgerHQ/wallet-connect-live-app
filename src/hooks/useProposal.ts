@@ -165,14 +165,15 @@ export function useProposal({ proposal }: Props) {
   }, [proposal]);
 
   const rejectSession = useCallback(async () => {
-    await web3wallet.rejectSession({
-      id: proposal.id,
-      reason: {
-        code: 5000,
-        message: "USER_REJECTED_METHODS",
-      },
-    });
-    navigate(Routes.Home);
+    web3wallet
+      .rejectSession({
+        id: proposal.id,
+        reason: {
+          code: 5000,
+          message: "USER_REJECTED_METHODS",
+        },
+      })
+      .finally(() => navigate(Routes.Home));
   }, [proposal]);
 
   const addNewAccount = useCallback(async (currency: string) => {
