@@ -144,7 +144,7 @@ export function useProposal({ proposal }: Props) {
     };
   };
 
-  const approveSession = useCallback(async () => {
+  const approveSession = useCallback(() => {
     web3wallet
       .approveSession({
         id: proposal.id,
@@ -164,7 +164,7 @@ export function useProposal({ proposal }: Props) {
       });
   }, [proposal]);
 
-  const rejectSession = useCallback(async () => {
+  const rejectSession = useCallback(() => {
     web3wallet
       .rejectSession({
         id: proposal.id,
