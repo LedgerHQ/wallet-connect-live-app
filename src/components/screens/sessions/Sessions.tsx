@@ -126,7 +126,7 @@ export default function Sessions({ goToConnect }: SessionsProps) {
               key={session.topic}
               title={session.peer.metadata.name}
               subtitle={formatUrl(session.peer.metadata.url)}
-              LeftIcon={<ImageWithPlaceholder icon={decodeURI(session.peer.metadata.icons[0])} />}
+              LeftIcon={<ImageWithPlaceholder icon={session.peer.metadata.icons[0] ?? null} />}
               rowType={RowType.Detail}
               onClick={() => goToDetailSession(session.topic)}
             />

@@ -1,17 +1,25 @@
+import { tryDecodeURI } from "@/shared/helpers/image";
 import { WalletConnectMedium } from "@ledgerhq/react-ui/assets/icons";
 import Image from "next/image";
 import { useState } from "react";
 import { useTheme } from "styled-components";
 
 type Props = {
-  icon?: string;
+  icon: string | null;
 };
 export const ImageWithPlaceholder = ({ icon }: Props) => {
   const [loadingError, setLoadingError] = useState(false);
   const { colors } = useTheme();
-  return icon && !loadingError ? (
+
+  if (!icon) {
+    return null;
+  }
+
+  const iconImage = tryDecodeURI(icon);
+
+  return iconImage && !loadingError ? (
     <Image
-      src={icon}
+      src={iconImage}
       alt="Picture of the proposer"
       width={32}
       style={{
