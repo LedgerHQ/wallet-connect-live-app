@@ -5,17 +5,21 @@ import { useState } from "react";
 import { useTheme } from "styled-components";
 
 type Props = {
-  icon?: string;
+  icon: string | null;
 };
 export const ImageWithPlaceholder = ({ icon }: Props) => {
   const [loadingError, setLoadingError] = useState(false);
   const { colors } = useTheme();
 
-  const setError = () => setLoadingError(true);
+  if (!icon) {
+    return null;
+  }
 
-  return icon && !loadingError ? (
+  const iconImage = tryDecodeURI(icon);
+
+  return iconImage && !loadingError ? (
     <Image
-      src={tryDecodeURI(icon, setError)}
+      src={iconImage}
       alt="Picture of the proposer"
       width={32}
       style={{

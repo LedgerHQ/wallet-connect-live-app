@@ -8,37 +8,30 @@ describe("Image Util", () => {
   });
 
   it("tryDecodeURI", () => {
-    const mockedSetError = jest.fn();
-    const called = tryDecodeURI("<svg></svg>", mockedSetError);
-    expect(called).toEqual("");
-    expect(mockedSetError).toHaveBeenCalled();
+    const called = tryDecodeURI("<svg></svg>");
+    expect(called).toEqual(null);
 
-    const mockedSetError5 = jest.fn();
-    const notCalled = tryDecodeURI("https://pancakeswap.finance/favicon.ico", mockedSetError5);
+    const notCalled = tryDecodeURI("https://pancakeswap.finance/favicon.ico");
     expect(notCalled).toEqual("https://pancakeswap.finance/favicon.ico");
-    expect(mockedSetError5).not.toHaveBeenCalled();
 
-    const mockedSetError6 = jest.fn();
-    const notCalled5 = tryDecodeURI("https://pancakeswap.finance/logo.png", mockedSetError6);
+    const notCalled5 = tryDecodeURI("https://pancakeswap.finance/logo.png");
     expect(notCalled5).toEqual("https://pancakeswap.finance/logo.png");
-    expect(mockedSetError6).not.toHaveBeenCalled();
 
     // Error will be called onLoad on Image component in React because of mounting error because uri doesn't not reach any image
-    const mockedSetError2 = jest.fn();
-    const notCalled4 = tryDecodeURI("polygon", mockedSetError2);
-    expect(notCalled4).toEqual("polygon");
-    expect(mockedSetError2).not.toHaveBeenCalled();
 
-    // Error will be called onLoad on Image component in React because of mounting error because uri doesn't not reach any image
-    const mockedSetError3 = jest.fn();
-    const notCalled2 = tryDecodeURI("", mockedSetError3);
-    expect(notCalled2).toEqual("");
-    expect(mockedSetError3).not.toHaveBeenCalled();
-
-    // Error will be called onLoad on Image component in React because of mounting error because uri doesn't not reach any image
-    const mockedSetError4 = jest.fn();
-    const notCalled3 = tryDecodeURI("https://walletconnect.com", mockedSetError4);
+    const notCalled3 = tryDecodeURI("https://walletconnect.com");
     expect(notCalled3).toEqual("https://walletconnect.com");
-    expect(mockedSetError4).not.toHaveBeenCalled();
+
+    const notCalled4 = tryDecodeURI("polygon");
+    expect(notCalled4).toEqual(null);
+
+    const notCalled2 = tryDecodeURI("");
+    expect(notCalled2).toEqual(null);
+
+    const undif = tryDecodeURI(undefined);
+    expect(undif).toEqual(null);
+
+    const nullImg = tryDecodeURI(null);
+    expect(nullImg).toEqual(null);
   });
 });

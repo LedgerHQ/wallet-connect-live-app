@@ -124,6 +124,8 @@ export default function SessionProposal() {
     entry.accounts.some((account) => selectedAccounts.includes(account.id)),
   );
 
+  const iconProposer = tryDecodeURI(proposer?.metadata?.icons[0] ?? undefined);
+
   if (!hydrated) {
     return null;
   }
@@ -158,7 +160,7 @@ export default function SessionProposal() {
           >
             <Flex flexDirection="column">
               <Header mt={12} mb={10}>
-                {proposer.metadata.icons.length > 0 && !imageLoadingError ? (
+                {iconProposer && !imageLoadingError ? (
                   <Container>
                     <LogoContainer>
                       <Logo size={30} />
@@ -166,23 +168,17 @@ export default function SessionProposal() {
 
                     <DAppContainer borderColor={colors.background.main}>
                       <LogoContainer>
-                        {proposer.metadata.icons.length > 0 ? (
-                          <Image
-                            src={tryDecodeURI(proposer.metadata.icons[0], () =>
-                              setImageLoadingError(true),
-                            )}
-                            alt="Picture of the proposer"
-                            width={60}
-                            style={{
-                              borderRadius: "50%",
-                              borderLeft: `3px solid ${colors.background.main}`,
-                            }}
-                            height={60}
-                            onError={() => setImageLoadingError(true)}
-                          />
-                        ) : (
-                          <div></div>
-                        )}
+                        <Image
+                          src={iconProposer}
+                          alt="Picture of the proposer"
+                          width={60}
+                          style={{
+                            borderRadius: "50%",
+                            borderLeft: `3px solid ${colors.background.main}`,
+                          }}
+                          height={60}
+                          onError={() => setImageLoadingError(true)}
+                        />
                       </LogoContainer>
                     </DAppContainer>
                   </Container>

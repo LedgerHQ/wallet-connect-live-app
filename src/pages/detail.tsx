@@ -173,7 +173,7 @@ export default function SessionDetail() {
             <DetailContainer>
               <Row justifyContent="space-between" alignItems="center">
                 <Flex flexDirection="row" justifyContent="space-between" alignItems="center">
-                  <ImageWithPlaceholder icon={metadata?.icons[0] ?? undefined} />
+                  <ImageWithPlaceholder icon={metadata?.icons[0] ?? null} />
 
                   <Flex flexDirection="column" ml={5}>
                     <Text variant="body" fontWeight="semiBold" color="neutral.c100">
