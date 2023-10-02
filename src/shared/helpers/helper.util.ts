@@ -69,9 +69,6 @@ export function formatUrl(url: string) {
   return url.split("//")[1];
 }
 
-export const isHTML = (string: string) => /<\/?[a-z][\s\S]*>/i.test(string);
-export const decodeUriImage = (string: string) => (isHTML(string) ? "" : decodeURI(string));
-
 export const getNetwork = (chain: string) => SUPPORTED_NETWORK[chain];
 
 export const getTicker = (chain: string) => SUPPORTED_NETWORK[chain].ticker;
