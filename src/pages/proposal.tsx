@@ -4,7 +4,7 @@ import LogoContainer from "@/components/atoms/logoContainers/LedgerLogoContainer
 import { AddAccountPlaceholder } from "@/components/screens/sessions/sessionProposal/AddAccountPlaceholder";
 import { ErrorBlockchainSupport } from "@/components/screens/sessions/sessionProposal/ErrorBlockchainSupport";
 import { InfoSessionProposal } from "@/components/screens/sessions/sessionProposal/InfoSessionProposal";
-import { formatUrl, getColor, getTicker, truncate } from "@/helpers/helper.util";
+import { decodeUriImage, formatUrl, getColor, getTicker, truncate } from "@/helpers/helper.util";
 import useHydratation from "@/hooks/useHydratation";
 import { useNavigation } from "@/hooks/common/useNavigation";
 import { useProposal } from "@/hooks/useProposal";
@@ -167,7 +167,7 @@ export default function SessionProposal() {
                       <LogoContainer>
                         {proposer.metadata.icons.length > 0 ? (
                           <Image
-                            src={decodeURI(proposer.metadata.icons[0])}
+                            src={decodeUriImage(proposer.metadata.icons[0])}
                             alt="Picture of the proposer"
                             width={60}
                             style={{

@@ -2,7 +2,7 @@ import { List, ButtonsContainer } from "@/components/atoms/containers/Elements";
 import { GenericRow, RowType } from "@/components/atoms/GenericRow";
 import { ImageWithPlaceholder } from "@/components/atoms/images/ImageWithPlaceholder";
 import { WalletConnectPopin } from "@/components/atoms/popin/WalletConnectPopin";
-import { formatUrl } from "@/helpers/helper.util";
+import { decodeUriImage, formatUrl } from "@/helpers/helper.util";
 import { web3wallet } from "@/helpers/walletConnect.util";
 import { Flex, Button, Box, Text } from "@ledgerhq/react-ui";
 
@@ -126,7 +126,9 @@ export default function Sessions({ goToConnect }: SessionsProps) {
               key={session.topic}
               title={session.peer.metadata.name}
               subtitle={formatUrl(session.peer.metadata.url)}
-              LeftIcon={<ImageWithPlaceholder icon={decodeURI(session.peer.metadata.icons[0])} />}
+              LeftIcon={
+                <ImageWithPlaceholder icon={decodeUriImage(session.peer.metadata.icons[0])} />
+              }
               rowType={RowType.Detail}
               onClick={() => goToDetailSession(session.topic)}
             />

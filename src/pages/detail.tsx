@@ -5,6 +5,7 @@ import {
   truncate,
   getDisplayName,
   getColor,
+  decodeUriImage,
 } from "@/helpers/helper.util";
 import { Box, Button, CryptoIcon, Flex, Text } from "@ledgerhq/react-ui";
 import { ArrowLeftMedium } from "@ledgerhq/react-ui/assets/icons";
@@ -173,7 +174,7 @@ export default function SessionDetail() {
             <DetailContainer>
               <Row justifyContent="space-between" alignItems="center">
                 <Flex flexDirection="row" justifyContent="space-between" alignItems="center">
-                  <ImageWithPlaceholder icon={decodeURI(metadata?.icons[0] ?? "")} />
+                  <ImageWithPlaceholder icon={decodeUriImage(metadata?.icons[0] ?? "")} />
 
                   <Flex flexDirection="column" ml={5}>
                     <Text variant="body" fontWeight="semiBold" color="neutral.c100">
