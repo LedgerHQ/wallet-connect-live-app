@@ -34,7 +34,7 @@ jobs:
       - name: Run tests
         run: yarn test --coverage
         
-      - name: SonarCloud Scan
+      - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
