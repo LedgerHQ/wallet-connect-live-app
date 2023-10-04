@@ -1,4 +1,4 @@
-name: Code Checks
+name: "[BOT] Code Checks"
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
 
 jobs:
     test-code:
-        name: Test code
+        name: Tests / Linter / Typecheck
         runs-on: ubuntu-latest
         steps:
             - name: Checkout project
