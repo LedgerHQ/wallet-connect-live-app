@@ -14,7 +14,9 @@ permissions:
 
 jobs:
   sonarcloud:
-    runs-on: ubuntu-latest
+    env:
+      FORCE_COLOR: 3
+    runs-on: [ledger-live-4xlarge-linux]
     steps:
       - name: Checkout project
         uses: actions/checkout@v3
@@ -37,3 +39,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
