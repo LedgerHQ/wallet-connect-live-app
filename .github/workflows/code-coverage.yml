@@ -1,4 +1,4 @@
-name: "[BOT] SonarCloud & Coverage"
+name: "[BOT] Code Quality Analysis & Coverage"
 
 on:
   # Trigger analysis when pushing in master or pull requests, and when creating
