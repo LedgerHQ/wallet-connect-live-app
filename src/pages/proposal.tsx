@@ -1,26 +1,27 @@
-import { ButtonsContainer, List } from "@/components/atoms/containers/Elements"
-import { GenericRow, RowType } from "@/components/atoms/GenericRow"
-import LogoContainer from "@/components/atoms/logoContainers/LedgerLogoContainer"
-import { AddAccountPlaceholder } from "@/components/screens/sessions/sessionProposal/AddAccountPlaceholder"
-import { ErrorBlockchainSupport } from "@/components/screens/sessions/sessionProposal/ErrorBlockchainSupport"
-import { InfoSessionProposal } from "@/components/screens/sessions/sessionProposal/InfoSessionProposal"
-import { formatUrl, getColor, getTicker, truncate } from "@/helpers/helper.util"
-import useHydratation from "@/hooks/useHydratation"
-import { useNavigation } from "@/hooks/common/useNavigation"
-import { useProposal } from "@/hooks/useProposal"
-import { ResponsiveContainer } from "@/styles/styles"
-import { Proposal } from "@/types/types"
-import { Flex, Button, Box, CryptoIcon, Text } from "@ledgerhq/react-ui"
-import { WalletConnectMedium, CircledCrossSolidMedium } from "@ledgerhq/react-ui/assets/icons"
-import Image from "next/image"
-import { space } from "@ledgerhq/react-ui/styles/theme"
-import { useTranslation } from "next-i18next"
-import { useCallback, useEffect, useMemo, useState } from "react"
-import { Logo } from "@/icons/LedgerLiveLogo"
-import styled, { useTheme } from "styled-components"
-import useAnalytics from "@/hooks/common/useAnalytics"
+import { ButtonsContainer, List } from "@/components/atoms/containers/Elements";
+import { GenericRow, RowType } from "@/components/atoms/GenericRow";
+import LogoContainer from "@/components/atoms/logoContainers/LedgerLogoContainer";
+import { AddAccountPlaceholder } from "@/components/screens/sessions/sessionProposal/AddAccountPlaceholder";
+import { ErrorBlockchainSupport } from "@/components/screens/sessions/sessionProposal/ErrorBlockchainSupport";
+import { InfoSessionProposal } from "@/components/screens/sessions/sessionProposal/InfoSessionProposal";
+import { formatUrl, getColor, getTicker, truncate } from "@/helpers/helper.util";
+import useHydratation from "@/hooks/useHydratation";
+import { useNavigation } from "@/hooks/common/useNavigation";
+import { useProposal } from "@/hooks/useProposal";
+import { ResponsiveContainer } from "@/styles/styles";
+import { Proposal } from "@/types/types";
+import { Flex, Button, Box, CryptoIcon, Text } from "@ledgerhq/react-ui";
+import { WalletConnectMedium, CircledCrossSolidMedium } from "@ledgerhq/react-ui/assets/icons";
+import Image from "next/image";
+import { space } from "@ledgerhq/react-ui/styles/theme";
+import { useTranslation } from "next-i18next";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Logo } from "@/icons/LedgerLiveLogo";
+import styled, { useTheme } from "styled-components";
+import useAnalytics from "@/hooks/common/useAnalytics";
+import { tryDecodeURI } from "@/shared/helpers/image";
 
-export { getServerSideProps } from "../lib/serverProps"
+export { getServerSideProps } from "@/lib/serverProps";
 
 const DAppContainer = styled(Flex).attrs(
   (p: { size: number; borderColor: string; backgroundColor: string }) => ({
@@ -35,7 +36,7 @@ const DAppContainer = styled(Flex).attrs(
     backgroundColor: p.backgroundColor,
     zIndex: 0,
   }),
-)<{ size: number }>``
+)<{ size: number }>``;
 
 const Container = styled(Flex).attrs((p: { size: number }) => ({
   heigth: p.size,
@@ -44,24 +45,24 @@ const Container = styled(Flex).attrs((p: { size: number }) => ({
   justifyContent: "center",
   position: "relative",
   left: "-25px",
-}))<{ size: number }>``
+}))<{ size: number }>``;
 
 const ListChains = styled(Flex)`
   flex-direction: column;
-`
+`;
 
 const Header = styled(Flex)`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-`
+`;
 
 export default function SessionProposal() {
-  const { colors } = useTheme()
-  const { router } = useNavigation()
-  const { t } = useTranslation()
-  const { hydrated } = useHydratation()
-  const proposal = JSON.parse(router.query.data as string) as Proposal
+  const { colors } = useTheme();
+  const { router } = useNavigation();
+  const { t } = useTranslation();
+  const { hydrated } = useHydratation();
+  const proposal = JSON.parse(router.query.data as string) as Proposal;
   const {
     handleClick,
     handleClose,
@@ -72,57 +73,61 @@ export default function SessionProposal() {
     selectedAccounts,
     proposer,
     addNewAccount,
-  } = useProposal({ proposal })
-  const analytics = useAnalytics()
+  } = useProposal({ proposal });
+  const analytics = useAnalytics();
+  const dApp = proposer?.metadata?.name ?? "Dapp name undefined";
+  const dAppUrl = proposer?.metadata?.url ?? "Dapp url undefined";
 
   useEffect(() => {
     analytics.page("Wallet Connect Session Request", {
-      dapp: proposer?.metadata?.name,
-      url: proposer?.metadata?.url,
-    })
-  }, [])
+      dapp: dApp,
+      url: dAppUrl,
+    });
+  }, []);
 
   const onApprove = () => {
     analytics.track("button_clicked", {
       button: "WC-Connect",
       page: "Wallet Connect Session Request",
-      dapp: proposer?.metadata?.name,
-      url: proposer?.metadata?.url,
-    })
-    approveSession()
-  }
+      dapp: dApp,
+      url: dAppUrl,
+    });
+    approveSession();
+  };
 
   const onReject = useCallback(() => {
     analytics.track("button_clicked", {
       button: "WC-Reject",
       page: "Wallet Connect Session Request",
-      dapp: proposer?.metadata?.name,
-      url: proposer?.metadata?.url,
-    })
-    rejectSession()
-  }, [])
+      dapp: dApp,
+      url: dAppUrl,
+    });
+    rejectSession();
+  }, []);
 
-  const [imageLoadingError, setImageLoadingError] = useState(false)
+  const [imageLoadingError, setImageLoadingError] = useState(false);
 
   const accountsByChain = useMemo(
     () => formatAccountsByChain(proposal, accounts),
     [proposal, accounts],
-  )
+  );
 
-  const requiredChains = accountsByChain.filter((entry) => entry.isRequired)
+  const requiredChains = accountsByChain.filter((entry) => entry.isRequired);
 
-  const chainsNotSupported = accountsByChain.filter((entry) => !entry.isSupported)
+  const chainsNotSupported = accountsByChain.filter((entry) => !entry.isSupported);
 
-  const noChainsSupported = !accountsByChain.some((entry) => entry.isSupported)
+  const noChainsSupported = !accountsByChain.some((entry) => entry.isSupported);
 
-  const everyRequiredChainsSupported = requiredChains.every((entry) => entry.isSupported)
+  const everyRequiredChainsSupported = requiredChains.every((entry) => entry.isSupported);
 
   const disabled = !requiredChains.every((entry) =>
     entry.accounts.some((account) => selectedAccounts.includes(account.id)),
-  )
+  );
+
+  const iconProposer = tryDecodeURI(proposer?.metadata?.icons[0] ?? undefined);
 
   if (!hydrated) {
-    return null
+    return null;
   }
 
   return (
@@ -155,7 +160,7 @@ export default function SessionProposal() {
           >
             <Flex flexDirection="column">
               <Header mt={12} mb={10}>
-                {proposer.metadata.icons.length > 0 && !imageLoadingError ? (
+                {iconProposer && !imageLoadingError ? (
                   <Container>
                     <LogoContainer>
                       <Logo size={30} />
@@ -163,21 +168,17 @@ export default function SessionProposal() {
 
                     <DAppContainer borderColor={colors.background.main}>
                       <LogoContainer>
-                        {proposer.metadata.icons.length > 0 ? (
-                          <Image
-                            src={decodeURI(proposer.metadata.icons[0])}
-                            alt="Picture of the proposer"
-                            width={60}
-                            style={{
-                              borderRadius: "50%",
-                              borderLeft: `3px solid ${colors.background.main}`,
-                            }}
-                            height={60}
-                            onError={() => setImageLoadingError(true)}
-                          />
-                        ) : (
-                          <div></div>
-                        )}
+                        <Image
+                          src={iconProposer}
+                          alt="Picture of the proposer"
+                          width={60}
+                          style={{
+                            borderRadius: "50%",
+                            borderLeft: `3px solid ${colors.background.main}`,
+                          }}
+                          height={60}
+                          onError={() => setImageLoadingError(true)}
+                        />
                       </LogoContainer>
                     </DAppContainer>
                   </Container>
@@ -257,7 +258,7 @@ export default function SessionProposal() {
                           <AddAccountPlaceholder onClick={() => addNewAccount(entry.chain)} />
                         )}
                       </Box>
-                    )
+                    );
                   })}
                 {chainsNotSupported && chainsNotSupported.length > 0 ? (
                   <GenericRow
@@ -313,5 +314,5 @@ export default function SessionProposal() {
         )}
       </ResponsiveContainer>
     </Flex>
-  )
+  );
 }

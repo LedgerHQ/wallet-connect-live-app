@@ -5,80 +5,100 @@ import {
   truncate,
   getDisplayName,
   getColor,
-} from "@/helpers/helper.util"
-import { Box, Button, CryptoIcon, Flex, Text } from "@ledgerhq/react-ui"
-import { ArrowLeftMedium } from "@ledgerhq/react-ui/assets/icons"
-import { useCallback, useEffect, useMemo } from "react"
-import styled from "styled-components"
-import { useTranslation } from "next-i18next"
-import { useNavigation } from "@/hooks/common/useNavigation"
-import Link from "next/link"
-import { Account } from "@ledgerhq/wallet-api-client"
-import { GenericRow, RowType } from "@/components/atoms/GenericRow"
-import { InfoSessionProposal } from "@/components/screens/sessions/sessionProposal/InfoSessionProposal"
-import { space } from "@ledgerhq/react-ui/styles/theme"
-import { ButtonsContainer, List, Row } from "@/components/atoms/containers/Elements"
-import { ResponsiveContainer } from "@/styles/styles"
-import { sessionSelector, useSessionsStore } from "@/storage/sessions.store"
-import { useAccountsStore, accountSelector } from "@/storage/accounts.store"
-import useHydratation from "@/hooks/useHydratation"
-import { web3wallet } from "@/helpers/walletConnect.util"
-import { ImageWithPlaceholder } from "@/components/atoms/images/ImageWithPlaceholder"
-import useAnalytics from "@/hooks/common/useAnalytics"
-import { Routes, TabsIndexes } from "@/shared/navigation"
+} from "@/helpers/helper.util";
+import { Box, Button, CryptoIcon, Flex, Text } from "@ledgerhq/react-ui";
+import { ArrowLeftMedium } from "@ledgerhq/react-ui/assets/icons";
+import { useCallback, useEffect, useMemo } from "react";
+import styled from "styled-components";
+import { useTranslation } from "next-i18next";
+import { useNavigation } from "@/hooks/common/useNavigation";
+import Link from "next/link";
+import { Account } from "@ledgerhq/wallet-api-client";
+import { GenericRow, RowType } from "@/components/atoms/GenericRow";
+import { InfoSessionProposal } from "@/components/screens/sessions/sessionProposal/InfoSessionProposal";
+import { space } from "@ledgerhq/react-ui/styles/theme";
+import { ButtonsContainer, List, Row } from "@/components/atoms/containers/Elements";
+import { ResponsiveContainer } from "@/styles/styles";
+import { sessionSelector, useSessionsStore } from "@/storage/sessions.store";
+import { useAccountsStore, accountSelector } from "@/storage/accounts.store";
+import useHydratation from "@/hooks/useHydratation";
+import { web3wallet } from "@/helpers/walletConnect.util";
+import { ImageWithPlaceholder } from "@/components/atoms/images/ImageWithPlaceholder";
+import useAnalytics from "@/hooks/common/useAnalytics";
+import { Routes, TabsIndexes } from "@/shared/navigation";
 
-export { getServerSideProps } from "../lib/serverProps"
+export { getServerSideProps } from "@/lib/serverProps";
 
 const DetailContainer = styled(Flex)`
   border-radius: 12px;
   background-color: ${(props) => props.theme.colors.neutral.c20};
   padding: 12px;
   flex-direction: column;
-`
+`;
 const BackButton = styled(Flex)`
   cursor: pointer;
   &:hover {
     opacity: 0.7;
   }
-`
+`;
 
 const CustomList = styled(Flex)`
   flex-direction: column;
-`
+`;
+
+const getAccountsFromAddresses = (addresses: string[], accounts: Account[]) => {
+  const accountsByChain = new Map<string, Account[]>();
+
+  addresses.forEach((addr) => {
+    const addrSplitted = addr.split(":");
+    const chain = getCurrencyByChainId(`${addrSplitted[0]}:${addrSplitted[1]}`);
+
+    const existingEntry = accountsByChain.get(chain);
+
+    const account = accounts.find((a) => a.address === addrSplitted[2] && chain === a.currency);
+
+    if (account) {
+      accountsByChain.set(chain, existingEntry ? [...existingEntry, account] : [account]);
+    }
+  });
+  return Array.from(accountsByChain);
+};
 
 export default function SessionDetail() {
-  const { hydrated } = useHydratation()
-  const { t } = useTranslation()
-  const { router, navigate } = useNavigation()
+  const { hydrated } = useHydratation();
+  const { t } = useTranslation();
+  const { router, navigate } = useNavigation();
 
-  const accounts = useAccountsStore(accountSelector.selectAccounts)
-  const sessions = useSessionsStore(sessionSelector.selectSessions)
-  const removeSession = useSessionsStore(sessionSelector.removeSession)
-  const setLastSessionVisited = useSessionsStore(sessionSelector.setLastSessionVisited)
-  const session = useSessionsStore(sessionSelector.selectLastSession)
+  const accounts = useAccountsStore(accountSelector.selectAccounts);
+  const sessions = useSessionsStore(sessionSelector.selectSessions);
+  const removeSession = useSessionsStore(sessionSelector.removeSession);
+  const setLastSessionVisited = useSessionsStore(sessionSelector.setLastSessionVisited);
+  const session = useSessionsStore(sessionSelector.selectLastSession);
 
   const navigateToSessionsHomeTab = useCallback(() => {
-    navigate(Routes.Home, { tab: TabsIndexes.Sessions })
-  }, [])
+    navigate(Routes.Home, { tab: TabsIndexes.Sessions });
+  }, []);
 
-  const analytics = useAnalytics()
+  const analytics = useAnalytics();
 
   useEffect(() => {
     analytics.page("Wallet Connect Session Detail", {
-      dapp: session?.peer?.metadata?.name,
-      url: session?.peer?.metadata?.url,
-    })
-  }, [])
+      dapp: session?.peer?.metadata?.name ?? "Dapp name undefined",
+      url: session?.peer?.metadata?.url ?? "Dapp url undefined",
+    });
+  }, []);
 
   useEffect(() => {
     if (router.query.data) {
-      const session = sessions.find((elem) => elem.topic === JSON.parse(String(router.query?.data)))
-      setLastSessionVisited(session || null)
+      const session = sessions.find(
+        (elem) => elem.topic === JSON.parse(String(router.query?.data)),
+      );
+      setLastSessionVisited(session ?? null);
     }
-  }, [router.query])
+  }, [router.query]);
 
   const handleDelete = useCallback(async () => {
-    if (!session) return
+    if (!session) return;
     try {
       web3wallet.disconnectSession({
         topic: session.topic,
@@ -86,64 +106,46 @@ export default function SessionDetail() {
           code: 3,
           message: "Disconnect Session",
         },
-      })
+      });
       analytics.track("button_clicked", {
         button: "WC-Disconnect Session",
         page: "Wallet Connect Session Detail",
-      })
+      });
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
-    removeSession(session.topic)
-    navigateToSessionsHomeTab()
-  }, [session])
+    removeSession(session.topic);
+    navigateToSessionsHomeTab();
+  }, [session]);
 
   const onGoBack = useCallback(() => {
-    navigateToSessionsHomeTab()
+    navigateToSessionsHomeTab();
     analytics.track("button_clicked", {
       button: "WC-Back",
       page: "Wallet Connect Session Detail",
-    })
-  }, [])
+    });
+  }, []);
 
-  const metadata = session?.peer.metadata
+  const metadata = session?.peer.metadata;
   const fullAddresses = !session
     ? []
     : Object.entries(session.namespaces).reduce(
         (acc, elem) => acc.concat(elem[1].accounts),
         [] as string[],
-      )
-
-  const getAccountsFromAddresses = (addresses: string[]) => {
-    const accountsByChain = new Map<string, Account[]>()
-
-    addresses.forEach((addr) => {
-      const addrSplitted = addr.split(":")
-      const chain = getCurrencyByChainId(`${addrSplitted[0]}:${addrSplitted[1]}`)
-
-      const existingEntry = accountsByChain.get(chain)
-
-      const account = accounts.find((a) => a.address === addrSplitted[2] && chain === a.currency)
-
-      if (account) {
-        accountsByChain.set(chain, existingEntry ? [...existingEntry, account] : [account])
-      }
-    })
-    return accountsByChain
-  }
+      );
 
   const sessionAccounts = useMemo(
-    () => getAccountsFromAddresses(fullAddresses),
+    () => getAccountsFromAddresses(fullAddresses, accounts),
     [fullAddresses, accounts],
-  )
+  );
 
   if (!hydrated) {
     // Returns null on first render, so the client and server match
-    return null
+    return null;
   }
 
   if (!session) {
-    navigateToSessionsHomeTab()
+    navigateToSessionsHomeTab();
   }
 
   return (
@@ -171,7 +173,7 @@ export default function SessionDetail() {
             <DetailContainer>
               <Row justifyContent="space-between" alignItems="center">
                 <Flex flexDirection="row" justifyContent="space-between" alignItems="center">
-                  <ImageWithPlaceholder icon={decodeURI(metadata?.icons[0] ?? "")} />
+                  <ImageWithPlaceholder icon={metadata?.icons[0] ?? null} />
 
                   <Flex flexDirection="column" ml={5}>
                     <Text variant="body" fontWeight="semiBold" color="neutral.c100">
@@ -208,52 +210,56 @@ export default function SessionDetail() {
                 )}
               </Row>
             </DetailContainer>
-            <Text variant="h4" mt={8} mb={6} color="neutral.c100">
-              {t("sessions.detail.accounts")}
-            </Text>
 
-            <CustomList>
-              {Array.from(sessionAccounts).map(([chain, accounts]) => {
-                return (
-                  <Box key={chain} mb={6} flex={1}>
-                    <Box mb={6}>
-                      <Text variant="subtitle" color="neutral.c70">
-                        {getDisplayName(chain)}
-                      </Text>
-                    </Box>
+            {sessionAccounts.length > 0 ? (
+              <>
+                <Text variant="h4" mt={8} mb={6} color="neutral.c100">
+                  {t("sessions.detail.accounts")}
+                </Text>
+                <CustomList>
+                  {sessionAccounts.map(([chain, accounts]) => {
+                    return (
+                      <Box key={chain} mb={6} flex={1}>
+                        <Box mb={6}>
+                          <Text variant="subtitle" color="neutral.c70">
+                            {getDisplayName(chain)}
+                          </Text>
+                        </Box>
 
-                    <List>
-                      {accounts.map((account: Account, index: number) => (
-                        <li
-                          key={account.id}
-                          style={{
-                            marginBottom: index !== accounts.length - 1 ? space[3] : 0,
-                          }}
-                        >
-                          <GenericRow
-                            title={account.name}
-                            subtitle={truncate(account.address, 30)}
-                            LeftIcon={
-                              <CryptoIcon
-                                name={getTicker(chain)}
-                                circleIcon
-                                size={24}
-                                color={getColor(chain)}
+                        <List>
+                          {accounts.map((account: Account, index: number) => (
+                            <li
+                              key={account.id}
+                              style={{
+                                marginBottom: index !== accounts.length - 1 ? space[3] : 0,
+                              }}
+                            >
+                              <GenericRow
+                                title={account.name}
+                                subtitle={truncate(account.address, 30)}
+                                LeftIcon={
+                                  <CryptoIcon
+                                    name={getTicker(chain)}
+                                    circleIcon
+                                    size={24}
+                                    color={getColor(chain)}
+                                  />
+                                }
+                                rowType={RowType.Default}
                               />
-                            }
-                            rowType={RowType.Default}
-                          />
-                        </li>
-                      ))}
-                    </List>
-                  </Box>
-                )
-              })}
+                            </li>
+                          ))}
+                        </List>
+                      </Box>
+                    );
+                  })}
 
-              <Box mt={6}>
-                <InfoSessionProposal isInSessionDetails />
-              </Box>
-            </CustomList>
+                  <Box mt={6}>
+                    <InfoSessionProposal isInSessionDetails />
+                  </Box>
+                </CustomList>
+              </>
+            ) : null}
           </Flex>
           <ButtonsContainer mt={5}>
             <Button variant="shade" size="large" flex={1} onClick={handleDelete}>
@@ -267,5 +273,5 @@ export default function SessionDetail() {
         </Flex>
       </ResponsiveContainer>
     </Flex>
-  )
+  );
 }

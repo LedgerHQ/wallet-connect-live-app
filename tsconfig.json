@@ -22,16 +22,14 @@
       "@/hooks/*": ["src/hooks/*"],
       "@/storage/*": ["src/storage/*"],
       "@/styles/*": ["src/styles/*"],
+      "@/shared/*": ["src/shared/*"],
       "@/utils/*": ["src/shared/utils/*"],
       "@/constants/*": ["src/shared/constants/*"],
-      "@/context/*": ["src/shared/context/*"],
-      "@/mocks/*": ["src/__mocks__/*"],
       "@/helpers/*": ["src/shared/helpers/*"],
-      "@/mappers/*": ["src/shared/mappers/*"],
       "@/types/*": ["src/shared/types/*"],
-      "@/shared/*": ["src/shared/*"],
       "@/tests-tools/*": ["src/tests-tools/*"],
       "@/icons/*": ["src/icons/*"],
+      "@/lib/*": ["src/lib/*"],
       "react": ["./node_modules/@types/react"]
     }
   },

@@ -1,12 +1,11 @@
-import styled from "styled-components"
-import { Input, Button, Text, Flex } from "@ledgerhq/react-ui"
-import { QrCodeMedium } from "@ledgerhq/react-ui/assets/icons"
-import { useCallback, useEffect, useState } from "react"
-import { PasteMedium } from "@ledgerhq/react-ui/assets/icons"
-import { QRScanner } from "./QRScanner"
-import { InputMode } from "@/types/types"
-import { useTranslation } from "next-i18next"
-import useAnalytics from "@/hooks/common/useAnalytics"
+import styled from "styled-components";
+import { Input, Button, Text, Flex } from "@ledgerhq/react-ui";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { PasteMedium, QrCodeMedium } from "@ledgerhq/react-ui/assets/icons";
+import { QRScanner } from "./QRScanner";
+import { InputMode } from "@/types/types";
+import { useTranslation } from "next-i18next";
+import useAnalytics from "@/hooks/common/useAnalytics";
 
 const QRScannerContainer = styled.div`
   display: flex;
@@ -19,7 +18,7 @@ const QRScannerContainer = styled.div`
   width: 280px;
   border: ${(p) => `1px solid ${p.theme.colors.neutral.c100}`};
   border-radius: ${(p) => p.theme.space[8]}px;
-`
+`;
 
 const QrCodeButton = styled.div`
   display: flex;
@@ -32,104 +31,104 @@ const QrCodeButton = styled.div`
     color: ${(p) => p.theme.colors.neutral.c50};
     cursor: unset;
   }
-`
+`;
 
 export type ConnectProps = {
-  initialURI?: string
-  onConnect: (uri: string) => void
-  mode?: InputMode
-}
+  initialURI?: string;
+  onConnect: (uri: string) => void;
+  mode?: InputMode;
+};
 
 export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
-  const { t } = useTranslation()
-  const [inputValue, setInputValue] = useState<string>("")
-  const [errorValue, setErrorValue] = useState<string | undefined>(undefined)
-  const [scanner, setScanner] = useState(mode === "scan")
-  const analytics = useAnalytics()
+  const { t } = useTranslation();
+  const [inputValue, setInputValue] = useState<string>("");
+  const [errorValue, setErrorValue] = useState<string | undefined>(undefined);
+  const [scanner, setScanner] = useState(mode === "scan");
+  const analytics = useAnalytics();
 
   const handleConnect = useCallback(() => {
     try {
-      const uri = new URL(inputValue)
-      setInputValue("")
+      const uri = new URL(inputValue);
+      setInputValue("");
 
-      onConnect(uri.toString())
+      onConnect(uri.toString());
       analytics.track("button_clicked", {
         button: "WC-Connect",
         page: "Connect",
-      })
+      });
     } catch (error) {
-      setErrorValue(t("error.invalidUri"))
+      setErrorValue(t("error.invalidUri"));
     }
-  }, [onConnect, inputValue])
+  }, [onConnect, inputValue]);
 
   const startScanning = useCallback(() => {
-    setScanner(true)
+    setScanner(true);
     analytics.track("button_clicked", {
       button: "WC-Scan QR Code",
       page: "Connect",
-    })
-  }, [])
+    });
+  }, []);
 
   useEffect(() => {
     if (initialURI) {
-      onConnect(initialURI)
+      onConnect(initialURI);
     }
-    analytics.page("Wallet Connect")
-  }, [initialURI])
+    analytics.page("Wallet Connect");
+  }, [initialURI]);
 
-  const isRunningInAndroidWebview = useCallback(
+  const isRunningInAndroidWebview = useMemo(
     () =>
       navigator.userAgent &&
       navigator.userAgent.includes("; wv") &&
       navigator.userAgent.includes("Android"),
-    [],
-  )
+    [navigator.userAgent],
+  );
 
   const handlePasteClick = useCallback(async () => {
     try {
-      const text = await navigator.clipboard.readText()
-      setInputValue(text)
+      const text = await navigator.clipboard.readText();
+      setInputValue(text);
       analytics.track("button_clicked", {
         button: "WC-Paste Url",
         page: "Connect",
-      })
+      });
     } catch (err) {
-      console.error(err)
+      console.error(err);
     }
-  }, [])
+  }, []);
 
   const tryConnect = useCallback(
     (rawURI: string) => {
       try {
-        const url = new URL(rawURI)
+        const url = new URL(rawURI);
 
         switch (url.protocol) {
           // handle usual wallet connect URIs
           case "wc:": {
-            onConnect(url.toString())
-            break
+            onConnect(url.toString());
+            break;
           }
 
           // handle Ledger Live specific URIs
           case "ledgerlive:": {
-            const uriParam = url.searchParams.get("uri")
+            const uriParam = url.searchParams.get("uri");
 
             if (url.pathname === "//wc" && uriParam) {
-              tryConnect(uriParam)
+              tryConnect(uriParam);
             }
-            break
+            break;
           }
         }
       } catch (error) {
         // bad urls are just ignored
         if (error instanceof TypeError) {
-          return
+          return;
         }
-        throw error
+        throw error;
       }
     },
     [onConnect],
-  )
+  );
 
   return (
     <Flex flexDirection="column" width="100%" height="100%" justifyContent="space-between">
@@ -172,7 +171,7 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
           error={errorValue}
           data-testid="input-uri"
           renderRight={
-            !isRunningInAndroidWebview() ? (
+            !isRunningInAndroidWebview ? (
               <QrCodeButton onClick={handlePasteClick} data-test="copy-button">
                 <PasteMedium size={18} color="neutral.c100" />
               </QrCodeButton>
@@ -198,5 +197,5 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
         </Button>
       </Flex>
     </Flex>
-  )
+  );
 }

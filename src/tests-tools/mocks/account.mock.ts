@@ -1,5 +1,5 @@
-import { Account } from "@ledgerhq/wallet-api-client"
-import BigNumber from "bignumber.js"
+import { Account } from "@ledgerhq/wallet-api-client";
+import BigNumber from "bignumber.js";
 
 const ACCOUNT_MOCK: Account = {
   id: "AccountID",
@@ -10,6 +10,6 @@ const ACCOUNT_MOCK: Account = {
   spendableBalance: BigNumber(0.32),
   blockHeight: 45668,
   lastSyncDate: new Date(),
-}
+};
 
-export { ACCOUNT_MOCK }
+export { ACCOUNT_MOCK };

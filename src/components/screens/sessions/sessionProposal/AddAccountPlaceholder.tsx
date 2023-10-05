@@ -1,8 +1,8 @@
-import { Text } from "@ledgerhq/react-ui"
-import { PlusMedium } from "@ledgerhq/react-ui/assets/icons"
-import { useTranslation } from "next-i18next"
-import React from "react"
-import styled from "styled-components"
+import { Text } from "@ledgerhq/react-ui";
+import { PlusMedium } from "@ledgerhq/react-ui/assets/icons";
+import { useTranslation } from "next-i18next";
+import React from "react";
+import styled from "styled-components";
 
 const AddAccountButton = styled.button`
   border: 1px dashed rgba(153, 153, 153, 0.3);
@@ -24,12 +24,12 @@ const AddAccountButton = styled.button`
     border-color: ${(p) => p.theme.colors.neutral.c100};
     color: ${(p) => p.theme.colors.neutral.c100};
   }
-`
+`;
 type Props = {
-  onClick: () => void
-}
+  onClick: () => void;
+};
 export const AddAccountPlaceholder = ({ onClick }: Props) => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   return (
     <AddAccountButton onClick={onClick}>
@@ -38,5 +38,5 @@ export const AddAccountPlaceholder = ({ onClick }: Props) => {
         {t("sessionProposal.addAccount")}
       </Text>
     </AddAccountButton>
-  )
-}
+  );
+};

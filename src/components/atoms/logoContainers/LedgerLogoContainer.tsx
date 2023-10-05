@@ -1,12 +1,12 @@
-import { Flex } from "@ledgerhq/react-ui"
-import React from "react"
-import styled from "styled-components"
+import { Flex } from "@ledgerhq/react-ui";
+import React, { ReactNode } from "react";
+import styled from "styled-components";
 
 type Props = {
-  children: React.ReactNode
-}
+  children: ReactNode;
+};
 function LogoContainer(props: Props) {
-  return <LiveAppLogoContainer data-test-id="logo">{props.children}</LiveAppLogoContainer>
+  return <LiveAppLogoContainer data-test-id="logo">{props.children}</LiveAppLogoContainer>;
 }
 
 const LiveAppLogoContainer = styled(Flex).attrs(() => ({
@@ -19,6 +19,6 @@ const LiveAppLogoContainer = styled(Flex).attrs(() => ({
   box-shadow: 0 2px 24px 0 #00000014;
   width: ${(p) => (p.width ? p.width : "60px")};
   height: ${(p) => (p.height ? p.height : "60px")};
-`
+`;
 
-export default LogoContainer
+export default LogoContainer;

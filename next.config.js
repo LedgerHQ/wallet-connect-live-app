@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /** @type {import('next').NextConfig} */
 
-const { withSentryConfig } = require("@sentry/nextjs")
+const { withSentryConfig } = require("@sentry/nextjs");
 const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true",
-})
+});
 
-const { i18n } = require("./next-i18next.config")
-const { version } = require("./package.json")
+const { i18n } = require("./next-i18next.config");
+const { version } = require("./package.json");
 
 const nextConfig = {
   i18n,
@@ -25,9 +25,9 @@ const nextConfig = {
   publicRuntimeConfig: {
     version,
   },
-}
+};
 
-module.exports = withBundleAnalyzer(nextConfig)
+module.exports = withBundleAnalyzer(nextConfig);
 
 module.exports = withSentryConfig(module.exports, {
   // For all available options, see:
@@ -38,4 +38,4 @@ module.exports = withSentryConfig(module.exports, {
   hideSourceMaps: false,
   org: "ledger",
   project: "wallet-connect-live-app",
-})
+});

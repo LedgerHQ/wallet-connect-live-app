@@ -1,32 +1,32 @@
-import { useState, useEffect } from "react"
-import type { NextPage } from "next"
-import Head from "next/head"
+import { useState, useEffect } from "react";
+import type { NextPage } from "next";
+import Head from "next/head";
 
-import { Container } from "@/styles/styles"
-import { WalletApiClientProvider } from "@/shared/WalletApiClientProvider"
-import WalletConnect from "@/components/screens"
-import { ApplicationDisabled } from "@/components/screens/ApplicationDisabled"
-import { useNavigation } from "@/hooks/common/useNavigation"
+import { Container } from "@/styles/styles";
+import { WalletApiClientProvider } from "@/shared/WalletApiClientProvider";
+import WalletConnect from "@/components/screens";
+import { ApplicationDisabled } from "@/components/screens/ApplicationDisabled";
+import { useNavigation } from "@/hooks/common/useNavigation";
 
-export { getServerSideProps } from "../lib/serverProps"
+export { getServerSideProps } from "@/lib/serverProps";
 
 const Index: NextPage = () => {
-  const { router } = useNavigation()
+  const { router } = useNavigation();
 
-  const isApplicationDisabled = Boolean(process.env.NEXT_PUBLIC_APPLICATION_DISABLED === "true")
+  const isApplicationDisabled = Boolean(process.env.NEXT_PUBLIC_APPLICATION_DISABLED === "true");
 
-  const { uri: rawURI, mode: rawInitialMode } = router.query
+  const { uri: rawURI, mode: rawInitialMode } = router.query;
 
-  const uri = rawURI && typeof rawURI === "string" ? rawURI : undefined
+  const uri = rawURI && typeof rawURI === "string" ? rawURI : undefined;
 
   const initialMode =
-    rawInitialMode === "scan" || rawInitialMode === "text" ? rawInitialMode : undefined
+    rawInitialMode === "scan" || rawInitialMode === "text" ? rawInitialMode : undefined;
 
-  const [isMounted, setMounted] = useState<boolean>(false)
+  const [isMounted, setMounted] = useState<boolean>(false);
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   return (
     <Container>
@@ -51,7 +51,7 @@ const Index: NextPage = () => {
         </WalletApiClientProvider>
       ) : null}
     </Container>
-  )
-}
+  );
+};
 
-export default Index
+export default Index;

@@ -1,8 +1,8 @@
-import { render, screen, renderHook } from "@/tests-tools/test.utils"
-import { ErrorBlockchainSupport } from "@/components/screens/sessions/sessionProposal/ErrorBlockchainSupport"
-import useAnalytics from "@/hooks/common/useAnalytics"
+import { render, screen, renderHook } from "@/tests-tools/test.utils";
+import { ErrorBlockchainSupport } from "@/components/screens/sessions/sessionProposal/ErrorBlockchainSupport";
+import useAnalytics from "@/hooks/common/useAnalytics";
 
-const APP_NAME = "WALLET_CONNECT"
+const APP_NAME = "WALLET_CONNECT";
 
 const CHAINS = [
   {
@@ -17,14 +17,14 @@ const CHAINS = [
     isRequired: true,
     accounts: [],
   },
-]
+];
 
 describe("Error BlockChian Support Screen", () => {
   it("Page should appears and on click triggers action", async () => {
-    renderHook(() => useAnalytics())
-    render(<ErrorBlockchainSupport appName={APP_NAME} chains={CHAINS} />)
-    const text = screen.getByTestId("error-title-blockchain-support")
+    renderHook(() => useAnalytics());
+    render(<ErrorBlockchainSupport appName={APP_NAME} chains={CHAINS} />);
+    const text = screen.getByTestId("error-title-blockchain-support");
 
-    expect(text).toBeInTheDocument()
-  })
-})
+    expect(text).toBeInTheDocument();
+  });
+});

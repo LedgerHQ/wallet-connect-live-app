@@ -3,7 +3,7 @@
  * @url https://chainlist.org
  */
 
-import { Network } from "./types"
+import { Network } from "./types";
 
 const EIP155_CHAINS: Record<string, Network> = {
   ethereum: {
@@ -48,6 +48,16 @@ const EIP155_CHAINS: Record<string, Network> = {
     displayName: "Avalanche C-Chain",
     color: "#E84142",
   },
+  base: {
+    chainId: 8453,
+    namespace: "eip155:8453",
+    ticker: "ETH",
+    displayName: "Base",
+    color: "#1755FE",
+  },
+};
+
+const EIP155_GOERLI_CHAINS: Record<string, Network> = {
   ethereum_goerli: {
     chainId: 5,
     namespace: "eip155:5",
@@ -62,7 +72,14 @@ const EIP155_CHAINS: Record<string, Network> = {
     displayName: "Optimism Goerli",
     color: "#00ff00",
   },
-}
+  base_goerli: {
+    chainId: 84531,
+    namespace: "eip155:84531",
+    ticker: "ETH",
+    displayName: "Base Goerli",
+    color: "#FF0052",
+  },
+};
 
 const COSMOS_MAINNET_CHAINS: Record<string, Network> = {
   cosmos: {
@@ -72,12 +89,13 @@ const COSMOS_MAINNET_CHAINS: Record<string, Network> = {
     ticker: "ATOM",
     color: "#16192f",
   },
-}
+};
 
 export const SUPPORTED_NETWORK: Record<string, Network> = {
   ...EIP155_CHAINS,
+  ...EIP155_GOERLI_CHAINS,
   ...COSMOS_MAINNET_CHAINS,
-}
+};
 
 export enum SupportedNamespace {
   EIP155 = "eip155",

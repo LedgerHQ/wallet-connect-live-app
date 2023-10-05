@@ -1,17 +1,18 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { Core } from "@walletconnect/core"
-import { ICore } from "@walletconnect/types"
-import { Web3Wallet, IWeb3Wallet } from "@walletconnect/web3wallet"
+import { Core } from "@walletconnect/core";
+import { ICore } from "@walletconnect/types";
+import { Web3Wallet, IWeb3Wallet } from "@walletconnect/web3wallet";
 
-export let web3wallet: IWeb3Wallet
-export let core: ICore
+export let web3wallet: IWeb3Wallet;
+export let core: ICore;
 
-export async function createWeb3Wallet(relayerRegionURL: string) {
+const relayerURL = "wss://relay.walletconnect.com";
+
+export async function createWeb3Wallet() {
   core = new Core({
     logger: "debug",
     projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
-    relayUrl: relayerRegionURL ?? "wss://relay.walletconnect.com",
-  })
+    relayUrl: relayerURL,
+  });
 
   web3wallet = await Web3Wallet.init({
     core,
@@ -21,39 +22,39 @@ export async function createWeb3Wallet(relayerRegionURL: string) {
       url: "https://walletconnect.com/",
       icons: ["https://avatars.githubusercontent.com/u/37784886"],
     },
-  })
+  });
 }
 
 async function pair(uri: string) {
-  return await core.pairing.pair({ uri })
+  return await core.pairing.pair({ uri });
 }
 
 export async function startProposal(uri: string) {
   try {
-    const url = new URL(uri)
+    const url = new URL(uri);
 
     switch (url.protocol) {
       // handle usual wallet connect URIs
       case "wc:": {
-        await pair(uri)
-        break
+        await pair(uri);
+        break;
       }
 
       // handle Ledger Live specific URIs
       case "ledgerlive:": {
-        const uriParam = url.searchParams.get("uri")
+        const uriParam = url.searchParams.get("uri");
 
         if (url.pathname === "//wc" && uriParam) {
-          await startProposal(uriParam)
+          await startProposal(uriParam);
         }
-        break
+        break;
       }
     }
   } catch (error) {
     // bad urls are just ignored
     if (error instanceof TypeError) {
-      return
+      return;
     }
-    throw error
+    throw error;
   }
 }

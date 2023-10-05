@@ -1,6 +1,6 @@
-import { getDefaultLanguage } from "@/helpers/generic"
-import { GetServerSideProps } from "next"
-import { serverSideTranslations } from "next-i18next/serverSideTranslations"
+import { getDefaultLanguage } from "@/helpers/generic";
+import { GetServerSideProps } from "next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 export const getServerSideProps: GetServerSideProps = async ({ query, locale, locales }) => ({
   props: {
@@ -8,4 +8,4 @@ export const getServerSideProps: GetServerSideProps = async ({ query, locale, lo
       getDefaultLanguage("en", locales, query.lang as string, locale),
     )),
   },
-})
+});

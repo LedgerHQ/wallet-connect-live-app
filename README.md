@@ -3,6 +3,21 @@
 This is a web application that uses [Next.js](https://nextjs.org/)
 and is intended to be integrated within ledger products, enabling users to seamlessly connect to dapps supporting the walletconnect wallet adapter.
 
+[![SonarCloud](https://sonarcloud.io/images/project_badges/sonarcloud-white.svg)](https://sonarcloud.io/summary/new_code?id=ledger_wallet-connect-live-app)
+
+## Supported Currencies
+
+| Currency          | Supported ? | Goerli Supported? |
+| ----------------- | ----------- | ----------------- |
+| Bitcoin           | ✅          | -                 |
+| Ethereum          | ✅          | ✅                |
+| Polygon           | ✅          | ❌                |
+| Arbitrum          | ✅          | ❌                |
+| Optimism          | ✅          | ✅                |
+| Avalanche C-Chain | ✅          | -                 |
+| Base              | ✅          | ✅                |
+| Cosmos            | ⏳          | -                 |
+
 ## Hosting
 
 This live app is currently hosted at https://wc.apps.ledger.com
@@ -22,6 +37,7 @@ Behavior of the live app can be influenced by navigating to it with the followin
 - Storage 🛒 (All the stored (persistent or not) data to manage the running of the app )
 - Data 📈 (All the types for each chain and some payloads)
 - Shared 🖖 (All the useful functions shared throughout the app)
+- tests-tools 🧪 (All the tools needed to carry out the tests)
 
 ## Store Management
 

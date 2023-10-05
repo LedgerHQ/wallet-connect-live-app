@@ -1,10 +1,10 @@
-import { Account } from "@ledgerhq/wallet-api-client"
-import { Flex, Text } from "@ledgerhq/react-ui"
-import { CloseMedium } from "@ledgerhq/react-ui/assets/icons"
-import { useTranslation } from "next-i18next"
-import { useEffect } from "react"
-import useAnalytics from "@/hooks/common/useAnalytics"
-import styled from "styled-components"
+import { Account } from "@ledgerhq/wallet-api-client";
+import { Flex, Text } from "@ledgerhq/react-ui";
+import { CloseMedium } from "@ledgerhq/react-ui/assets/icons";
+import { useTranslation } from "next-i18next";
+import { useEffect } from "react";
+import useAnalytics from "@/hooks/common/useAnalytics";
+import styled from "styled-components";
 
 const LogoContainer = styled(Flex)`
   border-radius: 50%;
@@ -13,21 +13,21 @@ const LogoContainer = styled(Flex)`
   background-color: ${(p) => p.theme.colors.error.c50};
   height: 50px;
   width: 50px;
-`
+`;
 
 type Props = {
-  appName: string
+  appName: string;
   chains: {
-    chain: string
-    isSupported: boolean
-    isRequired: boolean
-    accounts: Account[]
-  }[]
-}
+    chain: string;
+    isSupported: boolean;
+    isRequired: boolean;
+    accounts: Account[];
+  }[];
+};
 
 export function ErrorBlockchainSupport({ appName, chains }: Props) {
-  const { t } = useTranslation()
-  const analytics = useAnalytics()
+  const { t } = useTranslation();
+  const analytics = useAnalytics();
 
   useEffect(() => {
     analytics.page("Wallet Connect Error Unsupported Blockchains", {
@@ -37,8 +37,8 @@ export function ErrorBlockchainSupport({ appName, chains }: Props) {
         isSupported: chain.isSupported,
         isRequired: chain.isRequired,
       })),
-    })
-  }, [])
+    });
+  }, []);
 
   return (
     <Flex alignItems="center" justifyContent="center" flexDirection="column" flex={1}>
@@ -65,5 +65,5 @@ export function ErrorBlockchainSupport({ appName, chains }: Props) {
         {t("sessionProposal.error.desc")}
       </Text>
     </Flex>
-  )
+  );
 }

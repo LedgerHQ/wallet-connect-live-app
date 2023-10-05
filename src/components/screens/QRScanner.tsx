@@ -1,7 +1,7 @@
-import styled from "styled-components"
-import dynamic from "next/dynamic"
+import styled from "styled-components";
+import dynamic from "next/dynamic";
 
-const QrReader = dynamic(() => import("react-qr-reader"), { ssr: false })
+const QrReader = dynamic(() => import("react-qr-reader"), { ssr: false });
 
 const QRScannerContainer = styled.div`
   width: 100%;
@@ -11,11 +11,11 @@ const QRScannerContainer = styled.div`
   justify-content: center;
   overflow: hidden;
   position: relative;
-`
+`;
 
 type QRScannerProps = {
-  onQRScan: (data: string) => void
-}
+  onQRScan: (data: string) => void;
+};
 
 export function QRScanner({ onQRScan }: QRScannerProps) {
   return (
@@ -24,12 +24,12 @@ export function QRScanner({ onQRScan }: QRScannerProps) {
         delay={500}
         onError={(error) => {
           if (error) {
-            console.error(error)
+            console.error(error);
           }
         }}
         onScan={(result) => {
           if (result) {
-            onQRScan(result)
+            onQRScan(result);
           }
         }}
         style={{ width: "100%" }}
@@ -37,5 +37,5 @@ export function QRScanner({ onQRScan }: QRScannerProps) {
         showViewFinder={false}
       />
     </QRScannerContainer>
-  )
+  );
 }

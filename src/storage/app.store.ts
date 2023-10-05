@@ -1,10 +1,10 @@
-import { ThemeNames } from "@ledgerhq/react-ui/styles"
-import { create } from "zustand"
-import { persist } from "zustand/middleware"
+import { ThemeNames } from "@ledgerhq/react-ui/styles";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 interface AppState {
-  theme: ThemeNames
-  setTheme: (theme: ThemeNames) => void
+  theme: ThemeNames;
+  setTheme: (theme: ThemeNames) => void;
 }
 
 const useAppStore = create<AppState>()(
@@ -17,11 +17,11 @@ const useAppStore = create<AppState>()(
       name: "app-storage",
     },
   ),
-)
+);
 
 const appSelector = {
   selectTheme: (state: AppState): ThemeNames => state.theme,
   setTheme: (state: AppState) => state.setTheme,
-}
+};
 
-export { useAppStore, appSelector }
+export { useAppStore, appSelector };
