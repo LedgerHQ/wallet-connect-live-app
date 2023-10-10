@@ -2,7 +2,7 @@ import { Account } from "@ledgerhq/wallet-api-client";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-interface AccountsState {
+export interface AccountsState {
   accounts: Account[];
   addAccounts: (accounts: Account[]) => void;
   addAccount: (account: Account) => void;

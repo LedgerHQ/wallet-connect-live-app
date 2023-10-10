@@ -36,7 +36,7 @@ const CloseButton = styled(Flex)`
 export function WalletConnectPopin({ isOpen, children, onClose }: Props) {
   return (
     <CustomPopin isOpen={isOpen}>
-      <CloseButton onClick={onClose}>
+      <CloseButton onClick={onClose} data-testid="close-button">
         <CloseMedium size={16} color="neutral.c100" />
       </CloseButton>
       {children}

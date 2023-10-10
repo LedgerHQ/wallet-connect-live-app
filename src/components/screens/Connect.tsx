@@ -77,10 +77,7 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
   }, [initialURI]);
 
   const isRunningInAndroidWebview = useMemo(
-    () =>
-      navigator.userAgent &&
-      navigator.userAgent.includes("; wv") &&
-      navigator.userAgent.includes("Android"),
+    () => navigator.userAgent?.includes("; wv") && navigator.userAgent?.includes("Android"),
     [navigator.userAgent],
   );
 

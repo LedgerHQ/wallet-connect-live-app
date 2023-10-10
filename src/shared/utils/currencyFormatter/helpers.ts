@@ -29,7 +29,7 @@ const isHexPrefixed = (str: string): boolean => {
     throw new Error(`[isHexPrefixed] input must be type 'string', received type ${typeof str}`);
   }
 
-  return str[0] === "0" && str[1] === "x";
+  return str.startsWith("0x");
 };
 
 // Copied from https://www.npmjs.com/package/ethereumjs-util

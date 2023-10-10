@@ -13,9 +13,7 @@ export type TNearChain = keyof typeof NEAR_TEST_CHAINS;
 /**
  * Chains
  */
-export const NEAR_MAINNET_CHAINS = {
-  // TODO: Dev account creation isn't supported on NEAR Mainnet.
-};
+export const NEAR_MAINNET_CHAINS = {};
 
 interface NearTestChains {
   [key: string]: ChainMetadata;
