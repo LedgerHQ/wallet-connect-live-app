@@ -78,8 +78,13 @@ const HeaderBottomBar = styled.div<HeaderBottomBarProps>`
   bottom: 3px;
 `;
 
-export default function Tabs({ tabs, activeTabIndex, setActiveTabIndex, children }: TabsProps) {
-  const [bottomBar, updateBottomBar] = useState<HeaderBottomBarProps>({
+export default function Tabs({
+  tabs,
+  activeTabIndex,
+  setActiveTabIndex,
+  children,
+}: Readonly<TabsProps>) {
+  const [bottomBar, setBottomBar] = useState<HeaderBottomBarProps>({
     left: 0,
     width: 0,
   });
@@ -91,7 +96,7 @@ export default function Tabs({ tabs, activeTabIndex, setActiveTabIndex, children
       const refsToHandle = refs.slice(0, refIndex);
       const width = refs[refIndex].current?.offsetWidth ?? 0;
       const left = refsToHandle.reduce((total, ref) => total + (ref.current?.offsetWidth ?? 0), 0);
-      updateBottomBar({
+      setBottomBar({
         width,
         left,
       });
