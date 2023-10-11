@@ -2,7 +2,7 @@ import { ThemeNames } from "@ledgerhq/react-ui/styles";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-interface AppState {
+export interface AppState {
   theme: ThemeNames;
   setTheme: (theme: ThemeNames) => void;
 }
