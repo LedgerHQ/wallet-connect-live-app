@@ -36,7 +36,7 @@ const TabHeaderBox = styled.div<{ disabled: boolean }>`
   justify-content: center;
   align-items: center;
   text-align: center;
-  cursor: ${(p) => (p.disabled ? "default" : "pointer")};
+  cursor: ${(p) => (p.disabled ? "not-allowed" : "pointer")};
   padding: 8px 12px;
 `;
 
