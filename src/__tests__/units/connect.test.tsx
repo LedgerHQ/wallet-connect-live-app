@@ -28,4 +28,11 @@ describe("Connect Screen", () => {
     await user.click(connect);
     expect(onConnectMock).toHaveBeenCalled();
   });
+
+  it("disables connect button when input is empty", () => {
+    render(<Connect onConnect={onConnectMock} />);
+    const connectButton = screen.getByRole("button", { name: /connect.cta/ });
+
+    expect(connectButton).toBeDisabled();
+  });
 });
