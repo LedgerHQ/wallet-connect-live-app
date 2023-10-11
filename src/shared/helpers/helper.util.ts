@@ -66,7 +66,7 @@ export function isElrondChain(chain: string) {
  * Formats url to to remove protocol
  */
 export function formatUrl(url: string) {
-  return url.split("//")[1];
+  return url.split("//")[1] ?? url;
 }
 
 export const getNetwork = (chain: string) => SUPPORTED_NETWORK[chain];
