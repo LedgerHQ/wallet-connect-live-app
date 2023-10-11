@@ -25,6 +25,40 @@ type AccountsInChain = {
   displayName: string;
 };
 
+export const getChains = (proposal: Proposal) => {
+  const requiredNamespaces = Object.values(proposal.params.requiredNamespaces).map((namespace) => ({
+    ...namespace,
+    required: true,
+  }));
+  const optionalNamespaces = proposal.params.optionalNamespaces
+    ? Object.values(proposal.params.optionalNamespaces)
+    : [];
+
+  return [...requiredNamespaces, ...optionalNamespaces];
+};
+
+export const formatAccountsByChain = (proposal: Proposal, accounts: Account[]) => {
+  const families = getChains(proposal);
+
+  const chains = families.map((f) => f.chains).reduce((value, acc) => acc.concat(value), []);
+
+  const chainsDeduplicated = [...Array.from(new Set(chains))];
+
+  const mappedAccountsByChains: AccountsInChain[] = chainsDeduplicated.map((chain) => {
+    const formatedChain = getCurrencyByChainId(chain);
+
+    return {
+      chain: formatedChain,
+      displayName: getDisplayName(formatedChain),
+      isSupported: Boolean(SUPPORTED_NETWORK[formatedChain] !== undefined),
+      isRequired: families.some((family) => family.required && family.chains.includes(chain)),
+      accounts: accounts.filter((acc) => acc.currency === formatedChain),
+    };
+  });
+
+  return mappedAccountsByChains;
+};
+
 export function useProposal({ proposal }: Props) {
   const { navigate, router } = useNavigation();
 
@@ -57,39 +91,6 @@ export function useProposal({ proposal }: Props) {
       page: "Wallet Connect Error Unsupported Blockchains",
     });
   }, []);
-
-  const getChains = (proposal: Proposal) => {
-    const requiredNamespaces = Object.values(proposal.params.requiredNamespaces).map(
-      (namespace) => ({ ...namespace, required: true }),
-    );
-    const optionalNamespaces = proposal.params.optionalNamespaces
-      ? Object.values(proposal.params.optionalNamespaces)
-      : [];
-
-    return [...requiredNamespaces, ...optionalNamespaces];
-  };
-
-  const formatAccountsByChain = (proposal: Proposal, accounts: Account[]) => {
-    const families = getChains(proposal);
-
-    const chains = families.map((f) => f.chains).reduce((value, acc) => acc.concat(value), []);
-
-    const chainsDeduplicated = [...Array.from(new Set(chains))];
-
-    const mappedAccountsByChains: AccountsInChain[] = chainsDeduplicated.map((chain) => {
-      const formatedChain = getCurrencyByChainId(chain);
-
-      return {
-        chain: formatedChain,
-        displayName: getDisplayName(formatedChain),
-        isSupported: Boolean(SUPPORTED_NETWORK[formatedChain] !== undefined),
-        isRequired: families.some((family) => family.required && family.chains.includes(chain)),
-        accounts: accounts.filter((acc) => acc.currency === formatedChain),
-      };
-    });
-
-    return mappedAccountsByChains;
-  };
 
   const buildSupportedNamespaces = (): Record<
     string,
