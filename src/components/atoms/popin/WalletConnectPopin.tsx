@@ -33,7 +33,7 @@ const CloseButton = styled(Flex)`
     opacity: 0.7;
   }
 `;
-export function WalletConnectPopin({ isOpen, children, onClose }: Props) {
+export function WalletConnectPopin({ isOpen, children, onClose }: Readonly<Props>) {
   return (
     <CustomPopin isOpen={isOpen}>
       <CloseButton onClick={onClose} data-testid="close-button">

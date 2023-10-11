@@ -32,7 +32,7 @@ export function GenericRow({
   isSelected = false,
   onClick,
   rowType,
-}: Props) {
+}: Readonly<Props>) {
   return (
     <Row
       justifyContent="space-between"
