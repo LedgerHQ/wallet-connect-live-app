@@ -77,15 +77,13 @@ jest.mock("@walletconnect/core", () => {
     Core: jest.fn(() => {
       return {
         pairing: {
-          // TODO : trigger a session_proposal event sending the proposal info
           pair: jest.fn(() => {
             setTimeout(() => {
-              () =>
-                window.dispatchEvent(
-                  new CustomEvent("session_proposal", {
-                    detail: sessionProposal,
-                  }),
-                );
+              window.dispatchEvent(
+                new CustomEvent("session_proposal", {
+                  detail: sessionProposal,
+                }),
+              );
             }, 200);
           }),
         },
