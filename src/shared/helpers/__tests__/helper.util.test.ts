@@ -9,6 +9,7 @@ import {
   getTicker,
   isDataInvalid,
   isEIP155Chain,
+  truncate,
 } from "../helper.util";
 
 describe("Helper Util", () => {
@@ -105,5 +106,42 @@ describe("formatUrl", () => {
     const inputUrl = "";
     const expectedOutput = "";
     expect(formatUrl(inputUrl)).toBe(expectedOutput);
+  });
+});
+
+describe("truncate", () => {
+  it("should return the same string when it's shorter than the specified length", () => {
+    const inputString = "Short";
+    const length = 10;
+    const result = truncate(inputString, length);
+    expect(result).toBe(inputString);
+  });
+
+  it("should truncate a long string in the middle", () => {
+    const inputString = "ThisIsALongString";
+    const length = 8;
+    const result = truncate(inputString, length);
+    expect(result).toBe("Thi...ng");
+  });
+
+  it("should handle the minimum possible length correctly", () => {
+    const inputString = "Hello";
+    const length = 0;
+    const result = truncate(inputString, length);
+    expect(result).toBe("...");
+  });
+
+  it("should handle an empty string", () => {
+    const inputString = "";
+    const length = 5;
+    const result = truncate(inputString, length);
+    expect(result).toBe("");
+  });
+
+  it("should handle a string with just the separator", () => {
+    const inputString = "...";
+    const length = 4;
+    const result = truncate(inputString, length);
+    expect(result).toBe("...");
   });
 });
