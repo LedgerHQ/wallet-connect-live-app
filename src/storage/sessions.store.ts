@@ -1,7 +1,7 @@
 import { SessionTypes } from "@walletconnect/types";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
+import { StorageKeys } from "@/storage/types";
 type Session = SessionTypes.Struct;
 
 interface SessionsState {
@@ -32,7 +32,7 @@ const useSessionsStore = create<SessionsState>()(
         })),
     }),
     {
-      name: "sessions-storage",
+      name: StorageKeys.Sessions,
     },
   ),
 );

@@ -1,7 +1,7 @@
 import { ThemeNames } from "@ledgerhq/react-ui/styles";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
+import { StorageKeys } from "@/storage/types";
 export interface AppState {
   theme: ThemeNames;
   setTheme: (theme: ThemeNames) => void;
@@ -14,7 +14,7 @@ const useAppStore = create<AppState>()(
       setTheme: (theme) => set(() => ({ theme: theme })),
     }),
     {
-      name: "app-storage",
+      name: StorageKeys.App,
     },
   ),
 );
