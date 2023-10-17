@@ -3,6 +3,10 @@
 		"title": "We are currently experiencing a temporary issue with WalletConnect v2 integration.",
 		"desc": "We are actively working to identify and implement a solution to restore the functionality as soon as possible. Thank you for your understanding."
 	},
+	"errorBoundary": {
+		"title": "Oops, something went wrong!",
+		"desc": "We have been notified of this error. Please try again by refreshing the page."
+	},
 	"back": "Back",
 	"close": "Close",
 	"error": {
