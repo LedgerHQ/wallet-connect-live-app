@@ -27,24 +27,26 @@ export function ErrorFallback() {
   }, []);
 
   return (
-    <Container>
-      <Flex alignItems="center" justifyContent="center" flexDirection="column" flex={1}>
-        <LogoContainer>
-          <CloseMedium size={32} color="background.main" />
-        </LogoContainer>
-        <Text variant="h4" fontWeight="medium" color="neutral.c100" mt={10} textAlign="center">
-          {t("errorBoundary.title")}
-        </Text>
-        <Text
-          variant="bodyLineHeight"
-          fontWeight="medium"
-          color="neutral.c80"
-          mt={10}
-          textAlign="center"
-        >
-          {t("errorBoundary.desc")}
-        </Text>
-      </Flex>
-    </Container>
+    <StyleProvider selectedPalette={theme as ThemeNames | undefined} fontsPath="/fonts">
+      <Container>
+        <Flex alignItems="center" justifyContent="center" flexDirection="column" flex={1}>
+          <LogoContainer>
+            <CloseMedium size={32} color="background.main" />
+          </LogoContainer>
+          <Text variant="h4" fontWeight="medium" color="neutral.c100" mt={10} textAlign="center">
+            {t("errorBoundary.title")}
+          </Text>
+          <Text
+            variant="bodyLineHeight"
+            fontWeight="medium"
+            color="neutral.c80"
+            mt={10}
+            textAlign="center"
+          >
+            {t("errorBoundary.desc")}
+          </Text>
+        </Flex>
+      </Container>
+    </StyleProvider>
   );
 }
