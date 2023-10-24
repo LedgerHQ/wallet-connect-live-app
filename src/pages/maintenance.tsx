@@ -2,7 +2,7 @@ import { ResponsiveContainer } from "@/styles/styles";
 import { Flex, StyleProvider, Text } from "@ledgerhq/react-ui";
 import { useTranslation } from "next-i18next";
 import { useEffect, useMemo } from "react";
-import styled, { useTheme } from "styled-components";
+import styled from "styled-components";
 import useAnalytics from "@/hooks/common/useAnalytics";
 import { CloseMedium } from "@ledgerhq/react-ui/assets/icons";
 import { ThemeNames } from "@ledgerhq/react-ui/styles";
@@ -21,7 +21,6 @@ const LogoContainer = styled(Flex)`
 
 export default function Maintenance() {
   const { t } = useTranslation();
-  const { colors } = useTheme();
   const analytics = useAnalytics();
   const router = useRouter();
 
@@ -33,14 +32,7 @@ export default function Maintenance() {
 
   return (
     <StyleProvider selectedPalette={theme as ThemeNames | undefined} fontsPath="/fonts">
-      <Flex
-        flex={1}
-        alignItems="center"
-        justifyContent="center"
-        width="100%"
-        height={"100%"}
-        bg={colors.background.main}
-      >
+      <Flex flex={1} alignItems="center" justifyContent="center" width="100%" height="100%">
         <ResponsiveContainer>
           <Flex
             alignItems="center"

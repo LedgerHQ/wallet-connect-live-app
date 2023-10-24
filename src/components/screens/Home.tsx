@@ -1,7 +1,6 @@
 import { startProposal } from "@/helpers/walletConnect.util";
 import { ResponsiveContainer } from "@/styles/styles";
 import { InputMode } from "@/types/types";
-import { Account } from "@ledgerhq/wallet-api-client";
 import { Flex } from "@ledgerhq/react-ui";
 import { useTranslation } from "next-i18next";
 import { Dispatch, SetStateAction, useState, useCallback, useMemo } from "react";
@@ -38,7 +37,6 @@ const WalletConnectInnerContainer = styled(TransitionGroup)`
 
 export type WalletConnectProps = {
   initialURI?: string;
-  accounts: Account[];
   initialMode?: InputMode;
   setUri: Dispatch<SetStateAction<string | undefined>>;
 };
