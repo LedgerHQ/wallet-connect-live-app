@@ -15,7 +15,7 @@ export const getLocaleSeparators: GetSeparators = (locale) => {
   let thousands = "";
 
   for (const char of formattedNumber) {
-    if (/[0-9]/.test(char)) continue; // ignore numbers
+    if (/\d/.test(char)) continue; // ignore numbers
 
     if (!thousands && typeof char === "string") {
       thousands = char; // first non number (separator) found that indicates thousands

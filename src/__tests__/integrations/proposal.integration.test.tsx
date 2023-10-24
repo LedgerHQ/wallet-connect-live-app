@@ -1,6 +1,6 @@
 /* eslint-disable testing-library/no-debugging-utils */
 import "@testing-library/react/dont-cleanup-after-each";
-import { act, cleanup, render, waitFor, screen } from "@/tests-tools/test.utils";
+import { cleanup, render, waitFor, screen } from "@/tests-tools/test.utils";
 import { initialParamsHomePage } from "@/tests-tools/mocks/initialParams.mock";
 import AppScreen from "@/pages/index";
 import sessionProposal from "@/data/mocks/sessionProposal.example.json";
@@ -32,35 +32,6 @@ jest.mock("@/hooks/common/useNavigation", () => {
   };
 });
 
-jest.mock("@walletconnect/core", () => {
-  return {
-    Core: jest.fn(() => {
-      return {
-        pairing: {
-          // TODO : trigger a session_proposal event sending the proposal info
-          pair: jest.fn(() => {
-            setTimeout(() => {
-              act(() =>
-                window.dispatchEvent(
-                  new CustomEvent("session_proposal", {
-                    detail: sessionProposal,
-                  }),
-                ),
-              );
-            }, 200);
-          }),
-        },
-      };
-    }),
-  };
-});
-
-jest.mock("@walletconnect/utils", () => {
-  return {
-    buildApprovedNamespaces: jest.fn(() => ({})),
-  };
-});
-
 const mockRejectSession = jest.fn(() => Promise.resolve(() => console.log("REJECT DONE")));
 
 const mockAcceptSession = jest.fn(() => Promise.resolve(() => console.log("ACCEPT DONE")));
@@ -77,36 +48,6 @@ jest.mock("@walletconnect/web3wallet", () => {
         acceptSession: mockAcceptSession,
       })),
     },
-  };
-});
-
-jest.mock("@ledgerhq/wallet-api-client", () => {
-  return {
-    WindowMessageTransport: jest.fn(() => {
-      return {
-        connect: jest.fn(),
-        disconnect: jest.fn(),
-      };
-    }),
-    WalletAPIClient: jest.fn(() => {
-      return {
-        account: {
-          list: jest.fn(() => Promise.resolve([])),
-        },
-        wallet: {
-          userId: jest.fn(() => Promise.resolve("testUserId")),
-          info: jest.fn(() =>
-            Promise.resolve({
-              tracking: false,
-              wallet: {
-                name: "test-wallet",
-                version: "1.0.0",
-              },
-            }),
-          ),
-        },
-      };
-    }),
   };
 });
 

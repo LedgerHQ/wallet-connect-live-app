@@ -32,7 +32,7 @@ export function GenericRow({
   isSelected = false,
   onClick,
   rowType,
-}: Props) {
+}: Readonly<Props>) {
   return (
     <Row
       justifyContent="space-between"
@@ -54,10 +54,10 @@ export function GenericRow({
           </Text>
         </Flex>
       </Flex>
-      <Flex alignItems="center">
+      <Flex alignItems="center" data-testid="rightComp">
         {rightElement ?? null}
         {rowType === RowType.Select && onClick && (
-          <Checkbox isChecked={isSelected} name={""} onChange={onClick} />
+          <Checkbox isChecked={isSelected} name={""} onChange={onClick} data-testid="checkbox" />
         )}
         {rowType === RowType.Detail && <ChevronRightMedium size={24} color="neutral.c70" />}
       </Flex>

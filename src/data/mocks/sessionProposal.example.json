@@ -17,6 +17,13 @@
         "events": ["chainChanged", "accountsChanged"]
       }
     },
+    "optionalNamespaces": {
+      "someOptionalNamespace": {
+        "methods": ["someMethod"],
+        "chains": ["optionalChain:1"],
+        "events": ["optionalEvent"]
+      }
+    },
     "relays": [
       {
         "protocol": "irn"

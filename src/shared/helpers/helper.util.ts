@@ -28,45 +28,10 @@ export function isEIP155Chain(chain: string) {
 }
 
 /**
- * Check if chain is part of COSMOS standard
- */
-export function isCosmosChain(chain: string) {
-  return chain.includes("cosmos");
-}
-
-/**
- * Check if chain is part of SOLANA standard
- */
-export function isSolanaChain(chain: string) {
-  return chain.includes("solana");
-}
-
-/**
- * Check if chain is part of POLKADOT standard
- */
-export function isPolkadotChain(chain: string) {
-  return chain.includes("polkadot");
-}
-
-/**
- * Check if chain is part of NEAR standard
- */
-export function isNearChain(chain: string) {
-  return chain.includes("near");
-}
-
-/**
- * Check if chain is part of ELROND standard
- */
-export function isElrondChain(chain: string) {
-  return chain.includes("elrond");
-}
-
-/**
  * Formats url to to remove protocol
  */
 export function formatUrl(url: string) {
-  return url.split("//")[1];
+  return url.split("//")[1] ?? url;
 }
 
 export const getNetwork = (chain: string) => SUPPORTED_NETWORK[chain];

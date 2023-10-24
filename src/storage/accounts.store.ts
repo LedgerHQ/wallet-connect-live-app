@@ -1,8 +1,8 @@
 import { Account } from "@ledgerhq/wallet-api-client";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
-interface AccountsState {
+import { StorageKeys } from "@/storage/types";
+export interface AccountsState {
   accounts: Account[];
   addAccounts: (accounts: Account[]) => void;
   addAccount: (account: Account) => void;
@@ -19,7 +19,7 @@ const useAccountsStore = create<AccountsState>()(
       clearAccounts: () => set(() => ({ accounts: [] })),
     }),
     {
-      name: "accounts-storage",
+      name: StorageKeys.Accounts,
     },
   ),
 );

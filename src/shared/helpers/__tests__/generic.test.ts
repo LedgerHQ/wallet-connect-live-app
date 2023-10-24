@@ -5,34 +5,59 @@ import {
   getAccountWithAddressAndChainId,
 } from "../generic";
 
-describe("Generic File", () => {
-  it("compareAddresses", async () => {
-    const adr1 = "0x98BD1afBf1775A1FA55Cbb34B42AC567aA15Ff6E";
-    const adr2 = "0x98BD1afBf1775A1FA55Cbb34B42AC567aA15Ff6E";
-    const adr3 = "0x98BD1afBf1235A1FA55Cbb34B42AC482aA15Ff6E";
-
-    const compare1 = compareAddresses(adr1, adr2);
-    const compare2 = compareAddresses(adr1, adr3);
-
-    expect(compare1).toBeTruthy();
-    expect(compare2).toBeFalsy();
+describe("compareAddresses", () => {
+  it("should return true for two identical addresses", () => {
+    const addr1 = "0x123456789";
+    const addr2 = "0x123456789";
+    expect(compareAddresses(addr1, addr2)).toBe(true);
   });
-  it("getAccountWithAddress", async () => {
-    const adr1 = "0x98BD1afBf1775A1FA55Cbb34B42AC567aA15Ff6E";
-    const res = getAccountWithAddress([ACCOUNT_MOCK], adr1);
-    const res2 = getAccountWithAddress([ACCOUNT_MOCK], ACCOUNT_MOCK.address);
 
-    expect(res).toBeUndefined();
-    expect(res2).toEqual(ACCOUNT_MOCK);
+  it("should return true for two identical addresses with different letter case", () => {
+    const addr1 = "0xABCDEF";
+    const addr2 = "0xabcdef";
+    expect(compareAddresses(addr1, addr2)).toBe(true);
   });
-  it("getAccountWithAddressAndChainId", async () => {
+
+  it("should return false for two different addresses", () => {
+    const addr1 = "0x123";
+    const addr2 = "0x456";
+    expect(compareAddresses(addr1, addr2)).toBe(false);
+  });
+});
+
+describe("getAccountWithAddress", () => {
+  it("should return the account with the specified address", () => {
+    const accounts = [
+      { ...ACCOUNT_MOCK, address: "0x123" },
+      { ...ACCOUNT_MOCK, address: "0x456" },
+      { ...ACCOUNT_MOCK, address: "0x789" },
+    ];
+    const addr = "0x456";
+    const result = getAccountWithAddress(accounts, addr);
+    expect(result).toEqual(accounts[1]);
+  });
+
+  it("should return undefined for an address that does not exist", () => {
+    const accounts = [
+      { ...ACCOUNT_MOCK, address: "0x123" },
+      { ...ACCOUNT_MOCK, address: "0x789" },
+    ];
+    const addr = "0x456";
+    const result = getAccountWithAddress(accounts, addr);
+    expect(result).toBeUndefined();
+  });
+});
+
+describe("getAccountWithAddressAndChainId", () => {
+  it("should return the account with the specified address and chainId", async () => {
     const chainId = "eip155:1";
     const res = getAccountWithAddressAndChainId([ACCOUNT_MOCK], ACCOUNT_MOCK.address, chainId);
 
+    expect(res).toEqual(ACCOUNT_MOCK);
+  });
+  it("should return undefined if no account matches the address and chainId", async () => {
     const chainId2 = "eip155:56";
     const res2 = getAccountWithAddressAndChainId([ACCOUNT_MOCK], ACCOUNT_MOCK.address, chainId2);
-
-    expect(res).toEqual(ACCOUNT_MOCK);
     expect(res2).toBeUndefined();
   });
 });

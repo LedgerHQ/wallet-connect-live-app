@@ -81,22 +81,11 @@ const EIP155_GOERLI_CHAINS: Record<string, Network> = {
   },
 };
 
-// const COSMOS_MAINNET_CHAINS = {
-// 	cosmos: {
-// 		chainId: 'cosmoshub-4',
-// 		displayName: 'Cosmos Hub',
-// 		namespace: 'cosmos:cosmoshub-4',
-// 		ticker: 'ATOM',
-// 	},
-// }
-
 export const SUPPORTED_NETWORK: Record<string, Network> = {
   ...EIP155_CHAINS,
   ...EIP155_GOERLI_CHAINS,
-  // ...COSMOS_MAINNET_CHAINS,
 };
 
 export enum SupportedNamespace {
   EIP155 = "eip155",
-  // cosmos = 'cosmos',
 }

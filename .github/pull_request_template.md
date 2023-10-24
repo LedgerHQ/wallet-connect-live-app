@@ -9,7 +9,7 @@ _Replace this text by a clear and concise description of what this pull request 
 
 ### ❓ Context
 
-- **Linked resource(s)**: `` <!-- Attach any ticket number if relevant. (JIRA / Github issue number) -->
+- **Linked resource(s)**: [] <!-- Attach any ticket number if relevant. like [LIVE-9879] (JIRA / Github issue number) -->
 
 
 ### 📸 Demo

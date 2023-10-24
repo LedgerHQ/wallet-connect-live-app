@@ -39,7 +39,7 @@ export type ConnectProps = {
   mode?: InputMode;
 };
 
-export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
+export function Connect({ initialURI, onConnect, mode }: Readonly<ConnectProps>) {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState<string>("");
   const [errorValue, setErrorValue] = useState<string | undefined>(undefined);
@@ -77,10 +77,7 @@ export function Connect({ initialURI, onConnect, mode }: ConnectProps) {
   }, [initialURI]);
 
   const isRunningInAndroidWebview = useMemo(
-    () =>
-      navigator.userAgent &&
-      navigator.userAgent.includes("; wv") &&
-      navigator.userAgent.includes("Android"),
+    () => navigator.userAgent?.includes("; wv") && navigator.userAgent?.includes("Android"),
     [navigator.userAgent],
   );
 

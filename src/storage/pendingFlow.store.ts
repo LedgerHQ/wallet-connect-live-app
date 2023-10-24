@@ -1,6 +1,7 @@
 import { PendingFlow } from "@/types/types";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { StorageKeys } from "@/storage/types";
 
 interface PendingFlowState {
   pendingFlow: PendingFlow | undefined;
@@ -16,7 +17,7 @@ const usePendingFlowStore = create<PendingFlowState>()(
       clearPendingFlow: () => set(() => ({ pendingFlow: undefined })),
     }),
     {
-      name: "pending-flow-storage",
+      name: StorageKeys.PendingFlow,
     },
   ),
 );

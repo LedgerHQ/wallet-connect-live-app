@@ -1,6 +1,6 @@
 import { act, renderHook } from "@testing-library/react";
 
-import { useAccountsStore } from "../accounts.store";
+import { AccountsState, accountSelector, useAccountsStore } from "../accounts.store";
 import { ACCOUNT_MOCK } from "@/tests-tools/mocks/account.mock";
 
 describe("Accounts Store", () => {
@@ -43,5 +43,23 @@ describe("Accounts Store", () => {
     expect(result.current.accounts.length).toEqual(3);
     act(() => result.current.clearAccounts());
     expect(result.current.accounts.length).toEqual(0);
+  });
+});
+
+describe("accountSelector", () => {
+  it("should select accounts", () => {
+    const mockState: AccountsState = {
+      accounts: [
+        { ...ACCOUNT_MOCK, id: "6", name: "Account 6" },
+        { ...ACCOUNT_MOCK, id: "7", name: "Account 7" },
+      ],
+      addAccounts: () => jest.fn(),
+      addAccount: () => jest.fn(),
+      clearAccounts: () => jest.fn(),
+    };
+
+    const selectedAccounts = accountSelector.selectAccounts(mockState);
+
+    expect(selectedAccounts).toEqual(mockState.accounts);
   });
 });
