@@ -1,6 +1,6 @@
 import React from "react";
 import Tabs, { TabContent, TabsProps } from "@/components/screens/Tabs";
-import { render, fireEvent, screen } from "@/tests-tools/test.utils";
+import { render, screen } from "@/tests-tools/test.utils";
 
 const tabs: TabContent[] = [
   {
@@ -48,11 +48,11 @@ describe("Tabs", () => {
     expect(screen.getByText("Tab 3").closest("div")).toHaveStyle("cursor: not-allowed");
   });
 
-  it("calls setActiveTabIndex when a tab is clicked", () => {
-    renderTabs();
+  it("calls setActiveTabIndex when a tab is clicked", async () => {
+    const { user } = renderTabs();
 
     // Click on the second tab (Tab 2)
-    fireEvent.click(screen.getByText("Tab 2"));
+    await user.click(screen.getByText("Tab 2"));
 
     expect(setActiveTabIndex).toHaveBeenCalledWith(1);
   });

@@ -1,5 +1,5 @@
 import { WalletConnectPopin } from "@/components/atoms/popin/WalletConnectPopin";
-import { render, screen, fireEvent } from "@/tests-tools/test.utils";
+import { render, screen } from "@/tests-tools/test.utils";
 import React from "react";
 
 // Mock the onClose function
@@ -28,15 +28,15 @@ describe("WalletConnectPopin", () => {
     expect(screen.queryByTestId("content")).not.toBeInTheDocument();
   });
 
-  it("should call the onClose function when the close button is clicked", () => {
-    render(
+  it("should call the onClose function when the close button is clicked", async () => {
+    const { user } = render(
       <WalletConnectPopin isOpen={true} onClose={mockOnClose}>
         <div>Content goes here</div>
       </WalletConnectPopin>,
     );
 
     const closeButton = screen.getByTestId("close-button");
-    fireEvent.click(closeButton);
+    await user.click(closeButton);
 
     // Assert that the onClose function is called when the close button is clicked
     expect(mockOnClose).toHaveBeenCalled();
