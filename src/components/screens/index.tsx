@@ -47,13 +47,5 @@ export default function WalletConnect({
     analytics.start(userId, walletInfo);
   }, []);
 
-  return (
-    <Home
-      initialMode={initialMode}
-      setUri={setUri}
-      accounts={accounts}
-      initialURI={uri}
-      {...rest}
-    />
-  );
+  return <Home initialMode={initialMode} setUri={setUri} initialURI={uri} {...rest} />;
 }
