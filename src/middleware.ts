@@ -7,4 +7,5 @@ export default combineMiddlewares(middlewares);
 
 export const config = {
   matcher: ["/"],
+  runtime: "edge",
 };
