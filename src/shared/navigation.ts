@@ -8,6 +8,7 @@ enum Routes {
   SessionProposal = "/proposal",
   SessionDetails = "/detail",
   ProtocolNotSupported = "/protocol-not-supported",
+  Maintenance = "/maintenance",
 }
 
 export { Routes, TabsIndexes };

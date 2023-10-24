@@ -22,6 +22,7 @@
       "@/hooks/*": ["src/hooks/*"],
       "@/storage/*": ["src/storage/*"],
       "@/styles/*": ["src/styles/*"],
+      "@/middlewares/*": ["src/middlewares/*"],
       "@/shared/*": ["src/shared/*"],
       "@/utils/*": ["src/shared/utils/*"],
       "@/constants/*": ["src/shared/constants/*"],

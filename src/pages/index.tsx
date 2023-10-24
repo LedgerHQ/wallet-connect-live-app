@@ -5,15 +5,12 @@ import Head from "next/head";
 import { Container } from "@/styles/styles";
 import { WalletApiClientProvider } from "@/shared/WalletApiClientProvider";
 import WalletConnect from "@/components/screens";
-import { ApplicationDisabled } from "@/components/screens/ApplicationDisabled";
 import { useNavigation } from "@/hooks/common/useNavigation";
 
 export { getServerSideProps } from "@/lib/serverProps";
 
 const Index: NextPage = () => {
   const { router } = useNavigation();
-
-  const isApplicationDisabled = Boolean(process.env.NEXT_PUBLIC_APPLICATION_DISABLED === "true");
 
   const { uri: rawURI, mode: rawInitialMode } = router.query;
 
@@ -34,10 +31,7 @@ const Index: NextPage = () => {
         <title>Ledger WalletConnect</title>
         <meta name="Ledger WalletConnect" content="Ledger WalletConnect" />
       </Head>
-
-      {isApplicationDisabled ? (
-        <ApplicationDisabled />
-      ) : isMounted ? (
+      {isMounted ? (
         <WalletApiClientProvider>
           {(accounts, userId, walletInfo) => (
             <WalletConnect

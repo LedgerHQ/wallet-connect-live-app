@@ -23,6 +23,7 @@
     "@segment/analytics-next": "^1.51.2",
     "@segment/snippet": "^4.15.3",
     "@sentry/nextjs": "^7.77.0",
+    "@vercel/edge-config": "^0.4.1",
     "@walletconnect/core": "^2.10.0",
     "@walletconnect/web3wallet": "^1.9.0",
     "bignumber.js": "^9.0.2",

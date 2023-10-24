@@ -1,4 +1,4 @@
-import { ApplicationDisabled } from "@/components/screens/ApplicationDisabled";
+import Maintenance from "@/pages/maintenance";
 import { render, screen } from "@/tests-tools/test.utils";
 
 jest.mock("next/router", () => ({
@@ -19,9 +19,9 @@ jest.mock("next/router", () => ({
   },
 }));
 
-describe("Application Disable Screen", () => {
+describe("Maintenance Screen", () => {
   it("Page should appears", () => {
-    render(<ApplicationDisabled />);
+    render(<Maintenance />);
 
     const page = screen.getByTestId("application-disabled-container");
     expect(page).toBeInTheDocument();
@@ -29,7 +29,7 @@ describe("Application Disable Screen", () => {
   });
 
   it("Page should have correct DOM", () => {
-    render(<ApplicationDisabled />);
+    render(<Maintenance />);
 
     const logo = screen.getByTestId("application-disabled-logo");
     const title = screen.getByText(/applicationDisabled.title/);
