@@ -7,6 +7,8 @@ import { ThemeNames } from "@ledgerhq/react-ui/styles";
 import GlobalStyle from "@/styles/globalStyle";
 import { useEffect } from "react";
 import { useAppStore, appSelector } from "@/storage/app.store";
+import { ErrorFallback } from "@/components/screens/errors/errorFallback";
+import { ErrorBoundary } from "@sentry/nextjs";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -25,7 +27,9 @@ function MyApp({ Component, pageProps }: AppProps) {
       </Head>
       <StyleProvider selectedPalette={theme as ThemeNames | undefined} fontsPath="/fonts">
         <GlobalStyle />
-        <Component {...pageProps} />
+        <ErrorBoundary fallback={<ErrorFallback />}>
+          <Component {...pageProps} />
+        </ErrorBoundary>
       </StyleProvider>
     </>
   );
