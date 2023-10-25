@@ -10,7 +10,7 @@ import { useNavigation } from "@/hooks/common/useNavigation";
 
 export { getServerSideProps } from "@/lib/serverProps";
 
-const Index: NextPage = () => {
+const Index: NextPage = ({ initialized }: { initialized?: boolean }) => {
   const { router } = useNavigation();
 
   const isApplicationDisabled = Boolean(process.env.NEXT_PUBLIC_APPLICATION_DISABLED === "true");
@@ -39,15 +39,17 @@ const Index: NextPage = () => {
         <ApplicationDisabled />
       ) : isMounted ? (
         <WalletApiClientProvider>
-          {(accounts, userId, walletInfo) => (
-            <WalletConnect
-              initialMode={initialMode}
-              initialURI={uri}
-              accounts={accounts}
-              userId={userId}
-              walletInfo={walletInfo}
-            />
-          )}
+          {(accounts, userId, walletInfo) =>
+            initialized ? (
+              <WalletConnect
+                initialMode={initialMode}
+                initialURI={uri}
+                accounts={accounts}
+                userId={userId}
+                walletInfo={walletInfo}
+              />
+            ) : null
+          }
         </WalletApiClientProvider>
       ) : null}
     </Container>

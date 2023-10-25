@@ -11,7 +11,7 @@ type WalletApiClientProviderProps = {
     accounts: Account[],
     userId: string,
     walletInfo: WalletInfo["result"],
-  ) => React.ReactElement;
+  ) => React.ReactElement | null;
 };
 
 export function WalletApiClientProvider({ children }: WalletApiClientProviderProps) {

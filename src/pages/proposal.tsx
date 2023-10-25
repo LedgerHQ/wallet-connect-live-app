@@ -5,7 +5,6 @@ import { AddAccountPlaceholder } from "@/components/screens/sessions/sessionProp
 import { ErrorBlockchainSupport } from "@/components/screens/sessions/sessionProposal/ErrorBlockchainSupport";
 import { InfoSessionProposal } from "@/components/screens/sessions/sessionProposal/InfoSessionProposal";
 import { formatUrl, getColor, getTicker, truncate } from "@/helpers/helper.util";
-import useHydratation from "@/hooks/useHydratation";
 import { useNavigation } from "@/hooks/common/useNavigation";
 import { useProposal } from "@/hooks/useProposal";
 import { ResponsiveContainer } from "@/styles/styles";
@@ -61,7 +60,7 @@ export default function SessionProposal() {
   const { colors } = useTheme();
   const { router } = useNavigation();
   const { t } = useTranslation();
-  const { hydrated } = useHydratation();
+  const [hydrated, setHydrated] = useState(false);
   const proposal = JSON.parse(router.query.data as string) as Proposal;
   const {
     handleClick,
@@ -83,6 +82,7 @@ export default function SessionProposal() {
       dapp: dApp,
       url: dAppUrl,
     });
+    setHydrated(true);
   }, []);
 
   const onApprove = () => {
