@@ -8,6 +8,7 @@ import SessionProposal from "@/pages/proposal";
 import { useNavigation } from "@/hooks/common/useNavigation";
 import SessionDetail from "@/pages/detail";
 import userEvent from "@testing-library/user-event";
+import { createWeb3Wallet } from "@/shared/helpers/walletConnect.util";
 
 // mock useRouter
 jest.mock("next/router", () => ({
@@ -85,6 +86,7 @@ describe("Proposal Flow tests", () => {
     cleanup();
     proposalRouter();
     render(<SessionProposal />);
+    await createWeb3Wallet();
 
     await waitFor(
       () => {
@@ -164,7 +166,5 @@ describe("Proposal Flow tests", () => {
         name: /sessions.detail.disconnect/i,
       }),
     ).toBeInTheDocument();
-
-    //screen.logTestingPlaygroundURL()
   });
 });

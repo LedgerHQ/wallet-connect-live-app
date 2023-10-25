@@ -10,7 +10,7 @@ import { useNavigation } from "@/hooks/common/useNavigation";
 
 export { getServerSideProps } from "@/lib/serverProps";
 
-const Index: NextPage = ({ initialized }: { initialized?: boolean }) => {
+const Index: NextPage = ({ initialized = true }: { initialized?: boolean }) => {
   const { router } = useNavigation();
 
   const isApplicationDisabled = Boolean(process.env.NEXT_PUBLIC_APPLICATION_DISABLED === "true");
