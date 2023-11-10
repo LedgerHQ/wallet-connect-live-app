@@ -27,12 +27,10 @@ export default function WalletConnect({
 
   const addAccounts = useAccountsStore(accountSelector.addAccounts);
   const clearAccounts = useAccountsStore(accountSelector.clearAccounts);
-  const setLastSessionVisited = useSessionsStore(sessionSelector.setLastSessionVisited);
   const analytics = useAnalytics();
 
   useEffect(() => {
     clearAccounts();
-    setLastSessionVisited(null);
     if (accounts.length > 0) {
       addAccounts(accounts);
     }

@@ -6,18 +6,11 @@ import { SESSION_MOCK } from "@/tests-tools/mocks/session.mock";
 describe("Sessions Store", () => {
   it("Should have initial state ok", () => {
     const { result } = renderHook(() => useSessionsStore());
-    const { sessions, lastSessionVisited } = result.current;
+    const { sessions } = result.current;
 
-    expect(lastSessionVisited).toBeNull();
     expect(sessions).toEqual([]);
   });
 
-  it("should setLastSessionVisited", async () => {
-    const { result } = renderHook(() => useSessionsStore());
-
-    act(() => result.current.setLastSessionVisited(SESSION_MOCK));
-    expect(result.current.lastSessionVisited).not.toBeNull();
-  });
   it("should add Sessions and remove One session and finally", () => {
     const { result } = renderHook(() => useSessionsStore());
 

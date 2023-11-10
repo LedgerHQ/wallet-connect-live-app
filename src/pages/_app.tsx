@@ -9,9 +9,11 @@ import { useEffect } from "react";
 import { useAppStore, appSelector } from "@/storage/app.store";
 import { ErrorFallback } from "@/components/screens/errors/errorFallback";
 import { ErrorBoundary } from "@sentry/nextjs";
+import useHydratation from "@/hooks/useHydratation";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
+  const { initialized } = useHydratation();
 
   const setTheme = useAppStore(appSelector.setTheme);
   const theme = useAppStore(appSelector.selectTheme);
@@ -28,7 +30,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <StyleProvider selectedPalette={theme as ThemeNames | undefined} fontsPath="/fonts">
         <GlobalStyle />
         <ErrorBoundary fallback={<ErrorFallback />}>
-          <Component {...pageProps} />
+          <Component {...pageProps} initialized={initialized} />
         </ErrorBoundary>
       </StyleProvider>
     </>

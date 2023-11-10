@@ -8,7 +8,7 @@ import {
 } from "@/helpers/helper.util";
 import { Box, Button, CryptoIcon, Flex, Text } from "@ledgerhq/react-ui";
 import { ArrowLeftMedium } from "@ledgerhq/react-ui/assets/icons";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { useNavigation } from "@/hooks/common/useNavigation";
@@ -21,7 +21,6 @@ import { ButtonsContainer, List, Row } from "@/components/atoms/containers/Eleme
 import { ResponsiveContainer } from "@/styles/styles";
 import { sessionSelector, useSessionsStore } from "@/storage/sessions.store";
 import { useAccountsStore, accountSelector } from "@/storage/accounts.store";
-import useHydratation from "@/hooks/useHydratation";
 import { web3wallet } from "@/helpers/walletConnect.util";
 import { ImageWithPlaceholder } from "@/components/atoms/images/ImageWithPlaceholder";
 import useAnalytics from "@/hooks/common/useAnalytics";
@@ -65,15 +64,16 @@ const getAccountsFromAddresses = (addresses: string[], accounts: Account[]) => {
 };
 
 export default function SessionDetail() {
-  const { hydrated } = useHydratation();
+  const [hydrated, setHydrated] = useState(false);
   const { t } = useTranslation();
   const { router, navigate } = useNavigation();
 
   const accounts = useAccountsStore(accountSelector.selectAccounts);
   const sessions = useSessionsStore(sessionSelector.selectSessions);
+  const [session] = useState(
+    sessions.find((elem) => elem.topic === JSON.parse(String(router.query?.data))),
+  );
   const removeSession = useSessionsStore(sessionSelector.removeSession);
-  const setLastSessionVisited = useSessionsStore(sessionSelector.setLastSessionVisited);
-  const session = useSessionsStore(sessionSelector.selectLastSession);
 
   const navigateToSessionsHomeTab = useCallback(() => {
     navigate(Routes.Home, { tab: TabsIndexes.Sessions });
@@ -86,16 +86,14 @@ export default function SessionDetail() {
       dapp: session?.peer?.metadata?.name ?? "Dapp name undefined",
       url: session?.peer?.metadata?.url ?? "Dapp url undefined",
     });
+    setHydrated(true);
   }, []);
 
   useEffect(() => {
-    if (router.query.data) {
-      const session = sessions.find(
-        (elem) => elem.topic === JSON.parse(String(router.query?.data)),
-      );
-      setLastSessionVisited(session ?? null);
+    if (!session) {
+      navigateToSessionsHomeTab();
     }
-  }, [router.query]);
+  }, [session]);
 
   const handleDelete = useCallback(async () => {
     if (!session) return;
@@ -142,10 +140,6 @@ export default function SessionDetail() {
   if (!hydrated) {
     // Returns null on first render, so the client and server match
     return null;
-  }
-
-  if (!session) {
-    navigateToSessionsHomeTab();
   }
 
   return (

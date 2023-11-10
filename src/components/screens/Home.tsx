@@ -6,7 +6,6 @@ import { Flex } from "@ledgerhq/react-ui";
 import { useTranslation } from "next-i18next";
 import { Dispatch, SetStateAction, useState, useCallback, useMemo } from "react";
 import { TransitionGroup } from "react-transition-group";
-import useHydratation from "@/hooks/useHydratation";
 import { useNavigation } from "@/hooks/common/useNavigation";
 import { useSessionsStore, sessionSelector } from "@/storage/sessions.store";
 import styled from "styled-components";
@@ -44,7 +43,6 @@ export type WalletConnectProps = {
 };
 
 export default function Home({ initialURI, initialMode, setUri }: WalletConnectProps) {
-  const { initialized } = useHydratation();
   const { router } = useNavigation();
   const routerQueryData = router?.query?.data;
   const initialTab = routerQueryData
@@ -123,13 +121,11 @@ export default function Home({ initialURI, initialMode, setUri }: WalletConnectP
 
   return (
     <WalletConnectContainer>
-      {initialized ? (
-        <Tabs tabs={TABS} activeTabIndex={activeTabIndex} setActiveTabIndex={onSetActiveTabIndex}>
-          <Flex flex={1} width="100%" height="100%" bg="background.main">
-            {TABS[activeTabIndex].Component}
-          </Flex>
-        </Tabs>
-      ) : null}
+      <Tabs tabs={TABS} activeTabIndex={activeTabIndex} setActiveTabIndex={onSetActiveTabIndex}>
+        <Flex flex={1} width="100%" height="100%" bg="background.main">
+          {TABS[activeTabIndex].Component}
+        </Flex>
+      </Tabs>
     </WalletConnectContainer>
   );
 }
