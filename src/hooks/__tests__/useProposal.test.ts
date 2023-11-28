@@ -164,14 +164,14 @@ describe("sortChains", () => {
       isSupported: true,
       isRequired: false,
       accounts: [],
-      displayName: "Polygon",
+      displayName: "Base",
     },
     {
       chain: "bsc",
       isSupported: true,
       isRequired: false,
       accounts: [ACCOUNT_MOCK],
-      displayName: "Polygon",
+      displayName: "Binance Smart Chain",
     },
   ];
 
@@ -198,14 +198,14 @@ describe("sortChains", () => {
         isSupported: true,
         isRequired: false,
         accounts: [ACCOUNT_MOCK],
-        displayName: "Polygon",
+        displayName: "Binance Smart Chain",
       },
       {
         chain: "base",
         isSupported: true,
         isRequired: false,
         accounts: [],
-        displayName: "Polygon",
+        displayName: "Base",
       },
     ]);
   });
@@ -217,14 +217,14 @@ describe("sortChains", () => {
         isSupported: true,
         isRequired: false,
         accounts: [],
-        displayName: "Polygon",
+        displayName: "Base",
       },
       {
         chain: "bsc",
         isSupported: true,
         isRequired: false,
         accounts: [ACCOUNT_MOCK],
-        displayName: "Polygon",
+        displayName: "Binance Smart Chain",
       },
       {
         chain: "ethereum",
