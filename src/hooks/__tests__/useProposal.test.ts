@@ -1,4 +1,9 @@
-import { formatAccountsByChain, getChains } from "@/hooks/useProposal";
+import {
+  formatAccountsByChain,
+  getChains,
+  sortChains,
+  sortAlphabetic,
+} from "@/hooks/useProposal/util";
 import { Proposal } from "@/shared/types/types";
 import sessionProposal from "@/data/mocks/sessionProposal.example.json";
 import sessionProposalNotSupported from "@/data/mocks/sessionProposalNotSupported.example.json";
@@ -89,9 +94,6 @@ describe("formatAccountsByChain", () => {
       currency: "polygon",
     },
   ];
-  jest.mock("@/hooks/useProposal", () => ({
-    getChains: jest.fn(),
-  }));
 
   const getCurrencyByChainId = jest.fn();
   getCurrencyByChainId.mockImplementation((chainId) => `${chainId}`);
@@ -136,6 +138,107 @@ describe("formatAccountsByChain", () => {
         isSupported: false,
         isRequired: true,
         accounts: [],
+      },
+    ]);
+  });
+});
+
+describe("sortChains", () => {
+  const DATA = [
+    {
+      chain: "polygon",
+      isSupported: true,
+      isRequired: true,
+      accounts: [ACCOUNT_MOCK],
+      displayName: "Polygon",
+    },
+    {
+      chain: "ethereum",
+      isSupported: true,
+      isRequired: true,
+      accounts: [ACCOUNT_MOCK],
+      displayName: "Ethereum",
+    },
+    {
+      chain: "base",
+      isSupported: true,
+      isRequired: false,
+      accounts: [],
+      displayName: "Base",
+    },
+    {
+      chain: "bsc",
+      isSupported: true,
+      isRequired: false,
+      accounts: [ACCOUNT_MOCK],
+      displayName: "Binance Smart Chain",
+    },
+  ];
+
+  it("should sort correclty", () => {
+    const result = sortChains(DATA);
+    expect(result).toEqual([
+      {
+        chain: "ethereum",
+        isSupported: true,
+        isRequired: true,
+        accounts: [ACCOUNT_MOCK],
+        displayName: "Ethereum",
+      },
+      {
+        chain: "polygon",
+        isSupported: true,
+        isRequired: true,
+        accounts: [ACCOUNT_MOCK],
+        displayName: "Polygon",
+      },
+
+      {
+        chain: "bsc",
+        isSupported: true,
+        isRequired: false,
+        accounts: [ACCOUNT_MOCK],
+        displayName: "Binance Smart Chain",
+      },
+      {
+        chain: "base",
+        isSupported: true,
+        isRequired: false,
+        accounts: [],
+        displayName: "Base",
+      },
+    ]);
+  });
+  it("should sort Alpabetic correclty", () => {
+    const result = sortAlphabetic(DATA);
+    expect(result).toEqual([
+      {
+        chain: "base",
+        isSupported: true,
+        isRequired: false,
+        accounts: [],
+        displayName: "Base",
+      },
+      {
+        chain: "bsc",
+        isSupported: true,
+        isRequired: false,
+        accounts: [ACCOUNT_MOCK],
+        displayName: "Binance Smart Chain",
+      },
+      {
+        chain: "ethereum",
+        isSupported: true,
+        isRequired: true,
+        accounts: [ACCOUNT_MOCK],
+        displayName: "Ethereum",
+      },
+      {
+        chain: "polygon",
+        isSupported: true,
+        isRequired: true,
+        accounts: [ACCOUNT_MOCK],
+        displayName: "Polygon",
       },
     ]);
   });

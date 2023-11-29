@@ -6,7 +6,7 @@ import { ErrorBlockchainSupport } from "@/components/screens/sessions/sessionPro
 import { InfoSessionProposal } from "@/components/screens/sessions/sessionProposal/InfoSessionProposal";
 import { formatUrl, getColor, getTicker, truncate } from "@/helpers/helper.util";
 import { useNavigation } from "@/hooks/common/useNavigation";
-import { useProposal } from "@/hooks/useProposal";
+import { useProposal } from "@/hooks/useProposal/useProposal";
 import { ResponsiveContainer } from "@/styles/styles";
 import { Proposal } from "@/types/types";
 import { Flex, Button, Box, CryptoIcon, Text } from "@ledgerhq/react-ui";
@@ -19,42 +19,9 @@ import { Logo } from "@/icons/LedgerLiveLogo";
 import styled, { useTheme } from "styled-components";
 import useAnalytics from "@/hooks/common/useAnalytics";
 import { tryDecodeURI } from "@/shared/helpers/image";
+import { sortChains } from "@/hooks/useProposal/util";
 
 export { getServerSideProps } from "@/lib/serverProps";
-
-const DAppContainer = styled(Flex).attrs(
-  (p: { size: number; borderColor: string; backgroundColor: string }) => ({
-    position: "absolute",
-    right: "-55px",
-    alignItems: "center",
-    justifyContent: "center",
-    heigth: p.size,
-    width: p.size,
-    borderRadius: 50.0,
-    border: `3px solid ${p.borderColor}`,
-    backgroundColor: p.backgroundColor,
-    zIndex: 0,
-  }),
-)<{ size: number }>``;
-
-const Container = styled(Flex).attrs((p: { size: number }) => ({
-  heigth: p.size,
-  width: p.size,
-  alignItems: "center",
-  justifyContent: "center",
-  position: "relative",
-  left: "-25px",
-}))<{ size: number }>``;
-
-const ListChains = styled(Flex)`
-  flex-direction: column;
-`;
-
-const Header = styled(Flex)`
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-`;
 
 export default function SessionProposal() {
   const { colors } = useTheme();
@@ -212,7 +179,7 @@ export default function SessionProposal() {
                 </Text>
               </Header>
               <ListChains>
-                {accountsByChain
+                {sortChains(accountsByChain)
                   .filter((entry) => entry.isSupported)
                   .map((entry) => {
                     return (
@@ -316,3 +283,37 @@ export default function SessionProposal() {
     </Flex>
   );
 }
+
+const DAppContainer = styled(Flex).attrs(
+  (p: { size: number; borderColor: string; backgroundColor: string }) => ({
+    position: "absolute",
+    right: "-55px",
+    alignItems: "center",
+    justifyContent: "center",
+    heigth: p.size,
+    width: p.size,
+    borderRadius: 50.0,
+    border: `3px solid ${p.borderColor}`,
+    backgroundColor: p.backgroundColor,
+    zIndex: 0,
+  }),
+)<{ size: number }>``;
+
+const Container = styled(Flex).attrs((p: { size: number }) => ({
+  heigth: p.size,
+  width: p.size,
+  alignItems: "center",
+  justifyContent: "center",
+  position: "relative",
+  left: "-25px",
+}))<{ size: number }>``;
+
+const ListChains = styled(Flex)`
+  flex-direction: column;
+`;
+
+const Header = styled(Flex)`
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
