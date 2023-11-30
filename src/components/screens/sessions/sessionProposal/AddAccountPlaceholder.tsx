@@ -4,6 +4,23 @@ import { useTranslation } from "next-i18next";
 import React from "react";
 import styled from "styled-components";
 
+type Props = {
+  onClick: () => void;
+};
+
+export const AddAccountPlaceholder = ({ onClick }: Props) => {
+  const { t } = useTranslation();
+
+  return (
+    <AddAccountButton onClick={onClick}>
+      <PlusMedium />
+      <Text ml={2} variant="bodyLineHeight" color="neutral.c100">
+        {t("sessionProposal.addAccount")}
+      </Text>
+    </AddAccountButton>
+  );
+};
+
 const AddAccountButton = styled.button`
   border: 1px dashed rgba(153, 153, 153, 0.3);
   cursor: pointer;
@@ -25,18 +42,3 @@ const AddAccountButton = styled.button`
     color: ${(p) => p.theme.colors.neutral.c100};
   }
 `;
-type Props = {
-  onClick: () => void;
-};
-export const AddAccountPlaceholder = ({ onClick }: Props) => {
-  const { t } = useTranslation();
-
-  return (
-    <AddAccountButton onClick={onClick}>
-      <PlusMedium />
-      <Text ml={2} variant="bodyLineHeight" color="neutral.c100">
-        {t("sessionProposal.addAccount")}
-      </Text>
-    </AddAccountButton>
-  );
-};

@@ -45,21 +45,21 @@ export default function Sessions({ goToConnect }: SessionsProps) {
 
   const isEmptyState = useMemo(() => sessions.length === 0, [sessions]);
 
-  const goToDetailSession = useCallback((topic: string) => {
+  const goToDetailSession = (topic: string) => {
     navigate(Routes.SessionDetails, topic);
     analytics.track("button_clicked", {
       button: "Session Detail",
       page: "Wallet Connect Sessions",
     });
-  }, []);
+  };
 
-  const onGoToConnect = useCallback(() => {
+  const onGoToConnect = () => {
     analytics.track("button_clicked", {
       button: "Connect",
       page: "Wallet Connect Sessions",
     });
     goToConnect();
-  }, []);
+  };
 
   const disconnect = useCallback(async () => {
     await Promise.all(

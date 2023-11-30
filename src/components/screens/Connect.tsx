@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { Input, Button, Text, Flex } from "@ledgerhq/react-ui";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { PasteMedium, QrCodeMedium } from "@ledgerhq/react-ui/assets/icons";
 import { QRScanner } from "./QRScanner";
 import { InputMode } from "@/types/types";
@@ -46,6 +46,9 @@ export function Connect({ initialURI, onConnect, mode }: Readonly<ConnectProps>)
   const [scanner, setScanner] = useState(mode === "scan");
   const analytics = useAnalytics();
 
+  const isRunningInAndroidWebview =
+    navigator.userAgent?.includes("; wv") && navigator.userAgent?.includes("Android");
+
   const handleConnect = useCallback(() => {
     try {
       const uri = new URL(inputValue);
@@ -61,13 +64,13 @@ export function Connect({ initialURI, onConnect, mode }: Readonly<ConnectProps>)
     }
   }, [onConnect, inputValue]);
 
-  const startScanning = useCallback(() => {
+  const startScanning = () => {
     setScanner(true);
     analytics.track("button_clicked", {
       button: "WC-Scan QR Code",
       page: "Connect",
     });
-  }, []);
+  };
 
   useEffect(() => {
     if (initialURI) {
@@ -76,12 +79,7 @@ export function Connect({ initialURI, onConnect, mode }: Readonly<ConnectProps>)
     analytics.page("Wallet Connect");
   }, [initialURI]);
 
-  const isRunningInAndroidWebview = useMemo(
-    () => navigator.userAgent?.includes("; wv") && navigator.userAgent?.includes("Android"),
-    [navigator.userAgent],
-  );
-
-  const handlePasteClick = useCallback(async () => {
+  const handlePasteClick = async () => {
     try {
       const text = await navigator.clipboard.readText();
       setInputValue(text);
@@ -92,7 +90,7 @@ export function Connect({ initialURI, onConnect, mode }: Readonly<ConnectProps>)
     } catch (err) {
       console.error(err);
     }
-  }, []);
+  };
 
   const tryConnect = useCallback(
     (rawURI: string) => {

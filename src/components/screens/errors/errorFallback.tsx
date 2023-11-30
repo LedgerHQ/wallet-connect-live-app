@@ -27,7 +27,7 @@ export function ErrorFallback() {
   }, []);
 
   return (
-    <StyleProvider selectedPalette={theme as ThemeNames | undefined} fontsPath="/fonts">
+    <StyleProvider selectedPalette={theme as ThemeNames} fontsPath="/fonts">
       <Container>
         <Flex alignItems="center" justifyContent="center" flexDirection="column" flex={1}>
           <LogoContainer>

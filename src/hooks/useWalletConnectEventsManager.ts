@@ -137,7 +137,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
       // web3wallet.on('session_update', (data) => console.log('update', data))
       web3wallet.on("session_delete", onSessionDeleted);
     }
-  }, [initialized, onSessionProposal, onSessionRequest, onAuthRequest, onSessionDeleted]);
+  }, [initialized, web3wallet]);
 
   useEffect(() => {
     if (initialized && web3wallet && pendingFlow) {
