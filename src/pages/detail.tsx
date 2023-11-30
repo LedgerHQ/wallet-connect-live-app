@@ -82,17 +82,14 @@ export default function SessionDetail() {
   const analytics = useAnalytics();
 
   useEffect(() => {
+    if (!session) {
+      navigateToSessionsHomeTab();
+    }
     analytics.page("Wallet Connect Session Detail", {
       dapp: session?.peer?.metadata?.name ?? "Dapp name undefined",
       url: session?.peer?.metadata?.url ?? "Dapp url undefined",
     });
     setHydrated(true);
-  }, []);
-
-  useEffect(() => {
-    if (!session) {
-      navigateToSessionsHomeTab();
-    }
   }, [session]);
 
   const handleDelete = useCallback(async () => {
@@ -116,21 +113,25 @@ export default function SessionDetail() {
     navigateToSessionsHomeTab();
   }, [session]);
 
-  const onGoBack = useCallback(() => {
+  const onGoBack = () => {
     navigateToSessionsHomeTab();
     analytics.track("button_clicked", {
       button: "WC-Back",
       page: "Wallet Connect Session Detail",
     });
-  }, []);
+  };
 
   const metadata = session?.peer.metadata;
-  const fullAddresses = !session
-    ? []
-    : Object.entries(session.namespaces).reduce(
-        (acc, elem) => acc.concat(elem[1].accounts),
-        [] as string[],
-      );
+  const fullAddresses = useMemo(
+    () =>
+      !session
+        ? []
+        : Object.entries(session.namespaces).reduce(
+            (acc, elem) => acc.concat(elem[1].accounts),
+            [] as string[],
+          ),
+    [session],
+  );
 
   const sessionAccounts = useMemo(
     () => getAccountsFromAddresses(fullAddresses, accounts),

@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { Input, Button, Text, Flex } from "@ledgerhq/react-ui";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { PasteMedium, QrCodeMedium } from "@ledgerhq/react-ui/assets/icons";
 import { QRScanner } from "./QRScanner";
 import { InputMode } from "@/types/types";
@@ -76,12 +76,10 @@ export function Connect({ initialURI, onConnect, mode }: Readonly<ConnectProps>)
     analytics.page("Wallet Connect");
   }, [initialURI]);
 
-  const isRunningInAndroidWebview = useMemo(
-    () => navigator.userAgent?.includes("; wv") && navigator.userAgent?.includes("Android"),
-    [navigator.userAgent],
-  );
+  const isRunningInAndroidWebview =
+    navigator.userAgent?.includes("; wv") && navigator.userAgent?.includes("Android");
 
-  const handlePasteClick = useCallback(async () => {
+  const handlePasteClick = async () => {
     try {
       const text = await navigator.clipboard.readText();
       setInputValue(text);
@@ -92,7 +90,7 @@ export function Connect({ initialURI, onConnect, mode }: Readonly<ConnectProps>)
     } catch (err) {
       console.error(err);
     }
-  }, []);
+  };
 
   const tryConnect = useCallback(
     (rawURI: string) => {

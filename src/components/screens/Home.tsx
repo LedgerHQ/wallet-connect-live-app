@@ -1,7 +1,6 @@
 import { startProposal } from "@/helpers/walletConnect.util";
 import { ResponsiveContainer } from "@/styles/styles";
 import { InputMode } from "@/types/types";
-import { Account } from "@ledgerhq/wallet-api-client";
 import { Flex } from "@ledgerhq/react-ui";
 import { useTranslation } from "next-i18next";
 import { Dispatch, SetStateAction, useState, useCallback, useMemo } from "react";
@@ -37,7 +36,6 @@ const WalletConnectInnerContainer = styled(TransitionGroup)`
 
 export type WalletConnectProps = {
   initialURI?: string;
-  accounts: Account[];
   initialMode?: InputMode;
   setUri: Dispatch<SetStateAction<string | undefined>>;
 };
@@ -55,7 +53,6 @@ export default function Home({ initialURI, initialMode, setUri }: WalletConnectP
   const { t } = useTranslation();
 
   const [activeTabIndex, setActiveTabIndex] = useState(initialTab);
-  const [inputValue] = useState<string>("");
 
   const onSetActiveTabIndex = useCallback(
     (newActiveTabIndex: number) => {
@@ -67,24 +64,21 @@ export default function Home({ initialURI, initialMode, setUri }: WalletConnectP
     [activeTabIndex, analytics],
   );
 
-  const handleConnect = useCallback(
-    async (inputValue: string) => {
-      try {
-        setUri(inputValue);
-        const uri = new URL(inputValue);
-        if (uri.toString().includes("@1")) {
-          router.push(Routes.ProtocolNotSupported);
-        } else {
-          await startProposal(uri.toString());
-        }
-      } catch (error: unknown) {
-        console.error(error);
-      } finally {
-        setUri("");
+  const handleConnect = useCallback(async (inputValue: string) => {
+    try {
+      setUri(inputValue);
+      const uri = new URL(inputValue);
+      if (uri.toString().includes("@1")) {
+        router.push(Routes.ProtocolNotSupported);
+      } else {
+        await startProposal(uri.toString());
       }
-    },
-    [inputValue],
-  );
+    } catch (error: unknown) {
+      console.error(error);
+    } finally {
+      setUri("");
+    }
+  }, []);
 
   const goToConnect = useCallback(() => {
     setActiveTabIndex(TabsIndexes.Connect);

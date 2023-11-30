@@ -3,7 +3,7 @@ import { CloseMedium } from "@ledgerhq/react-ui/assets/icons";
 import { ThemeNames } from "@ledgerhq/react-ui/styles";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import useAnalytics from "@/hooks/common/useAnalytics";
 import styled from "styled-components";
 
@@ -21,14 +21,14 @@ export function ApplicationDisabled() {
   const analytics = useAnalytics();
   const router = useRouter();
 
-  const theme = useMemo(() => router?.query?.theme ?? "light", [router?.query?.theme]);
+  const theme = router?.query?.theme ?? "light";
 
   useEffect(() => {
     analytics.page("WalletConnect Has Been Disabled");
   }, []);
 
   return (
-    <StyleProvider selectedPalette={theme as ThemeNames | undefined} fontsPath="/fonts">
+    <StyleProvider selectedPalette={theme as ThemeNames} fontsPath="/fonts">
       <Flex
         alignItems="center"
         justifyContent="center"
