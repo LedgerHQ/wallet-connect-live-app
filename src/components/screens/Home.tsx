@@ -64,7 +64,7 @@ export default function Home({ initialURI, initialMode, setUri }: WalletConnectP
     [activeTabIndex, analytics],
   );
 
-  const handleConnect = useCallback(async (inputValue: string) => {
+  const handleConnect = async (inputValue: string) => {
     try {
       setUri(inputValue);
       const uri = new URL(inputValue);
@@ -78,11 +78,9 @@ export default function Home({ initialURI, initialMode, setUri }: WalletConnectP
     } finally {
       setUri("");
     }
-  }, []);
+  };
 
-  const goToConnect = useCallback(() => {
-    setActiveTabIndex(TabsIndexes.Connect);
-  }, []);
+  const goToConnect = () => setActiveTabIndex(TabsIndexes.Connect);
 
   const TABS = useMemo(
     () => [

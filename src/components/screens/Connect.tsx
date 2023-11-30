@@ -46,6 +46,9 @@ export function Connect({ initialURI, onConnect, mode }: Readonly<ConnectProps>)
   const [scanner, setScanner] = useState(mode === "scan");
   const analytics = useAnalytics();
 
+  const isRunningInAndroidWebview =
+    navigator.userAgent?.includes("; wv") && navigator.userAgent?.includes("Android");
+
   const handleConnect = useCallback(() => {
     try {
       const uri = new URL(inputValue);
@@ -61,13 +64,13 @@ export function Connect({ initialURI, onConnect, mode }: Readonly<ConnectProps>)
     }
   }, [onConnect, inputValue]);
 
-  const startScanning = useCallback(() => {
+  const startScanning = () => {
     setScanner(true);
     analytics.track("button_clicked", {
       button: "WC-Scan QR Code",
       page: "Connect",
     });
-  }, []);
+  };
 
   useEffect(() => {
     if (initialURI) {
@@ -75,9 +78,6 @@ export function Connect({ initialURI, onConnect, mode }: Readonly<ConnectProps>)
     }
     analytics.page("Wallet Connect");
   }, [initialURI]);
-
-  const isRunningInAndroidWebview =
-    navigator.userAgent?.includes("; wv") && navigator.userAgent?.includes("Android");
 
   const handlePasteClick = async () => {
     try {

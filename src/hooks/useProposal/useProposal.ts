@@ -37,13 +37,13 @@ export function useProposal({ proposal }: ProposalProps) {
     [selectedAccounts],
   );
 
-  const handleClose = useCallback(() => {
+  const handleClose = () => {
     router.push(Routes.Home);
     analytics.track("button_clicked", {
       button: "Close",
       page: "Wallet Connect Error Unsupported Blockchains",
     });
-  }, []);
+  };
 
   const buildSupportedNamespaces = (): Record<
     string,
@@ -98,7 +98,7 @@ export function useProposal({ proposal }: ProposalProps) {
     };
   };
 
-  const approveSession = useCallback(() => {
+  const approveSession = () => {
     web3wallet
       .approveSession({
         id: proposal.id,
@@ -116,9 +116,9 @@ export function useProposal({ proposal }: ProposalProps) {
         // TODO : display error toast
         navigate(Routes.Home, { tab: TabsIndexes.Connect });
       });
-  }, [proposal]);
+  };
 
-  const rejectSession = useCallback(() => {
+  const rejectSession = () => {
     web3wallet
       .rejectSession({
         id: proposal.id,
@@ -128,9 +128,9 @@ export function useProposal({ proposal }: ProposalProps) {
         },
       })
       .finally(() => navigate(Routes.Home));
-  }, [proposal]);
+  };
 
-  const addNewAccount = useCallback(async (currency: string) => {
+  const addNewAccount = async (currency: string) => {
     const walletApiClient = initWalletApiClient();
     try {
       const newAccount = await walletApiClient.account.request({
@@ -141,7 +141,7 @@ export function useProposal({ proposal }: ProposalProps) {
       console.error("request account canceled by user");
     }
     closeTransport();
-  }, []);
+  };
 
   return {
     approveSession,
