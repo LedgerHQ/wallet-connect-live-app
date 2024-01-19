@@ -31,7 +31,12 @@
       "@/icons/*": ["src/icons/*"],
       "@/lib/*": ["src/lib/*"],
       "react": ["./node_modules/@types/react"]
-    }
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "include": [
     "next-env.d.ts",
@@ -39,7 +44,8 @@
     "**/*.tsx",
     "jest.integration.config.js",
     "jest.config.js",
-    "jest.setup.js"
+    "jest.setup.js",
+    ".next/types/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }

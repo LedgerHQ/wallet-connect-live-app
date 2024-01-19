@@ -8,9 +8,9 @@ import useAnalytics from "@/hooks/common/useAnalytics";
 export type WalletConnectProps = {
   initialMode?: InputMode;
   initialURI?: string;
-  accounts: Account[];
-  userId: string;
-  walletInfo: WalletInfo["result"];
+  accounts?: Account[];
+  userId?: string;
+  walletInfo?: WalletInfo["result"];
 };
 
 export default function WalletConnect({
@@ -28,7 +28,7 @@ export default function WalletConnect({
 
   useEffect(() => {
     clearAccounts();
-    addAccounts(accounts);
+    addAccounts(accounts || []);
   }, [accounts]);
 
   useEffect(() => {
