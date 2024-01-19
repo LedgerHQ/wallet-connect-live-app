@@ -106,11 +106,16 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
             captureException(error);
             throw error;
           }
-          const hash = await walletApiClient.transaction.signAndBroadcast(
-            pendingFlow.accountId,
-            liveTx,
-          );
-          acceptRequest(pendingFlow.topic, pendingFlow.id, hash);
+          if (pendingFlow.send) {
+            const hash = await walletApiClient.transaction.signAndBroadcast(
+              pendingFlow.accountId,
+              liveTx,
+            );
+            acceptRequest(pendingFlow.topic, pendingFlow.id, hash);
+          } else {
+            const hash = await walletApiClient.transaction.sign(pendingFlow.accountId, liveTx);
+            acceptRequest(pendingFlow.topic, pendingFlow.id, hash.toString());
+          }
         }
       } catch (error) {
         rejectRequest(pendingFlow.topic, pendingFlow.id, Errors.userDecline);
@@ -196,7 +201,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
   ) {
     switch (request.method) {
       case EIP155_SIGNING_METHODS.ETH_SIGN:
-      case EIP155_SIGNING_METHODS.PERSONAL_SIGN:
+      case EIP155_SIGNING_METHODS.PERSONAL_SIGN: {
         const isPersonalSign = request.method === EIP155_SIGNING_METHODS.PERSONAL_SIGN;
         const accountSign = getAccountWithAddressAndChainId(
           accounts,
@@ -228,9 +233,10 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
           closeTransport();
         }
         break;
+      }
       case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA:
       case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V3:
-      case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V4:
+      case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V4: {
         const accountSignTyped = getAccountWithAddressAndChainId(
           accounts,
           request.params[0],
@@ -260,8 +266,34 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
           closeTransport();
         }
         break;
-      case EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION:
-      case EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION:
+      }
+      case EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION: {
+        const ethTx = request.params[0];
+        const accountTX = getAccountWithAddressAndChainId(accounts, ethTx.from, chainId);
+        if (accountTX) {
+          try {
+            const walletApiClient = initWalletApiClient();
+            const liveTx = convertEthToLiveTX(ethTx);
+            addPendingFlow({
+              id,
+              topic,
+              accountId: accountTX.id,
+              ethTx,
+              txHadSomeData: ethTx.data && ethTx.data.length > 0,
+              send: true,
+            });
+            const hash = await walletApiClient.transaction.signAndBroadcast(accountTX.id, liveTx);
+            acceptRequest(topic, id, hash);
+          } catch (error) {
+            rejectRequest(topic, id, Errors.txDeclined);
+            console.error(error);
+          }
+          clearPendingFlow();
+          closeTransport();
+        }
+        break;
+      }
+      case EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION: {
         const ethTx = request.params[0];
         const accountTX = getAccountWithAddressAndChainId(accounts, ethTx.from, chainId);
         if (accountTX) {
@@ -275,8 +307,8 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
               ethTx,
               txHadSomeData: ethTx.data && ethTx.data.length > 0,
             });
-            const hash = await walletApiClient.transaction.signAndBroadcast(accountTX.id, liveTx);
-            acceptRequest(topic, id, hash);
+            const hash = await walletApiClient.transaction.sign(accountTX.id, liveTx);
+            acceptRequest(topic, id, hash.toString());
           } catch (error) {
             rejectRequest(topic, id, Errors.txDeclined);
             console.error(error);
@@ -285,6 +317,7 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
           closeTransport();
         }
         break;
+      }
       default:
         return; // ModalStore.open('SessionUnsuportedMethodModal', { requestEvent, requestSession })
     }
