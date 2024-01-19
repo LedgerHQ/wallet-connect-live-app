@@ -52,4 +52,5 @@ export type PendingFlow = {
   // We can then check if we still have some data once we retrieve it from the storage
   // and only trigger the signAndBroadcast transaction flow if the data is still there
   txHadSomeData?: boolean;
+  send?: boolean;
 };
