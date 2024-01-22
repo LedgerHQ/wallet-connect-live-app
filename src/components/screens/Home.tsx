@@ -75,7 +75,8 @@ export default function Home({
 
   const handleConnect = async (inputValue: string) => {
     try {
-      setUri(inputValue);
+      // setUri(inputValue)
+      // NOTE: useEffect in Connect would retrigger onConnect with that same value
       const uri = new URL(inputValue);
       if (uri.toString().includes("@1")) {
         await navigate({ to: "/protocol-not-supported" });
