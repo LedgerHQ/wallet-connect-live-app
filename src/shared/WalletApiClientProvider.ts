@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Account,
   WalletInfo,
@@ -10,16 +10,20 @@ type WalletApiClientProviderProps = {
   children: (
     accounts: Account[],
     userId: string,
-    walletInfo: WalletInfo["result"],
+    walletInfo: WalletInfo["result"]
   ) => React.ReactElement | null;
 };
 
-export function WalletApiClientProvider({ children }: WalletApiClientProviderProps) {
+export function WalletApiClientProvider({
+  children,
+}: WalletApiClientProviderProps) {
   const walletApiClientRef = useRef<WalletAPIClient | null>(null);
 
   const [accounts, setAccounts] = useState<Account[] | undefined>(undefined);
   const [userId, setUserId] = useState<string | undefined>(undefined);
-  const [walletInfo, setWalletInfo] = useState<WalletInfo["result"] | undefined>(undefined);
+  const [walletInfo, setWalletInfo] = useState<
+    WalletInfo["result"] | undefined
+  >(undefined);
 
   useEffect(() => {
     const transport = new WindowMessageTransport();

@@ -2,9 +2,6 @@ import { useCallback, useMemo } from "react";
 import { WalletInfo } from "@ledgerhq/wallet-api-client";
 import { AnalyticsBrowser } from "@segment/analytics-next";
 import { sessionSelector, useSessionsStore } from "@/storage/sessions.store";
-import getConfig from "next/config";
-
-const { publicRuntimeConfig } = getConfig();
 
 const analyticsOptions = { ip: "0.0.0.0" };
 
@@ -13,7 +10,7 @@ let userId: string | undefined;
 
 export default function useAnalytics() {
   const sessions = useSessionsStore(sessionSelector.selectSessions);
-  const version = publicRuntimeConfig?.version;
+  const version = import.meta.env.VITE_APP_VERSION;
 
   const userProperties = useMemo(() => {
     return {
@@ -24,29 +21,32 @@ export default function useAnalytics() {
     };
   }, [sessions?.length, userId, version]);
 
-  const start = useCallback((userIdReceived?: string, walletInfo?: WalletInfo["result"]) => {
-    if (analytics || !userIdReceived || !walletInfo) return;
-    userId = userIdReceived;
+  const start = useCallback(
+    (userIdReceived?: string, walletInfo?: WalletInfo["result"]) => {
+      if (analytics ?? !userIdReceived ?? !walletInfo) return;
+      userId = userIdReceived;
 
-    const walletName = walletInfo.wallet.name;
+      const walletName = walletInfo.wallet.name;
 
-    let writeKey: string | undefined = undefined;
-    if (walletName === "ledger-live-desktop") {
-      writeKey = process.env.NEXT_PUBLIC_SEGMENT_API_KEY_DESKTOP;
-    } else if (walletName === "ledger-live-mobile") {
-      writeKey = process.env.NEXT_PUBLIC_SEGMENT_API_KEY_MOBILE;
-    }
+      let writeKey: string | undefined = undefined;
+      if (walletName === "ledger-live-desktop") {
+        writeKey = process.env.NEXT_PUBLIC_SEGMENT_API_KEY_DESKTOP;
+      } else if (walletName === "ledger-live-mobile") {
+        writeKey = process.env.NEXT_PUBLIC_SEGMENT_API_KEY_MOBILE;
+      }
 
-    if (walletInfo.tracking && writeKey) {
-      analytics = AnalyticsBrowser.load({ writeKey });
-      identify();
-    }
-  }, []);
+      if (walletInfo.tracking && writeKey) {
+        analytics = AnalyticsBrowser.load({ writeKey });
+        identify();
+      }
+    },
+    []
+  );
 
   const identify = useCallback(() => {
     if (!analytics) return;
 
-    analytics.identify(userId, userProperties, analyticsOptions);
+    void analytics.identify(userId, userProperties, analyticsOptions);
   }, [userId, userProperties]);
 
   const track = useCallback(
@@ -57,9 +57,9 @@ export default function useAnalytics() {
         ...userProperties,
         ...eventProperties,
       };
-      analytics.track(eventName, allProperties, analyticsOptions);
+      void analytics.track(eventName, allProperties, analyticsOptions);
     },
-    [userProperties],
+    [userProperties]
   );
 
   const page = useCallback(
@@ -72,9 +72,9 @@ export default function useAnalytics() {
         ...userProperties,
         ...eventProperties,
       };
-      analytics.page(category, pageName, allProperties, analyticsOptions);
+      void analytics.page(category, pageName, allProperties, analyticsOptions);
     },
-    [userProperties],
+    [userProperties]
   );
 
   return {

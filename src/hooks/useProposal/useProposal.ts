@@ -1,5 +1,4 @@
 import { useCallback, useState } from "react";
-import { useNavigation } from "@/hooks/common/useNavigation";
 import { sessionSelector, useSessionsStore } from "@/storage/sessions.store";
 import { accountSelector, useAccountsStore } from "@/storage/accounts.store";
 import { getNamespace } from "@/helpers/helper.util";
@@ -8,12 +7,18 @@ import { web3wallet } from "@/helpers/walletConnect.util";
 import useAnalytics from "@/hooks/common/useAnalytics";
 import { useLedgerLive } from "../common/useLedgerLive";
 import { SupportedNamespace } from "@/data/network.config";
-import { Routes, TabsIndexes } from "@/shared/navigation";
+import { TabsIndexes } from "@/shared/navigation";
 import { buildApprovedNamespaces } from "@walletconnect/utils";
-import { ProposalProps, formatAccountsByChain } from "@/hooks/useProposal/util";
+import { formatAccountsByChain } from "@/hooks/useProposal/util";
+import { useNavigate } from "@tanstack/react-router";
+import { Web3WalletTypes } from "@walletconnect/web3wallet";
+
+type ProposalProps = {
+  proposal?: Web3WalletTypes.SessionProposal;
+};
 
 export function useProposal({ proposal }: ProposalProps) {
-  const { navigate, router } = useNavigation();
+  const navigate = useNavigate();
 
   const addSession = useSessionsStore(sessionSelector.addSession);
   const accounts = useAccountsStore(accountSelector.selectAccounts);
@@ -24,7 +29,7 @@ export function useProposal({ proposal }: ProposalProps) {
 
   const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
 
-  const proposer = proposal.params.proposer;
+  const proposer = proposal?.params.proposer;
 
   const handleClick = useCallback(
     (account: string) => {
@@ -34,30 +39,26 @@ export function useProposal({ proposal }: ProposalProps) {
         setSelectedAccounts([...selectedAccounts, account]);
       }
     },
-    [selectedAccounts],
+    [selectedAccounts]
   );
 
   const handleClose = () => {
-    router.push(Routes.Home);
+    void navigate({ to: "/", search: { tab: TabsIndexes.Connect } });
     analytics.track("button_clicked", {
       button: "Close",
       page: "Wallet Connect Error Unsupported Blockchains",
     });
   };
 
-  const buildSupportedNamespaces = (): Record<
-    string,
-    {
-      chains: string[];
-      methods: string[];
-      events: string[];
-      accounts: string[];
-    }
-  > => {
+  const buildSupportedNamespaces = (
+    proposal: Web3WalletTypes.SessionProposal
+  ) => {
     const accountsByChain = formatAccountsByChain(proposal, accounts).filter(
-      (a) => a.accounts.length > 0 && a.isSupported,
+      (a) => a.accounts.length > 0 && a.isSupported
     );
-    const dataToSend = accountsByChain.reduce<{ account: string; chain: string }[]>(
+    const dataToSend = accountsByChain.reduce<
+      { account: string; chain: string }[]
+    >(
       (accum, elem) =>
         accum.concat(
           elem.accounts
@@ -65,9 +66,9 @@ export function useProposal({ proposal }: ProposalProps) {
             .map((a) => ({
               account: `${getNamespace(a.currency)}:${a.address}`,
               chain: getNamespace(a.currency),
-            })),
+            }))
         ),
-      [],
+      []
     );
 
     const requiredNamespaces = proposal.params.requiredNamespaces;
@@ -76,7 +77,11 @@ export function useProposal({ proposal }: ProposalProps) {
         ? requiredNamespaces[SupportedNamespace.EIP155]
         : { methods: [] as string[], events: [] as string[] };
 
-    const methods = [...new Set(namespace.methods.concat(Object.values(EIP155_SIGNING_METHODS)))];
+    const methods = [
+      ...new Set(
+        namespace.methods.concat(Object.values(EIP155_SIGNING_METHODS))
+      ),
+    ];
     const events = [
       ...new Set(
         namespace.events.concat([
@@ -84,7 +89,7 @@ export function useProposal({ proposal }: ProposalProps) {
           "session_request",
           "auth_request",
           "session_delete",
-        ]),
+        ])
       ),
     ];
 
@@ -99,27 +104,36 @@ export function useProposal({ proposal }: ProposalProps) {
   };
 
   const approveSession = () => {
+    if (!proposal) {
+      return;
+    }
+
     web3wallet
       .approveSession({
         id: proposal.id,
         namespaces: buildApprovedNamespaces({
           proposal: proposal.params,
-          supportedNamespaces: buildSupportedNamespaces(),
+          supportedNamespaces: buildSupportedNamespaces(proposal),
         }),
       })
       .then((res) => {
         addSession(res);
-        navigate(Routes.SessionDetails, res.topic);
+        void navigate({ to: "/detail/$topic", params: { topic: res.topic } });
       })
       .catch((error) => {
         console.error(error);
         // TODO : display error toast
-        navigate(Routes.Home, { tab: TabsIndexes.Connect });
+        // void navigate({ to: "/", search: { tab: TabsIndexes.Connect } });
+        void navigate({ to: "/" });
       });
   };
 
   const rejectSession = () => {
-    web3wallet
+    if (!proposal) {
+      return;
+    }
+
+    void web3wallet
       .rejectSession({
         id: proposal.id,
         reason: {
@@ -127,7 +141,9 @@ export function useProposal({ proposal }: ProposalProps) {
           message: "USER_REJECTED_METHODS",
         },
       })
-      .finally(() => navigate(Routes.Home));
+      .finally(
+        () => void navigate({ to: "/", search: { tab: TabsIndexes.Connect } })
+      );
   };
 
   const addNewAccount = async (currency: string) => {

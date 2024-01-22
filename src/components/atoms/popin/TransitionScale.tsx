@@ -1,4 +1,3 @@
-import React from "react";
 import { CSSTransition } from "react-transition-group";
 import { CSSTransitionProps } from "react-transition-group/CSSTransition";
 import styled from "styled-components";
@@ -39,7 +38,12 @@ const TransitionScale = ({
   timeout = duration,
   ...TransitionProps
 }: TransitionScaleProps) => (
-  <CSSTransition {...TransitionProps} in={inProp} timeout={timeout} classNames="transition-scale">
+  <CSSTransition
+    {...TransitionProps}
+    in={inProp}
+    timeout={timeout}
+    classNames="transition-scale"
+  >
     <ChildrenWrapper>{children}</ChildrenWrapper>
   </CSSTransition>
 );

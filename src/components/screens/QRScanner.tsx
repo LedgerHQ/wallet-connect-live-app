@@ -1,7 +1,5 @@
 import styled from "styled-components";
-import dynamic from "next/dynamic";
-
-const QrReader = dynamic(() => import("react-qr-reader"), { ssr: false });
+import QrReader from "react-qr-reader";
 
 const QRScannerContainer = styled.div`
   width: 100%;

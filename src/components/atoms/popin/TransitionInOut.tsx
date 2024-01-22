@@ -1,4 +1,3 @@
-import React from "react";
 import { CSSTransition } from "react-transition-group";
 import { CSSTransitionProps } from "react-transition-group/CSSTransition";
 import styled from "styled-components";
@@ -39,7 +38,12 @@ const TransitionInOut = ({
   timeout = duration,
   ...TransitionProps
 }: TransitionInOutProps): JSX.Element => (
-  <CSSTransition {...TransitionProps} in={inProp} timeout={timeout} classNames="transition-inout">
+  <CSSTransition
+    {...TransitionProps}
+    in={inProp}
+    timeout={timeout}
+    classNames="transition-inout"
+  >
     <ChildrenWrapper timeout={timeout}>{children}</ChildrenWrapper>
   </CSSTransition>
 );

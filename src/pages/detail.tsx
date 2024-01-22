@@ -10,23 +10,24 @@ import { Box, Button, CryptoIcon, Flex, Text } from "@ledgerhq/react-ui";
 import { ArrowLeftMedium } from "@ledgerhq/react-ui/assets/icons";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
-import { useTranslation } from "next-i18next";
-import { useNavigation } from "@/hooks/common/useNavigation";
-import Link from "next/link";
+import { useTranslation } from "react-i18next";
 import { Account } from "@ledgerhq/wallet-api-client";
 import { GenericRow, RowType } from "@/components/atoms/GenericRow";
 import { InfoSessionProposal } from "@/components/screens/sessions/sessionProposal/InfoSessionProposal";
 import { space } from "@ledgerhq/react-ui/styles/theme";
-import { ButtonsContainer, List, Row } from "@/components/atoms/containers/Elements";
+import {
+  ButtonsContainer,
+  List,
+  Row,
+} from "@/components/atoms/containers/Elements";
 import { ResponsiveContainer } from "@/styles/styles";
 import { sessionSelector, useSessionsStore } from "@/storage/sessions.store";
 import { useAccountsStore, accountSelector } from "@/storage/accounts.store";
 import { web3wallet } from "@/helpers/walletConnect.util";
 import { ImageWithPlaceholder } from "@/components/atoms/images/ImageWithPlaceholder";
 import useAnalytics from "@/hooks/common/useAnalytics";
-import { Routes, TabsIndexes } from "@/shared/navigation";
-
-export { getServerSideProps } from "@/lib/serverProps";
+import { TabsIndexes } from "@/shared/navigation";
+import { Link, useNavigate } from "@tanstack/react-router";
 
 const DetailContainer = styled(Flex)`
   border-radius: 12px;
@@ -54,36 +55,46 @@ const getAccountsFromAddresses = (addresses: string[], accounts: Account[]) => {
 
     const existingEntry = accountsByChain.get(chain);
 
-    const account = accounts.find((a) => a.address === addrSplitted[2] && chain === a.currency);
+    const account = accounts.find(
+      (a) => a.address === addrSplitted[2] && chain === a.currency
+    );
 
     if (account) {
-      accountsByChain.set(chain, existingEntry ? [...existingEntry, account] : [account]);
+      accountsByChain.set(
+        chain,
+        existingEntry ? [...existingEntry, account] : [account]
+      );
     }
   });
   return Array.from(accountsByChain);
 };
 
-export default function SessionDetail() {
+type Props = {
+  topic: string;
+};
+
+export default function SessionDetail({ topic }: Props) {
   const [hydrated, setHydrated] = useState(false);
   const { t } = useTranslation();
-  const { router, navigate } = useNavigation();
+  const navigate = useNavigate();
 
   const accounts = useAccountsStore(accountSelector.selectAccounts);
   const sessions = useSessionsStore(sessionSelector.selectSessions);
-  const [session] = useState(
-    sessions.find((elem) => elem.topic === JSON.parse(String(router.query?.data))),
+  const session = useMemo(
+    () => sessions.find((elem) => elem.topic === topic),
+    []
   );
   const removeSession = useSessionsStore(sessionSelector.removeSession);
 
   const navigateToSessionsHomeTab = useCallback(() => {
-    navigate(Routes.Home, { tab: TabsIndexes.Sessions });
+    return navigate({ to: "/", search: { tab: TabsIndexes.Sessions } });
   }, []);
 
   const analytics = useAnalytics();
 
   useEffect(() => {
     if (!session) {
-      navigateToSessionsHomeTab();
+      void navigateToSessionsHomeTab();
     }
     analytics.page("Wallet Connect Session Detail", {
       dapp: session?.peer?.metadata?.name ?? "Dapp name undefined",
@@ -92,10 +103,10 @@ export default function SessionDetail() {
     setHydrated(true);
   }, [session]);
 
-  const handleDelete = useCallback(async () => {
+  const handleDelete = useCallback(() => {
     if (!session) return;
     try {
-      web3wallet.disconnectSession({
+      void web3wallet.disconnectSession({
         topic: session.topic,
         reason: {
           code: 3,
@@ -110,11 +121,11 @@ export default function SessionDetail() {
       console.error(error);
     }
     removeSession(session.topic);
-    navigateToSessionsHomeTab();
+    void navigateToSessionsHomeTab();
   }, [session]);
 
   const onGoBack = () => {
-    navigateToSessionsHomeTab();
+    void navigateToSessionsHomeTab();
     analytics.track("button_clicked", {
       button: "WC-Back",
       page: "Wallet Connect Session Detail",
@@ -128,14 +139,14 @@ export default function SessionDetail() {
         ? []
         : Object.entries(session.namespaces).reduce(
             (acc, elem) => acc.concat(elem[1].accounts),
-            [] as string[],
+            [] as string[]
           ),
-    [session],
+    [session]
   );
 
   const sessionAccounts = useMemo(
     () => getAccountsFromAddresses(fullAddresses, accounts),
-    [fullAddresses, accounts],
+    [fullAddresses, accounts]
   );
 
   if (!hydrated) {
@@ -144,7 +155,13 @@ export default function SessionDetail() {
   }
 
   return (
-    <Flex flex={1} alignItems="center" justifyContent="center" width="100%" height="auto">
+    <Flex
+      flex={1}
+      alignItems="center"
+      justifyContent="center"
+      width="100%"
+      height="auto"
+    >
       <ResponsiveContainer>
         <Flex
           width="100%"
@@ -167,15 +184,28 @@ export default function SessionDetail() {
 
             <DetailContainer>
               <Row justifyContent="space-between" alignItems="center">
-                <Flex flexDirection="row" justifyContent="space-between" alignItems="center">
+                <Flex
+                  flexDirection="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
                   <ImageWithPlaceholder icon={metadata?.icons[0] ?? null} />
 
                   <Flex flexDirection="column" ml={5}>
-                    <Text variant="body" fontWeight="semiBold" color="neutral.c100">
+                    <Text
+                      variant="body"
+                      fontWeight="semiBold"
+                      color="neutral.c100"
+                    >
                       {metadata?.name}
                     </Text>
 
-                    <Text variant="small" fontWeight="medium" color="neutral.c70" mt={1}>
+                    <Text
+                      variant="small"
+                      fontWeight="medium"
+                      color="neutral.c70"
+                      mt={1}
+                    >
                       {formatUrl(metadata?.url ?? "")}
                     </Text>
                   </Flex>
@@ -226,7 +256,8 @@ export default function SessionDetail() {
                             <li
                               key={account.id}
                               style={{
-                                marginBottom: index !== accounts.length - 1 ? space[3] : 0,
+                                marginBottom:
+                                  index !== accounts.length - 1 ? space[3] : 0,
                               }}
                             >
                               <GenericRow
@@ -257,8 +288,13 @@ export default function SessionDetail() {
             ) : null}
           </Flex>
           <ButtonsContainer mt={5}>
-            <Button variant="shade" size="large" flex={1} onClick={handleDelete}>
-              <Link href={Routes.Home}>
+            <Button
+              variant="shade"
+              size="large"
+              flex={1}
+              onClick={handleDelete}
+            >
+              <Link to="/">
                 <Text variant="body" fontWeight="semiBold" color="neutral.c100">
                   {t("sessions.detail.disconnect")}
                 </Text>

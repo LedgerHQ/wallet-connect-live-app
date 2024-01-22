@@ -4,31 +4,35 @@ import LogoContainer from "@/components/atoms/logoContainers/LedgerLogoContainer
 import { AddAccountPlaceholder } from "@/components/screens/sessions/sessionProposal/AddAccountPlaceholder";
 import { ErrorBlockchainSupport } from "@/components/screens/sessions/sessionProposal/ErrorBlockchainSupport";
 import { InfoSessionProposal } from "@/components/screens/sessions/sessionProposal/InfoSessionProposal";
-import { formatUrl, getColor, getTicker, truncate } from "@/helpers/helper.util";
-import { useNavigation } from "@/hooks/common/useNavigation";
+import {
+  formatUrl,
+  getColor,
+  getTicker,
+  truncate,
+} from "@/helpers/helper.util";
 import { useProposal } from "@/hooks/useProposal/useProposal";
 import { ResponsiveContainer } from "@/styles/styles";
 import { Proposal } from "@/types/types";
 import { Flex, Button, Box, CryptoIcon, Text } from "@ledgerhq/react-ui";
-import { WalletConnectMedium, CircledCrossSolidMedium } from "@ledgerhq/react-ui/assets/icons";
-import Image from "next/image";
+import {
+  WalletConnectMedium,
+  CircledCrossSolidMedium,
+} from "@ledgerhq/react-ui/assets/icons";
 import { space } from "@ledgerhq/react-ui/styles/theme";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "react-i18next";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Logo } from "@/icons/LedgerLiveLogo";
 import styled, { useTheme } from "styled-components";
 import useAnalytics from "@/hooks/common/useAnalytics";
 import { tryDecodeURI } from "@/shared/helpers/image";
 import { sortChains } from "@/hooks/useProposal/util";
-
-export { getServerSideProps } from "@/lib/serverProps";
+import { sessionSelector, useSessionsStore } from "@/storage/sessions.store";
 
 export default function SessionProposal() {
   const { colors } = useTheme();
-  const { router } = useNavigation();
   const { t } = useTranslation();
   const [hydrated, setHydrated] = useState(false);
-  const proposal = JSON.parse(router.query.data as string) as Proposal;
+  const proposal = useSessionsStore(sessionSelector.selectProposal);
   const {
     handleClick,
     handleClose,
@@ -72,23 +76,25 @@ export default function SessionProposal() {
     rejectSession();
   }, []);
 
-  const [imageLoadingError, setImageLoadingError] = useState(false);
-
   const accountsByChain = useMemo(
-    () => formatAccountsByChain(proposal, accounts),
-    [proposal, accounts],
+    () => (proposal ? formatAccountsByChain(proposal, accounts) : []),
+    [proposal, accounts]
   );
 
   const requiredChains = accountsByChain.filter((entry) => entry.isRequired);
 
-  const chainsNotSupported = accountsByChain.filter((entry) => !entry.isSupported);
+  const chainsNotSupported = accountsByChain.filter(
+    (entry) => !entry.isSupported
+  );
 
   const noChainsSupported = !accountsByChain.some((entry) => entry.isSupported);
 
-  const everyRequiredChainsSupported = requiredChains.every((entry) => entry.isSupported);
+  const everyRequiredChainsSupported = requiredChains.every(
+    (entry) => entry.isSupported
+  );
 
   const disabled = !requiredChains.every((entry) =>
-    entry.accounts.some((account) => selectedAccounts.includes(account.id)),
+    entry.accounts.some((account) => selectedAccounts.includes(account.id))
   );
 
   const iconProposer = tryDecodeURI(proposer?.metadata?.icons[0] ?? undefined);
@@ -103,14 +109,21 @@ export default function SessionProposal() {
       alignItems="center"
       justifyContent="center"
       width="100%"
-      height={noChainsSupported || !everyRequiredChainsSupported ? "100%" : "auto"}
+      height={
+        noChainsSupported || !everyRequiredChainsSupported ? "100%" : "auto"
+      }
     >
       <ResponsiveContainer>
         {noChainsSupported || !everyRequiredChainsSupported ? (
           <Flex flex={1} flexDirection="column" height="100%">
-            <ErrorBlockchainSupport appName={proposer.metadata.name} chains={accountsByChain} />
+            <ErrorBlockchainSupport appName={dApp} chains={accountsByChain} />
             <ButtonsContainer>
-              <Button variant="main" size="large" flex={1} onClick={handleClose}>
+              <Button
+                variant="main"
+                size="large"
+                flex={1}
+                onClick={handleClose}
+              >
                 <Text variant="body" fontWeight="semiBold" color="neutral.c00">
                   {t("sessionProposal.close")}
                 </Text>
@@ -127,7 +140,7 @@ export default function SessionProposal() {
           >
             <Flex flexDirection="column">
               <Header mt={12} mb={10}>
-                {iconProposer && !imageLoadingError ? (
+                {iconProposer ? (
                   <Container>
                     <LogoContainer>
                       <Logo size={30} />
@@ -135,7 +148,7 @@ export default function SessionProposal() {
 
                     <DAppContainer borderColor={colors.background.main}>
                       <LogoContainer>
-                        <Image
+                        <img
                           src={iconProposer}
                           alt="Picture of the proposer"
                           width={60}
@@ -144,7 +157,6 @@ export default function SessionProposal() {
                             borderLeft: `3px solid ${colors.background.main}`,
                           }}
                           height={60}
-                          onError={() => setImageLoadingError(true)}
                         />
                       </LogoContainer>
                     </DAppContainer>
@@ -164,7 +176,7 @@ export default function SessionProposal() {
                   fontWeight="medium"
                 >
                   {t("sessionProposal.connectTo", {
-                    name: proposer.metadata.name,
+                    name: dApp,
                   })}
                 </Text>
 
@@ -175,7 +187,7 @@ export default function SessionProposal() {
                   color={colors.neutral.c80}
                   uppercase={false}
                 >
-                  {formatUrl(proposer.metadata.url)}
+                  {formatUrl(dAppUrl)}
                 </Text>
               </Header>
               <ListChains>
@@ -200,13 +212,18 @@ export default function SessionProposal() {
                               <li
                                 key={account.id}
                                 style={{
-                                  marginBottom: index !== entry.accounts.length - 1 ? space[3] : 0,
+                                  marginBottom:
+                                    index !== entry.accounts.length - 1
+                                      ? space[3]
+                                      : 0,
                                 }}
                               >
                                 <GenericRow
                                   title={account.name}
                                   subtitle={truncate(account.address, 30)}
-                                  isSelected={selectedAccounts.includes(account.id)}
+                                  isSelected={selectedAccounts.includes(
+                                    account.id
+                                  )}
                                   onClick={() => handleClick(account.id)}
                                   LeftIcon={
                                     <CryptoIcon
@@ -222,7 +239,9 @@ export default function SessionProposal() {
                             ))}
                           </List>
                         ) : (
-                          <AddAccountPlaceholder onClick={() => addNewAccount(entry.chain)} />
+                          <AddAccountPlaceholder
+                            onClick={() => addNewAccount(entry.chain)}
+                          />
                         )}
                       </Box>
                     );
@@ -254,8 +273,18 @@ export default function SessionProposal() {
 
             <Flex>
               <ButtonsContainer>
-                <Button variant="shade" size="large" flex={0.9} mr={6} onClick={onReject}>
-                  <Text variant="body" fontWeight="semiBold" color="neutral.c100">
+                <Button
+                  variant="shade"
+                  size="large"
+                  flex={0.9}
+                  mr={6}
+                  onClick={onReject}
+                >
+                  <Text
+                    variant="body"
+                    fontWeight="semiBold"
+                    color="neutral.c100"
+                  >
                     {t("sessionProposal.reject")}
                   </Text>
                 </Button>
@@ -296,7 +325,7 @@ const DAppContainer = styled(Flex).attrs(
     border: `3px solid ${p.borderColor}`,
     backgroundColor: p.backgroundColor,
     zIndex: 0,
-  }),
+  })
 )<{ size: number }>``;
 
 const Container = styled(Flex).attrs((p: { size: number }) => ({

@@ -1,19 +1,13 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "ESNext",
     "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
     "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "Bundler",
     "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": true,
+    "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
       "@/components/*": ["src/components/*"],
@@ -30,16 +24,9 @@
       "@/tests-tools/*": ["src/tests-tools/*"],
       "@/icons/*": ["src/icons/*"],
       "@/lib/*": ["src/lib/*"],
-      "react": ["./node_modules/@types/react"]
-    }
+      "react": ["./node_modules/@types/react"],
+    },
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    "jest.integration.config.js",
-    "jest.config.js",
-    "jest.setup.js"
-  ],
-  "exclude": ["node_modules"]
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"],
 }

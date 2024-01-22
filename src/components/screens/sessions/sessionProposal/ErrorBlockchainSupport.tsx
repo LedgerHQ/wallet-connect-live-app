@@ -1,7 +1,7 @@
 import { Account } from "@ledgerhq/wallet-api-client";
 import { Flex, Text } from "@ledgerhq/react-ui";
 import { CloseMedium } from "@ledgerhq/react-ui/assets/icons";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 import useAnalytics from "@/hooks/common/useAnalytics";
 import styled from "styled-components";
@@ -41,7 +41,12 @@ export function ErrorBlockchainSupport({ appName, chains }: Props) {
   }, []);
 
   return (
-    <Flex alignItems="center" justifyContent="center" flexDirection="column" flex={1}>
+    <Flex
+      alignItems="center"
+      justifyContent="center"
+      flexDirection="column"
+      flex={1}
+    >
       <LogoContainer>
         <CloseMedium size={32} color="background.main" />
       </LogoContainer>

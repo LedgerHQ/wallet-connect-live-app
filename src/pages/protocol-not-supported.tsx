@@ -1,14 +1,12 @@
 import { Flex, Text, Button } from "@ledgerhq/react-ui";
 import { CloseMedium } from "@ledgerhq/react-ui/assets/icons";
-import { useTranslation } from "next-i18next";
-import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { useCallback, useEffect } from "react";
 import styled from "styled-components";
-import router from "next/router";
 import { ResponsiveContainer } from "@/styles/styles";
 import { device } from "@/styles/breakpoints";
 import useAnalytics from "@/hooks/common/useAnalytics";
-
-export { getServerSideProps } from "@/lib/serverProps";
+import { useNavigate } from "@tanstack/react-router";
 
 const LogoContainer = styled(Flex)`
   border-radius: 50%;
@@ -43,9 +41,14 @@ const ButtonsContainer = styled(Flex)`
 export default function ProtocolNotSupported() {
   const { t } = useTranslation();
   const analytics = useAnalytics();
+  const navigate = useNavigate();
 
   useEffect(() => {
     analytics.page("Wallet Connect Error Unsupported Protocol V1");
+  }, []);
+
+  const goHome = useCallback(() => {
+    void navigate({ to: "/" });
   }, []);
 
   return (
@@ -54,7 +57,13 @@ export default function ProtocolNotSupported() {
         <LogoContainer>
           <CloseMedium size={32} color="background.main" />
         </LogoContainer>
-        <Text variant="h4" fontWeight="medium" color="neutral.c100" mt={10} textAlign="center">
+        <Text
+          variant="h4"
+          fontWeight="medium"
+          color="neutral.c100"
+          mt={10}
+          textAlign="center"
+        >
           {t("connect.errorProtocol.title")}
         </Text>
         <Text
@@ -70,7 +79,7 @@ export default function ProtocolNotSupported() {
           <Button
             flex={1}
             mt={12}
-            onClick={() => router.push("/")}
+            onClick={goHome}
             data-test="connect-button"
             variant="main"
             size="large"

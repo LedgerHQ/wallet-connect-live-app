@@ -1,6 +1,5 @@
 import { InfoSessionProposal } from "@/components/screens/sessions/sessionProposal/InfoSessionProposal";
 import { render, screen } from "@/tests-tools/test.utils";
-import React from "react";
 
 describe("InfoSessionProposal", () => {
   it("renders in session details", () => {

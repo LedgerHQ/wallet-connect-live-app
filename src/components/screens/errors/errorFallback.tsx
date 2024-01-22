@@ -1,7 +1,7 @@
 import { Flex, StyleProvider, Text } from "@ledgerhq/react-ui";
 import { CloseMedium } from "@ledgerhq/react-ui/assets/icons";
 import { ThemeNames } from "@ledgerhq/react-ui/styles";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 import useAnalytics from "@/hooks/common/useAnalytics";
 import styled from "styled-components";
@@ -29,11 +29,22 @@ export function ErrorFallback() {
   return (
     <StyleProvider selectedPalette={theme as ThemeNames} fontsPath="/fonts">
       <Container>
-        <Flex alignItems="center" justifyContent="center" flexDirection="column" flex={1}>
+        <Flex
+          alignItems="center"
+          justifyContent="center"
+          flexDirection="column"
+          flex={1}
+        >
           <LogoContainer>
             <CloseMedium size={32} color="background.main" />
           </LogoContainer>
-          <Text variant="h4" fontWeight="medium" color="neutral.c100" mt={10} textAlign="center">
+          <Text
+            variant="h4"
+            fontWeight="medium"
+            color="neutral.c100"
+            mt={10}
+            textAlign="center"
+          >
             {t("errorBoundary.title")}
           </Text>
           <Text

@@ -2,17 +2,24 @@ import { startProposal } from "@/helpers/walletConnect.util";
 import { ResponsiveContainer } from "@/styles/styles";
 import { InputMode } from "@/types/types";
 import { Flex } from "@ledgerhq/react-ui";
-import { useTranslation } from "next-i18next";
-import { Dispatch, SetStateAction, useState, useCallback, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import {
+  Dispatch,
+  SetStateAction,
+  useState,
+  useCallback,
+  useMemo,
+} from "react";
 import { TransitionGroup } from "react-transition-group";
-import { useNavigation } from "@/hooks/common/useNavigation";
 import { useSessionsStore, sessionSelector } from "@/storage/sessions.store";
 import styled from "styled-components";
 import { Connect } from "./Connect";
 import Sessions from "./sessions/Sessions";
 import Tabs from "./Tabs";
 import useAnalytics from "@/hooks/common/useAnalytics";
-import { TabsIndexes, Routes } from "@/shared/navigation";
+import { TabsIndexes } from "@/shared/navigation";
+import { useNavigate } from "@tanstack/react-router";
+import { indexRoute } from "src/routes";
 
 const WalletConnectContainer = styled.div`
   display: flex;
@@ -40,28 +47,30 @@ export type WalletConnectProps = {
   setUri: Dispatch<SetStateAction<string | undefined>>;
 };
 
-export default function Home({ initialURI, initialMode, setUri }: WalletConnectProps) {
-  const { router } = useNavigation();
-  const routerQueryData = router?.query?.data;
-  const initialTab = routerQueryData
-    ? JSON.parse(String(routerQueryData))?.tab
-    : TabsIndexes.Connect;
+export default function Home({
+  initialURI,
+  initialMode,
+  setUri,
+}: WalletConnectProps) {
+  const navigate = useNavigate();
+  const params = indexRoute.useParams();
+  const search = indexRoute.useSearch();
 
   const sessions = useSessionsStore(sessionSelector.selectSessions);
   const analytics = useAnalytics();
 
   const { t } = useTranslation();
 
-  const [activeTabIndex, setActiveTabIndex] = useState(initialTab);
-
   const onSetActiveTabIndex = useCallback(
     (newActiveTabIndex: number) => {
-      const newTab = newActiveTabIndex === TabsIndexes.Connect ? "Connect" : "Sessions";
-      const currentTab = activeTabIndex === TabsIndexes.Connect ? "Connect" : "Sessions";
+      const newTab =
+        newActiveTabIndex === TabsIndexes.Connect ? "Connect" : "Sessions";
+      const currentTab =
+        search.tab === TabsIndexes.Connect ? "Connect" : "Sessions";
       analytics.track("tab_clicked", { tab: newTab, page: currentTab });
-      setActiveTabIndex(newActiveTabIndex);
+      void navigate({ params, search: { tab: newActiveTabIndex } });
     },
-    [activeTabIndex, analytics],
+    [search.tab, analytics]
   );
 
   const handleConnect = async (inputValue: string) => {
@@ -69,7 +78,7 @@ export default function Home({ initialURI, initialMode, setUri }: WalletConnectP
       setUri(inputValue);
       const uri = new URL(inputValue);
       if (uri.toString().includes("@1")) {
-        router.push(Routes.ProtocolNotSupported);
+        await navigate({ to: "/protocol-not-supported" });
       } else {
         await startProposal(uri.toString());
       }
@@ -80,7 +89,8 @@ export default function Home({ initialURI, initialMode, setUri }: WalletConnectP
     }
   };
 
-  const goToConnect = () => setActiveTabIndex(TabsIndexes.Connect);
+  const goToConnect = () =>
+    void navigate({ params, search: { tab: TabsIndexes.Connect } });
 
   const TABS = useMemo(
     () => [
@@ -90,7 +100,11 @@ export default function Home({ initialURI, initialMode, setUri }: WalletConnectP
         Component: (
           <WalletConnectInnerContainer>
             <ResponsiveContainer>
-              <Connect initialURI={initialURI} mode={initialMode} onConnect={handleConnect} />
+              <Connect
+                initialURI={initialURI}
+                mode={initialMode}
+                onConnect={handleConnect}
+              />
             </ResponsiveContainer>
           </WalletConnectInnerContainer>
         ),
@@ -108,14 +122,18 @@ export default function Home({ initialURI, initialMode, setUri }: WalletConnectP
         ),
       },
     ],
-    [t, sessions],
+    [t, sessions]
   );
 
   return (
     <WalletConnectContainer>
-      <Tabs tabs={TABS} activeTabIndex={activeTabIndex} setActiveTabIndex={onSetActiveTabIndex}>
+      <Tabs
+        tabs={TABS}
+        activeTabIndex={search.tab}
+        setActiveTabIndex={onSetActiveTabIndex}
+      >
         <Flex flex={1} width="100%" height="100%" bg="background.main">
-          {TABS[activeTabIndex].Component}
+          {TABS[search.tab].Component}
         </Flex>
       </Tabs>
     </WalletConnectContainer>

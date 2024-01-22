@@ -1,8 +1,7 @@
 import { Flex, StyleProvider, Text } from "@ledgerhq/react-ui";
 import { CloseMedium } from "@ledgerhq/react-ui/assets/icons";
 import { ThemeNames } from "@ledgerhq/react-ui/styles";
-import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
+import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 import useAnalytics from "@/hooks/common/useAnalytics";
 import styled from "styled-components";

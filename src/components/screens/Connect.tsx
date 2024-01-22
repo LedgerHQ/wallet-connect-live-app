@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { PasteMedium, QrCodeMedium } from "@ledgerhq/react-ui/assets/icons";
 import { QRScanner } from "./QRScanner";
 import { InputMode } from "@/types/types";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "react-i18next";
 import useAnalytics from "@/hooks/common/useAnalytics";
 
 const QRScannerContainer = styled.div`
@@ -39,7 +39,11 @@ export type ConnectProps = {
   mode?: InputMode;
 };
 
-export function Connect({ initialURI, onConnect, mode }: Readonly<ConnectProps>) {
+export function Connect({
+  initialURI,
+  onConnect,
+  mode,
+}: Readonly<ConnectProps>) {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState<string>("");
   const [errorValue, setErrorValue] = useState<string | undefined>(undefined);
@@ -47,7 +51,8 @@ export function Connect({ initialURI, onConnect, mode }: Readonly<ConnectProps>)
   const analytics = useAnalytics();
 
   const isRunningInAndroidWebview =
-    navigator.userAgent?.includes("; wv") && navigator.userAgent?.includes("Android");
+    navigator.userAgent?.includes("; wv") &&
+    navigator.userAgent?.includes("Android");
 
   const handleConnect = useCallback(() => {
     try {
@@ -122,11 +127,16 @@ export function Connect({ initialURI, onConnect, mode }: Readonly<ConnectProps>)
         throw error;
       }
     },
-    [onConnect],
+    [onConnect]
   );
 
   return (
-    <Flex flexDirection="column" width="100%" height="100%" justifyContent="space-between">
+    <Flex
+      flexDirection="column"
+      width="100%"
+      height="100%"
+      justifyContent="space-between"
+    >
       <Flex justifyContent="center" width="100%" my={14}>
         <QRScannerContainer>
           {scanner ? (
@@ -141,7 +151,11 @@ export function Connect({ initialURI, onConnect, mode }: Readonly<ConnectProps>)
                   variant="main"
                   size="medium"
                 >
-                  <Text fontSize="body" fontWeight="semiBold" color="neutral.c00">
+                  <Text
+                    fontSize="body"
+                    fontWeight="semiBold"
+                    color="neutral.c00"
+                  >
                     {t("connect.scanQRCode")}
                   </Text>
                 </Button>

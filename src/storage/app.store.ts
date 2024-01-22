@@ -2,10 +2,11 @@ import { ThemeNames } from "@ledgerhq/react-ui/styles";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { StorageKeys } from "@/storage/types";
-export interface AppState {
+
+export type AppState = {
   theme: ThemeNames;
   setTheme: (theme: ThemeNames) => void;
-}
+};
 
 const useAppStore = create<AppState>()(
   persist(
@@ -15,8 +16,8 @@ const useAppStore = create<AppState>()(
     }),
     {
       name: StorageKeys.App,
-    },
-  ),
+    }
+  )
 );
 
 const appSelector = {

@@ -1,4 +1,3 @@
-import React from "react";
 import Tabs, { TabContent, TabsProps } from "@/components/screens/Tabs";
 import { render, screen } from "@/tests-tools/test.utils";
 
@@ -27,9 +26,14 @@ describe("Tabs", () => {
 
   const renderTabs = (props: Partial<TabsProps> = {}) => {
     return render(
-      <Tabs tabs={tabs} activeTabIndex={0} setActiveTabIndex={setActiveTabIndex} {...props}>
+      <Tabs
+        tabs={tabs}
+        activeTabIndex={0}
+        setActiveTabIndex={setActiveTabIndex}
+        {...props}
+      >
         {props.children}
-      </Tabs>,
+      </Tabs>
     );
   };
 
@@ -45,7 +49,9 @@ describe("Tabs", () => {
     expect(screen.getByText("5")).toBeInTheDocument();
 
     // Check if the disabled tab has the "disabled" class
-    expect(screen.getByText("Tab 3").closest("div")).toHaveStyle("cursor: not-allowed");
+    expect(screen.getByText("Tab 3").closest("div")).toHaveStyle(
+      "cursor: not-allowed"
+    );
   });
 
   it("calls setActiveTabIndex when a tab is clicked", async () => {

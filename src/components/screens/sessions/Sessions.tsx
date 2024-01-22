@@ -6,15 +6,14 @@ import { formatUrl } from "@/helpers/helper.util";
 import { web3wallet } from "@/helpers/walletConnect.util";
 import { Flex, Button, Box, Text } from "@ledgerhq/react-ui";
 
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "react-i18next";
 import { useCallback, useEffect, useMemo } from "react";
 import useWalletConnectPopin from "@/hooks/useWalletConnectPopin";
 
 import styled from "styled-components";
 import { useSessionsStore, sessionSelector } from "@/storage/sessions.store";
 import useAnalytics from "@/hooks/common/useAnalytics";
-import { useNavigation } from "@/hooks/common/useNavigation";
-import { Routes } from "@/shared/navigation";
+import { useNavigate } from "@tanstack/react-router";
 
 export type SessionsProps = {
   goToConnect: () => void;
@@ -24,7 +23,7 @@ const CustomList = styled(List)``;
 
 export default function Sessions({ goToConnect }: SessionsProps) {
   const { t } = useTranslation();
-  const { navigate } = useNavigation();
+  const navigate = useNavigate();
   const { openModal, closeModal, isModalOpen } = useWalletConnectPopin();
   const clearSessions = useSessionsStore(sessionSelector.clearSessions);
   const sessions = useSessionsStore(sessionSelector.selectSessions);
@@ -46,7 +45,7 @@ export default function Sessions({ goToConnect }: SessionsProps) {
   const isEmptyState = useMemo(() => sessions.length === 0, [sessions]);
 
   const goToDetailSession = (topic: string) => {
-    navigate(Routes.SessionDetails, topic);
+    void navigate({ to: "/detail/$topic", params: { topic } });
     analytics.track("button_clicked", {
       button: "Session Detail",
       page: "Wallet Connect Sessions",
@@ -70,8 +69,8 @@ export default function Sessions({ goToConnect }: SessionsProps) {
             code: 3,
             message: "Disconnect Session",
           },
-        }),
-      ),
+        })
+      )
     )
       .catch((err) => {
         console.error(err);
@@ -126,7 +125,11 @@ export default function Sessions({ goToConnect }: SessionsProps) {
               key={session.topic}
               title={session.peer.metadata.name}
               subtitle={formatUrl(session.peer.metadata.url)}
-              LeftIcon={<ImageWithPlaceholder icon={session.peer.metadata.icons[0] ?? null} />}
+              LeftIcon={
+                <ImageWithPlaceholder
+                  icon={session.peer.metadata.icons[0] ?? null}
+                />
+              }
               rowType={RowType.Detail}
               onClick={() => goToDetailSession(session.topic)}
             />

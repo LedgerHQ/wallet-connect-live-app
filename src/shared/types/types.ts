@@ -13,9 +13,7 @@ export type Family = {
   events: string[];
   required?: boolean;
 };
-export type Families = {
-  [key: string]: Family;
-};
+export type Families = Record<string, Family>;
 export type Relay = {
   protocol: string;
 };

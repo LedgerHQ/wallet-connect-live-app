@@ -1,7 +1,6 @@
 import { Text } from "@ledgerhq/react-ui";
 import { PlusMedium } from "@ledgerhq/react-ui/assets/icons";
-import { useTranslation } from "next-i18next";
-import React from "react";
+import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 
 type Props = {

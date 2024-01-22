@@ -1,9 +1,3 @@
 {
-  "presets": ["next/babel"],
-  "plugins": [["styled-components", { "ssr": true }]],
-  "env": {
-    "production": {
-      "plugins": ["transform-remove-console"]
-    }
-  }
+  "plugins": ["styled-components"]
 }

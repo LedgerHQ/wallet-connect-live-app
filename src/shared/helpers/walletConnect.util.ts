@@ -10,7 +10,7 @@ const relayerURL = "wss://relay.walletconnect.com";
 export async function createWeb3Wallet() {
   core = new Core({
     logger: "debug",
-    projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
+    projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID,
     relayUrl: relayerURL,
   });
 

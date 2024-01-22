@@ -1,4 +1,4 @@
-import React, { ReactElement } from "react";
+import { ReactElement } from "react";
 import { render, RenderOptions } from "@testing-library/react";
 import { StyleProvider } from "@ledgerhq/react-ui";
 import userEvent from "@testing-library/user-event";
@@ -22,8 +22,10 @@ const AllProviders = ({ children, theme = "dark" }: PropsTheme) => {
   );
 };
 
-const customRender = (ui: ReactElement, options?: Omit<RenderOptions, "wrapper">) =>
-  render(ui, { wrapper: AllProviders, ...options });
+const customRender = (
+  ui: ReactElement,
+  options?: Omit<RenderOptions, "wrapper">
+) => render(ui, { wrapper: AllProviders, ...options });
 
 /**
  *
@@ -31,7 +33,10 @@ const customRender = (ui: ReactElement, options?: Omit<RenderOptions, "wrapper">
  * @param options
  * @returns your component wrapped with theme and userEvent setuped
  */
-const setupUserEventWithRender = (ui: ReactElement, options?: Omit<RenderOptions, "wrapper">) => ({
+const setupUserEventWithRender = (
+  ui: ReactElement,
+  options?: Omit<RenderOptions, "wrapper">
+) => ({
   user: userEvent.setup(),
   ...customRender(ui, options),
 });
