@@ -8,6 +8,9 @@ export let core: ICore;
 const relayerURL = "wss://relay.walletconnect.com";
 
 export async function createWeb3Wallet() {
+  if (core) {
+    return
+  }
   core = new Core({
     logger: "debug",
     projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID,
