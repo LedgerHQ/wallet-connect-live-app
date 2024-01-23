@@ -11,7 +11,6 @@ export default function useInitialization() {
     try {
       clearSessions();
       await createWeb3Wallet();
-
       addSessions(Object.values(web3wallet.getActiveSessions()));
 
       setInitialized(true);
