@@ -1,9 +1,17 @@
 {
-  "buy" : "Acheter",
-  "sell" : "Vendre",
-  "continue" : "Continuer",
-  "back" : "Retour",
-  "add_account" : "Ajouter un compte",
-  "choose_asset" : "Choisir un actif",
-  "choose_account" : "Choisir un compte"
+  "buy": "Acheter",
+  "sell": "Vendre",
+  "continue": "Continuer",
+  "back": "Retour",
+  "add_account": "Ajouter un compte",
+  "choose_asset": "Choisir un actif",
+  "choose_account": "Choisir un compte",
+  "connect": {
+    "title": "Connection",
+    "cta": "Se connecter",
+    "scanQRCode": "Scanner un QR code"
+  },
+  "sessions": {
+    "title": "Sessions"
+  }
 }

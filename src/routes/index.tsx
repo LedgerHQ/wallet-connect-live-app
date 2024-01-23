@@ -12,6 +12,7 @@ import useInitialization from "@/hooks/useInitialization";
 import { WalletAPIProvider } from "@ledgerhq/wallet-api-client-react";
 import { WindowMessageTransport } from "@ledgerhq/wallet-api-client";
 import useWalletConnectEventsManager from "@/hooks/useWalletConnectEventsManager";
+import { useTranslation } from "react-i18next";
 // import {
 //   getSimulatorTransport,
 //   profiles,
@@ -44,6 +45,16 @@ const transport = getWalletAPITransport();
 
 function Root() {
   const theme = useAppStore(appSelector.selectTheme);
+
+  const {
+    i18n: { changeLanguage, language },
+  } = useTranslation();
+  let params = new URL(document.location.href).searchParams;
+  let lng = params.get("lang");
+  if (!!lng && lng !== language) {
+    changeLanguage(lng);
+  }
+
   const initialized = useInitialization();
   useWalletConnectEventsManager(initialized);
 
