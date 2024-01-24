@@ -3,14 +3,7 @@ import { ResponsiveContainer } from "@/styles/styles";
 import { InputMode } from "@/types/types";
 import { Flex } from "@ledgerhq/react-ui";
 import { useTranslation } from "react-i18next";
-import {
-  Dispatch,
-  SetStateAction,
-  useState,
-  useCallback,
-  useMemo,
-} from "react";
-import { TransitionGroup } from "react-transition-group";
+import { Dispatch, SetStateAction, useCallback, useMemo } from "react";
 import { useSessionsStore, sessionSelector } from "@/storage/sessions.store";
 import styled from "styled-components";
 import { Connect } from "./Connect";
