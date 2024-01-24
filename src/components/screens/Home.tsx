@@ -130,11 +130,11 @@ export default function Home({
     <WalletConnectContainer>
       <Tabs
         tabs={TABS}
-        activeTabIndex={search.tab}
+        activeTabIndex={search.tab ?? 0}
         setActiveTabIndex={onSetActiveTabIndex}
       >
         <Flex flex={1} width="100%" height="100%" bg="background.main">
-          {TABS[search.tab].Component}
+          {TABS[search.tab ?? 0].Component}
         </Flex>
       </Tabs>
     </WalletConnectContainer>
