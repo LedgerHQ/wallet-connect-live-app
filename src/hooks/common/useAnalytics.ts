@@ -30,9 +30,9 @@ export default function useAnalytics() {
 
       let writeKey: string | undefined = undefined;
       if (walletName === "ledger-live-desktop") {
-        writeKey = process.env.NEXT_PUBLIC_SEGMENT_API_KEY_DESKTOP;
+        writeKey = import.meta.env.VITE_PUBLIC_SEGMENT_API_KEY_DESKTOP;
       } else if (walletName === "ledger-live-mobile") {
-        writeKey = process.env.NEXT_PUBLIC_SEGMENT_API_KEY_MOBILE;
+        writeKey = import.meta.env.VITE_PUBLIC_SEGMENT_API_KEY_MOBILE;
       }
 
       if (walletInfo.tracking && writeKey) {

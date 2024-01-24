@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider } from "@tanstack/react-router";
 import { router } from "./routes";
 import "../i18n.ts";
-import { useTranslation } from "react-i18next";
+import * as Sentry from "@sentry/react";
 // import "./index.css";
 
 declare module "@tanstack/react-router" {
@@ -12,7 +12,22 @@ declare module "@tanstack/react-router" {
     router: typeof router;
   }
 }
-// init sentry here
+
+const SENTRY_DNS =
+  import.meta.env.VITE_SENTRY_DNS ?? import.meta.env.VITE_PUBLIC_SENTRY_DSN;
+
+if (SENTRY_DNS) {
+  Sentry.init({
+    dsn: SENTRY_DNS,
+    environment: import.meta.env.MODE, // https://vitejs.dev/guide/env-and-mode#env-variables
+    tracesSampleRate: 0, // https://docs.sentry.io/platforms/javascript/performance
+    autoSessionTracking: false, // https://docs.sentry.io/platforms/javascript/configuration/options/#auto-session-tracking
+    sendClientReports: false, // https://docs.sentry.io/platforms/javascript/configuration/options/#send-client-reports
+    // NOTE: routing instrumentation only supports react-router out of the box https://docs.sentry.io/platforms/javascript/guides/react/features/react-router/
+  });
+} else {
+  console.error("NO CONFIG FOR SENTRY (S)");
+}
 
 const rootElement = document.getElementById("app");
 if (rootElement && !rootElement.innerHTML) {
