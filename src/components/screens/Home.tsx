@@ -31,7 +31,7 @@ const WalletConnectContainer = styled.div`
   padding-top: ${(p) => p.theme.space[5]}px;
 `;
 
-const WalletConnectInnerContainer = styled(TransitionGroup)`
+const WalletConnectInnerContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
