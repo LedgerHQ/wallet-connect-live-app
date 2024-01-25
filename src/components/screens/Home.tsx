@@ -46,7 +46,6 @@ export default function Home({
   setUri,
 }: WalletConnectProps) {
   const navigate = useNavigate();
-  const params = indexRoute.useParams();
   const search = indexRoute.useSearch();
 
   const sessions = useSessionsStore(sessionSelector.selectSessions);
@@ -61,7 +60,10 @@ export default function Home({
       const currentTab =
         search.tab === TabsIndexes.Connect ? "Connect" : "Sessions";
       analytics.track("tab_clicked", { tab: newTab, page: currentTab });
-      void navigate({ params, search: { tab: newActiveTabIndex } });
+      void navigate({
+        params: (params) => params,
+        search: { tab: newActiveTabIndex },
+      });
     },
     [search.tab, analytics]
   );
@@ -84,7 +86,10 @@ export default function Home({
   };
 
   const goToConnect = () =>
-    void navigate({ params, search: { tab: TabsIndexes.Connect } });
+    void navigate({
+      params: (params) => params,
+      search: { tab: TabsIndexes.Connect },
+    });
 
   const TABS = useMemo(
     () => [
@@ -106,7 +111,7 @@ export default function Home({
       {
         index: TabsIndexes.Sessions,
         title: t("sessions.title"),
-        badge: sessions?.length ?? undefined,
+        badge: sessions?.length,
         Component: (
           <WalletConnectInnerContainer>
             <ResponsiveContainer>
@@ -123,11 +128,11 @@ export default function Home({
     <WalletConnectContainer>
       <Tabs
         tabs={TABS}
-        activeTabIndex={search.tab ?? 0}
+        activeTabIndex={search.tab}
         setActiveTabIndex={onSetActiveTabIndex}
       >
         <Flex flex={1} width="100%" height="100%" bg="background.main">
-          {TABS[search.tab ?? 0].Component}
+          {TABS[search.tab].Component}
         </Flex>
       </Tabs>
     </WalletConnectContainer>

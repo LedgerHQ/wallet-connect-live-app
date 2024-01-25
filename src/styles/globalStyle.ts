@@ -12,7 +12,7 @@ const GlobalStyle = createGlobalStyle`
         -webkit-tap-highlight-color: transparent;
     }
 
-    #__next {
+    #app {
         width: 100vw;
         height: 100vh;
     }

@@ -15,6 +15,7 @@ import { WindowMessageTransport } from "@ledgerhq/wallet-api-client";
 import useWalletConnectEventsManager from "@/hooks/useWalletConnectEventsManager";
 import { ApplicationDisabled } from "@/components/ApplicationDisabled";
 import { InputMode } from "@/shared/types/types";
+import { Container } from "@/styles/styles";
 
 // import {
 //   getSimulatorTransport,
@@ -65,7 +66,9 @@ function Root() {
     <StyleProvider selectedPalette={theme} fontsPath="/fonts">
       <WalletAPIProvider transport={transport}>
         <GlobalStyle />
-        <Outlet />
+        <Container>
+          <Outlet />
+        </Container>
         <TanStackRouterDevtools />
       </WalletAPIProvider>
     </StyleProvider>
@@ -86,7 +89,7 @@ const walletInfo = {
 };
 
 type IndexSearch = {
-  tab?: TabsIndexes;
+  tab: TabsIndexes;
   uri?: string;
   mode?: InputMode;
 };
@@ -102,18 +105,20 @@ export const indexRoute = new Route({
   validateSearch: (search: Record<string, unknown>): IndexSearch => {
     // validate and parse the search params into a typed state
 
-    const initialUri =
+    const tab = search.tab ? Number(search.tab) : TabsIndexes.Connect;
+
+    const uri =
       search.uri && typeof search.uri === "string" ? search.uri : undefined;
 
-    const initialMode =
+    const mode =
       search.mode === "scan" || search.mode === "text"
         ? search.mode
         : undefined;
 
     return {
-      tab: Number(search.tab ?? TabsIndexes.Connect),
-      uri: initialUri,
-      mode: initialMode,
+      tab,
+      uri,
+      mode,
     };
   },
   component: function Index() {
