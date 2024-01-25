@@ -1,5 +1,6 @@
 import { Router, Route, RootRoute, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
+import { useTranslation } from "react-i18next";
 import App from "@/components/screens";
 import { detailRoute } from "./detail";
 import { proposalRoute } from "./proposalRoute";
@@ -12,7 +13,9 @@ import useInitialization from "@/hooks/useInitialization";
 import { WalletAPIProvider } from "@ledgerhq/wallet-api-client-react";
 import { WindowMessageTransport } from "@ledgerhq/wallet-api-client";
 import useWalletConnectEventsManager from "@/hooks/useWalletConnectEventsManager";
-import { useTranslation } from "react-i18next";
+import { ApplicationDisabled } from "@/components/ApplicationDisabled";
+import { InputMode } from "@/shared/types/types";
+
 // import {
 //   getSimulatorTransport,
 //   profiles,
@@ -84,18 +87,40 @@ const walletInfo = {
 
 type IndexSearch = {
   tab?: TabsIndexes;
+  uri?: string;
+  mode?: InputMode;
 };
+
+// We could make everything lazy at the top to avoid download code for the app when disabled
+const isApplicationDisabled = Boolean(
+  import.meta.env.VITE_APPLICATION_DISABLED === "true"
+);
 
 export const indexRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "/",
   validateSearch: (search: Record<string, unknown>): IndexSearch => {
     // validate and parse the search params into a typed state
+
+    const initialUri =
+      search.uri && typeof search.uri === "string" ? search.uri : undefined;
+
+    const initialMode =
+      search.mode === "scan" || search.mode === "text"
+        ? search.mode
+        : undefined;
+
     return {
       tab: Number(search.tab ?? TabsIndexes.Connect),
+      uri: initialUri,
+      mode: initialMode,
     };
   },
   component: function Index() {
+    if (isApplicationDisabled) {
+      return <ApplicationDisabled />;
+    }
+
     return <App accounts={[]} userId="" walletInfo={walletInfo} />;
   },
 });

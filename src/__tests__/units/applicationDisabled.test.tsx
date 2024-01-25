@@ -1,4 +1,4 @@
-import { ApplicationDisabled } from "@/components/screens/ApplicationDisabled";
+import { ApplicationDisabled } from "@/components/ApplicationDisabled";
 import { render, screen } from "@/tests-tools/test.utils";
 
 jest.mock("next/router", () => ({
