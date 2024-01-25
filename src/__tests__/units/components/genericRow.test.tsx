@@ -45,7 +45,7 @@ describe("GenericRow", () => {
   });
 
   it("should call onClick when GenericRow with Select type is clicked", () => {
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     const { container } = render(
       <GenericRow
         {...defaultProps}
