@@ -30,6 +30,11 @@ export default defineConfig({
       // env: process.env.NODE_ENV,
     }),
   ],
+  test: {
+    coverage: {
+      provider: 'v8' // or 'v8'
+    },
+  },
   // resolve: {
   //   "@ledgerhq/react-ui": path.join(
   //     path.dirname(require.resolve("@ledgerhq/react-ui/package.json")),
