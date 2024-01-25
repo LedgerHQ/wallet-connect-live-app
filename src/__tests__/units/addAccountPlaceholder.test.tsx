@@ -1,8 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@/tests-tools/test.utils";
 import { AddAccountPlaceholder } from "@/components/screens/sessions/sessionProposal/AddAccountPlaceholder";
 
-const onClickMock = jest.fn();
+const onClickMock = vi.fn();
 
 describe("Add Account Placeholder Screen", () => {
   it("Page should appears and on click triggers action", async () => {

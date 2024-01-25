@@ -1,9 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { Connect } from "@/components/screens/Connect";
 import useAnalytics from "@/hooks/common/useAnalytics";
 import { render, screen, renderHook } from "@/tests-tools/test.utils";
 
-const onConnectMock = jest.fn();
+const onConnectMock = vi.fn();
 
 describe("Connect Screen", () => {
   it("Page should appears", () => {

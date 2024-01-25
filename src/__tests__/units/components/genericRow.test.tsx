@@ -1,5 +1,6 @@
 import { GenericRow, RowType } from "@/components/atoms/GenericRow";
 import { fireEvent, render, screen } from "@/tests-tools/test.utils";
+import { vi } from "vitest";
 
 describe("GenericRow", () => {
   const defaultProps = {
@@ -22,7 +23,7 @@ describe("GenericRow", () => {
   });
 
   it("should render GenericRow with Select type correctly", () => {
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     render(
       <GenericRow
         {...defaultProps}

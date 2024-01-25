@@ -1,6 +1,6 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import Tabs, { TabContent, TabsProps } from "@/components/screens/Tabs";
-import { render, screen } from "@/tests-tools/test.utils";
+import { cleanup, render, screen } from "@/tests-tools/test.utils";
 
 const tabs: TabContent[] = [
   {

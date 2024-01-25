@@ -1,8 +1,9 @@
 import { WalletConnectPopin } from "@/components/atoms/popin/WalletConnectPopin";
 import { render, screen } from "@/tests-tools/test.utils";
+import { vi } from "vitest";
 
 // Mock the onClose function
-const mockOnClose = jest.fn();
+const mockOnClose = vi.fn();
 
 describe("WalletConnectPopin", () => {
   it("should render the component when isOpen is true", () => {
