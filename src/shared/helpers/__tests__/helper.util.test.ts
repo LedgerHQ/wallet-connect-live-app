@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest'
 import { SUPPORTED_NETWORK } from "@/data/network.config";
 import {
   formatUrl,

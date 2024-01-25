@@ -34,6 +34,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8' // or 'v8'
     },
+    environment: 'happy-dom' // https://vitest.dev/config/#environment
   },
   // resolve: {
   //   "@ledgerhq/react-ui": path.join(

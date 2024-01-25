@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest'
 import { ACCOUNT_MOCK } from "@/tests-tools/mocks/account.mock";
 import {
   compareAddresses,

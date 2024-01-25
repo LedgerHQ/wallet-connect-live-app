@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest'
 import { isHTML, tryDecodeURI } from "../image";
 
 describe("Image Util", () => {
