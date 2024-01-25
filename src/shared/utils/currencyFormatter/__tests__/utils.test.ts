@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest'
 import BigNumber from "bignumber.js";
 import { defaultFormatOptions } from "../constants";
 import { formatCurrencyUnitFragment, toLocaleString } from "../formatCurrency";
@@ -48,7 +49,7 @@ describe("getNumberWithOptions tests", () => {
 describe("formatCurrencyUnitFragment tests", () => {
   const unit = { code: "BTC", magnitude: 0, name: "bitcoin" };
   it("should validate big number input", () => {
-    const consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(); // mock console.warn to clean warnings while running this test
+    const consoleWarnMock = vi.spyOn(console, "warn").mockImplementation(() => {}); // mock console.warn to clean warnings while running this test
 
     expect(formatCurrencyUnitFragment(unit, new BigNumber("not a number"))).toEqual([]);
 
