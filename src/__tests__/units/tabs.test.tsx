@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from "vitest";
 import Tabs, { TabContent, TabsProps } from "@/components/screens/Tabs";
 import { render, screen } from "@/tests-tools/test.utils";
 
@@ -22,7 +23,7 @@ const tabs: TabContent[] = [
 ];
 
 describe("Tabs", () => {
-  const setActiveTabIndex = jest.fn();
+  const setActiveTabIndex = vi.fn();
 
   const renderTabs = (props: Partial<TabsProps> = {}) => {
     return render(

@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { Connect } from "@/components/screens/Connect";
 import useAnalytics from "@/hooks/common/useAnalytics";
 import { render, screen, renderHook } from "@/tests-tools/test.utils";

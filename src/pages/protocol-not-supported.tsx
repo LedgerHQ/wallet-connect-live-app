@@ -7,6 +7,7 @@ import { ResponsiveContainer } from "@/styles/styles";
 import { device } from "@/styles/breakpoints";
 import useAnalytics from "@/hooks/common/useAnalytics";
 import { useNavigate } from "@tanstack/react-router";
+import { TabsIndexes } from "@/shared/navigation";
 
 const LogoContainer = styled(Flex)`
   border-radius: 50%;
@@ -48,7 +49,7 @@ export default function ProtocolNotSupported() {
   }, []);
 
   const goHome = useCallback(() => {
-    void navigate({ to: "/" });
+    void navigate({ to: "/", search: { tab: TabsIndexes.Connect } });
   }, []);
 
   return (

@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { render, screen } from "@/tests-tools/test.utils";
 import { ErrorFallback } from "@/components/screens/errors/errorFallback";
 

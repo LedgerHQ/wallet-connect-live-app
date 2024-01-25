@@ -31,10 +31,13 @@ export default defineConfig({
     }),
   ],
   test: {
+    globals: true, // so cleanup() runs after each test.
+    setupFiles: './vitest.setup.ts',
     coverage: {
       provider: 'v8' // or 'v8'
     },
-    environment: 'happy-dom' // https://vitest.dev/config/#environment
+    // environment: 'happy-dom' // https://vitest.dev/config/#environment
+    environment: 'jsdom' // https://vitest.dev/config/#environment
   },
   // resolve: {
   //   "@ledgerhq/react-ui": path.join(

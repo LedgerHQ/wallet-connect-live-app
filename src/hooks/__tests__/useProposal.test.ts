@@ -13,6 +13,7 @@ import { Proposal } from '@/storage/sessions.store';
 
 describe("getChains", () => {
   it("should return an array with required and optional namespaces", () => {
+    // TODO: check here (types and mock)
     const proposal = JSON.parse(JSON.stringify(sessionProposal)) as Proposal;
 
     const result = getChains(proposal);

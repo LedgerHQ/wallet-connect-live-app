@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { ApplicationDisabled } from "@/components/ApplicationDisabled";
 import { render, screen } from "@/tests-tools/test.utils";
 
