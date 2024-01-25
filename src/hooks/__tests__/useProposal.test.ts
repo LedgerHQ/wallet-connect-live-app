@@ -1,14 +1,15 @@
+import { describe, expect, it, vi } from 'vitest'
 import {
   formatAccountsByChain,
   getChains,
   sortChains,
   sortAlphabetic,
 } from "@/hooks/useProposal/util";
-import { Proposal } from "@/shared/types/types";
 import sessionProposal from "@/data/mocks/sessionProposal.example.json";
 import sessionProposalNotSupported from "@/data/mocks/sessionProposalNotSupported.example.json";
 
 import { ACCOUNT_MOCK } from "@/tests-tools/mocks/account.mock";
+import { Proposal } from '@/storage/sessions.store';
 
 describe("getChains", () => {
   it("should return an array with required and optional namespaces", () => {
@@ -33,6 +34,7 @@ describe("getChains", () => {
         methods: ["someMethod"],
         chains: ["optionalChain:1"],
         events: ["optionalEvent"],
+        required: false,
       },
     ]);
   });
@@ -95,10 +97,10 @@ describe("formatAccountsByChain", () => {
     },
   ];
 
-  const getCurrencyByChainId = jest.fn();
+  const getCurrencyByChainId = vi.fn();
   getCurrencyByChainId.mockImplementation((chainId) => `${chainId}`);
 
-  jest.mock("@/shared/helpers/helper.util", () => ({
+  vi.doMock("@/shared/helpers/helper.util", () => ({
     getCurrencyByChainId,
   }));
 

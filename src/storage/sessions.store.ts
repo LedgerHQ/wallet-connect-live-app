@@ -6,7 +6,7 @@ import { Web3WalletTypes } from "@walletconnect/web3wallet";
 
 type Session = SessionTypes.Struct;
 
-type Proposal = Web3WalletTypes.SessionProposal;
+export type Proposal = Web3WalletTypes.SessionProposal;
 
 type SessionsState = {
   proposal?: Proposal;
