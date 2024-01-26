@@ -2,7 +2,7 @@
 import "@testing-library/react/dont-cleanup-after-each";
 import { cleanup, render, waitFor, screen } from "@/tests-tools/test.utils";
 import { initialParamsHomePage } from "@/tests-tools/mocks/initialParams.mock";
-import AppScreen from "@/components/screens";
+import AppScreen from "@/components/screens/Home";
 import sessionProposalNotSupported from "@/data/mocks/sessionProposalNotSupported.example.json";
 import SessionProposal from "@/pages/proposal";
 import { useNavigate } from "@tanstack/react-router";

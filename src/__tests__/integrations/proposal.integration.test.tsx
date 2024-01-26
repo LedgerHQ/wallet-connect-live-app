@@ -10,7 +10,7 @@ import userEvent from "@testing-library/user-event";
 import { createWeb3Wallet } from "@/shared/helpers/walletConnect.util";
 import { vi } from "vitest";
 import { Route, useNavigate } from "@tanstack/react-router";
-import AppScreen from "@/components/screens";
+import AppScreen from "@/components/screens/Home";
 
 // mock useRouter
 // jest.mock("next/router", () => ({
