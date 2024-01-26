@@ -9,7 +9,7 @@ const relayerURL = "wss://relay.walletconnect.com";
 
 export async function createWeb3Wallet() {
   if (core) {
-    return
+    return;
   }
   core = new Core({
     logger: "debug",
@@ -28,8 +28,8 @@ export async function createWeb3Wallet() {
   });
 }
 
-async function pair(uri: string) {
-  return await core.pairing.pair({ uri });
+function pair(uri: string) {
+  return core.pairing.pair({ uri });
 }
 
 export async function startProposal(uri: string) {

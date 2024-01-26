@@ -46,7 +46,6 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
    *****************************************************************************/
   const onSessionProposal = useCallback(
     (proposal: Web3WalletTypes.SessionProposal) => {
-      console.log("navigate to proposal ", proposal);
       setProposal(proposal);
       void navigate({ to: "/proposal" });
     },

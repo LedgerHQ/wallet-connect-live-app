@@ -1,7 +1,7 @@
 import { Router, Route, RootRoute, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import { useTranslation } from "react-i18next";
-import App from "@/components/screens";
+import App from "@/components/screens/Home";
 import { detailRoute } from "./detail";
 import { proposalRoute } from "./proposalRoute";
 import { protocolNotSupportedRoute } from "./protocolNotSupportedRoute";
@@ -16,6 +16,7 @@ import useWalletConnectEventsManager from "@/hooks/useWalletConnectEventsManager
 import { ApplicationDisabled } from "@/components/ApplicationDisabled";
 import { InputMode } from "@/shared/types/types";
 import { Container } from "@/styles/styles";
+// import useAnalytics from "@/hooks/common/useAnalytics";
 
 // import {
 //   getSimulatorTransport,
@@ -50,6 +51,14 @@ const transport = getWalletAPITransport();
 function Root() {
   const theme = useAppStore(appSelector.selectTheme);
 
+  // Migrate to analytics provider that will get the wallet-api infos by itself
+  // const analytics = useAnalytics();
+
+  // useEffect(() => {
+  //   analytics.start(userId, walletInfo);
+  // }, []);
+
+  // TODO: we could probably use the search from tanstack router for lang and theme params
   const {
     i18n: { changeLanguage, language },
   } = useTranslation();
@@ -79,14 +88,6 @@ function Root() {
 export const rootRoute = new RootRoute({
   component: Root,
 });
-
-const walletInfo = {
-  tracking: false,
-  wallet: {
-    name: "test",
-    version: "test",
-  },
-};
 
 type IndexSearch = {
   tab: TabsIndexes;
@@ -126,7 +127,7 @@ export const indexRoute = new Route({
       return <ApplicationDisabled />;
     }
 
-    return <App accounts={[]} userId="" walletInfo={walletInfo} />;
+    return <App />;
   },
 });
 

@@ -1,9 +1,8 @@
 import { startProposal } from "@/helpers/walletConnect.util";
 import { ResponsiveContainer } from "@/styles/styles";
-import { InputMode } from "@/types/types";
 import { Flex } from "@ledgerhq/react-ui";
 import { useTranslation } from "react-i18next";
-import { Dispatch, SetStateAction, useCallback, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useSessionsStore, sessionSelector } from "@/storage/sessions.store";
 import styled from "styled-components";
 import { Connect } from "./Connect";
@@ -34,17 +33,7 @@ const WalletConnectInnerContainer = styled.div`
   background: ${({ theme }) => theme.colors.background.main};
 `;
 
-export type WalletConnectProps = {
-  initialURI?: string;
-  initialMode?: InputMode;
-  setUri: Dispatch<SetStateAction<string | undefined>>;
-};
-
-export default function Home({
-  initialURI,
-  initialMode,
-  setUri,
-}: WalletConnectProps) {
+export default function Home() {
   const navigate = useNavigate();
   const search = indexRoute.useSearch();
 
@@ -70,8 +59,10 @@ export default function Home({
 
   const handleConnect = async (inputValue: string) => {
     try {
-      // setUri(inputValue)
-      // NOTE: useEffect in Connect would retrigger onConnect with that same value
+      await navigate({
+        params: (params) => params,
+        search: (search) => ({ ...search, uri: inputValue }),
+      });
       const uri = new URL(inputValue);
       if (uri.toString().includes("@1")) {
         await navigate({ to: "/protocol-not-supported" });
@@ -81,7 +72,10 @@ export default function Home({
     } catch (error: unknown) {
       console.error(error);
     } finally {
-      setUri("");
+      await navigate({
+        params: (params) => params,
+        search: (search) => ({ ...search, uri: undefined }),
+      });
     }
   };
 
@@ -100,8 +94,8 @@ export default function Home({
           <WalletConnectInnerContainer>
             <ResponsiveContainer>
               <Connect
-                initialURI={initialURI}
-                mode={initialMode}
+                initialURI={search.uri}
+                mode={search.mode}
                 onConnect={handleConnect}
               />
             </ResponsiveContainer>
