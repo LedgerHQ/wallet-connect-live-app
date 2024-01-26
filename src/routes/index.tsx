@@ -63,7 +63,7 @@ function Root() {
     i18n: { changeLanguage, language },
   } = useTranslation();
   let params = new URL(document.location.href).searchParams;
-  let lng = params.get("lang");
+  const lng = params.get("lang");
   if (!!lng && lng !== language) {
     changeLanguage(lng);
   }
