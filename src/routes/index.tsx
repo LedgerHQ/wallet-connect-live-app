@@ -55,7 +55,12 @@ function getWalletAPITransport() {
 const transport = getWalletAPITransport();
 
 function Root() {
-  // const theme = useAppStore(appSelector.selectTheme);
+  const themeStored = useAppStore(appSelector.selectTheme);
+  const setTheme = useAppStore(appSelector.setTheme);
+  // TODO: we could probably use the search from tanstack router for lang and theme params
+  const {
+    i18n: { changeLanguage, language },
+  } = useTranslation();
 
   // Migrate to analytics provider that will get the wallet-api infos by itself
   // const analytics = useAnalytics();
@@ -64,21 +69,19 @@ function Root() {
   //   analytics.start(userId, walletInfo);
   // }, []);
 
-  // TODO: we could probably use the search from tanstack router for lang and theme params
-  const {
-    i18n: { changeLanguage, language },
-  } = useTranslation();
-
   const { lang, theme } = rootRoute.useSearch();
   if (lang !== language) {
     changeLanguage(lang);
+  }
+  if ((theme == "dark" || theme == "light") && theme !== themeStored) {
+    setTheme(theme);
   }
 
   const initialized = useInitialization();
   useWalletConnectEventsManager(initialized);
 
   return (
-    <StyleProvider selectedPalette={theme} fontsPath="/fonts">
+    <StyleProvider selectedPalette={themeStored} fontsPath="/fonts">
       <WalletAPIProvider transport={transport}>
         <GlobalStyle />
         <Container>
@@ -91,7 +94,7 @@ function Root() {
 }
 
 type RootSearch = {
-  theme?: "light" | "dark";
+  theme?: string;
   lang?: string;
 };
 
@@ -99,7 +102,10 @@ type RootSearch = {
 export const rootRoute = new RootRoute({
   component: Root,
   validateSearch: (search: Record<string, unknown>): RootSearch => {
-    const theme = search.theme == "light" ? "light" : "dark";
+    const theme =
+      search.theme && typeof search.theme === "string"
+        ? search.theme
+        : undefined;
     const lang =
       search.lang && typeof search.lang === "string" ? search.lang : undefined;
 
