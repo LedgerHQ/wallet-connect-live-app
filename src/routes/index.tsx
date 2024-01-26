@@ -1,4 +1,10 @@
-import { Router, Route, RootRoute, Outlet } from "@tanstack/react-router";
+import {
+  Router,
+  Route,
+  RootRoute,
+  Outlet,
+  useRouter,
+} from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import { useTranslation } from "react-i18next";
 import App from "@/components/screens/Home";
@@ -49,7 +55,7 @@ function getWalletAPITransport() {
 const transport = getWalletAPITransport();
 
 function Root() {
-  const theme = useAppStore(appSelector.selectTheme);
+  // const theme = useAppStore(appSelector.selectTheme);
 
   // Migrate to analytics provider that will get the wallet-api infos by itself
   // const analytics = useAnalytics();
@@ -62,10 +68,10 @@ function Root() {
   const {
     i18n: { changeLanguage, language },
   } = useTranslation();
-  let params = new URL(document.location.href).searchParams;
-  const lng = params.get("lang");
-  if (!!lng && lng !== language) {
-    changeLanguage(lng);
+
+  const { lang, theme } = rootRoute.useSearch();
+  if (lang !== language) {
+    changeLanguage(lang);
   }
 
   const initialized = useInitialization();
@@ -84,9 +90,24 @@ function Root() {
   );
 }
 
+type RootSearch = {
+  theme?: "light" | "dark";
+  lang?: string;
+};
+
 // All providers should be declared here
 export const rootRoute = new RootRoute({
   component: Root,
+  validateSearch: (search: Record<string, unknown>): RootSearch => {
+    const theme = search.theme == "light" ? "light" : "dark";
+    const lang =
+      search.lang && typeof search.lang === "string" ? search.lang : undefined;
+
+    return {
+      theme,
+      lang,
+    };
+  },
 });
 
 type IndexSearch = {
