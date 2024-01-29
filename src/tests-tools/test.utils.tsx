@@ -54,7 +54,7 @@ const setupUserEventWithRender = (
 });
 
 export * from "@testing-library/react";
-// export { setupUserEventWithRender as render };
+export { setupUserEventWithRender as render };
 
 const Root = () => {
   const transport = getWalletAPITransport();
@@ -102,4 +102,4 @@ export async function renderComponent(component: () => JSX.Element) {
   return router;
 }
 
-export { renderComponent as render };
+export { renderComponent as renderWithRouter };
