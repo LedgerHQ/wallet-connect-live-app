@@ -164,7 +164,7 @@ export function formatCurrencyUnit(
   options?: Partial<typeof defaultFormatOptions>,
 ): string {
   const joinFragmentsSeparator =
-    (options && options.joinFragmentsSeparator) || defaultFormatOptions.joinFragmentsSeparator;
+    options?.joinFragmentsSeparator ?? defaultFormatOptions.joinFragmentsSeparator;
   return formatCurrencyUnitFragment(unit, value, options)
     .map((f) => f.value)
     .join(joinFragmentsSeparator);

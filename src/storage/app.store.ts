@@ -12,7 +12,7 @@ const useAppStore = create<AppState>()(
   persist(
     (set) => ({
       theme: "dark",
-      setTheme: (theme) => set(() => ({ theme: theme })),
+      setTheme: (theme: string) => set(() => ({ theme: theme })),
     }),
     {
       name: StorageKeys.App,
