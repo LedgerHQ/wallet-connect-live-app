@@ -1,7 +1,19 @@
 import { ReactElement } from "react";
-import { render, RenderOptions } from "@testing-library/react";
+import { act, render, RenderOptions } from "@testing-library/react";
 import { StyleProvider } from "@ledgerhq/react-ui";
 import userEvent from "@testing-library/user-event";
+import { getWalletAPITransport } from "src/routes";
+import { WalletAPIProvider } from "@ledgerhq/wallet-api-client-react";
+import GlobalStyle from "@/styles/globalStyle";
+import { Container } from "@/styles/styles";
+import {
+  createMemoryHistory,
+  Outlet,
+  RootRoute,
+  Route,
+  Router,
+  RouterProvider,
+} from "@tanstack/react-router";
 
 type PropsTheme = {
   children: React.ReactNode;
@@ -42,4 +54,52 @@ const setupUserEventWithRender = (
 });
 
 export * from "@testing-library/react";
-export { setupUserEventWithRender as render };
+// export { setupUserEventWithRender as render };
+
+const Root = () => {
+  const transport = getWalletAPITransport();
+  return (
+    <StyleProvider selectedPalette={"dark"} fontsPath="/fonts">
+      <WalletAPIProvider transport={transport}>
+        <GlobalStyle />
+        <Container>
+          <Outlet />
+        </Container>
+      </WalletAPIProvider>
+    </StyleProvider>
+  );
+};
+
+function createTestRouter(component: () => JSX.Element) {
+  const rootRoute = new RootRoute({
+    component: Root,
+  });
+
+  const componentRoute = new Route({
+    getParentRoute: () => rootRoute,
+    path: "/",
+    component,
+  });
+
+  const router = new Router({
+    routeTree: rootRoute.addChildren([componentRoute]),
+    history: createMemoryHistory(),
+  });
+
+  return router;
+}
+const _router = createTestRouter(() => <></>);
+
+// export function renderComponent(component: typeof _router) {
+export async function renderComponent(component: () => JSX.Element) {
+  const router = createTestRouter(component);
+  render(<RouterProvider router={router} />);
+  await act(async () => {
+    return router.navigate({
+      to: "/",
+    });
+  });
+  return router;
+}
+
+export { renderComponent as render };

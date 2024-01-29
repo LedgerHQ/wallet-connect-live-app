@@ -34,7 +34,7 @@ import { Container } from "@/styles/styles";
 //     ? false
 //     : new URLSearchParams(window.location.search).get("simulator");
 
-function getWalletAPITransport() {
+export function getWalletAPITransport() {
   if (typeof window === "undefined") {
     return {
       onMessage: undefined,
