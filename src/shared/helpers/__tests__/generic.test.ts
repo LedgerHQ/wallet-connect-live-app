@@ -50,13 +50,13 @@ describe("getAccountWithAddress", () => {
 });
 
 describe("getAccountWithAddressAndChainId", () => {
-  it("should return the account with the specified address and chainId", async () => {
+  it("should return the account with the specified address and chainId", () => {
     const chainId = "eip155:1";
     const res = getAccountWithAddressAndChainId([ACCOUNT_MOCK], ACCOUNT_MOCK.address, chainId);
 
     expect(res).toEqual(ACCOUNT_MOCK);
   });
-  it("should return undefined if no account matches the address and chainId", async () => {
+  it("should return undefined if no account matches the address and chainId", () => {
     const chainId2 = "eip155:56";
     const res2 = getAccountWithAddressAndChainId([ACCOUNT_MOCK], ACCOUNT_MOCK.address, chainId2);
     expect(res2).toBeUndefined();

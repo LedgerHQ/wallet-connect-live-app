@@ -14,14 +14,14 @@ import {
 } from "../helper.util";
 
 describe("Helper Util", () => {
-  it("getTicker", async () => {
+  it("getTicker", () => {
     const text = getTicker("polygon");
     expect(text).toEqual("MATIC");
 
     const textETh = getTicker("ethereum");
     expect(textETh).toEqual("ETH");
   });
-  it("getNamespace", async () => {
+  it("getNamespace", () => {
     const text = getNamespace("ethereum");
 
     expect(text).toEqual("eip155:1");
@@ -29,7 +29,7 @@ describe("Helper Util", () => {
     const falseText = getNamespace("polygome");
     expect(falseText).toEqual("polygome");
   });
-  it("getCurrencyByChainId", async () => {
+  it("getCurrencyByChainId", () => {
     const text = getCurrencyByChainId("error-title-blockchain-support");
 
     expect(text).toEqual("error-title-blockchain-support");
@@ -39,25 +39,25 @@ describe("Helper Util", () => {
     expect(polygon).toEqual("polygon");
   });
 
-  it("getNetwork", async () => {
+  it("getNetwork", () => {
     const matic = getNetwork("polygon");
-    expect(matic.chainId).toEqual(SUPPORTED_NETWORK["polygon"].chainId);
+    expect(matic.chainId).toEqual(SUPPORTED_NETWORK.polygon.chainId);
 
     const arb = getNetwork("arbitrum");
-    expect(arb.chainId).toEqual(SUPPORTED_NETWORK["arbitrum"].chainId);
+    expect(arb.chainId).toEqual(SUPPORTED_NETWORK.arbitrum.chainId);
   });
 
-  it("getDisplayName", async () => {
+  it("getDisplayName", () => {
     const matic = getDisplayName("polygon");
-    expect(matic).toEqual(SUPPORTED_NETWORK["polygon"].displayName);
+    expect(matic).toEqual(SUPPORTED_NETWORK.polygon.displayName);
 
     const arb = getDisplayName("arboretum");
     expect(arb).toEqual("arboretum");
   });
 
-  it("getColor", async () => {
+  it("getColor", () => {
     const matic = getColor("polygon");
-    expect(matic).toEqual(SUPPORTED_NETWORK["polygon"].color);
+    expect(matic).toEqual(SUPPORTED_NETWORK.polygon.color);
   });
 });
 

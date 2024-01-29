@@ -49,7 +49,7 @@ describe("getNumberWithOptions tests", () => {
 describe("formatCurrencyUnitFragment tests", () => {
   const unit = { code: "BTC", magnitude: 0, name: "bitcoin" };
   it("should validate big number input", () => {
-    const consoleWarnMock = vi.spyOn(console, "warn").mockImplementation(() => {}); // mock console.warn to clean warnings while running this test
+    const consoleWarnMock = vi.spyOn(console, "warn").mockImplementation(() => { return }); // mock console.warn to clean warnings while running this test
 
     expect(formatCurrencyUnitFragment(unit, new BigNumber("not a number"))).toEqual([]);
 
