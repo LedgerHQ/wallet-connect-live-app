@@ -13,6 +13,7 @@ i18n
     // resources: {}, // Where we can put translations' files, not needed if using react Backend
     lng: "en",     // Set the initial language of the App
     defaultNS: 'common',
-  });
+  })
+  .catch(err => console.error(err));
 
 export default i18n;

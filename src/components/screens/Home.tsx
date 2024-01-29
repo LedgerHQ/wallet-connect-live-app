@@ -43,7 +43,7 @@ export default function Home() {
   const { t } = useTranslation();
 
   const onSetActiveTabIndex = useCallback(
-    (newActiveTabIndex: number) => {
+    (newActiveTabIndex: TabsIndexes) => {
       const newTab =
         newActiveTabIndex === TabsIndexes.Connect ? "Connect" : "Sessions";
       const currentTab =
