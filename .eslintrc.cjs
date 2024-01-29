@@ -13,7 +13,7 @@ module.exports = {
     ecmaVersion: 2018,
     sourceType: "module",
   },
-  plugins: ["testing-library"],
+  plugins: ["testing-library", "jest"],
   extends: ["eslint:recommended", "prettier", "plugin:react-hooks/recommended"],
   rules: {
     "prefer-const": "error",
