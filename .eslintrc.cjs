@@ -20,6 +20,7 @@ module.exports = {
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "off",
   },
+  ignorePatterns: ["src/pages/*", "src/data/*"],
   overrides: [
     {
       files: ["**/*.{ts,tsx}"],
