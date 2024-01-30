@@ -1,11 +1,11 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from "vitest";
 import BigNumber from "bignumber.js";
 import { EthTransaction, convertEthToLiveTX } from "../converters";
 import eip55 from "eip55";
 import { ethTx, to } from "@/tests-tools/mocks/eth-transaction.mock";
 
 describe("Converter File", () => {
-  it("convertEthToLiveTX correclty formatted", async () => {
+  it("convertEthToLiveTX correclty formatted", () => {
     const expected = {
       family: "ethereum",
       amount: new BigNumber(ethTx.value.replace("0x", ""), 16),
@@ -19,7 +19,7 @@ describe("Converter File", () => {
     expect(converted).toEqual(expected);
   });
 
-  it("convertEthToLiveTX wrongly formatted", async () => {
+  it("convertEthToLiveTX wrongly formatted", () => {
     const ethTx: EthTransaction = {
       value: "",
       to: to,
@@ -41,7 +41,7 @@ describe("Converter File", () => {
     expect(converted).toEqual(expected);
   });
 
-  it("convertEthToLiveTX should handle TX without recipient", async () => {
+  it("convertEthToLiveTX should handle TX without recipient", () => {
     const ethTx: EthTransaction = {
       value: "",
       gasPrice: "",

@@ -4,12 +4,12 @@ import { cleanup, render, waitFor, screen } from "@/tests-tools/test.utils";
 import { initialParamsHomePage } from "@/tests-tools/mocks/initialParams.mock";
 // import AppScreen from "@/pages/index";
 import sessionProposal from "@/data/mocks/sessionProposal.example.json";
-import SessionProposal from "@/pages/proposal";
-import SessionDetail from "@/pages/detail";
+import SessionProposal from "@/components/screens/SessionProposal";
+import SessionDetail from "@/components/screens/SessionDetail";
 import userEvent from "@testing-library/user-event";
-import { createWeb3Wallet } from "@/shared/helpers/walletConnect.util";
-import { vi } from "vitest";
-import { Route, useNavigate } from "@tanstack/react-router";
+import { createWeb3Wallet } from "@/helpers/walletConnect.util";
+import { vi, describe, it, expect } from "vitest";
+import { createRoute, useNavigate } from "@tanstack/react-router";
 import AppScreen from "@/components/screens/Home";
 
 // mock useRouter
@@ -23,7 +23,7 @@ import AppScreen from "@/components/screens/Home";
 vi.doMock("@tanstack/react-router", () => {
   return {
     // ...requireA
-    Route: Route,
+    createRoute: createRoute,
     useRouter: () => {
       console.log("HI");
     },
@@ -54,6 +54,7 @@ vi.mock("@walletconnect/web3wallet", () => {
       init: vi.fn(() => ({
         getActiveSessions: vi.fn(() => []),
         on: vi.fn((eventName, callback) => {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
           window.addEventListener(eventName, callback);
         }),
         rejectSession: mockRejectSession,
@@ -170,7 +171,7 @@ describe.skip("Proposal Flow tests", () => {
     );
 
     cleanup();
-    render(<SessionDetail />);
+    render(<SessionDetail topic="" />);
 
     expect(screen.getByText(/sessions\.detail\.title/i)).toBeInTheDocument();
     expect(

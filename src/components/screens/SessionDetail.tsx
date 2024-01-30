@@ -8,12 +8,12 @@ import {
 } from "@/helpers/helper.util";
 import { Box, Button, CryptoIcon, Flex, Text } from "@ledgerhq/react-ui";
 import { ArrowLeftMedium } from "@ledgerhq/react-ui/assets/icons";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { Account } from "@ledgerhq/wallet-api-client";
 import { GenericRow, RowType } from "@/components/atoms/GenericRow";
-import { InfoSessionProposal } from "@/components/screens/sessions/sessionProposal/InfoSessionProposal";
+import { InfoSessionProposal } from "@/components/screens/sessionProposal/InfoSessionProposal";
 import { space } from "@ledgerhq/react-ui/styles/theme";
 import {
   ButtonsContainer,
@@ -22,12 +22,14 @@ import {
 } from "@/components/atoms/containers/Elements";
 import { ResponsiveContainer } from "@/styles/styles";
 import { sessionSelector, useSessionsStore } from "@/storage/sessions.store";
-import { useAccountsStore, accountSelector } from "@/storage/accounts.store";
 import { web3wallet } from "@/helpers/walletConnect.util";
 import { ImageWithPlaceholder } from "@/components/atoms/images/ImageWithPlaceholder";
-import useAnalytics from "@/hooks/common/useAnalytics";
-import { TabsIndexes } from "@/shared/navigation";
+import useAnalytics from "@/hooks/useAnalytics";
+import { TabsIndexes } from "@/routes";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { getAccounts } from "@/hooks/useWalletConnectEventsManager";
+import { useQuery } from "@tanstack/react-query";
+import { useWalletAPIClient } from "@ledgerhq/wallet-api-client-react";
 
 const DetailContainer = styled(Flex)`
   border-radius: 12px;
@@ -73,12 +75,21 @@ type Props = {
   topic: string;
 };
 
+// Created to have a stable ref in case of undefined accounts data
+const initialAccounts: Account[] = [];
+
 export default function SessionDetail({ topic }: Props) {
-  const [hydrated, setHydrated] = useState(false);
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const accounts = useAccountsStore(accountSelector.selectAccounts);
+  const { client } = useWalletAPIClient();
+
+  const accounts = useQuery({
+    queryKey: ["accounts"],
+    queryFn: getAccounts(client),
+    initialData: initialAccounts,
+  });
+
   const sessions = useSessionsStore(sessionSelector.selectSessions);
   const session = useMemo(
     () => sessions.find((elem) => elem.topic === topic),
@@ -100,7 +111,6 @@ export default function SessionDetail({ topic }: Props) {
       dapp: session?.peer?.metadata?.name ?? "Dapp name undefined",
       url: session?.peer?.metadata?.url ?? "Dapp url undefined",
     });
-    setHydrated(true);
   }, [session]);
 
   const handleDelete = useCallback(() => {
@@ -145,14 +155,9 @@ export default function SessionDetail({ topic }: Props) {
   );
 
   const sessionAccounts = useMemo(
-    () => getAccountsFromAddresses(fullAddresses, accounts),
+    () => getAccountsFromAddresses(fullAddresses, accounts.data),
     [fullAddresses, accounts]
   );
-
-  if (!hydrated) {
-    // Returns null on first render, so the client and server match
-    return null;
-  }
 
   return (
     <Flex
@@ -294,7 +299,7 @@ export default function SessionDetail({ topic }: Props) {
               flex={1}
               onClick={handleDelete}
             >
-              <Link to="/">
+              <Link to="/" search={{ tab: TabsIndexes.Connect }}>
                 <Text variant="body" fontWeight="semiBold" color="neutral.c100">
                   {t("sessions.detail.disconnect")}
                 </Text>

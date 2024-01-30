@@ -8,10 +8,10 @@ import GlobalStyle from "@/styles/globalStyle";
 import { Container } from "@/styles/styles";
 import {
   createMemoryHistory,
+  createRootRoute,
+  createRoute,
+  createRouter,
   Outlet,
-  RootRoute,
-  Route,
-  Router,
   RouterProvider,
 } from "@tanstack/react-router";
 
@@ -71,24 +71,24 @@ const Root = () => {
 };
 
 function createTestRouter(component: () => JSX.Element) {
-  const rootRoute = new RootRoute({
+  const rootRoute = createRootRoute({
     component: Root,
   });
 
-  const componentRoute = new Route({
+  const componentRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: "/",
     component,
   });
 
-  const router = new Router({
+  const router = createRouter({
     routeTree: rootRoute.addChildren([componentRoute]),
     history: createMemoryHistory(),
   });
 
   return router;
 }
-const _router = createTestRouter(() => <></>);
+// const _router = createTestRouter(() => <></>);
 
 // export function renderComponent(component: typeof _router) {
 export async function renderComponent(component: () => JSX.Element) {

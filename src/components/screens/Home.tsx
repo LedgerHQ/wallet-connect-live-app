@@ -6,10 +6,10 @@ import { useCallback, useMemo } from "react";
 import { useSessionsStore, sessionSelector } from "@/storage/sessions.store";
 import styled from "styled-components";
 import { Connect } from "./Connect";
-import Sessions from "./sessions/Sessions";
-import Tabs from "./Tabs";
-import useAnalytics from "@/hooks/common/useAnalytics";
-import { TabsIndexes } from "@/shared/navigation";
+import Sessions from "./Sessions";
+import Tabs from "../Tabs";
+import useAnalytics from "@/hooks/useAnalytics";
+import { TabsIndexes } from "@/routes";
 import { useNavigate } from "@tanstack/react-router";
 import { indexRoute } from "src/routes";
 

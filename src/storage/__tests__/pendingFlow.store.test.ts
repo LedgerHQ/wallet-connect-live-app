@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from "vitest";
 import { act, renderHook } from "@testing-library/react";
 
 import { usePendingFlowStore } from "../pendingFlow.store";
@@ -12,7 +12,7 @@ describe("PendingFlow Store", () => {
     expect(pendingFlow).toBeUndefined();
   });
 
-  it("should addPendingFlow", async () => {
+  it("should addPendingFlow", () => {
     const { result } = renderHook(() => usePendingFlowStore());
 
     act(() => result.current.addPendingFlow(PENDING_FLOW_MOCK));

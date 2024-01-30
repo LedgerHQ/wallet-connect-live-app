@@ -1,6 +1,6 @@
 import { GenericRow, RowType } from "@/components/atoms/GenericRow";
 import { fireEvent, render, screen } from "@/tests-tools/test.utils";
-import { vi } from "vitest";
+import { vi, describe, it, expect } from "vitest";
 
 describe("GenericRow", () => {
   const defaultProps = {

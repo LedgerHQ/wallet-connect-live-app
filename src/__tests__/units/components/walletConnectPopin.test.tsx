@@ -1,6 +1,6 @@
 import { WalletConnectPopin } from "@/components/atoms/popin/WalletConnectPopin";
 import { render, screen } from "@/tests-tools/test.utils";
-import { vi } from "vitest";
+import { vi, describe, it, expect } from "vitest";
 
 // Mock the onClose function
 const mockOnClose = vi.fn();

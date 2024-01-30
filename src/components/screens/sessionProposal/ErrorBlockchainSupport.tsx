@@ -1,3 +1,4 @@
+import { Account } from "@ledgerhq/wallet-api-client";
 import { Flex, Text } from "@ledgerhq/react-ui";
 import { CloseMedium } from "@ledgerhq/react-ui/assets/icons";
 import { useTranslation } from "react-i18next";
@@ -14,12 +15,29 @@ const LogoContainer = styled(Flex)`
   width: 50px;
 `;
 
-export function ApplicationDisabled() {
+type Props = {
+  appName: string;
+  chains: {
+    chain: string;
+    isSupported: boolean;
+    isRequired: boolean;
+    accounts: Account[];
+  }[];
+};
+
+export function ErrorBlockchainSupport({ appName, chains }: Props) {
   const { t } = useTranslation();
   const analytics = useAnalytics();
 
   useEffect(() => {
-    analytics.page("WalletConnect Has Been Disabled");
+    analytics.page("Wallet Connect Error Unsupported Blockchains", {
+      dapp: appName,
+      chains: chains.map((chain) => ({
+        chain: chain.chain,
+        isSupported: chain.isSupported,
+        isRequired: chain.isRequired,
+      })),
+    });
   }, []);
 
   return (
@@ -28,9 +46,8 @@ export function ApplicationDisabled() {
       justifyContent="center"
       flexDirection="column"
       flex={1}
-      data-testid="application-disabled-container"
     >
-      <LogoContainer data-testid="application-disabled-logo">
+      <LogoContainer>
         <CloseMedium size={32} color="background.main" />
       </LogoContainer>
       <Text
@@ -39,9 +56,9 @@ export function ApplicationDisabled() {
         color="neutral.c100"
         mt={10}
         textAlign="center"
-        data-testid="application-disabled-title"
+        data-testid="error-title-blockchain-support"
       >
-        {t("applicationDisabled.title")}
+        {t("sessionProposal.error.title", { appName })}
       </Text>
       <Text
         variant="bodyLineHeight"
@@ -49,9 +66,8 @@ export function ApplicationDisabled() {
         color="neutral.c80"
         mt={10}
         textAlign="center"
-        data-testid="application-disabled-subtitle"
       >
-        {t("applicationDisabled.desc")}
+        {t("sessionProposal.error.desc")}
       </Text>
     </Flex>
   );

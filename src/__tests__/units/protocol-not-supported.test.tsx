@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { renderWithRouter, screen } from "@/tests-tools/test.utils";
-import ProtocolNotSupported from "@/pages/protocol-not-supported";
+import ProtocolNotSupported from "@/components/screens/ProtocolNotSupported";
 
 describe("ProtocolNotSupported Screen", () => {
   it("Page should appears", async () => {

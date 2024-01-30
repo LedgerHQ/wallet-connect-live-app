@@ -2,10 +2,10 @@ import styled from "styled-components";
 import { Input, Button, Text, Flex } from "@ledgerhq/react-ui";
 import { useCallback, useEffect, useState } from "react";
 import { PasteMedium, QrCodeMedium } from "@ledgerhq/react-ui/assets/icons";
-import { QRScanner } from "./QRScanner";
+import { QRScanner } from "../QRScanner";
 import { InputMode } from "@/types/types";
 import { useTranslation } from "react-i18next";
-import useAnalytics from "@/hooks/common/useAnalytics";
+import useAnalytics from "@/hooks/useAnalytics";
 
 const QRScannerContainer = styled.div`
   display: flex;
@@ -35,7 +35,7 @@ const QrCodeButton = styled.div`
 
 export type ConnectProps = {
   initialURI?: string;
-  onConnect: (uri: string) => void;
+  onConnect: (uri: string) => Promise<void>;
   mode?: InputMode;
 };
 
@@ -59,7 +59,7 @@ export function Connect({
       const uri = new URL(inputValue);
       setInputValue("");
 
-      onConnect(uri.toString());
+      void onConnect(uri.toString());
       analytics.track("button_clicked", {
         button: "WC-Connect",
         page: "Connect",
@@ -79,22 +79,19 @@ export function Connect({
 
   useEffect(() => {
     if (initialURI) {
-      onConnect(initialURI);
+      void onConnect(initialURI);
     }
     analytics.page("Wallet Connect");
   }, [initialURI]);
 
-  const handlePasteClick = async () => {
-    try {
-      const text = await navigator.clipboard.readText();
+  const handlePasteClick = () => {
+    navigator.clipboard.readText().then((text) => {
       setInputValue(text);
       analytics.track("button_clicked", {
         button: "WC-Paste Url",
         page: "Connect",
       });
-    } catch (err) {
-      console.error(err);
-    }
+    }, console.error);
   };
 
   const tryConnect = useCallback(
@@ -105,7 +102,7 @@ export function Connect({
         switch (url.protocol) {
           // handle usual wallet connect URIs
           case "wc:": {
-            onConnect(url.toString());
+            void onConnect(url.toString());
             break;
           }
 

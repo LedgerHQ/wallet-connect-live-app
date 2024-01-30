@@ -6,9 +6,6 @@ export type ChainMetadata = {
   rpc?: string;
 };
 
-interface Chains {
-  [key: string]: ChainMetadata;
-}
 export type Network = {
   chainId: number | string;
   namespace: string;

@@ -1,31 +1,42 @@
 import { useCallback, useState } from "react";
 import { sessionSelector, useSessionsStore } from "@/storage/sessions.store";
-import { accountSelector, useAccountsStore } from "@/storage/accounts.store";
 import { getNamespace } from "@/helpers/helper.util";
 import { EIP155_SIGNING_METHODS } from "@/data/methods/EIP155Data.methods";
 import { web3wallet } from "@/helpers/walletConnect.util";
-import useAnalytics from "@/hooks/common/useAnalytics";
-import { useLedgerLive } from "../common/useLedgerLive";
+import useAnalytics from "@/hooks/useAnalytics";
 import { SupportedNamespace } from "@/data/network.config";
-import { TabsIndexes } from "@/shared/navigation";
+import { TabsIndexes } from "@/routes";
 import { buildApprovedNamespaces } from "@walletconnect/utils";
 import { formatAccountsByChain } from "@/hooks/useProposal/util";
 import { useNavigate } from "@tanstack/react-router";
 import { Web3WalletTypes } from "@walletconnect/web3wallet";
+import { useWalletAPIClient } from "@ledgerhq/wallet-api-client-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getAccounts } from "../useWalletConnectEventsManager";
+import { Account } from "@ledgerhq/wallet-api-client";
 
 type ProposalProps = {
   proposal?: Web3WalletTypes.SessionProposal;
 };
 
+// Created to have a stable ref in case of undefined accounts data
+const initialAccounts: Account[] = [];
+
 export function useProposal({ proposal }: ProposalProps) {
   const navigate = useNavigate();
 
-  const addSession = useSessionsStore(sessionSelector.addSession);
-  const accounts = useAccountsStore(accountSelector.selectAccounts);
-  const addAccount = useAccountsStore(accountSelector.addAccount);
-  const analytics = useAnalytics();
+  const queryClient = useQueryClient();
 
-  const { initWalletApiClient, closeTransport } = useLedgerLive();
+  const { client } = useWalletAPIClient();
+
+  const accounts = useQuery({
+    queryKey: ["accounts"],
+    queryFn: getAccounts(client),
+    initialData: initialAccounts,
+  });
+
+  const addSession = useSessionsStore(sessionSelector.addSession);
+  const analytics = useAnalytics();
 
   const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
 
@@ -53,9 +64,10 @@ export function useProposal({ proposal }: ProposalProps) {
   const buildSupportedNamespaces = (
     proposal: Web3WalletTypes.SessionProposal
   ) => {
-    const accountsByChain = formatAccountsByChain(proposal, accounts).filter(
-      (a) => a.accounts.length > 0 && a.isSupported
-    );
+    const accountsByChain = formatAccountsByChain(
+      proposal,
+      accounts.data
+    ).filter((a) => a.accounts.length > 0 && a.isSupported);
     const dataToSend = accountsByChain.reduce<
       { account: string; chain: string }[]
     >(
@@ -121,10 +133,10 @@ export function useProposal({ proposal }: ProposalProps) {
         void navigate({ to: "/detail/$topic", params: { topic: res.topic } });
       })
       .catch((error) => {
-        console.error(error);
         // TODO : display error toast
-        // void navigate({ to: "/", search: { tab: TabsIndexes.Connect } });
-        void navigate({ to: "/" });
+        console.error(error);
+        // void navigate({ to: "/" }); // cannot be typed correctly with default fallback
+        void navigate({ to: "/", search: { tab: TabsIndexes.Connect } });
       });
   };
 
@@ -147,16 +159,19 @@ export function useProposal({ proposal }: ProposalProps) {
   };
 
   const addNewAccount = async (currency: string) => {
-    const walletApiClient = initWalletApiClient();
+    if (!client) {
+      return;
+    }
     try {
-      const newAccount = await walletApiClient.account.request({
+      await client.account.request({
         currencyIds: [currency],
       });
-      addAccount(newAccount);
+      // Maybe we should also select the requested account
     } catch (error) {
       console.error("request account canceled by user");
     }
-    closeTransport();
+    // refetch accounts
+    await queryClient.invalidateQueries({ queryKey: ["accounts"] });
   };
 
   return {
@@ -165,7 +180,7 @@ export function useProposal({ proposal }: ProposalProps) {
     proposer,
     handleClose,
     handleClick,
-    accounts,
+    accounts: accounts.data,
     selectedAccounts,
     formatAccountsByChain,
     addNewAccount,
