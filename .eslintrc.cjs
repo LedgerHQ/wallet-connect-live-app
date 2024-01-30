@@ -14,7 +14,12 @@ module.exports = {
     sourceType: "module",
   },
   plugins: ["testing-library", "jest"],
-  extends: ["eslint:recommended", "prettier", "plugin:react-hooks/recommended"],
+  extends: [
+    "eslint:recommended",
+    "prettier",
+    "plugin:react-hooks/recommended",
+    "plugin:@tanstack/eslint-plugin-query/recommended",
+  ],
   rules: {
     "prefer-const": "error",
     "react-hooks/rules-of-hooks": "error",

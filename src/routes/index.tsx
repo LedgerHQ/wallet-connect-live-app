@@ -1,10 +1,6 @@
-import {
-  Router,
-  Route,
-  RootRoute,
-  Outlet,
-  useRouter,
-} from "@tanstack/react-router";
+import { Router, Route, RootRoute, Outlet } from "@tanstack/react-router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import { useTranslation } from "react-i18next";
 import App from "@/components/screens/Home";
@@ -54,6 +50,9 @@ export function getWalletAPITransport() {
 
 const transport = getWalletAPITransport();
 
+// Create a client
+const queryClient = new QueryClient();
+
 function Root() {
   const themeStored = useAppStore(appSelector.selectTheme);
   const setTheme = useAppStore(appSelector.setTheme);
@@ -81,15 +80,18 @@ function Root() {
   useWalletConnectEventsManager(initialized);
 
   return (
-    <StyleProvider selectedPalette={themeStored} fontsPath="/fonts">
-      <WalletAPIProvider transport={transport}>
-        <GlobalStyle />
-        <Container>
-          <Outlet />
-        </Container>
-        <TanStackRouterDevtools />
-      </WalletAPIProvider>
-    </StyleProvider>
+    <QueryClientProvider client={queryClient}>
+      <StyleProvider selectedPalette={themeStored} fontsPath="/fonts">
+        <WalletAPIProvider transport={transport}>
+          <GlobalStyle />
+          <Container>
+            <Outlet />
+          </Container>
+          <TanStackRouterDevtools />
+          <ReactQueryDevtools />
+        </WalletAPIProvider>
+      </StyleProvider>
+    </QueryClientProvider>
   );
 }
 
