@@ -11,6 +11,11 @@ export default defineConfig({
   build: {
     sourcemap: true, // Source map generation must be turned on
   },
+  // TODO: separate config for playwright (or update wallet-api-simulator)
+  define: {
+    'process': {env: {}},
+    'global': {}
+  },
   plugins: [
     tsconfigPaths(),
     react(),
