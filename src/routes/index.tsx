@@ -18,10 +18,10 @@ import useWalletConnectEventsManager from "@/hooks/useWalletConnectEventsManager
 import { ApplicationDisabled } from "@/components/ApplicationDisabled";
 import { InputMode } from "@/shared/types/types";
 import { Container } from "@/styles/styles";
-import {
-  getSimulatorTransport,
-  profiles,
-} from "@ledgerhq/wallet-api-simulator";
+// import {
+//   getSimulatorTransport,
+//   profiles,
+// } from "@ledgerhq/wallet-api-simulator";
 // import useAnalytics from "@/hooks/common/useAnalytics";
 
 // import {
@@ -43,8 +43,8 @@ export function getWalletAPITransport() {
     };
   }
 
-  // if (isSimulator) {
-  //   return getSimulatorTransport(profiles.STANDARD);
+  // if (import.meta.env.VITE_TEST === "playwright") {
+  // return getSimulatorTransport(profiles.STANDARD);
   // }
 
   const transport = new WindowMessageTransport();
@@ -52,12 +52,7 @@ export function getWalletAPITransport() {
   return transport;
 }
 
-let transport: Transport;
-if (import.meta.env.VITE_TEST === "playwright") {
-  transport = getSimulatorTransport(profiles.STANDARD);
-} else {
-  transport = getWalletAPITransport();
-}
+let transport = getWalletAPITransport();
 
 // Create a client
 const queryClient = new QueryClient();
