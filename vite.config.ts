@@ -1,4 +1,5 @@
 import { defineConfig } from "vite";
+import { configDefaults } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
@@ -40,6 +41,7 @@ export default defineConfig({
     }),
   ],
   test: {
+    exclude: [...configDefaults.exclude, "tests_playwright/*"],
     globals: true, // so cleanup() runs after each test.
     setupFiles: "./vitest.setup.ts",
     coverage: {
