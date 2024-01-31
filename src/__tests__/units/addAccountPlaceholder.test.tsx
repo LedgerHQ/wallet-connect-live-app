@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@/tests-tools/test.utils";
-import { AddAccountPlaceholder } from "@/components/screens/sessions/sessionProposal/AddAccountPlaceholder";
+import { AddAccountPlaceholder } from "@/components/screens/sessionProposal/AddAccountPlaceholder";
 
 const onClickMock = vi.fn();
 

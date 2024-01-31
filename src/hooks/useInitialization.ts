@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useSessionsStore, sessionSelector } from "@/storage/sessions.store";
 import { createWeb3Wallet, web3wallet } from "@/helpers/walletConnect.util";
 
+// Todo redo/remove
 export default function useInitialization() {
   const [initialized, setInitialized] = useState(false);
 
@@ -21,7 +22,7 @@ export default function useInitialization() {
 
   useEffect(() => {
     if (!initialized) {
-      onInitialize();
+      void onInitialize();
     }
   }, [initialized, onInitialize]);
 

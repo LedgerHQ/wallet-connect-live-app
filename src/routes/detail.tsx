@@ -1,8 +1,8 @@
-import { Route } from "@tanstack/react-router";
+import { createRoute } from "@tanstack/react-router";
 import { rootRoute } from ".";
-import SessionDetail from "@/pages/detail";
+import SessionDetail from "@/components/screens/SessionDetail";
 
-export const detailRoute = new Route({
+export const detailRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/detail/$topic",
   component: function Detail() {

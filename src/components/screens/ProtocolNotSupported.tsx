@@ -5,9 +5,9 @@ import { useCallback, useEffect } from "react";
 import styled from "styled-components";
 import { ResponsiveContainer } from "@/styles/styles";
 import { device } from "@/styles/breakpoints";
-import useAnalytics from "@/hooks/common/useAnalytics";
+import useAnalytics from "@/hooks/useAnalytics";
 import { useNavigate } from "@tanstack/react-router";
-import { TabsIndexes } from "@/shared/navigation";
+import { TabsIndexes } from "@/routes";
 
 const LogoContainer = styled(Flex)`
   border-radius: 50%;

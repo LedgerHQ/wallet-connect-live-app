@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { ApplicationDisabled } from "@/components/ApplicationDisabled";
 import { render, screen } from "@/tests-tools/test.utils";
 

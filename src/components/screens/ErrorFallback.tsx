@@ -1,9 +1,8 @@
-import { Account } from "@ledgerhq/wallet-api-client";
 import { Flex, Text } from "@ledgerhq/react-ui";
 import { CloseMedium } from "@ledgerhq/react-ui/assets/icons";
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
-import useAnalytics from "@/hooks/common/useAnalytics";
+import useAnalytics from "@/hooks/useAnalytics";
 import styled from "styled-components";
 
 const LogoContainer = styled(Flex)`
@@ -15,29 +14,12 @@ const LogoContainer = styled(Flex)`
   width: 50px;
 `;
 
-type Props = {
-  appName: string;
-  chains: {
-    chain: string;
-    isSupported: boolean;
-    isRequired: boolean;
-    accounts: Account[];
-  }[];
-};
-
-export function ErrorBlockchainSupport({ appName, chains }: Props) {
+export function ErrorFallback() {
   const { t } = useTranslation();
   const analytics = useAnalytics();
 
   useEffect(() => {
-    analytics.page("Wallet Connect Error Unsupported Blockchains", {
-      dapp: appName,
-      chains: chains.map((chain) => ({
-        chain: chain.chain,
-        isSupported: chain.isSupported,
-        isRequired: chain.isRequired,
-      })),
-    });
+    analytics.page("WalletConnect ErrorBoundary Page");
   }, []);
 
   return (
@@ -56,9 +38,8 @@ export function ErrorBlockchainSupport({ appName, chains }: Props) {
         color="neutral.c100"
         mt={10}
         textAlign="center"
-        data-testid="error-title-blockchain-support"
       >
-        {t("sessionProposal.error.title", { appName })}
+        {t("errorBoundary.title")}
       </Text>
       <Text
         variant="bodyLineHeight"
@@ -67,7 +48,7 @@ export function ErrorBlockchainSupport({ appName, chains }: Props) {
         mt={10}
         textAlign="center"
       >
-        {t("sessionProposal.error.desc")}
+        {t("errorBoundary.desc")}
       </Text>
     </Flex>
   );

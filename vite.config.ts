@@ -1,7 +1,9 @@
 import { defineConfig } from "vite";
+import { configDefaults } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
+import inject from "@rollup/plugin-inject";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -10,6 +12,9 @@ export default defineConfig({
   },
   build: {
     sourcemap: true, // Source map generation must be turned on
+    rollupOptions: {
+      plugins: [inject({ Buffer: ["buffer", "Buffer"] })],
+    },
   },
   // TODO: separate config for playwright (or update wallet-api-simulator)
   // define: {
@@ -36,18 +41,13 @@ export default defineConfig({
     }),
   ],
   test: {
+    exclude: [...configDefaults.exclude, "tests_playwright/*"],
     globals: true, // so cleanup() runs after each test.
-    setupFiles: './vitest.setup.ts',
+    setupFiles: "./vitest.setup.ts",
     coverage: {
-      provider: 'v8' // or 'v8'
+      provider: "v8", // or 'v8'
     },
     // environment: 'happy-dom' // https://vitest.dev/config/#environment
-    environment: 'jsdom' // https://vitest.dev/config/#environment
+    environment: "jsdom", // https://vitest.dev/config/#environment
   },
-  // resolve: {
-  //   "@ledgerhq/react-ui": path.join(
-  //     path.dirname(require.resolve("@ledgerhq/react-ui/package.json")),
-  //     "lib"
-  //   ),
-  // },
 });

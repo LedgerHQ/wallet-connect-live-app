@@ -1,12 +1,8 @@
-/* eslint-disable testing-library/no-debugging-utils */
 import "@testing-library/react/dont-cleanup-after-each";
 import { cleanup, render, waitFor, screen } from "@/tests-tools/test.utils";
-import { initialParamsHomePage } from "@/tests-tools/mocks/initialParams.mock";
 import AppScreen from "@/components/screens/Home";
-import sessionProposalNotSupported from "@/data/mocks/sessionProposalNotSupported.example.json";
-import SessionProposal from "@/pages/proposal";
-import { useNavigate } from "@tanstack/react-router";
-import { vi } from "vitest";
+import SessionProposal from "@/components/screens/SessionProposal";
+import { vi, describe, it, expect } from "vitest";
 
 // mock useRouter
 vi.mock("next/router", () => ({
@@ -31,7 +27,7 @@ vi.mock("next/router", () => ({
 //   };
 // });
 
-const mockPush = vi.fn();
+// const mockPush = vi.fn();
 
 afterEach(() => vi.clearAllMocks());
 afterAll(() => cleanup());

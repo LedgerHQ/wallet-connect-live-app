@@ -8,11 +8,11 @@ import { Flex, Button, Box, Text } from "@ledgerhq/react-ui";
 
 import { useTranslation } from "react-i18next";
 import { useCallback, useEffect, useMemo } from "react";
-import useWalletConnectPopin from "@/hooks/useWalletConnectPopin";
+import useModal from "@/hooks/useModal";
 
 import styled from "styled-components";
 import { useSessionsStore, sessionSelector } from "@/storage/sessions.store";
-import useAnalytics from "@/hooks/common/useAnalytics";
+import useAnalytics from "@/hooks/useAnalytics";
 import { useNavigate } from "@tanstack/react-router";
 
 export type SessionsProps = {
@@ -24,7 +24,7 @@ const CustomList = styled(List)``;
 export default function Sessions({ goToConnect }: SessionsProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { openModal, closeModal, isModalOpen } = useWalletConnectPopin();
+  const { openModal, closeModal, isModalOpen } = useModal();
   const clearSessions = useSessionsStore(sessionSelector.clearSessions);
   const sessions = useSessionsStore(sessionSelector.selectSessions);
   const analytics = useAnalytics();
@@ -60,8 +60,8 @@ export default function Sessions({ goToConnect }: SessionsProps) {
     goToConnect();
   };
 
-  const disconnect = useCallback(async () => {
-    await Promise.all(
+  const disconnect = useCallback(() => {
+    void Promise.all(
       sessions.map((session) =>
         web3wallet.disconnectSession({
           topic: session.topic,
@@ -78,11 +78,11 @@ export default function Sessions({ goToConnect }: SessionsProps) {
       .finally(() => {
         clearSessions();
         closeModal();
+        analytics.track("button_clicked", {
+          button: "WC-Disconnect All Sessions",
+          page: "Wallet Connect Sessions",
+        });
       });
-    analytics.track("button_clicked", {
-      button: "WC-Disconnect All Sessions",
-      page: "Wallet Connect Sessions",
-    });
   }, [sessions]);
 
   if (isEmptyState) {

@@ -1,4 +1,9 @@
-import { Router, Route, RootRoute, Outlet } from "@tanstack/react-router";
+import {
+  createRouter,
+  createRoute,
+  createRootRoute,
+  Outlet,
+} from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
@@ -10,14 +15,15 @@ import { protocolNotSupportedRoute } from "./protocolNotSupportedRoute";
 import { appSelector, useAppStore } from "@/storage/app.store";
 import { StyleProvider } from "@ledgerhq/react-ui";
 import GlobalStyle from "@/styles/globalStyle";
-import { TabsIndexes } from "@/shared/navigation";
 import useInitialization from "@/hooks/useInitialization";
 import { WalletAPIProvider } from "@ledgerhq/wallet-api-client-react";
-import { Transport, WindowMessageTransport } from "@ledgerhq/wallet-api-client";
+import { WindowMessageTransport } from "@ledgerhq/wallet-api-client";
 import useWalletConnectEventsManager from "@/hooks/useWalletConnectEventsManager";
 import { ApplicationDisabled } from "@/components/ApplicationDisabled";
-import { InputMode } from "@/shared/types/types";
+import { InputMode } from "@/types/types";
 import { Container } from "@/styles/styles";
+import { ErrorFallback } from "@/components/screens/ErrorFallback";
+import { ErrorBoundary } from "@sentry/react";
 // import {
 //   getSimulatorTransport,
 //   profiles,
@@ -52,10 +58,15 @@ export function getWalletAPITransport() {
   return transport;
 }
 
-let transport = getWalletAPITransport();
+const transport = getWalletAPITransport();
 
 // Create a client
 const queryClient = new QueryClient();
+
+// We could make everything lazy at the top to avoid downloading code for the app when disabled
+const isApplicationDisabled = Boolean(
+  import.meta.env.VITE_APPLICATION_DISABLED === "true"
+);
 
 function Root() {
   const themeStored = useAppStore(appSelector.selectTheme);
@@ -74,14 +85,11 @@ function Root() {
 
   const { lang, theme } = rootRoute.useSearch();
   if (lang !== language) {
-    changeLanguage(lang);
+    void changeLanguage(lang);
   }
   if ((theme == "dark" || theme == "light") && theme !== themeStored) {
     setTheme(theme);
   }
-
-  const initialized = useInitialization();
-  useWalletConnectEventsManager(initialized);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -89,7 +97,9 @@ function Root() {
         <WalletAPIProvider transport={transport}>
           <GlobalStyle />
           <Container>
-            <Outlet />
+            <ErrorBoundary fallback={<ErrorFallback />}>
+              {isApplicationDisabled ? <ApplicationDisabled /> : <Outlet />}
+            </ErrorBoundary>
           </Container>
           <TanStackRouterDevtools />
           <ReactQueryDevtools />
@@ -105,7 +115,7 @@ type RootSearch = {
 };
 
 // All providers should be declared here
-export const rootRoute = new RootRoute({
+export const rootRoute = createRootRoute({
   component: Root,
   validateSearch: (search: Record<string, unknown>): RootSearch => {
     const theme =
@@ -122,18 +132,18 @@ export const rootRoute = new RootRoute({
   },
 });
 
+export enum TabsIndexes {
+  Connect = 0,
+  Sessions = 1,
+}
+
 type IndexSearch = {
   tab: TabsIndexes;
   uri?: string;
   mode?: InputMode;
 };
 
-// We could make everything lazy at the top to avoid download code for the app when disabled
-const isApplicationDisabled = Boolean(
-  import.meta.env.VITE_APPLICATION_DISABLED === "true"
-);
-
-export const indexRoute = new Route({
+export const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
   validateSearch: (search: Record<string, unknown>): IndexSearch => {
@@ -156,9 +166,8 @@ export const indexRoute = new Route({
     };
   },
   component: function Index() {
-    if (isApplicationDisabled) {
-      return <ApplicationDisabled />;
-    }
+    const initialized = useInitialization();
+    useWalletConnectEventsManager(initialized);
 
     return <App />;
   },
@@ -171,4 +180,4 @@ const routeTree = rootRoute.addChildren([
   protocolNotSupportedRoute,
 ]);
 
-export const router = new Router({ routeTree });
+export const router = createRouter({ routeTree });

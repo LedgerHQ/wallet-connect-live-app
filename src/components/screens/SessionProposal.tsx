@@ -1,9 +1,9 @@
 import { ButtonsContainer, List } from "@/components/atoms/containers/Elements";
 import { GenericRow, RowType } from "@/components/atoms/GenericRow";
 import LogoContainer from "@/components/atoms/logoContainers/LedgerLogoContainer";
-import { AddAccountPlaceholder } from "@/components/screens/sessions/sessionProposal/AddAccountPlaceholder";
-import { ErrorBlockchainSupport } from "@/components/screens/sessions/sessionProposal/ErrorBlockchainSupport";
-import { InfoSessionProposal } from "@/components/screens/sessions/sessionProposal/InfoSessionProposal";
+import { AddAccountPlaceholder } from "@/components/screens/sessionProposal/AddAccountPlaceholder";
+import { ErrorBlockchainSupport } from "@/components/screens/sessionProposal/ErrorBlockchainSupport";
+import { InfoSessionProposal } from "@/components/screens/sessionProposal/InfoSessionProposal";
 import {
   formatUrl,
   getColor,
@@ -12,7 +12,6 @@ import {
 } from "@/helpers/helper.util";
 import { useProposal } from "@/hooks/useProposal/useProposal";
 import { ResponsiveContainer } from "@/styles/styles";
-import { Proposal } from "@/types/types";
 import { Flex, Button, Box, CryptoIcon, Text } from "@ledgerhq/react-ui";
 import {
   WalletConnectMedium,
@@ -23,8 +22,8 @@ import { useTranslation } from "react-i18next";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Logo } from "@/icons/LedgerLiveLogo";
 import styled, { useTheme } from "styled-components";
-import useAnalytics from "@/hooks/common/useAnalytics";
-import { tryDecodeURI } from "@/shared/helpers/image";
+import useAnalytics from "@/hooks/useAnalytics";
+import { tryDecodeURI } from "@/helpers/image";
 import { sortChains } from "@/hooks/useProposal/util";
 import { sessionSelector, useSessionsStore } from "@/storage/sessions.store";
 
@@ -240,7 +239,7 @@ export default function SessionProposal() {
                           </List>
                         ) : (
                           <AddAccountPlaceholder
-                            onClick={() => addNewAccount(entry.chain)}
+                            onClick={() => void addNewAccount(entry.chain)}
                           />
                         )}
                       </Box>

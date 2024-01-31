@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { render, screen, renderHook } from "@/tests-tools/test.utils";
-import { ErrorBlockchainSupport } from "@/components/screens/sessions/sessionProposal/ErrorBlockchainSupport";
-import useAnalytics from "@/hooks/common/useAnalytics";
+import { ErrorBlockchainSupport } from "@/components/screens/sessionProposal/ErrorBlockchainSupport";
+import useAnalytics from "@/hooks/useAnalytics";
 
 const APP_NAME = "WALLET_CONNECT";
 
@@ -21,7 +21,7 @@ const CHAINS = [
 ];
 
 describe("Error BlockChian Support Screen", () => {
-  it("Page should appears and on click triggers action", async () => {
+  it("Page should appears and on click triggers action", () => {
     renderHook(() => useAnalytics());
     render(<ErrorBlockchainSupport appName={APP_NAME} chains={CHAINS} />);
     const text = screen.getByTestId("error-title-blockchain-support");

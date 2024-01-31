@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { Connect } from "@/components/screens/Connect";
-import useAnalytics from "@/hooks/common/useAnalytics";
+import useAnalytics from "@/hooks/useAnalytics";
 import { render, screen, renderHook } from "@/tests-tools/test.utils";
 
 const onConnectMock = vi.fn();
