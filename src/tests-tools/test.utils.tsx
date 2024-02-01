@@ -1,6 +1,6 @@
-import { ReactElement } from "react";
+import { ReactElement, Suspense } from "react";
 import { act, render, RenderOptions } from "@testing-library/react";
-import { StyleProvider } from "@ledgerhq/react-ui";
+import { Flex, ProgressLoader, StyleProvider } from "@ledgerhq/react-ui";
 import userEvent from "@testing-library/user-event";
 import { getWalletAPITransport } from "src/routes";
 import { WalletAPIProvider } from "@ledgerhq/wallet-api-client-react";
@@ -14,11 +14,24 @@ import {
   Outlet,
   RouterProvider,
 } from "@tanstack/react-router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ErrorBoundary } from "@sentry/react";
+import { ErrorFallback } from "@/components/screens/ErrorFallback";
 
 type PropsTheme = {
   children: React.ReactNode;
   theme?: "dark" | "light";
 };
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+});
+
+const transport = getWalletAPITransport();
 
 /**
  *
@@ -28,9 +41,26 @@ type PropsTheme = {
  */
 const AllProviders = ({ children, theme = "dark" }: PropsTheme) => {
   return (
-    <StyleProvider selectedPalette={theme} fontsPath="/fonts">
-      {children}
-    </StyleProvider>
+    <QueryClientProvider client={queryClient}>
+      <StyleProvider selectedPalette={theme} fontsPath="/fonts">
+        <WalletAPIProvider transport={transport}>
+          <Suspense
+            fallback={
+              <Flex
+                alignItems="center"
+                justifyContent="center"
+                flexDirection="column"
+                flex={1}
+              >
+                <ProgressLoader infinite showPercentage={false} />
+              </Flex>
+            }
+          >
+            {children}
+          </Suspense>
+        </WalletAPIProvider>
+      </StyleProvider>
+    </QueryClientProvider>
   );
 };
 
@@ -57,16 +87,32 @@ export * from "@testing-library/react";
 export { setupUserEventWithRender as render };
 
 const Root = () => {
-  const transport = getWalletAPITransport();
   return (
-    <StyleProvider selectedPalette={"dark"} fontsPath="/fonts">
-      <WalletAPIProvider transport={transport}>
-        <GlobalStyle />
-        <Container>
-          <Outlet />
-        </Container>
-      </WalletAPIProvider>
-    </StyleProvider>
+    <QueryClientProvider client={queryClient}>
+      <StyleProvider selectedPalette={"dark"} fontsPath="/fonts">
+        <WalletAPIProvider transport={transport}>
+          <GlobalStyle />
+          <Container>
+            <Suspense
+              fallback={
+                <Flex
+                  alignItems="center"
+                  justifyContent="center"
+                  flexDirection="column"
+                  flex={1}
+                >
+                  <ProgressLoader infinite showPercentage={false} />
+                </Flex>
+              }
+            >
+              <ErrorBoundary fallback={<ErrorFallback />}>
+                <Outlet />
+              </ErrorBoundary>
+            </Suspense>
+          </Container>
+        </WalletAPIProvider>
+      </StyleProvider>
+    </QueryClientProvider>
   );
 };
 

@@ -35,7 +35,7 @@ export function isEIP155Chain(
   chain: string,
   // request is passed and used here only for type narrowing
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  _request: { method: string; params: any }
+  _request?: { method: string; params: any }
 ): _request is EIP155_REQUESTS {
   return chain.includes("eip155");
 }

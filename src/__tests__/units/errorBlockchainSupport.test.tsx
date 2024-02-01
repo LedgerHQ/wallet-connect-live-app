@@ -21,10 +21,10 @@ const CHAINS = [
 ];
 
 describe("Error BlockChian Support Screen", () => {
-  it("Page should appears and on click triggers action", () => {
+  it("Page should appears and on click triggers action", async () => {
     renderHook(() => useAnalytics());
     render(<ErrorBlockchainSupport appName={APP_NAME} chains={CHAINS} />);
-    const text = screen.getByTestId("error-title-blockchain-support");
+    const text = await screen.findByTestId("error-title-blockchain-support");
 
     expect(text).toBeInTheDocument();
   });

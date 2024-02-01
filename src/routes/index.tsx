@@ -11,7 +11,7 @@ import App from "@/components/screens/App";
 import { detailRoute } from "./detail";
 import { proposalRoute } from "./proposalRoute";
 import { protocolNotSupportedRoute } from "./protocolNotSupportedRoute";
-import { StyleProvider } from "@ledgerhq/react-ui";
+import { Flex, ProgressLoader, StyleProvider } from "@ledgerhq/react-ui";
 import GlobalStyle from "@/styles/globalStyle";
 import { WalletAPIProvider } from "@ledgerhq/wallet-api-client-react";
 import { WindowMessageTransport } from "@ledgerhq/wallet-api-client";
@@ -22,7 +22,7 @@ import { Container } from "@/styles/styles";
 import { ErrorFallback } from "@/components/screens/ErrorFallback";
 import { ErrorBoundary } from "@sentry/react";
 import { ThemeNames } from "@ledgerhq/react-ui/styles/index";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import i18n from "@/i18n";
 // import useAnalytics from "@/hooks/common/useAnalytics";
 // import {
@@ -76,9 +76,22 @@ function Root() {
         <WalletAPIProvider transport={transport}>
           <GlobalStyle />
           <Container>
-            <ErrorBoundary fallback={<ErrorFallback />}>
-              {isApplicationDisabled ? <ApplicationDisabled /> : <Outlet />}
-            </ErrorBoundary>
+            <Suspense
+              fallback={
+                <Flex
+                  alignItems="center"
+                  justifyContent="center"
+                  flexDirection="column"
+                  flex={1}
+                >
+                  <ProgressLoader infinite showPercentage={false} />
+                </Flex>
+              }
+            >
+              <ErrorBoundary fallback={<ErrorFallback />}>
+                {isApplicationDisabled ? <ApplicationDisabled /> : <Outlet />}
+              </ErrorBoundary>
+            </Suspense>
           </Container>
           <TanStackRouterDevtools />
           <ReactQueryDevtools />
