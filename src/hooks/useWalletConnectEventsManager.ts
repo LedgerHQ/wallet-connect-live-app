@@ -4,9 +4,11 @@ import { Web3WalletTypes } from "@walletconnect/web3wallet";
 import { getAccountWithAddressAndChainId } from "@/helpers/generic";
 import { stripHexPrefix } from "@/utils/currencyFormatter/helpers";
 import { convertEthToLiveTX } from "@/helpers/converters";
-import { EIP155_SIGNING_METHODS } from "@/data/methods/EIP155Data.methods";
-import { web3wallet } from "@/helpers/walletConnect.util";
-import { sessionSelector, useSessionsStore } from "@/storage/sessions.store";
+import {
+  EIP155_REQUESTS,
+  EIP155_SIGNING_METHODS,
+} from "@/data/methods/EIP155Data.methods";
+import { proposalAtom, web3walletAtom } from "@/storage/web3wallet.store";
 import {
   pendingFlowSelector,
   usePendingFlowStore,
@@ -16,8 +18,10 @@ import { isEIP155Chain, isDataInvalid } from "@/helpers/helper.util";
 import { TabsIndexes } from "@/routes";
 import { useNavigate } from "@tanstack/react-router";
 import { useWalletAPIClient } from "@ledgerhq/wallet-api-client-react";
-import { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
-import { useQuery } from "@tanstack/react-query";
+import { WalletAPIClient } from "@ledgerhq/wallet-api-client";
+import { useAtomValue, useSetAtom } from "jotai";
+import { Web3Wallet } from "@walletconnect/web3wallet/dist/types/client";
+import useAccounts from "./useAccounts";
 
 enum Errors {
   userDecline = "User rejected",
@@ -34,7 +38,12 @@ const formatMessage = (buffer: Buffer) => {
   return "0x" + message;
 };
 
-const acceptRequest = (topic: string, id: number, signedMessage: string) => {
+const acceptRequest = (
+  web3wallet: Web3Wallet,
+  topic: string,
+  id: number,
+  signedMessage: string
+) => {
   return web3wallet.respondSessionRequest({
     topic,
     response: {
@@ -45,7 +54,12 @@ const acceptRequest = (topic: string, id: number, signedMessage: string) => {
   });
 };
 
-const rejectRequest = (topic: string, id: number, message: Errors) => {
+const rejectRequest = (
+  web3wallet: Web3Wallet,
+  topic: string,
+  id: number,
+  message: Errors
+) => {
   return web3wallet.respondSessionRequest({
     topic,
     response: {
@@ -59,15 +73,13 @@ const rejectRequest = (topic: string, id: number, message: Errors) => {
   });
 };
 
-function usePendingFlow(initialized: boolean, client?: WalletAPIClient) {
+function usePendingFlow(
+  web3wallet: Web3Wallet,
+  clearPendingFlow: () => void,
+  client?: WalletAPIClient
+) {
   const pendingFlow = usePendingFlowStore(
     pendingFlowSelector.selectPendingFlow
-  );
-  const addPendingFlow = usePendingFlowStore(
-    pendingFlowSelector.addPendingFlow
-  );
-  const clearPendingFlow = usePendingFlowStore(
-    pendingFlowSelector.clearPendingFlow
   );
 
   const triggerPendingFlow = useCallback(async () => {
@@ -82,6 +94,7 @@ function usePendingFlow(initialized: boolean, client?: WalletAPIClient) {
               : Buffer.from(pendingFlow.message)
           );
           return acceptRequest(
+            web3wallet,
             pendingFlow.topic,
             pendingFlow.id,
             formatMessage(signedMessage)
@@ -103,13 +116,19 @@ function usePendingFlow(initialized: boolean, client?: WalletAPIClient) {
               pendingFlow.accountId,
               liveTx
             );
-            return acceptRequest(pendingFlow.topic, pendingFlow.id, hash);
+            return acceptRequest(
+              web3wallet,
+              pendingFlow.topic,
+              pendingFlow.id,
+              hash
+            );
           } else {
             const hash = await client.transaction.sign(
               pendingFlow.accountId,
               liveTx
             );
             return acceptRequest(
+              web3wallet,
               pendingFlow.topic,
               pendingFlow.id,
               hash.toString()
@@ -119,80 +138,221 @@ function usePendingFlow(initialized: boolean, client?: WalletAPIClient) {
       } catch (error) {
         console.error(error);
         return rejectRequest(
+          web3wallet,
           pendingFlow.topic,
           pendingFlow.id,
           Errors.userDecline
         );
       }
     }
-  }, [pendingFlow, clearPendingFlow]);
+  }, [pendingFlow, clearPendingFlow, client, web3wallet]);
 
   useEffect(() => {
-    if (initialized && web3wallet && pendingFlow) {
+    if (web3wallet && pendingFlow) {
       void triggerPendingFlow();
     }
-  }, [initialized]);
-
-  return {
-    addPendingFlow,
-    clearPendingFlow,
-  };
+  }, [pendingFlow, triggerPendingFlow, web3wallet]);
 }
 
-export function getAccounts(client?: WalletAPIClient) {
-  if (!client) {
-    return undefined;
-  }
-
-  return () => {
-    return client.account.list();
-  };
-}
-
-// Created to have a stable ref in case of undefined accounts data
-const initialAccounts: Account[] = [];
-
-export default function useWalletConnectEventsManager(initialized: boolean) {
+export default function useWalletConnectEventsManager() {
   const navigate = useNavigate();
-  const setProposal = useSessionsStore(sessionSelector.setProposal);
-  const removeSession = useSessionsStore(sessionSelector.removeSession);
+  const setProposal = useSetAtom(proposalAtom);
+  const web3wallet = useAtomValue(web3walletAtom);
 
   const { client } = useWalletAPIClient();
 
-  const accounts = useQuery({
-    queryKey: ["accounts"],
-    queryFn: getAccounts(client),
-    initialData: initialAccounts,
-  });
+  const accounts = useAccounts(client);
 
-  /******************************************************************************
-   * 1. Open session proposal modal for confirmation / rejection
-   *****************************************************************************/
+  const addPendingFlow = usePendingFlowStore(
+    pendingFlowSelector.addPendingFlow
+  );
+  const clearPendingFlow = usePendingFlowStore(
+    pendingFlowSelector.clearPendingFlow
+  );
+
   const onSessionProposal = useCallback(
     (proposal: Web3WalletTypes.SessionProposal) => {
       setProposal(proposal);
-      void navigate({ to: "/proposal" });
+      void navigate({ to: "/proposal", search: (search) => search });
     },
-    []
+    [setProposal, navigate]
   );
 
-  /******************************************************************************
-   * 3. Open request handling modal based on method that was used
-   *****************************************************************************/
+  const handleEIP155Request = useCallback(
+    async (
+      request: EIP155_REQUESTS,
+      topic: string,
+      id: number,
+      chainId: string
+    ) => {
+      switch (request.method) {
+        case EIP155_SIGNING_METHODS.ETH_SIGN:
+        case EIP155_SIGNING_METHODS.PERSONAL_SIGN: {
+          const isPersonalSign =
+            request.method === EIP155_SIGNING_METHODS.PERSONAL_SIGN;
+          const accountSign = getAccountWithAddressAndChainId(
+            accounts.data,
+            isPersonalSign ? request.params[1] : request.params[0],
+            chainId
+          );
+          if (accountSign && client) {
+            try {
+              const message = stripHexPrefix(
+                isPersonalSign ? request.params[0] : request.params[1]
+              );
+
+              addPendingFlow({
+                id,
+                topic,
+                accountId: accountSign.id,
+                message,
+                isHex: true,
+              });
+              const signedMessage = await client.message.sign(
+                accountSign.id,
+                Buffer.from(message, "hex")
+              );
+              void acceptRequest(
+                web3wallet,
+                topic,
+                id,
+                formatMessage(signedMessage)
+              );
+            } catch (error) {
+              void rejectRequest(web3wallet, topic, id, Errors.userDecline);
+              console.error(error);
+            }
+            clearPendingFlow();
+          } else {
+            void rejectRequest(web3wallet, topic, id, Errors.userDecline);
+          }
+          break;
+        }
+        case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA:
+        case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V3:
+        case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V4: {
+          const accountSignTyped = getAccountWithAddressAndChainId(
+            accounts.data,
+            request.params[0],
+            chainId
+          );
+          if (accountSignTyped && client) {
+            try {
+              const message = stripHexPrefix(request.params[1]);
+
+              addPendingFlow({
+                id,
+                topic,
+                accountId: accountSignTyped.id,
+                message,
+              });
+              const signedMessage = await client.message.sign(
+                accountSignTyped.id,
+                Buffer.from(message)
+              );
+              void acceptRequest(
+                web3wallet,
+                topic,
+                id,
+                formatMessage(signedMessage)
+              );
+            } catch (error) {
+              void rejectRequest(web3wallet, topic, id, Errors.msgDecline);
+              console.error(error);
+            }
+            clearPendingFlow();
+          } else {
+            void rejectRequest(web3wallet, topic, id, Errors.msgDecline);
+          }
+          break;
+        }
+        case EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION: {
+          const ethTx = request.params[0];
+          const accountTX = getAccountWithAddressAndChainId(
+            accounts.data,
+            ethTx.from,
+            chainId
+          );
+          if (accountTX && client) {
+            try {
+              const liveTx = convertEthToLiveTX(ethTx);
+              addPendingFlow({
+                id,
+                topic,
+                accountId: accountTX.id,
+                ethTx,
+                txHadSomeData: ethTx.data ? ethTx.data.length > 0 : false,
+                send: true,
+              });
+              const hash = await client.transaction.signAndBroadcast(
+                accountTX.id,
+                liveTx
+              );
+              void acceptRequest(web3wallet, topic, id, hash);
+            } catch (error) {
+              void rejectRequest(web3wallet, topic, id, Errors.txDeclined);
+              console.error(error);
+            }
+            clearPendingFlow();
+          } else {
+            void rejectRequest(web3wallet, topic, id, Errors.txDeclined);
+          }
+          break;
+        }
+        case EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION: {
+          const ethTx = request.params[0];
+          const accountTX = getAccountWithAddressAndChainId(
+            accounts.data,
+            ethTx.from,
+            chainId
+          );
+          if (accountTX && client) {
+            try {
+              const liveTx = convertEthToLiveTX(ethTx);
+              addPendingFlow({
+                id,
+                topic,
+                accountId: accountTX.id,
+                ethTx,
+                txHadSomeData: ethTx.data ? ethTx.data.length > 0 : false,
+              });
+              const hash = await client.transaction.sign(accountTX.id, liveTx);
+              void acceptRequest(web3wallet, topic, id, hash.toString());
+            } catch (error) {
+              void rejectRequest(web3wallet, topic, id, Errors.txDeclined);
+              console.error(error);
+            }
+            clearPendingFlow();
+          } else {
+            void rejectRequest(web3wallet, topic, id, Errors.txDeclined);
+          }
+          break;
+        }
+        default:
+          // TODO handle default case ?
+          return; // ModalStore.open('SessionUnsuportedMethodModal', { requestEvent, requestSession })
+      }
+    },
+    [accounts.data, addPendingFlow, clearPendingFlow, client, web3wallet]
+  );
+
   const onSessionRequest = useCallback(
     (requestEvent: SignClientTypes.EventArguments["session_request"]) => {
-      const { topic, params, id } = requestEvent;
-      const { request, chainId } = params;
+      const {
+        topic,
+        params: { request, chainId },
+        id,
+      } = requestEvent;
 
-      console.log("onSessionRequest ", requestEvent);
+      console.log("onSessionRequest: ", requestEvent);
 
-      if (isEIP155Chain(chainId)) {
+      if (isEIP155Chain(chainId, request)) {
         void handleEIP155Request(request, topic, id, chainId);
       } else {
         console.error("Not Supported Chain");
       }
     },
-    []
+    [handleEIP155Request]
   );
 
   const onSessionDeleted = useCallback(
@@ -209,188 +369,39 @@ export default function useWalletConnectEventsManager(initialized: boolean) {
           console.error(err);
         })
         .finally(() => {
-          removeSession(session.topic);
           void navigate({
             to: "/",
-            search: { tab: TabsIndexes.Sessions },
+            search: (search) => ({ ...search, tab: TabsIndexes.Sessions }),
           });
         });
     },
-    []
+    [web3wallet, navigate]
   );
 
-  /******************************************************************************
-   * Set up WalletConnect event listeners
-   *****************************************************************************/
   useEffect(() => {
-    if (initialized && web3wallet) {
-      console.log("initialized web3wallet");
+    if (web3wallet) {
+      console.log("web3wallet setup listeners");
       // sign
       web3wallet.on("session_proposal", onSessionProposal);
       web3wallet.on("session_request", onSessionRequest);
+      web3wallet.on("session_delete", onSessionDeleted);
+
       // auth
       // web3wallet.on("auth_request", onAuthRequest);
-
-      // TODOs
-      // web3wallet.on('session_ping', (data) => console.log('ping', data))
-      // web3wallet.on('session_event', (data) => console.log('event', data))
-      // web3wallet.on('session_update', (data) => console.log('update', data))
-      web3wallet.on("session_delete", onSessionDeleted);
     }
-  }, [initialized, web3wallet]);
+    return () => {
+      console.log("web3wallet cleanup listeners");
+      // sign
+      web3wallet.off("session_proposal", onSessionProposal);
+      web3wallet.off("session_request", onSessionRequest);
+      web3wallet.off("session_delete", onSessionDeleted);
 
-  const { addPendingFlow, clearPendingFlow } = usePendingFlow(
-    initialized,
-    client
-  );
+      // auth
+      // web3wallet.off("auth_request", onAuthRequest);
+    };
+  }, [web3wallet, onSessionProposal, onSessionRequest, onSessionDeleted]);
 
-  /******************************************************************************
-   * EIP155
-   *****************************************************************************/
-
-  async function handleEIP155Request(
-    // TODO: type params for each methods
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    request: { method: string; params: any },
-    topic: string,
-    id: number,
-    chainId: string
-  ) {
-    switch (request.method) {
-      case EIP155_SIGNING_METHODS.ETH_SIGN:
-      case EIP155_SIGNING_METHODS.PERSONAL_SIGN: {
-        const isPersonalSign =
-          request.method === EIP155_SIGNING_METHODS.PERSONAL_SIGN;
-        const accountSign = getAccountWithAddressAndChainId(
-          accounts.data,
-          isPersonalSign ? request.params[1] : request.params[0],
-          chainId
-        );
-        if (accountSign && client) {
-          try {
-            const message = stripHexPrefix(
-              isPersonalSign ? request.params[0] : request.params[1]
-            );
-
-            addPendingFlow({
-              id,
-              topic,
-              accountId: accountSign.id,
-              message,
-              isHex: true,
-            });
-            const signedMessage = await client.message.sign(
-              accountSign.id,
-              Buffer.from(message, "hex")
-            );
-            void acceptRequest(topic, id, formatMessage(signedMessage));
-          } catch (error) {
-            void rejectRequest(topic, id, Errors.userDecline);
-            console.error(error);
-          }
-          clearPendingFlow();
-        } else {
-          void rejectRequest(topic, id, Errors.userDecline);
-        }
-        break;
-      }
-      case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA:
-      case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V3:
-      case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V4: {
-        const accountSignTyped = getAccountWithAddressAndChainId(
-          accounts.data,
-          request.params[0],
-          chainId
-        );
-        if (accountSignTyped && client) {
-          try {
-            const message = stripHexPrefix(request.params[1]);
-
-            addPendingFlow({
-              id,
-              topic,
-              accountId: accountSignTyped.id,
-              message,
-            });
-            const signedMessage = await client.message.sign(
-              accountSignTyped.id,
-              Buffer.from(message)
-            );
-            void acceptRequest(topic, id, formatMessage(signedMessage));
-          } catch (error) {
-            void rejectRequest(topic, id, Errors.msgDecline);
-            console.error(error);
-          }
-          clearPendingFlow();
-        } else {
-          void rejectRequest(topic, id, Errors.msgDecline);
-        }
-        break;
-      }
-      case EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION: {
-        const ethTx = request.params[0];
-        const accountTX = getAccountWithAddressAndChainId(
-          accounts.data,
-          ethTx.from,
-          chainId
-        );
-        if (accountTX && client) {
-          try {
-            const liveTx = convertEthToLiveTX(ethTx);
-            addPendingFlow({
-              id,
-              topic,
-              accountId: accountTX.id,
-              ethTx,
-              txHadSomeData: ethTx.data && ethTx.data.length > 0,
-              send: true,
-            });
-            const hash = await client.transaction.signAndBroadcast(
-              accountTX.id,
-              liveTx
-            );
-            void acceptRequest(topic, id, hash);
-          } catch (error) {
-            void rejectRequest(topic, id, Errors.txDeclined);
-            console.error(error);
-          }
-          clearPendingFlow();
-        } else {
-          void rejectRequest(topic, id, Errors.txDeclined);
-        }
-        break;
-      }
-      case EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION: {
-        const ethTx = request.params[0];
-        const accountTX = getAccountWithAddressAndChainId(
-          accounts.data,
-          ethTx.from,
-          chainId
-        );
-        if (accountTX && client) {
-          try {
-            const liveTx = convertEthToLiveTX(ethTx);
-            addPendingFlow({
-              id,
-              topic,
-              accountId: accountTX.id,
-              ethTx,
-              txHadSomeData: ethTx.data && ethTx.data.length > 0,
-            });
-            const hash = await client.transaction.sign(accountTX.id, liveTx);
-            void acceptRequest(topic, id, hash.toString());
-          } catch (error) {
-            void rejectRequest(topic, id, Errors.txDeclined);
-            console.error(error);
-          }
-          clearPendingFlow();
-        } else {
-          void rejectRequest(topic, id, Errors.txDeclined);
-        }
-        break;
-      }
-      default:
-        return; // ModalStore.open('SessionUnsuportedMethodModal', { requestEvent, requestSession })
-    }
-  }
+  // TODO maybe redo differently and need to test if we get the last message when reconnecting to wc by default
+  // After listeners created
+  usePendingFlow(web3wallet, clearPendingFlow, client);
 }

@@ -97,6 +97,7 @@ export async function renderComponent(component: () => JSX.Element) {
   await act(async () => {
     return router.navigate({
       to: "/",
+      search: (search) => search,
     });
   });
   return router;

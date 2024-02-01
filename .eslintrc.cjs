@@ -13,18 +13,15 @@ module.exports = {
     ecmaVersion: 2020,
     sourceType: "module",
   },
-  plugins: ["testing-library"],
   extends: [
     "eslint:recommended",
     "prettier",
+    "plugin:react/recommended",
+    "plugin:react/jsx-runtime",
     "plugin:react-hooks/recommended",
     "plugin:@tanstack/eslint-plugin-query/recommended",
   ],
-  rules: {
-    "prefer-const": "error",
-    "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "off",
-  },
+  rules: {},
   overrides: [
     {
       files: ["**/*.{ts,tsx}"],
@@ -58,4 +55,12 @@ module.exports = {
       extends: ["plugin:testing-library/react"],
     },
   ],
+  settings: {
+    react: {
+      version: "detect", // React version. "detect" automatically picks the version you have installed.
+    },
+    linkComponents: [
+      { name: "Link", linkAttribute: "to" }, // allows specifying multiple properties if necessary
+    ],
+  },
 };

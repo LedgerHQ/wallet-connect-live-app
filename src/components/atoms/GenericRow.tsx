@@ -42,7 +42,11 @@ export function GenericRow({
       }}
       alignItems="center"
     >
-      <Flex flexDirection="row" justifyContent="space-between" alignItems="center">
+      <Flex
+        flexDirection="row"
+        justifyContent="space-between"
+        alignItems="center"
+      >
         {LeftIcon}
         <Flex flexDirection="column" ml={5}>
           <Text variant="body" fontWeight="semiBold" color="neutral.c100">
@@ -57,9 +61,16 @@ export function GenericRow({
       <Flex alignItems="center" data-testid="rightComp">
         {rightElement ?? null}
         {rowType === RowType.Select && onClick && (
-          <Checkbox isChecked={isSelected} name={""} onChange={onClick} data-testid="checkbox" />
+          <Checkbox
+            isChecked={isSelected}
+            name={""}
+            onChange={onClick}
+            data-testid="checkbox"
+          />
         )}
-        {rowType === RowType.Detail && <ChevronRightMedium size={24} color="neutral.c70" />}
+        {rowType === RowType.Detail && (
+          <ChevronRightMedium size={24} color="neutral.c70" />
+        )}
       </Flex>
     </Row>
   );

@@ -7,15 +7,12 @@ import {
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
-import { useTranslation } from "react-i18next";
-import App from "@/components/screens/Home";
+import App from "@/components/screens/App";
 import { detailRoute } from "./detail";
 import { proposalRoute } from "./proposalRoute";
 import { protocolNotSupportedRoute } from "./protocolNotSupportedRoute";
-import { appSelector, useAppStore } from "@/storage/app.store";
 import { StyleProvider } from "@ledgerhq/react-ui";
 import GlobalStyle from "@/styles/globalStyle";
-import useInitialization from "@/hooks/useInitialization";
 import { WalletAPIProvider } from "@ledgerhq/wallet-api-client-react";
 import { WindowMessageTransport } from "@ledgerhq/wallet-api-client";
 import useWalletConnectEventsManager from "@/hooks/useWalletConnectEventsManager";
@@ -24,12 +21,10 @@ import { InputMode } from "@/types/types";
 import { Container } from "@/styles/styles";
 import { ErrorFallback } from "@/components/screens/ErrorFallback";
 import { ErrorBoundary } from "@sentry/react";
-// import {
-//   getSimulatorTransport,
-//   profiles,
-// } from "@ledgerhq/wallet-api-simulator";
+import { ThemeNames } from "@ledgerhq/react-ui/styles/index";
+import { useEffect } from "react";
+import i18n from "@/i18n";
 // import useAnalytics from "@/hooks/common/useAnalytics";
-
 // import {
 //   getSimulatorTransport,
 //   profiles,
@@ -69,31 +64,15 @@ const isApplicationDisabled = Boolean(
 );
 
 function Root() {
-  const themeStored = useAppStore(appSelector.selectTheme);
-  const setTheme = useAppStore(appSelector.setTheme);
-  // TODO: we could probably use the search from tanstack router for lang and theme params
-  const {
-    i18n: { changeLanguage, language },
-  } = useTranslation();
-
-  // Migrate to analytics provider that will get the wallet-api infos by itself
-  // const analytics = useAnalytics();
-
-  // useEffect(() => {
-  //   analytics.start(userId, walletInfo);
-  // }, []);
-
   const { lang, theme } = rootRoute.useSearch();
-  if (lang !== language) {
-    void changeLanguage(lang);
-  }
-  if ((theme == "dark" || theme == "light") && theme !== themeStored) {
-    setTheme(theme);
-  }
+
+  useEffect(() => {
+    void i18n.changeLanguage(lang);
+  }, [lang]);
 
   return (
     <QueryClientProvider client={queryClient}>
-      <StyleProvider selectedPalette={themeStored} fontsPath="/fonts">
+      <StyleProvider selectedPalette={theme} fontsPath="/fonts">
         <WalletAPIProvider transport={transport}>
           <GlobalStyle />
           <Container>
@@ -110,8 +89,8 @@ function Root() {
 }
 
 type RootSearch = {
-  theme?: string;
-  lang?: string;
+  theme: ThemeNames;
+  lang: string;
 };
 
 // All providers should be declared here
@@ -119,11 +98,13 @@ export const rootRoute = createRootRoute({
   component: Root,
   validateSearch: (search: Record<string, unknown>): RootSearch => {
     const theme =
-      search.theme && typeof search.theme === "string"
+      search.theme &&
+      typeof search.theme === "string" &&
+      (search.theme === "dark" || search.theme === "light")
         ? search.theme
-        : undefined;
+        : "dark";
     const lang =
-      search.lang && typeof search.lang === "string" ? search.lang : undefined;
+      search.lang && typeof search.lang === "string" ? search.lang : "en";
 
     return {
       theme,
@@ -166,8 +147,14 @@ export const indexRoute = createRoute({
     };
   },
   component: function Index() {
-    const initialized = useInitialization();
-    useWalletConnectEventsManager(initialized);
+    useWalletConnectEventsManager();
+
+    // Migrate to analytics provider that will get the wallet-api infos by itself
+    // const analytics = useAnalytics();
+
+    // useEffect(() => {
+    //   analytics.start(userId, walletInfo);
+    // }, []);
 
     return <App />;
   },

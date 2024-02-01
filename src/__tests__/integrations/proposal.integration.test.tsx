@@ -7,10 +7,9 @@ import sessionProposal from "@/data/mocks/sessionProposal.example.json";
 import SessionProposal from "@/components/screens/SessionProposal";
 import SessionDetail from "@/components/screens/SessionDetail";
 import userEvent from "@testing-library/user-event";
-import { createWeb3Wallet } from "@/helpers/walletConnect.util";
 import { vi, describe, it, expect } from "vitest";
 import { createRoute, useNavigate } from "@tanstack/react-router";
-import AppScreen from "@/components/screens/Home";
+import AppScreen from "@/components/screens/App";
 
 // mock useRouter
 // jest.mock("next/router", () => ({
@@ -98,7 +97,6 @@ describe.skip("Proposal Flow tests", () => {
     cleanup();
     proposalRouter();
     render(<SessionProposal />);
-    await createWeb3Wallet();
 
     await waitFor(
       () => {

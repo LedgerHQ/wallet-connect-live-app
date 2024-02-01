@@ -21,15 +21,15 @@ import {
   Row,
 } from "@/components/atoms/containers/Elements";
 import { ResponsiveContainer } from "@/styles/styles";
-import { sessionSelector, useSessionsStore } from "@/storage/sessions.store";
-import { web3wallet } from "@/helpers/walletConnect.util";
 import { ImageWithPlaceholder } from "@/components/atoms/images/ImageWithPlaceholder";
 import useAnalytics from "@/hooks/useAnalytics";
 import { TabsIndexes } from "@/routes";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { getAccounts } from "@/hooks/useWalletConnectEventsManager";
-import { useQuery } from "@tanstack/react-query";
 import { useWalletAPIClient } from "@ledgerhq/wallet-api-client-react";
+import { useAtomValue } from "jotai";
+import { web3walletAtom } from "@/storage/web3wallet.store";
+import useSessions from "@/hooks/useSessions";
+import useAccounts from "@/hooks/useAccounts";
 
 const DetailContainer = styled(Flex)`
   border-radius: 12px;
@@ -75,31 +75,27 @@ type Props = {
   topic: string;
 };
 
-// Created to have a stable ref in case of undefined accounts data
-const initialAccounts: Account[] = [];
-
 export default function SessionDetail({ topic }: Props) {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
   const { client } = useWalletAPIClient();
 
-  const accounts = useQuery({
-    queryKey: ["accounts"],
-    queryFn: getAccounts(client),
-    initialData: initialAccounts,
-  });
+  const accounts = useAccounts(client);
 
-  const sessions = useSessionsStore(sessionSelector.selectSessions);
+  const web3wallet = useAtomValue(web3walletAtom);
+  const sessions = useSessions(web3wallet);
   const session = useMemo(
     () => sessions.find((elem) => elem.topic === topic),
-    []
+    [sessions, topic]
   );
-  const removeSession = useSessionsStore(sessionSelector.removeSession);
 
   const navigateToSessionsHomeTab = useCallback(() => {
-    return navigate({ to: "/", search: { tab: TabsIndexes.Sessions } });
-  }, []);
+    void navigate({
+      to: "/",
+      search: (search) => ({ ...search, tab: TabsIndexes.Sessions }),
+    });
+  }, [navigate]);
 
   const analytics = useAnalytics();
 
@@ -111,6 +107,7 @@ export default function SessionDetail({ topic }: Props) {
       dapp: session?.peer?.metadata?.name ?? "Dapp name undefined",
       url: session?.peer?.metadata?.url ?? "Dapp url undefined",
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
   const handleDelete = useCallback(() => {
@@ -130,17 +127,16 @@ export default function SessionDetail({ topic }: Props) {
     } catch (error) {
       console.error(error);
     }
-    removeSession(session.topic);
     void navigateToSessionsHomeTab();
-  }, [session]);
+  }, [analytics, navigateToSessionsHomeTab, session, web3wallet]);
 
-  const onGoBack = () => {
+  const onGoBack = useCallback(() => {
     void navigateToSessionsHomeTab();
     analytics.track("button_clicked", {
       button: "WC-Back",
       page: "Wallet Connect Session Detail",
     });
-  };
+  }, [analytics, navigateToSessionsHomeTab]);
 
   const metadata = session?.peer.metadata;
   const fullAddresses = useMemo(
@@ -299,7 +295,10 @@ export default function SessionDetail({ topic }: Props) {
               flex={1}
               onClick={handleDelete}
             >
-              <Link to="/" search={{ tab: TabsIndexes.Connect }}>
+              <Link
+                to="/"
+                search={(search) => ({ ...search, tab: TabsIndexes.Connect })}
+              >
                 <Text variant="body" fontWeight="semiBold" color="neutral.c100">
                   {t("sessions.detail.disconnect")}
                 </Text>

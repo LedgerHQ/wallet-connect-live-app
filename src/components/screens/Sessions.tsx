@@ -3,62 +3,68 @@ import { GenericRow, RowType } from "@/components/atoms/GenericRow";
 import { ImageWithPlaceholder } from "@/components/atoms/images/ImageWithPlaceholder";
 import { WalletConnectPopin } from "@/components/atoms/popin/WalletConnectPopin";
 import { formatUrl } from "@/helpers/helper.util";
-import { web3wallet } from "@/helpers/walletConnect.util";
 import { Flex, Button, Box, Text } from "@ledgerhq/react-ui";
-
 import { useTranslation } from "react-i18next";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect } from "react";
 import useModal from "@/hooks/useModal";
-
-import styled from "styled-components";
-import { useSessionsStore, sessionSelector } from "@/storage/sessions.store";
 import useAnalytics from "@/hooks/useAnalytics";
 import { useNavigate } from "@tanstack/react-router";
+import { TabsIndexes } from "@/routes";
+import { useAtomValue } from "jotai";
+import { web3walletAtom } from "@/storage/web3wallet.store";
+import useSessions from "@/hooks/useSessions";
 
-export type SessionsProps = {
-  goToConnect: () => void;
-};
-
-const CustomList = styled(List)``;
-
-export default function Sessions({ goToConnect }: SessionsProps) {
+export default function Sessions() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { openModal, closeModal, isModalOpen } = useModal();
-  const clearSessions = useSessionsStore(sessionSelector.clearSessions);
-  const sessions = useSessionsStore(sessionSelector.selectSessions);
+  const web3wallet = useAtomValue(web3walletAtom);
+  const sessions = useSessions(web3wallet);
+  const sessionsLength = sessions.length;
+  const isEmptyState = sessionsLength === 0;
   const analytics = useAnalytics();
 
+  // TODO look at improving the analytics here maybe
   useEffect(() => {
     analytics.page("Wallet Connect Sessions", {
       isEmptyState,
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     analytics.track("equipment_connected", {
-      sessionsConnected: sessions?.length ?? 0,
+      sessionsConnected: sessionsLength,
     });
     analytics.identify();
-  }, [sessions?.length]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const isEmptyState = useMemo(() => sessions.length === 0, [sessions]);
+  const goToDetailSession = useCallback(
+    (topic: string) => {
+      void navigate({
+        to: "/detail/$topic",
+        params: { topic },
+        search: (search) => search,
+      });
+      analytics.track("button_clicked", {
+        button: "Session Detail",
+        page: "Wallet Connect Sessions",
+      });
+    },
+    [analytics, navigate]
+  );
 
-  const goToDetailSession = (topic: string) => {
-    void navigate({ to: "/detail/$topic", params: { topic } });
-    analytics.track("button_clicked", {
-      button: "Session Detail",
-      page: "Wallet Connect Sessions",
-    });
-  };
-
-  const onGoToConnect = () => {
+  const onGoToConnect = useCallback(() => {
     analytics.track("button_clicked", {
       button: "Connect",
       page: "Wallet Connect Sessions",
     });
-    goToConnect();
-  };
+    void navigate({
+      params: (params) => params,
+      search: (search) => ({ ...search, tab: TabsIndexes.Connect }),
+    });
+  }, [analytics, navigate]);
 
   const disconnect = useCallback(() => {
     void Promise.all(
@@ -76,14 +82,13 @@ export default function Sessions({ goToConnect }: SessionsProps) {
         console.error(err);
       })
       .finally(() => {
-        clearSessions();
         closeModal();
         analytics.track("button_clicked", {
           button: "WC-Disconnect All Sessions",
           page: "Wallet Connect Sessions",
         });
       });
-  }, [sessions]);
+  }, [analytics, closeModal, sessions, web3wallet]);
 
   if (isEmptyState) {
     return (
@@ -118,7 +123,7 @@ export default function Sessions({ goToConnect }: SessionsProps) {
 
   return (
     <Flex flexDirection="column" width="100%" height="100%" mt={6}>
-      <CustomList>
+      <List>
         {sessions.map((session) => (
           <Box key={session.topic} mt={3}>
             <GenericRow
@@ -135,7 +140,7 @@ export default function Sessions({ goToConnect }: SessionsProps) {
             />
           </Box>
         ))}
-      </CustomList>
+      </List>
 
       <ButtonsContainer my={6}>
         <Button variant="shade" size="large" flex={1} onClick={openModal}>

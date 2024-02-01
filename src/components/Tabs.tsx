@@ -1,5 +1,5 @@
 import { Flex, Text } from "@ledgerhq/react-ui";
-import { createRef, forwardRef, useEffect, useState } from "react";
+import { createRef, forwardRef, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 
 export type TabContent = {
@@ -40,32 +40,38 @@ const TabHeaderBox = styled.div<{ disabled: boolean }>`
   padding: 8px 12px;
 `;
 
-const HeaderElement = forwardRef<HTMLDivElement, HeaderElementProps>((props, ref) => {
-  const { onClick, badge, disabled, selected, title } = props;
+const HeaderElement = forwardRef<HTMLDivElement, HeaderElementProps>(
+  (props, ref) => {
+    const { onClick, badge, disabled, selected, title } = props;
 
-  return (
-    <TabHeaderBox ref={ref} disabled={disabled} onClick={onClick}>
-      <Text variant="body" fontWeight="semiBold" color={selected ? "neutral.c100" : "neutral.c70"}>
-        {title}
-      </Text>
-      {badge && badge > 0 ? (
-        <Flex
-          width={24}
-          height={24}
-          alignItems="center"
-          justifyContent="center"
-          bg="primary.c80"
-          borderRadius={100}
-          ml={3}
+    return (
+      <TabHeaderBox ref={ref} disabled={disabled} onClick={onClick}>
+        <Text
+          variant="body"
+          fontWeight="semiBold"
+          color={selected ? "neutral.c100" : "neutral.c70"}
         >
-          <Text variant="small" fontWeight="semiBold" color="neutral.c00">
-            {badge >= 99 ? "99+" : badge}
-          </Text>
-        </Flex>
-      ) : null}
-    </TabHeaderBox>
-  );
-});
+          {title}
+        </Text>
+        {badge && badge > 0 ? (
+          <Flex
+            width={24}
+            height={24}
+            alignItems="center"
+            justifyContent="center"
+            bg="primary.c80"
+            borderRadius={100}
+            ml={3}
+          >
+            <Text variant="small" fontWeight="semiBold" color="neutral.c00">
+              {badge >= 99 ? "99+" : badge}
+            </Text>
+          </Flex>
+        ) : null}
+      </TabHeaderBox>
+    );
+  }
+);
 HeaderElement.displayName = "HeaderElement";
 
 const HeaderBottomBar = styled.div<HeaderBottomBarProps>`
@@ -88,19 +94,26 @@ export default function Tabs({
     left: 0,
     width: 0,
   });
-  const refs = tabs.map(() => createRef<HTMLDivElement>());
+
+  const refs = useMemo(() => {
+    return tabs.map(() => createRef<HTMLDivElement>());
+  }, [tabs]);
 
   useEffect(() => {
     if (refs[0].current) {
       const refIndex = tabs.findIndex((t) => t.index === activeTabIndex);
       const refsToHandle = refs.slice(0, refIndex);
       const width = refs[refIndex].current?.offsetWidth ?? 0;
-      const left = refsToHandle.reduce((total, ref) => total + (ref.current?.offsetWidth ?? 0), 0);
+      const left = refsToHandle.reduce(
+        (total, ref) => total + (ref.current?.offsetWidth ?? 0),
+        0
+      );
       setBottomBar({
         width,
         left,
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTabIndex]);
 
   const onTabClick = (index: number) => {
@@ -112,7 +125,12 @@ export default function Tabs({
 
   return (
     <>
-      <Flex flexDirection="column" justifyContent="center" width="100%" height={56}>
+      <Flex
+        flexDirection="column"
+        justifyContent="center"
+        width="100%"
+        height={56}
+      >
         <Flex flex={1} width="100%" alignItems="center">
           {tabs.map((tab, i) => (
             <HeaderElement
@@ -126,7 +144,13 @@ export default function Tabs({
             />
           ))}
         </Flex>
-        <Flex width="100%" height={1} bg="neutral.c30" position="relative" mt={3}>
+        <Flex
+          width="100%"
+          height={1}
+          bg="neutral.c30"
+          position="relative"
+          mt={3}
+        >
           <HeaderBottomBar width={bottomBar.width} left={bottomBar.left} />
         </Flex>
       </Flex>

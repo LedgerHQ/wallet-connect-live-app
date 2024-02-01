@@ -19,30 +19,31 @@ import {
 } from "@ledgerhq/react-ui/assets/icons";
 import { space } from "@ledgerhq/react-ui/styles/theme";
 import { useTranslation } from "react-i18next";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { Logo } from "@/icons/LedgerLiveLogo";
 import styled, { useTheme } from "styled-components";
 import useAnalytics from "@/hooks/useAnalytics";
 import { tryDecodeURI } from "@/helpers/image";
-import { sortChains } from "@/hooks/useProposal/util";
-import { sessionSelector, useSessionsStore } from "@/storage/sessions.store";
+import { formatAccountsByChain, sortChains } from "@/hooks/useProposal/util";
+import { proposalAtom } from "@/storage/web3wallet.store";
+import { useAtomValue } from "jotai";
+
+const emptyAccounts: ReturnType<typeof formatAccountsByChain> = [];
 
 export default function SessionProposal() {
   const { colors } = useTheme();
   const { t } = useTranslation();
-  const [hydrated, setHydrated] = useState(false);
-  const proposal = useSessionsStore(sessionSelector.selectProposal);
+  const proposal = useAtomValue(proposalAtom);
   const {
     handleClick,
     handleClose,
     approveSession,
     rejectSession,
-    formatAccountsByChain,
     accounts,
     selectedAccounts,
     proposer,
     addNewAccount,
-  } = useProposal({ proposal });
+  } = useProposal(proposal);
   const analytics = useAnalytics();
   const dApp = proposer?.metadata?.name ?? "Dapp name undefined";
   const dAppUrl = proposer?.metadata?.url ?? "Dapp url undefined";
@@ -52,10 +53,10 @@ export default function SessionProposal() {
       dapp: dApp,
       url: dAppUrl,
     });
-    setHydrated(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onApprove = () => {
+  const onApprove = useCallback(() => {
     analytics.track("button_clicked", {
       button: "WC-Connect",
       page: "Wallet Connect Session Request",
@@ -63,7 +64,7 @@ export default function SessionProposal() {
       url: dAppUrl,
     });
     approveSession();
-  };
+  }, [analytics, approveSession, dApp, dAppUrl]);
 
   const onReject = useCallback(() => {
     analytics.track("button_clicked", {
@@ -73,34 +74,46 @@ export default function SessionProposal() {
       url: dAppUrl,
     });
     rejectSession();
-  }, []);
+  }, [analytics, dApp, dAppUrl, rejectSession]);
 
   const accountsByChain = useMemo(
-    () => (proposal ? formatAccountsByChain(proposal, accounts) : []),
+    () =>
+      proposal ? formatAccountsByChain(proposal, accounts) : emptyAccounts,
     [proposal, accounts]
   );
 
-  const requiredChains = accountsByChain.filter((entry) => entry.isRequired);
-
-  const chainsNotSupported = accountsByChain.filter(
-    (entry) => !entry.isSupported
+  const requiredChains = useMemo(
+    () => accountsByChain.filter((entry) => entry.isRequired),
+    [accountsByChain]
   );
 
-  const noChainsSupported = !accountsByChain.some((entry) => entry.isSupported);
-
-  const everyRequiredChainsSupported = requiredChains.every(
-    (entry) => entry.isSupported
+  const chainsNotSupported = useMemo(
+    () => accountsByChain.filter((entry) => !entry.isSupported),
+    [accountsByChain]
   );
 
-  const disabled = !requiredChains.every((entry) =>
-    entry.accounts.some((account) => selectedAccounts.includes(account.id))
+  const noChainsSupported = useMemo(
+    () => !accountsByChain.some((entry) => entry.isSupported),
+    [accountsByChain]
   );
 
-  const iconProposer = tryDecodeURI(proposer?.metadata?.icons[0] ?? undefined);
+  const everyRequiredChainsSupported = useMemo(
+    () => requiredChains.every((entry) => entry.isSupported),
+    [requiredChains]
+  );
 
-  if (!hydrated) {
-    return null;
-  }
+  const disabled = useMemo(
+    () =>
+      !requiredChains.every((entry) =>
+        entry.accounts.some((account) => selectedAccounts.includes(account.id))
+      ),
+    [requiredChains, selectedAccounts]
+  );
+
+  const iconProposer = useMemo(
+    () => tryDecodeURI(proposer?.metadata?.icons[0] ?? undefined),
+    [proposer?.metadata?.icons]
+  );
 
   return (
     <Flex

@@ -1,6 +1,6 @@
 import "@testing-library/react/dont-cleanup-after-each";
 import { cleanup, render, waitFor, screen } from "@/tests-tools/test.utils";
-import AppScreen from "@/components/screens/Home";
+import AppScreen from "@/components/screens/App";
 import SessionProposal from "@/components/screens/SessionProposal";
 import { vi, describe, it, expect } from "vitest";
 

@@ -3,9 +3,12 @@ import { Input, Button, Text, Flex } from "@ledgerhq/react-ui";
 import { useCallback, useEffect, useState } from "react";
 import { PasteMedium, QrCodeMedium } from "@ledgerhq/react-ui/assets/icons";
 import { QRScanner } from "../QRScanner";
-import { InputMode } from "@/types/types";
 import { useTranslation } from "react-i18next";
 import useAnalytics from "@/hooks/useAnalytics";
+import { indexRoute } from "@/routes";
+import { useNavigate } from "@tanstack/react-router";
+import { useAtomValue } from "jotai";
+import { coreAtom } from "@/storage/web3wallet.store";
 
 const QRScannerContainer = styled.div`
   display: flex;
@@ -33,17 +36,9 @@ const QrCodeButton = styled.div`
   }
 `;
 
-export type ConnectProps = {
-  initialURI?: string;
-  onConnect: (uri: string) => Promise<void>;
-  mode?: InputMode;
-};
-
-export function Connect({
-  initialURI,
-  onConnect,
-  mode,
-}: Readonly<ConnectProps>) {
+export function Connect() {
+  const navigate = useNavigate();
+  const { mode, uri: initialURI } = indexRoute.useSearch();
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState<string>("");
   const [errorValue, setErrorValue] = useState<string | undefined>(undefined);
@@ -54,12 +49,74 @@ export function Connect({
     navigator.userAgent?.includes("; wv") &&
     navigator.userAgent?.includes("Android");
 
+  const core = useAtomValue(coreAtom);
+
+  const startProposal = useCallback(
+    (uri: string) => {
+      try {
+        const url = new URL(uri);
+
+        switch (url.protocol) {
+          // handle usual wallet connect URIs
+          case "wc:": {
+            return core.pairing.pair({ uri });
+          }
+
+          // handle Ledger Live specific URIs
+          case "ledgerlive:": {
+            const uriParam = url.searchParams.get("uri");
+
+            if (url.pathname === "//wc" && uriParam) {
+              return startProposal(uriParam);
+            }
+            break;
+          }
+        }
+      } catch (error) {
+        // bad urls are just ignored
+        if (error instanceof TypeError) {
+          return;
+        }
+        throw error;
+      }
+    },
+    [core]
+  );
+
+  const onConnect = useCallback(
+    async (inputValue: URL) => {
+      try {
+        const uri = inputValue.toString();
+        await navigate({
+          params: (params) => params,
+          search: (search) => ({ ...search, uri: inputValue }),
+        });
+        if (uri.includes("@1")) {
+          await navigate({
+            to: "/protocol-not-supported",
+            search: (search) => search,
+          });
+        } else {
+          await startProposal(uri);
+        }
+      } catch (error: unknown) {
+        console.error(error);
+      } finally {
+        await navigate({
+          params: (params) => params,
+          search: (search) => ({ ...search, uri: undefined }),
+        });
+      }
+    },
+    [navigate, startProposal]
+  );
+
   const handleConnect = useCallback(() => {
     try {
       const uri = new URL(inputValue);
       setInputValue("");
 
-      void onConnect(uri.toString());
+      void onConnect(uri);
       analytics.track("button_clicked", {
         button: "WC-Connect",
         page: "Connect",
@@ -67,24 +124,31 @@ export function Connect({
     } catch (error) {
       setErrorValue(t("error.invalidUri"));
     }
-  }, [onConnect, inputValue]);
+  }, [inputValue, onConnect, analytics, t]);
 
-  const startScanning = () => {
+  const startScanning = useCallback(() => {
     setScanner(true);
     analytics.track("button_clicked", {
       button: "WC-Scan QR Code",
       page: "Connect",
     });
-  };
+  }, [analytics]);
 
   useEffect(() => {
     if (initialURI) {
-      void onConnect(initialURI);
+      try {
+        const uri = new URL(initialURI);
+
+        void onConnect(uri);
+      } catch (error) {
+        setErrorValue(t("error.invalidUri"));
+      }
     }
     analytics.page("Wallet Connect");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialURI]);
 
-  const handlePasteClick = () => {
+  const handlePasteClick = useCallback(() => {
     navigator.clipboard.readText().then((text) => {
       setInputValue(text);
       analytics.track("button_clicked", {
@@ -92,8 +156,9 @@ export function Connect({
         page: "Connect",
       });
     }, console.error);
-  };
+  }, [analytics]);
 
+  // TODO improve looks like we have some duplication of logic
   const tryConnect = useCallback(
     (rawURI: string) => {
       try {
@@ -102,7 +167,7 @@ export function Connect({
         switch (url.protocol) {
           // handle usual wallet connect URIs
           case "wc:": {
-            void onConnect(url.toString());
+            void onConnect(url);
             break;
           }
 

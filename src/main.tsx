@@ -4,8 +4,8 @@ import { RouterProvider } from "@tanstack/react-router";
 import * as Sentry from "@sentry/react";
 import { Buffer as BufferPolyfill } from "buffer";
 globalThis.Buffer = BufferPolyfill;
-import { router } from "./routes";
-import "../i18n";
+import { router } from "@/routes";
+import "@/i18n";
 
 declare module "@tanstack/react-router" {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions

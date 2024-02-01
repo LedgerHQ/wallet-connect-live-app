@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from "vitest";
 import {
   formatAccountsByChain,
   getChains,
@@ -9,7 +9,9 @@ import sessionProposal from "@/data/mocks/sessionProposal.example.json";
 import sessionProposalNotSupported from "@/data/mocks/sessionProposalNotSupported.example.json";
 
 import { ACCOUNT_MOCK } from "@/tests-tools/mocks/account.mock";
-import { Proposal } from '@/storage/sessions.store';
+import { Web3WalletTypes } from "@walletconnect/web3wallet";
+
+type Proposal = Web3WalletTypes.SessionProposal;
 
 describe("getChains", () => {
   it("should return an array with required and optional namespaces", () => {
@@ -41,7 +43,9 @@ describe("getChains", () => {
   });
 
   it("should return an array with multiple chains", () => {
-    const proposal = JSON.parse(JSON.stringify(sessionProposalNotSupported)) as Proposal;
+    const proposal = JSON.parse(
+      JSON.stringify(sessionProposalNotSupported)
+    ) as Proposal;
 
     const result = getChains(proposal);
 
