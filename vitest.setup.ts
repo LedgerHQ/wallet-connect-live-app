@@ -6,7 +6,13 @@ vi.mock("@walletconnect/web3wallet", () => {
   return {
     Web3Wallet: {
       init: vi.fn(() => ({
-        getActiveSessions: vi.fn(() => []),
+        engine: {
+          signClient: {
+            session: {
+              getAll: vi.fn(() => []),
+            },
+          },
+        },
         on: vi.fn<Parameters<typeof window.addEventListener>>(
           (eventName, callback) => window.addEventListener(eventName, callback)
         ),
