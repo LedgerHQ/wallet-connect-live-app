@@ -175,16 +175,10 @@ We use [`Jest`](https://jestjs.io/) and
 #### Launch tests
 
 The live-app contains unit tests and integration tests.
-To run the unit tests :
+To run the tests :
 
 ```bash
-pnpm test:unit
-```
-
-To run integration tests :
-
-```bash
-pnpm test:integration
+pnpm test
 ```
 
 To run the tests and obtain coverage, simply run
