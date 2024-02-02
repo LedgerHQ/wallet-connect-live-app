@@ -106,13 +106,13 @@ proto use
 First, you should install dependencies
 
 ```bash
-yarn
+pnpm i
 ```
 
 Secondly, run the development server:
 
 ```bash
-yarn dev
+pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
@@ -178,19 +178,19 @@ The live-app contains unit tests and integration tests.
 To run the unit tests :
 
 ```bash
-yarn test:unit
+pnpm test:unit
 ```
 
 To run integration tests :
 
 ```bash
-yarn test:integration
+pnpm test:integration
 ```
 
 To run the tests and obtain coverage, simply run
 
 ```bash
-yarn test:coverage
+pnpm test:coverage
 ```
 
 #### Naming convention
