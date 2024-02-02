@@ -9,7 +9,9 @@ import { ErrorFallback } from "@/components/screens/ErrorFallback";
 import { ErrorBoundary } from "@sentry/react";
 import { ThemeNames } from "@ledgerhq/react-ui/styles/index";
 import { Suspense, lazy, useEffect } from "react";
+import useWalletConnect from "@/hooks/useWalletConnect";
 import i18n from "@/i18n";
+// import useAnalytics from "@/hooks/common/useAnalytics";
 
 // eslint-disable-next-line react-refresh/only-export-components
 const TanStackRouterDevtools = import.meta.env.PROD
@@ -23,8 +25,37 @@ const TanStackRouterDevtools = import.meta.env.PROD
       }))
     );
 
+// eslint-disable-next-line react-refresh/only-export-components
+function WalletConnectInit() {
+  useWalletConnect();
+
+  return null;
+}
+
+// // TODO Migrate to analytics provider or jotai atom that will get the wallet-api infos by itself
+// // eslint-disable-next-line react-refresh/only-export-components
+// function AnalyticsInit() {
+//   const analytics = useAnalytics();
+
+//   useEffect(() => {
+//     analytics.start(userId, walletInfo);
+//   }, [analytics]);
+
+//   return null;
+// }
+
 // Create a client
-const queryClient = new QueryClient();
+const twentyFourHoursInMs = 1000 * 60 * 60 * 24;
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      staleTime: twentyFourHoursInMs,
+    },
+  },
+});
 
 // We could make everything lazy at the top to avoid downloading code for the app when disabled
 const isApplicationDisabled = Boolean(
@@ -78,6 +109,8 @@ export const rootRoute = createRootRoute({
               }
             >
               <ErrorBoundary fallback={<ErrorFallback />}>
+                <WalletConnectInit />
+                {/* <AnalyticsInit /> */}
                 {isApplicationDisabled ? <ApplicationDisabled /> : <Outlet />}
               </ErrorBoundary>
             </Suspense>

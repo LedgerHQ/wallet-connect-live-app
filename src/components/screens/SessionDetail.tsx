@@ -153,7 +153,7 @@ export default function SessionDetail({ topic }: Props) {
 
   const sessionAccounts = useMemo(
     () => getAccountsFromAddresses(fullAddresses, accounts.data),
-    [fullAddresses, accounts]
+    [accounts.data, fullAddresses]
   );
 
   return (

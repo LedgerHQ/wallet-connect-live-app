@@ -154,7 +154,7 @@ function usePendingFlow(
   }, [pendingFlow, triggerPendingFlow, web3wallet]);
 }
 
-export default function useWalletConnectEventsManager() {
+export default function useWalletConnect() {
   const navigate = useNavigate();
   const setProposal = useSetAtom(proposalAtom);
   const web3wallet = useAtomValue(web3walletAtom);
@@ -388,17 +388,17 @@ export default function useWalletConnectEventsManager() {
 
       // auth
       // web3wallet.on("auth_request", onAuthRequest);
-    }
-    return () => {
-      console.log("web3wallet cleanup listeners");
-      // sign
-      web3wallet.off("session_proposal", onSessionProposal);
-      web3wallet.off("session_request", onSessionRequest);
-      web3wallet.off("session_delete", onSessionDeleted);
+      return () => {
+        console.log("web3wallet cleanup listeners");
+        // sign
+        web3wallet.off("session_proposal", onSessionProposal);
+        web3wallet.off("session_request", onSessionRequest);
+        web3wallet.off("session_delete", onSessionDeleted);
 
-      // auth
-      // web3wallet.off("auth_request", onAuthRequest);
-    };
+        // auth
+        // web3wallet.off("auth_request", onAuthRequest);
+      };
+    }
   }, [web3wallet, onSessionProposal, onSessionRequest, onSessionDeleted]);
 
   // TODO maybe redo differently and need to test if we get the last message when reconnecting to wc by default
