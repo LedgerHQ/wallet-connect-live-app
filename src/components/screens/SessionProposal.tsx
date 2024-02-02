@@ -59,7 +59,7 @@ export default function SessionProposal() {
       dapp: dApp,
       url: dAppUrl,
     });
-    approveSession();
+    void approveSession();
   }, [analytics, approveSession, dApp, dAppUrl]);
 
   const onReject = useCallback(() => {
@@ -69,7 +69,7 @@ export default function SessionProposal() {
       dapp: dApp,
       url: dAppUrl,
     });
-    rejectSession();
+    void rejectSession();
   }, [analytics, dApp, dAppUrl, rejectSession]);
 
   const accountsByChain = useMemo(

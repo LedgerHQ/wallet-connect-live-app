@@ -17,7 +17,7 @@ export default function useAnalytics() {
   const [userId, setUserId] = useState<string>();
   const web3wallet = useAtomValue(web3walletAtom);
   const sessions = useSessions(web3wallet);
-  const sessionsLength = sessions.length;
+  const sessionsLength = sessions.data.length;
 
   const userProperties = useMemo(() => {
     return {

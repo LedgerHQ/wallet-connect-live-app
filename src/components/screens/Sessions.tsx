@@ -13,15 +13,17 @@ import { useNavigate } from "@tanstack/react-router";
 import { TabsIndexes } from "@/types/types";
 import { useAtomValue } from "jotai";
 import { web3walletAtom } from "@/store/web3wallet.store";
-import useSessions from "@/hooks/useSessions";
+import useSessions, { queryKey as sessionsQueryKey } from "@/hooks/useSessions";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function Sessions() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { openModal, closeModal, isModalOpen } = useModal();
+  const queryClient = useQueryClient();
   const web3wallet = useAtomValue(web3walletAtom);
   const sessions = useSessions(web3wallet);
-  const sessionsLength = sessions.length;
+  const sessionsLength = sessions.data.length;
   const isEmptyState = sessionsLength === 0;
   const analytics = useAnalytics();
 
@@ -69,7 +71,7 @@ export default function Sessions() {
 
   const disconnect = useCallback(() => {
     void Promise.all(
-      sessions.map((session) =>
+      sessions.data.map((session) =>
         web3wallet.disconnectSession({
           topic: session.topic,
           reason: {
@@ -88,8 +90,11 @@ export default function Sessions() {
           button: "WC-Disconnect All Sessions",
           page: "Wallet Connect Sessions",
         });
+        void queryClient.invalidateQueries({
+          queryKey: sessionsQueryKey,
+        });
       });
-  }, [analytics, closeModal, sessions, web3wallet]);
+  }, [analytics, closeModal, queryClient, sessions.data, web3wallet]);
 
   if (isEmptyState) {
     return (
@@ -125,7 +130,7 @@ export default function Sessions() {
   return (
     <Flex flexDirection="column" width="100%" height="100%" mt={6}>
       <List>
-        {sessions.map((session) => (
+        {sessions.data.map((session) => (
           <Box key={session.topic} mt={3}>
             <GenericRow
               key={session.topic}

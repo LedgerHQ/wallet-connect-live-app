@@ -25,12 +25,13 @@ import { ResponsiveContainer } from "@/styles/styles";
 import { ImageWithPlaceholder } from "@/components/atoms/images/ImageWithPlaceholder";
 import useAnalytics from "@/hooks/useAnalytics";
 import { TabsIndexes } from "@/types/types";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useAtomValue } from "jotai";
 import { web3walletAtom } from "@/store/web3wallet.store";
-import useSessions from "@/hooks/useSessions";
+import useSessions, { queryKey as sessionsQueryKey } from "@/hooks/useSessions";
 import useAccounts from "@/hooks/useAccounts";
 import { walletAPIClientAtom } from "@/store/wallet-api.store";
+import { useQueryClient } from "@tanstack/react-query";
 
 const DetailContainer = styled(Flex)`
   border-radius: 12px;
@@ -80,6 +81,8 @@ export default function SessionDetail({ topic }: Props) {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
+  const queryClient = useQueryClient();
+
   const client = useAtomValue(walletAPIClientAtom);
 
   const accounts = useAccounts(client);
@@ -87,12 +90,12 @@ export default function SessionDetail({ topic }: Props) {
   const web3wallet = useAtomValue(web3walletAtom);
   const sessions = useSessions(web3wallet);
   const session = useMemo(
-    () => sessions.find((elem) => elem.topic === topic),
-    [sessions, topic]
+    () => sessions.data.find((elem) => elem.topic === topic),
+    [sessions.data, topic]
   );
 
   const navigateToSessionsHomeTab = useCallback(() => {
-    void navigate({
+    return navigate({
       to: "/",
       search: (search) => ({ ...search, tab: TabsIndexes.Sessions }),
     });
@@ -113,23 +116,29 @@ export default function SessionDetail({ topic }: Props) {
 
   const handleDelete = useCallback(() => {
     if (!session) return;
-    try {
-      void web3wallet.disconnectSession({
+    void web3wallet
+      .disconnectSession({
         topic: session.topic,
         reason: {
           code: 3,
           message: "Disconnect Session",
         },
+      })
+      .then(() => {
+        analytics.track("button_clicked", {
+          button: "WC-Disconnect Session",
+          page: "Wallet Connect Session Detail",
+        });
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {
+        void queryClient
+          .invalidateQueries({ queryKey: sessionsQueryKey })
+          .then(() => navigateToSessionsHomeTab());
       });
-      analytics.track("button_clicked", {
-        button: "WC-Disconnect Session",
-        page: "Wallet Connect Session Detail",
-      });
-    } catch (error) {
-      console.error(error);
-    }
-    void navigateToSessionsHomeTab();
-  }, [analytics, navigateToSessionsHomeTab, session, web3wallet]);
+  }, [analytics, navigateToSessionsHomeTab, queryClient, session, web3wallet]);
 
   const onGoBack = useCallback(() => {
     void navigateToSessionsHomeTab();
@@ -296,14 +305,9 @@ export default function SessionDetail({ topic }: Props) {
               flex={1}
               onClick={handleDelete}
             >
-              <Link
-                to="/"
-                search={(search) => ({ ...search, tab: TabsIndexes.Connect })}
-              >
-                <Text variant="body" fontWeight="semiBold" color="neutral.c100">
-                  {t("sessions.detail.disconnect")}
-                </Text>
-              </Link>
+              <Text variant="body" fontWeight="semiBold" color="neutral.c100">
+                {t("sessions.detail.disconnect")}
+              </Text>
             </Button>
           </ButtonsContainer>
         </Flex>

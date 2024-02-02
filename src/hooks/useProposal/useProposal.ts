@@ -11,8 +11,9 @@ import { Web3WalletTypes } from "@walletconnect/web3wallet";
 import { useQueryClient } from "@tanstack/react-query";
 import { web3walletAtom } from "@/store/web3wallet.store";
 import { useAtomValue } from "jotai";
-import useAccounts, { queryKey } from "@/hooks/useAccounts";
+import useAccounts, { queryKey as accountsQueryKey } from "@/hooks/useAccounts";
 import { walletAPIClientAtom } from "@/store/wallet-api.store";
+import { queryKey as sessionsQueryKey } from "../useSessions";
 
 export function useProposal(proposal?: Web3WalletTypes.SessionProposal) {
   const navigate = useNavigate();
@@ -108,58 +109,55 @@ export function useProposal(proposal?: Web3WalletTypes.SessionProposal) {
     [accounts.data, selectedAccounts]
   );
 
-  const approveSession = useCallback(() => {
+  const approveSession = useCallback(async () => {
     if (!proposal) {
       return;
     }
 
-    web3wallet
-      .approveSession({
+    try {
+      const session = await web3wallet.approveSession({
         id: proposal.id,
         namespaces: buildApprovedNamespaces({
           proposal: proposal.params,
           supportedNamespaces: buildSupportedNamespaces(proposal),
         }),
-      })
-      .then((res) => {
-        void navigate({
-          to: "/detail/$topic",
-          params: { topic: res.topic },
-          search: (search) => search,
-        });
-      })
-      .catch((error) => {
-        // TODO : display error toast
-        console.error(error);
-        // void navigate({ to: "/", search: (search) => search }); // cannot be typed correctly with default fallback
-        void navigate({
-          to: "/",
-          search: (search) => ({ ...search, tab: TabsIndexes.Connect }),
-        });
       });
-  }, [buildSupportedNamespaces, navigate, proposal, web3wallet]);
+      await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
+      await navigate({
+        to: "/detail/$topic",
+        params: { topic: session.topic },
+        search: (search) => search,
+      });
+    } catch (error) {
+      // TODO : display error toast
+      console.error(error);
+      await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
+      // void navigate({ to: "/", search: (search) => search }); // cannot be typed correctly with default fallback
+      await navigate({
+        to: "/",
+        search: (search) => ({ ...search, tab: TabsIndexes.Connect }),
+      });
+    }
+  }, [buildSupportedNamespaces, navigate, proposal, queryClient, web3wallet]);
 
-  const rejectSession = useCallback(() => {
+  const rejectSession = useCallback(async () => {
     if (!proposal) {
       return;
     }
 
-    void web3wallet
-      .rejectSession({
-        id: proposal.id,
-        reason: {
-          code: 5000,
-          message: "USER_REJECTED_METHODS",
-        },
-      })
-      .finally(
-        () =>
-          void navigate({
-            to: "/",
-            search: (search) => ({ ...search, tab: TabsIndexes.Connect }),
-          })
-      );
-  }, [navigate, proposal, web3wallet]);
+    await web3wallet.rejectSession({
+      id: proposal.id,
+      reason: {
+        code: 5000,
+        message: "USER_REJECTED_METHODS",
+      },
+    });
+    await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
+    await navigate({
+      to: "/",
+      search: (search) => ({ ...search, tab: TabsIndexes.Connect }),
+    });
+  }, [navigate, proposal, queryClient, web3wallet]);
 
   const addNewAccount = useCallback(
     async (currency: string) => {
@@ -170,12 +168,12 @@ export function useProposal(proposal?: Web3WalletTypes.SessionProposal) {
         await client.account.request({
           currencyIds: [currency],
         });
-        // Maybe we should also select the requested account
+        // TODO Maybe we should also select the requested account
       } catch (error) {
         console.error("request account canceled by user");
       }
       // refetch accounts
-      await queryClient.invalidateQueries({ queryKey });
+      await queryClient.invalidateQueries({ queryKey: accountsQueryKey });
     },
     [client, queryClient]
   );

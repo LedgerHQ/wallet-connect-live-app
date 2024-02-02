@@ -44,7 +44,7 @@ export default function App({ tab, mode, initialURI }: Props) {
 
   const web3wallet = useAtomValue(web3walletAtom);
   const sessions = useSessions(web3wallet);
-  const sessionsLength = sessions.length;
+  const sessionsLength = sessions.data.length;
 
   const analytics = useAnalytics();
 

@@ -15,13 +15,14 @@ import {
 } from "@/store/pendingFlow.store";
 import { captureException } from "@sentry/react";
 import { isEIP155Chain, isDataInvalid } from "@/utils/helper.util";
-import { TabsIndexes } from "@/types/types";
 import { useNavigate } from "@tanstack/react-router";
 import { WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import { useAtomValue, useSetAtom } from "jotai";
 import { Web3Wallet } from "@walletconnect/web3wallet/dist/types/client";
 import useAccounts from "./useAccounts";
 import { walletAPIClientAtom } from "@/store/wallet-api.store";
+import { queryKey as sessionsQueryKey } from "./useSessions";
+import { useQueryClient } from "@tanstack/react-query";
 
 enum Errors {
   userDecline = "User rejected",
@@ -158,6 +159,8 @@ export default function useWalletConnect() {
   const navigate = useNavigate();
   const setProposal = useSetAtom(proposalAtom);
   const web3wallet = useAtomValue(web3walletAtom);
+
+  const queryClient = useQueryClient();
 
   const client = useAtomValue(walletAPIClientAtom);
 
@@ -355,28 +358,9 @@ export default function useWalletConnect() {
     [handleEIP155Request]
   );
 
-  const onSessionDeleted = useCallback(
-    (session: SignClientTypes.EventArguments["session_delete"]) => {
-      void web3wallet
-        .disconnectSession({
-          topic: session.topic,
-          reason: {
-            code: 3,
-            message: "Session has been disconnected",
-          },
-        })
-        .catch((err) => {
-          console.error(err);
-        })
-        .finally(() => {
-          void navigate({
-            to: "/",
-            search: (search) => ({ ...search, tab: TabsIndexes.Sessions }),
-          });
-        });
-    },
-    [web3wallet, navigate]
-  );
+  const onSessionDeleted = useCallback(() => {
+    void queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
+  }, [queryClient]);
 
   useEffect(() => {
     if (web3wallet) {
