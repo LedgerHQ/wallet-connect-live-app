@@ -6,7 +6,6 @@ import {
 } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import App from "@/components/screens/App";
 import { detailRoute } from "./detail";
 import { proposalRoute } from "./proposalRoute";
@@ -22,7 +21,7 @@ import { Container } from "@/styles/styles";
 import { ErrorFallback } from "@/components/screens/ErrorFallback";
 import { ErrorBoundary } from "@sentry/react";
 import { ThemeNames } from "@ledgerhq/react-ui/styles/index";
-import { Suspense, useEffect } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import i18n from "@/i18n";
 // import useAnalytics from "@/hooks/common/useAnalytics";
 // import {
@@ -34,6 +33,17 @@ import i18n from "@/i18n";
 //   typeof window === "undefined"
 //     ? false
 //     : new URLSearchParams(window.location.search).get("simulator");
+
+const TanStackRouterDevtools = import.meta.env.PROD
+  ? () => null // Render nothing in production
+  : lazy(() =>
+      // Lazy load in development
+      import("@tanstack/router-devtools").then((res) => ({
+        default: res.TanStackRouterDevtools,
+        // For Embedded Mode
+        // default: res.TanStackRouterDevtoolsPanel
+      }))
+    );
 
 export function getWalletAPITransport() {
   if (typeof window === "undefined") {
