@@ -8,20 +8,20 @@ import {
   EIP155_REQUESTS,
   EIP155_SIGNING_METHODS,
 } from "@/data/methods/EIP155Data.methods";
-import { proposalAtom, web3walletAtom } from "@/storage/web3wallet.store";
+import { proposalAtom, web3walletAtom } from "@/store/web3wallet.store";
 import {
   pendingFlowSelector,
   usePendingFlowStore,
-} from "@/storage/pendingFlow.store";
+} from "@/store/pendingFlow.store";
 import { captureException } from "@sentry/react";
 import { isEIP155Chain, isDataInvalid } from "@/utils/helper.util";
 import { TabsIndexes } from "@/types/types";
 import { useNavigate } from "@tanstack/react-router";
-import { useWalletAPIClient } from "@ledgerhq/wallet-api-client-react";
 import { WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import { useAtomValue, useSetAtom } from "jotai";
 import { Web3Wallet } from "@walletconnect/web3wallet/dist/types/client";
 import useAccounts from "./useAccounts";
+import { walletAPIClientAtom } from "@/store/wallet-api.store";
 
 enum Errors {
   userDecline = "User rejected",
@@ -76,7 +76,7 @@ const rejectRequest = (
 function usePendingFlow(
   web3wallet: Web3Wallet,
   clearPendingFlow: () => void,
-  client?: WalletAPIClient
+  client: WalletAPIClient
 ) {
   const pendingFlow = usePendingFlowStore(
     pendingFlowSelector.selectPendingFlow
@@ -86,7 +86,7 @@ function usePendingFlow(
     if (pendingFlow) {
       try {
         clearPendingFlow();
-        if (client && pendingFlow.message) {
+        if (pendingFlow.message) {
           const signedMessage = await client.message.sign(
             pendingFlow.accountId,
             pendingFlow.isHex
@@ -100,7 +100,7 @@ function usePendingFlow(
             formatMessage(signedMessage)
           );
         }
-        if (client && pendingFlow.ethTx) {
+        if (pendingFlow.ethTx) {
           const liveTx = convertEthToLiveTX(pendingFlow.ethTx);
           // If the transaction initally had some data and we somehow lost them
           // then we don't signAndBroadcast the transaction to protect our users funds
@@ -159,7 +159,7 @@ export default function useWalletConnectEventsManager() {
   const setProposal = useSetAtom(proposalAtom);
   const web3wallet = useAtomValue(web3walletAtom);
 
-  const { client } = useWalletAPIClient();
+  const client = useAtomValue(walletAPIClientAtom);
 
   const accounts = useAccounts(client);
 
@@ -195,7 +195,7 @@ export default function useWalletConnectEventsManager() {
             isPersonalSign ? request.params[1] : request.params[0],
             chainId
           );
-          if (accountSign && client) {
+          if (accountSign) {
             try {
               const message = stripHexPrefix(
                 isPersonalSign ? request.params[0] : request.params[1]
@@ -236,7 +236,7 @@ export default function useWalletConnectEventsManager() {
             request.params[0],
             chainId
           );
-          if (accountSignTyped && client) {
+          if (accountSignTyped) {
             try {
               const message = stripHexPrefix(request.params[1]);
 
@@ -273,7 +273,7 @@ export default function useWalletConnectEventsManager() {
             ethTx.from,
             chainId
           );
-          if (accountTX && client) {
+          if (accountTX) {
             try {
               const liveTx = convertEthToLiveTX(ethTx);
               addPendingFlow({
@@ -306,7 +306,7 @@ export default function useWalletConnectEventsManager() {
             ethTx.from,
             chainId
           );
-          if (accountTX && client) {
+          if (accountTX) {
             try {
               const liveTx = convertEthToLiveTX(ethTx);
               addPendingFlow({

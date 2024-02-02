@@ -26,11 +26,11 @@ import { ImageWithPlaceholder } from "@/components/atoms/images/ImageWithPlaceho
 import useAnalytics from "@/hooks/useAnalytics";
 import { TabsIndexes } from "@/types/types";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useWalletAPIClient } from "@ledgerhq/wallet-api-client-react";
 import { useAtomValue } from "jotai";
-import { web3walletAtom } from "@/storage/web3wallet.store";
+import { web3walletAtom } from "@/store/web3wallet.store";
 import useSessions from "@/hooks/useSessions";
 import useAccounts from "@/hooks/useAccounts";
+import { walletAPIClientAtom } from "@/store/wallet-api.store";
 
 const DetailContainer = styled(Flex)`
   border-radius: 12px;
@@ -80,7 +80,7 @@ export default function SessionDetail({ topic }: Props) {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const { client } = useWalletAPIClient();
+  const client = useAtomValue(walletAPIClientAtom);
 
   const accounts = useAccounts(client);
 

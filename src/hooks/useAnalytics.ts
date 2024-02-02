@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { WalletInfo } from "@ledgerhq/wallet-api-client";
 import { AnalyticsBrowser } from "@segment/analytics-next";
-import { web3walletAtom } from "@/storage/web3wallet.store";
+import { web3walletAtom } from "@/store/web3wallet.store";
 import { useAtomValue } from "jotai";
 import useSessions from "./useSessions";
 import { useState } from "react";

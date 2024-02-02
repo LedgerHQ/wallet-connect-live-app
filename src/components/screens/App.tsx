@@ -2,7 +2,7 @@ import { ResponsiveContainer } from "@/styles/styles";
 import { Flex } from "@ledgerhq/react-ui";
 import { useTranslation } from "react-i18next";
 import { useCallback, useMemo } from "react";
-import { web3walletAtom } from "@/storage/web3wallet.store";
+import { web3walletAtom } from "@/store/web3wallet.store";
 import styled from "styled-components";
 import { Connect } from "./Connect";
 import Sessions from "./Sessions";

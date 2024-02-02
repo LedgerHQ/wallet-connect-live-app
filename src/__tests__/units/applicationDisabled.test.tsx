@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ApplicationDisabled } from "@/components/ApplicationDisabled";
-import { render, screen } from "@/tests-tools/test.utils";
+import { render, screen } from "@/tests/test.utils";
 
 describe("Application Disable Screen", () => {
   it("Page should appears", async () => {

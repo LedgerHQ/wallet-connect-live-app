@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { InfoSessionProposal } from "@/components/screens/sessionProposal/InfoSessionProposal";
-import { render, screen } from "@/tests-tools/test.utils";
+import { render, screen } from "@/tests/test.utils";
 
 describe("InfoSessionProposal", () => {
   it("renders in session details", async () => {

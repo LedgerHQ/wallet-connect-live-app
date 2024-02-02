@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import useAnalytics from "@/hooks/useAnalytics";
 import { useNavigate } from "@tanstack/react-router";
 import { useAtomValue } from "jotai";
-import { coreAtom } from "@/storage/web3wallet.store";
+import { coreAtom } from "@/store/web3wallet.store";
 import { InputMode } from "@/types/types";
 
 const QRScannerContainer = styled.div`

@@ -1,7 +1,7 @@
 /* eslint-disable testing-library/no-debugging-utils */
 import "@testing-library/react/dont-cleanup-after-each";
-import { cleanup, render, waitFor, screen } from "@/tests-tools/test.utils";
-import { initialParamsHomePage } from "@/tests-tools/mocks/initialParams.mock";
+import { cleanup, render, waitFor, screen } from "@/tests/test.utils";
+import { initialParamsHomePage } from "@/tests/mocks/initialParams.mock";
 // import AppScreen from "@/pages/index";
 import sessionProposal from "@/data/mocks/sessionProposal.example.json";
 import SessionProposal from "@/components/screens/SessionProposal";

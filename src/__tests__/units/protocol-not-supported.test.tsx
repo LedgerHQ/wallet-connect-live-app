@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { renderWithRouter, screen } from "@/tests-tools/test.utils";
+import { renderWithRouter, screen } from "@/tests/test.utils";
 import ProtocolNotSupported from "@/components/screens/ProtocolNotSupported";
 
 describe("ProtocolNotSupported Screen", () => {

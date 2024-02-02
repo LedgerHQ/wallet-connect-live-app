@@ -2,7 +2,6 @@ import { ReactElement, Suspense } from "react";
 import { act, render, RenderOptions } from "@testing-library/react";
 import { Flex, ProgressLoader, StyleProvider } from "@ledgerhq/react-ui";
 import userEvent from "@testing-library/user-event";
-import { WalletAPIProvider } from "@ledgerhq/wallet-api-client-react";
 import GlobalStyle from "@/styles/globalStyle";
 import { Container } from "@/styles/styles";
 import {
@@ -16,7 +15,6 @@ import {
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ErrorBoundary } from "@sentry/react";
 import { ErrorFallback } from "@/components/screens/ErrorFallback";
-import { getWalletAPITransport } from "@/utils/wallet-api";
 
 type PropsTheme = {
   children: React.ReactNode;
@@ -31,8 +29,6 @@ const queryClient = new QueryClient({
   },
 });
 
-const transport = getWalletAPITransport();
-
 /**
  *
  * @param children Your component you want to render
@@ -43,22 +39,20 @@ const AllProviders = ({ children, theme = "dark" }: PropsTheme) => {
   return (
     <QueryClientProvider client={queryClient}>
       <StyleProvider selectedPalette={theme} fontsPath="/fonts">
-        <WalletAPIProvider transport={transport}>
-          <Suspense
-            fallback={
-              <Flex
-                alignItems="center"
-                justifyContent="center"
-                flexDirection="column"
-                flex={1}
-              >
-                <ProgressLoader infinite showPercentage={false} />
-              </Flex>
-            }
-          >
-            {children}
-          </Suspense>
-        </WalletAPIProvider>
+        <Suspense
+          fallback={
+            <Flex
+              alignItems="center"
+              justifyContent="center"
+              flexDirection="column"
+              flex={1}
+            >
+              <ProgressLoader infinite showPercentage={false} />
+            </Flex>
+          }
+        >
+          {children}
+        </Suspense>
       </StyleProvider>
     </QueryClientProvider>
   );
@@ -90,27 +84,25 @@ const Root = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <StyleProvider selectedPalette={"dark"} fontsPath="/fonts">
-        <WalletAPIProvider transport={transport}>
-          <GlobalStyle />
-          <Container>
-            <Suspense
-              fallback={
-                <Flex
-                  alignItems="center"
-                  justifyContent="center"
-                  flexDirection="column"
-                  flex={1}
-                >
-                  <ProgressLoader infinite showPercentage={false} />
-                </Flex>
-              }
-            >
-              <ErrorBoundary fallback={<ErrorFallback />}>
-                <Outlet />
-              </ErrorBoundary>
-            </Suspense>
-          </Container>
-        </WalletAPIProvider>
+        <GlobalStyle />
+        <Container>
+          <Suspense
+            fallback={
+              <Flex
+                alignItems="center"
+                justifyContent="center"
+                flexDirection="column"
+                flex={1}
+              >
+                <ProgressLoader infinite showPercentage={false} />
+              </Flex>
+            }
+          >
+            <ErrorBoundary fallback={<ErrorFallback />}>
+              <Outlet />
+            </ErrorBoundary>
+          </Suspense>
+        </Container>
       </StyleProvider>
     </QueryClientProvider>
   );

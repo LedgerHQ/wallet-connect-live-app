@@ -1,5 +1,5 @@
 import { WalletConnectPopin } from "@/components/atoms/popin/WalletConnectPopin";
-import { render, screen } from "@/tests-tools/test.utils";
+import { render, screen } from "@/tests/test.utils";
 import { vi, describe, it, expect } from "vitest";
 
 // Mock the onClose function

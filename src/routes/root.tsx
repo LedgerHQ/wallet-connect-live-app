@@ -3,7 +3,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Flex, ProgressLoader, StyleProvider } from "@ledgerhq/react-ui";
 import GlobalStyle from "@/styles/globalStyle";
-import { WalletAPIProvider } from "@ledgerhq/wallet-api-client-react";
 import { ApplicationDisabled } from "@/components/ApplicationDisabled";
 import { Container } from "@/styles/styles";
 import { ErrorFallback } from "@/components/screens/ErrorFallback";
@@ -11,7 +10,6 @@ import { ErrorBoundary } from "@sentry/react";
 import { ThemeNames } from "@ledgerhq/react-ui/styles/index";
 import { Suspense, lazy, useEffect } from "react";
 import i18n from "@/i18n";
-import { getWalletAPITransport } from "@/utils/wallet-api";
 
 // eslint-disable-next-line react-refresh/only-export-components
 const TanStackRouterDevtools = import.meta.env.PROD
@@ -24,8 +22,6 @@ const TanStackRouterDevtools = import.meta.env.PROD
         // default: res.TanStackRouterDevtoolsPanel
       }))
     );
-
-const transport = getWalletAPITransport();
 
 // Create a client
 const queryClient = new QueryClient();
@@ -67,29 +63,27 @@ export const rootRoute = createRootRoute({
     return (
       <QueryClientProvider client={queryClient}>
         <StyleProvider selectedPalette={theme} fontsPath="/fonts">
-          <WalletAPIProvider transport={transport}>
-            <GlobalStyle />
-            <Container>
-              <Suspense
-                fallback={
-                  <Flex
-                    alignItems="center"
-                    justifyContent="center"
-                    flexDirection="column"
-                    flex={1}
-                  >
-                    <ProgressLoader infinite showPercentage={false} />
-                  </Flex>
-                }
-              >
-                <ErrorBoundary fallback={<ErrorFallback />}>
-                  {isApplicationDisabled ? <ApplicationDisabled /> : <Outlet />}
-                </ErrorBoundary>
-              </Suspense>
-            </Container>
-            <TanStackRouterDevtools />
-            <ReactQueryDevtools />
-          </WalletAPIProvider>
+          <GlobalStyle />
+          <Container>
+            <Suspense
+              fallback={
+                <Flex
+                  alignItems="center"
+                  justifyContent="center"
+                  flexDirection="column"
+                  flex={1}
+                >
+                  <ProgressLoader infinite showPercentage={false} />
+                </Flex>
+              }
+            >
+              <ErrorBoundary fallback={<ErrorFallback />}>
+                {isApplicationDisabled ? <ApplicationDisabled /> : <Outlet />}
+              </ErrorBoundary>
+            </Suspense>
+          </Container>
+          <TanStackRouterDevtools />
+          <ReactQueryDevtools />
         </StyleProvider>
       </QueryClientProvider>
     );

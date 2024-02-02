@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { Connect } from "@/components/screens/Connect";
 import useAnalytics from "@/hooks/useAnalytics";
-import { renderWithRouter, screen, renderHook } from "@/tests-tools/test.utils";
+import { renderWithRouter, screen, renderHook } from "@/tests/test.utils";
 import userEvent from "@testing-library/user-event";
 
 describe("Connect Screen", () => {

@@ -21,7 +21,7 @@ import styled, { useTheme } from "styled-components";
 import useAnalytics from "@/hooks/useAnalytics";
 import { tryDecodeURI } from "@/utils/image";
 import { formatAccountsByChain, sortChains } from "@/hooks/useProposal/util";
-import { proposalAtom } from "@/storage/web3wallet.store";
+import { proposalAtom } from "@/store/web3wallet.store";
 import { useAtomValue } from "jotai";
 
 const emptyAccounts: ReturnType<typeof formatAccountsByChain> = [];

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { render, screen, renderHook } from "@/tests-tools/test.utils";
+import { render, screen, renderHook } from "@/tests/test.utils";
 import { ErrorBlockchainSupport } from "@/components/screens/sessionProposal/ErrorBlockchainSupport";
 import useAnalytics from "@/hooks/useAnalytics";
 

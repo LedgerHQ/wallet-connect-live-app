@@ -12,7 +12,7 @@ import useAnalytics from "@/hooks/useAnalytics";
 import { useNavigate } from "@tanstack/react-router";
 import { TabsIndexes } from "@/types/types";
 import { useAtomValue } from "jotai";
-import { web3walletAtom } from "@/storage/web3wallet.store";
+import { web3walletAtom } from "@/store/web3wallet.store";
 import useSessions from "@/hooks/useSessions";
 
 export default function Sessions() {

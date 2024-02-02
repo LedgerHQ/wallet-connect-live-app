@@ -1,4 +1,8 @@
-import { WindowMessageTransport } from "@ledgerhq/wallet-api-client";
+import { atom } from "jotai";
+import {
+  WalletAPIClient,
+  WindowMessageTransport,
+} from "@ledgerhq/wallet-api-client";
 // import {
 //   getSimulatorTransport,
 //   profiles,
@@ -9,8 +13,7 @@ import { WindowMessageTransport } from "@ledgerhq/wallet-api-client";
 //     ? false
 //     : new URLSearchParams(window.location.search).get("simulator");
 
-// TODO maybe migrate to jotai ?
-export function getWalletAPITransport() {
+export const transportAtom = atom(() => {
   if (typeof window === "undefined") {
     return {
       onMessage: undefined,
@@ -26,4 +29,10 @@ export function getWalletAPITransport() {
   const transport = new WindowMessageTransport();
   transport.connect();
   return transport;
-}
+});
+
+export const walletAPIClientAtom = atom((get) => {
+  const transport = get(transportAtom);
+
+  return new WalletAPIClient(transport);
+});

@@ -8,18 +8,18 @@ import { buildApprovedNamespaces } from "@walletconnect/utils";
 import { formatAccountsByChain } from "@/hooks/useProposal/util";
 import { useNavigate } from "@tanstack/react-router";
 import { Web3WalletTypes } from "@walletconnect/web3wallet";
-import { useWalletAPIClient } from "@ledgerhq/wallet-api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { web3walletAtom } from "@/storage/web3wallet.store";
+import { web3walletAtom } from "@/store/web3wallet.store";
 import { useAtomValue } from "jotai";
 import useAccounts, { queryKey } from "@/hooks/useAccounts";
+import { walletAPIClientAtom } from "@/store/wallet-api.store";
 
 export function useProposal(proposal?: Web3WalletTypes.SessionProposal) {
   const navigate = useNavigate();
 
   const queryClient = useQueryClient();
 
-  const { client } = useWalletAPIClient();
+  const client = useAtomValue(walletAPIClientAtom);
 
   const accounts = useAccounts(client);
 

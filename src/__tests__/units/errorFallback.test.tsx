@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { render, screen } from "@/tests-tools/test.utils";
+import { render, screen } from "@/tests/test.utils";
 import { ErrorFallback } from "@/components/screens/ErrorFallback";
 
 describe("ErrorFallback  Screen", () => {

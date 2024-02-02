@@ -8,7 +8,7 @@ import {
 import sessionProposal from "@/data/mocks/sessionProposal.example.json";
 import sessionProposalNotSupported from "@/data/mocks/sessionProposalNotSupported.example.json";
 
-import { ACCOUNT_MOCK } from "@/tests-tools/mocks/account.mock";
+import { ACCOUNT_MOCK } from "@/tests/mocks/account.mock";
 import { Web3WalletTypes } from "@walletconnect/web3wallet";
 
 type Proposal = Web3WalletTypes.SessionProposal;

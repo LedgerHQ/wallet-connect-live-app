@@ -1,6 +1,6 @@
 import { GenericRow } from "@/components/atoms/GenericRow";
 import { RowType } from "@/components/atoms/types";
-import { fireEvent, render, screen } from "@/tests-tools/test.utils";
+import { fireEvent, render, screen } from "@/tests/test.utils";
 import { vi, describe, it, expect } from "vitest";
 
 describe("GenericRow", () => {
