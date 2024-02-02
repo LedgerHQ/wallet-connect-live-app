@@ -1,9 +1,9 @@
 import { useCallback, useState } from "react";
-import { getNamespace } from "@/helpers/helper.util";
+import { getNamespace } from "@/utils/helper.util";
 import { EIP155_SIGNING_METHODS } from "@/data/methods/EIP155Data.methods";
 import useAnalytics from "@/hooks/useAnalytics";
 import { SupportedNamespace } from "@/data/network.config";
-import { TabsIndexes } from "@/routes";
+import { TabsIndexes } from "@/types/types";
 import { buildApprovedNamespaces } from "@walletconnect/utils";
 import { formatAccountsByChain } from "@/hooks/useProposal/util";
 import { useNavigate } from "@tanstack/react-router";

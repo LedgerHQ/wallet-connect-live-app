@@ -1,15 +1,11 @@
 import { ButtonsContainer, List } from "@/components/atoms/containers/Elements";
-import { GenericRow, RowType } from "@/components/atoms/GenericRow";
+import { GenericRow } from "@/components/atoms/GenericRow";
+import { RowType } from "@/components/atoms/types";
 import LogoContainer from "@/components/atoms/logoContainers/LedgerLogoContainer";
 import { AddAccountPlaceholder } from "@/components/screens/sessionProposal/AddAccountPlaceholder";
 import { ErrorBlockchainSupport } from "@/components/screens/sessionProposal/ErrorBlockchainSupport";
 import { InfoSessionProposal } from "@/components/screens/sessionProposal/InfoSessionProposal";
-import {
-  formatUrl,
-  getColor,
-  getTicker,
-  truncate,
-} from "@/helpers/helper.util";
+import { formatUrl, getColor, getTicker, truncate } from "@/utils/helper.util";
 import { useProposal } from "@/hooks/useProposal/useProposal";
 import { ResponsiveContainer } from "@/styles/styles";
 import { Flex, Button, Box, CryptoIcon, Text } from "@ledgerhq/react-ui";
@@ -23,7 +19,7 @@ import { useCallback, useEffect, useMemo } from "react";
 import { Logo } from "@/icons/LedgerLiveLogo";
 import styled, { useTheme } from "styled-components";
 import useAnalytics from "@/hooks/useAnalytics";
-import { tryDecodeURI } from "@/helpers/image";
+import { tryDecodeURI } from "@/utils/image";
 import { formatAccountsByChain, sortChains } from "@/hooks/useProposal/util";
 import { proposalAtom } from "@/storage/web3wallet.store";
 import { useAtomValue } from "jotai";

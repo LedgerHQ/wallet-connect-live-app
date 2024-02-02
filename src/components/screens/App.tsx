@@ -8,9 +8,8 @@ import { Connect } from "./Connect";
 import Sessions from "./Sessions";
 import Tabs from "../Tabs";
 import useAnalytics from "@/hooks/useAnalytics";
-import { TabsIndexes } from "@/routes";
+import { InputMode, TabsIndexes } from "@/types/types";
 import { useNavigate } from "@tanstack/react-router";
-import { indexRoute } from "src/routes";
 import { useAtomValue } from "jotai";
 import useSessions from "@/hooks/useSessions";
 
@@ -34,9 +33,14 @@ const WalletConnectInnerContainer = styled.div`
   background: ${({ theme }) => theme.colors.background.main};
 `;
 
-export default function App() {
+type Props = {
+  tab: TabsIndexes;
+  mode?: InputMode;
+  initialURI?: string;
+};
+
+export default function App({ tab, mode, initialURI }: Props) {
   const navigate = useNavigate();
-  const { tab } = indexRoute.useSearch();
 
   const web3wallet = useAtomValue(web3walletAtom);
   const sessions = useSessions(web3wallet);
@@ -68,7 +72,7 @@ export default function App() {
         Component: (
           <WalletConnectInnerContainer>
             <ResponsiveContainer>
-              <Connect />
+              <Connect mode={mode} initialURI={initialURI} />
             </ResponsiveContainer>
           </WalletConnectInnerContainer>
         ),
@@ -86,7 +90,7 @@ export default function App() {
         ),
       },
     ],
-    [t, sessionsLength]
+    [t, mode, initialURI, sessionsLength]
   );
 
   return (

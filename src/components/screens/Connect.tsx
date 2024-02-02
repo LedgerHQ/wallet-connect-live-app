@@ -5,10 +5,10 @@ import { PasteMedium, QrCodeMedium } from "@ledgerhq/react-ui/assets/icons";
 import { QRScanner } from "../QRScanner";
 import { useTranslation } from "react-i18next";
 import useAnalytics from "@/hooks/useAnalytics";
-import { indexRoute } from "@/routes";
 import { useNavigate } from "@tanstack/react-router";
 import { useAtomValue } from "jotai";
 import { coreAtom } from "@/storage/web3wallet.store";
+import { InputMode } from "@/types/types";
 
 const QRScannerContainer = styled.div`
   display: flex;
@@ -36,9 +36,13 @@ const QrCodeButton = styled.div`
   }
 `;
 
-export function Connect() {
+type Props = {
+  mode?: InputMode;
+  initialURI?: string;
+};
+
+export function Connect({ mode, initialURI }: Props) {
   const navigate = useNavigate();
-  const { mode, uri: initialURI } = indexRoute.useSearch();
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState<string>("");
   const [errorValue, setErrorValue] = useState<string | undefined>(undefined);

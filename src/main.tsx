@@ -4,7 +4,7 @@ import { RouterProvider } from "@tanstack/react-router";
 import * as Sentry from "@sentry/react";
 import { Buffer as BufferPolyfill } from "buffer";
 globalThis.Buffer = BufferPolyfill;
-import { router } from "@/routes";
+import { router } from "./router";
 import "@/i18n";
 
 declare module "@tanstack/react-router" {

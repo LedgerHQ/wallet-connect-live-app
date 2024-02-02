@@ -1,6 +1,7 @@
 import { Flex, Text, Checkbox } from "@ledgerhq/react-ui";
 import { ChevronRightMedium } from "@ledgerhq/react-ui/assets/icons";
 import styled from "styled-components";
+import { RowType } from "./types";
 
 type Props = {
   title: string;
@@ -11,12 +12,6 @@ type Props = {
   onClick?: () => void;
   rowType: RowType;
 };
-
-export enum RowType {
-  Select = "select",
-  Detail = "detail",
-  Default = "default",
-}
 
 const Row = styled(Flex)`
   border-radius: 12px;

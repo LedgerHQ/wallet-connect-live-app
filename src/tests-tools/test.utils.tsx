@@ -2,7 +2,6 @@ import { ReactElement, Suspense } from "react";
 import { act, render, RenderOptions } from "@testing-library/react";
 import { Flex, ProgressLoader, StyleProvider } from "@ledgerhq/react-ui";
 import userEvent from "@testing-library/user-event";
-import { getWalletAPITransport } from "src/routes";
 import { WalletAPIProvider } from "@ledgerhq/wallet-api-client-react";
 import GlobalStyle from "@/styles/globalStyle";
 import { Container } from "@/styles/styles";
@@ -17,6 +16,7 @@ import {
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ErrorBoundary } from "@sentry/react";
 import { ErrorFallback } from "@/components/screens/ErrorFallback";
+import { getWalletAPITransport } from "@/utils/wallet-api";
 
 type PropsTheme = {
   children: React.ReactNode;

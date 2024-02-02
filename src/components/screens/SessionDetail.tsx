@@ -5,14 +5,15 @@ import {
   truncate,
   getDisplayName,
   getColor,
-} from "@/helpers/helper.util";
+} from "@/utils/helper.util";
 import { Box, Button, CryptoIcon, Flex, Text } from "@ledgerhq/react-ui";
 import { ArrowLeftMedium } from "@ledgerhq/react-ui/assets/icons";
 import { useCallback, useEffect, useMemo } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { Account } from "@ledgerhq/wallet-api-client";
-import { GenericRow, RowType } from "@/components/atoms/GenericRow";
+import { GenericRow } from "@/components/atoms/GenericRow";
+import { RowType } from "@/components/atoms/types";
 import { InfoSessionProposal } from "@/components/screens/sessionProposal/InfoSessionProposal";
 import { space } from "@ledgerhq/react-ui/styles/theme";
 import {
@@ -23,7 +24,7 @@ import {
 import { ResponsiveContainer } from "@/styles/styles";
 import { ImageWithPlaceholder } from "@/components/atoms/images/ImageWithPlaceholder";
 import useAnalytics from "@/hooks/useAnalytics";
-import { TabsIndexes } from "@/routes";
+import { TabsIndexes } from "@/types/types";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useWalletAPIClient } from "@ledgerhq/wallet-api-client-react";
 import { useAtomValue } from "jotai";

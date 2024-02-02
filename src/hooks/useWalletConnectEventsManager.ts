@@ -1,9 +1,9 @@
 import { SignClientTypes } from "@walletconnect/types";
 import { useCallback, useEffect } from "react";
 import { Web3WalletTypes } from "@walletconnect/web3wallet";
-import { getAccountWithAddressAndChainId } from "@/helpers/generic";
+import { getAccountWithAddressAndChainId } from "@/utils/generic";
 import { stripHexPrefix } from "@/utils/currencyFormatter/helpers";
-import { convertEthToLiveTX } from "@/helpers/converters";
+import { convertEthToLiveTX } from "@/utils/converters";
 import {
   EIP155_REQUESTS,
   EIP155_SIGNING_METHODS,
@@ -14,8 +14,8 @@ import {
   usePendingFlowStore,
 } from "@/storage/pendingFlow.store";
 import { captureException } from "@sentry/react";
-import { isEIP155Chain, isDataInvalid } from "@/helpers/helper.util";
-import { TabsIndexes } from "@/routes";
+import { isEIP155Chain, isDataInvalid } from "@/utils/helper.util";
+import { TabsIndexes } from "@/types/types";
 import { useNavigate } from "@tanstack/react-router";
 import { useWalletAPIClient } from "@ledgerhq/wallet-api-client-react";
 import { WalletAPIClient } from "@ledgerhq/wallet-api-client";

@@ -7,7 +7,7 @@ import { ResponsiveContainer } from "@/styles/styles";
 import { device } from "@/styles/breakpoints";
 import useAnalytics from "@/hooks/useAnalytics";
 import { useNavigate } from "@tanstack/react-router";
-import { TabsIndexes } from "@/routes";
+import { TabsIndexes } from "@/types/types";
 
 const LogoContainer = styled(Flex)`
   border-radius: 50%;

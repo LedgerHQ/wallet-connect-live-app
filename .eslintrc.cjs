@@ -13,6 +13,7 @@ module.exports = {
     ecmaVersion: 2020,
     sourceType: "module",
   },
+  plugins: ["react-refresh"],
   extends: [
     "eslint:recommended",
     "prettier",
@@ -21,7 +22,9 @@ module.exports = {
     "plugin:react-hooks/recommended",
     "plugin:@tanstack/eslint-plugin-query/recommended",
   ],
-  rules: {},
+  rules: {
+    "react-refresh/only-export-components": "warn",
+  },
   overrides: [
     {
       files: ["**/*.{ts,tsx}"],
@@ -51,8 +54,15 @@ module.exports = {
 
     // Only uses Testing Library lint rules in test files
     {
-      files: ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],
+      files: [
+        "**/__tests__/**/*.[jt]s?(x)",
+        "**/?(*.)+(spec|test).[jt]s?(x)",
+        "test.utils.tsx",
+      ],
       extends: ["plugin:testing-library/react"],
+      rules: {
+        "react-refresh/only-export-components": "off",
+      },
     },
   ],
   settings: {

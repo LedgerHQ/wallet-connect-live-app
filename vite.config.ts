@@ -4,6 +4,8 @@ import react from "@vitejs/plugin-react";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 import inject from "@rollup/plugin-inject";
+import jotaiDebugLabel from "jotai/babel/plugin-debug-label";
+import jotaiReactRefresh from "jotai/babel/plugin-react-refresh";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -23,7 +25,15 @@ export default defineConfig({
   // },
   plugins: [
     tsconfigPaths(),
-    react(),
+    react({
+      babel: {
+        plugins: [
+          "babel-plugin-styled-components",
+          jotaiDebugLabel,
+          jotaiReactRefresh,
+        ],
+      },
+    }),
     // react({
     //   include: /\.(jsx|tsx)$/,
     //   babel: {
