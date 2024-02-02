@@ -149,10 +149,10 @@ function usePendingFlow(
   }, [pendingFlow, clearPendingFlow, client, web3wallet]);
 
   useEffect(() => {
-    if (web3wallet && pendingFlow) {
+    if (pendingFlow) {
       void triggerPendingFlow();
     }
-  }, [pendingFlow, triggerPendingFlow, web3wallet]);
+  }, [pendingFlow, triggerPendingFlow]);
 }
 
 export default function useWalletConnect() {
@@ -363,26 +363,24 @@ export default function useWalletConnect() {
   }, [queryClient]);
 
   useEffect(() => {
-    if (web3wallet) {
-      console.log("web3wallet setup listeners");
+    console.log("web3wallet setup listeners");
+    // sign
+    web3wallet.on("session_proposal", onSessionProposal);
+    web3wallet.on("session_request", onSessionRequest);
+    web3wallet.on("session_delete", onSessionDeleted);
+
+    // auth
+    // web3wallet.on("auth_request", onAuthRequest);
+    return () => {
+      console.log("web3wallet cleanup listeners");
       // sign
-      web3wallet.on("session_proposal", onSessionProposal);
-      web3wallet.on("session_request", onSessionRequest);
-      web3wallet.on("session_delete", onSessionDeleted);
+      web3wallet.off("session_proposal", onSessionProposal);
+      web3wallet.off("session_request", onSessionRequest);
+      web3wallet.off("session_delete", onSessionDeleted);
 
       // auth
-      // web3wallet.on("auth_request", onAuthRequest);
-      return () => {
-        console.log("web3wallet cleanup listeners");
-        // sign
-        web3wallet.off("session_proposal", onSessionProposal);
-        web3wallet.off("session_request", onSessionRequest);
-        web3wallet.off("session_delete", onSessionDeleted);
-
-        // auth
-        // web3wallet.off("auth_request", onAuthRequest);
-      };
-    }
+      // web3wallet.off("auth_request", onAuthRequest);
+    };
   }, [web3wallet, onSessionProposal, onSessionRequest, onSessionDeleted]);
 
   // TODO maybe redo differently and need to test if we get the last message when reconnecting to wc by default
