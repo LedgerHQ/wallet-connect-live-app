@@ -1,5 +1,5 @@
 import useModal from "@/hooks/useModal";
-import { act, renderHook } from "@/tests-tools/test.utils";
+import { act, renderHook } from "@/tests/test.utils";
 
 describe("useModal", () => {
   it("should initialize isModalOpen as false", () => {

@@ -1,30 +1,43 @@
 import { useCallback, useMemo } from "react";
 import { WalletInfo } from "@ledgerhq/wallet-api-client";
 import { AnalyticsBrowser } from "@segment/analytics-next";
-import { sessionSelector, useSessionsStore } from "@/storage/sessions.store";
+import { web3walletAtom } from "@/store/web3wallet.store";
+import { useAtomValue } from "jotai";
+import useSessions from "./useSessions";
+import { useState } from "react";
 
 const analyticsOptions = { ip: "0.0.0.0" };
 
 let analytics: AnalyticsBrowser | undefined;
-let userId: string | undefined;
+
+const APP_NAME = "Wallet Connect v2";
+const version = import.meta.env.VITE_APP_VERSION;
 
 export default function useAnalytics() {
-  const sessions = useSessionsStore(sessionSelector.selectSessions);
-  const version = import.meta.env.VITE_APP_VERSION;
+  const [userId, setUserId] = useState<string>();
+  const web3wallet = useAtomValue(web3walletAtom);
+  const sessions = useSessions(web3wallet);
+  const sessionsLength = sessions.data.length;
 
   const userProperties = useMemo(() => {
     return {
-      sessionsConnected: sessions?.length ?? 0,
-      live_app: "Wallet Connect v2",
+      sessionsConnected: sessionsLength,
+      live_app: APP_NAME,
       live_app_version: version,
       userId,
     };
-  }, [sessions?.length, userId, version]);
+  }, [sessionsLength, userId]);
+
+  const identify = useCallback(() => {
+    if (!analytics) return;
+
+    void analytics.identify(userId, userProperties, analyticsOptions);
+  }, [userId, userProperties]);
 
   const start = useCallback(
     (userIdReceived?: string, walletInfo?: WalletInfo["result"]) => {
       if (analytics ?? !userIdReceived ?? !walletInfo) return;
-      userId = userIdReceived;
+      setUserId(userIdReceived);
 
       const walletName = walletInfo.wallet.name;
 
@@ -40,14 +53,8 @@ export default function useAnalytics() {
         identify();
       }
     },
-    []
+    [identify]
   );
-
-  const identify = useCallback(() => {
-    if (!analytics) return;
-
-    void analytics.identify(userId, userProperties, analyticsOptions);
-  }, [userId, userProperties]);
 
   const track = useCallback(
     (eventName: string, eventProperties?: Record<string, unknown>) => {
@@ -66,7 +73,7 @@ export default function useAnalytics() {
     (pageName: string, eventProperties?: Record<string, unknown>) => {
       if (!analytics) return;
 
-      const category = "Wallet Connect v2";
+      const category = APP_NAME;
 
       const allProperties = {
         ...userProperties,
@@ -77,10 +84,13 @@ export default function useAnalytics() {
     [userProperties]
   );
 
-  return {
-    start,
-    identify,
-    track,
-    page,
-  };
+  return useMemo(
+    () => ({
+      start,
+      identify,
+      track,
+      page,
+    }),
+    [start, identify, track, page]
+  );
 }

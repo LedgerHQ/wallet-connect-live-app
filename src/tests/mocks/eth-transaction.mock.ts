@@ -1,4 +1,4 @@
-import { EthTransaction } from "@/helpers/converters";
+import { EthTransaction } from "@/utils/converters";
 const to = "0x98BD1afBf1775A1FA55Cbb34B42AC482aA15Ff6E";
 
 const ethTx: EthTransaction = {

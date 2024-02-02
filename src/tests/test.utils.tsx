@@ -1,9 +1,7 @@
-import { ReactElement } from "react";
+import { ReactElement, Suspense } from "react";
 import { act, render, RenderOptions } from "@testing-library/react";
-import { StyleProvider } from "@ledgerhq/react-ui";
+import { Flex, ProgressLoader, StyleProvider } from "@ledgerhq/react-ui";
 import userEvent from "@testing-library/user-event";
-import { getWalletAPITransport } from "src/routes";
-import { WalletAPIProvider } from "@ledgerhq/wallet-api-client-react";
 import GlobalStyle from "@/styles/globalStyle";
 import { Container } from "@/styles/styles";
 import {
@@ -14,11 +12,27 @@ import {
   Outlet,
   RouterProvider,
 } from "@tanstack/react-router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ErrorBoundary } from "@sentry/react";
+import { ErrorFallback } from "@/components/screens/ErrorFallback";
 
 type PropsTheme = {
   children: React.ReactNode;
   theme?: "dark" | "light";
 };
+
+const twentyFourHoursInMs = 1000 * 60 * 60 * 24;
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      staleTime: twentyFourHoursInMs,
+      retry: false,
+    },
+  },
+});
 
 /**
  *
@@ -28,9 +42,24 @@ type PropsTheme = {
  */
 const AllProviders = ({ children, theme = "dark" }: PropsTheme) => {
   return (
-    <StyleProvider selectedPalette={theme} fontsPath="/fonts">
-      {children}
-    </StyleProvider>
+    <QueryClientProvider client={queryClient}>
+      <StyleProvider selectedPalette={theme} fontsPath="/fonts">
+        <Suspense
+          fallback={
+            <Flex
+              alignItems="center"
+              justifyContent="center"
+              flexDirection="column"
+              flex={1}
+            >
+              <ProgressLoader infinite showPercentage={false} />
+            </Flex>
+          }
+        >
+          {children}
+        </Suspense>
+      </StyleProvider>
+    </QueryClientProvider>
   );
 };
 
@@ -57,16 +86,30 @@ export * from "@testing-library/react";
 export { setupUserEventWithRender as render };
 
 const Root = () => {
-  const transport = getWalletAPITransport();
   return (
-    <StyleProvider selectedPalette={"dark"} fontsPath="/fonts">
-      <WalletAPIProvider transport={transport}>
+    <QueryClientProvider client={queryClient}>
+      <StyleProvider selectedPalette={"dark"} fontsPath="/fonts">
         <GlobalStyle />
         <Container>
-          <Outlet />
+          <Suspense
+            fallback={
+              <Flex
+                alignItems="center"
+                justifyContent="center"
+                flexDirection="column"
+                flex={1}
+              >
+                <ProgressLoader infinite showPercentage={false} />
+              </Flex>
+            }
+          >
+            <ErrorBoundary fallback={<ErrorFallback />}>
+              <Outlet />
+            </ErrorBoundary>
+          </Suspense>
         </Container>
-      </WalletAPIProvider>
-    </StyleProvider>
+      </StyleProvider>
+    </QueryClientProvider>
   );
 };
 
@@ -97,6 +140,7 @@ export async function renderComponent(component: () => JSX.Element) {
   await act(async () => {
     return router.navigate({
       to: "/",
+      search: (search) => search,
     });
   });
   return router;

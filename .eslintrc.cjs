@@ -13,17 +13,17 @@ module.exports = {
     ecmaVersion: 2020,
     sourceType: "module",
   },
-  plugins: ["testing-library"],
+  plugins: ["react-refresh"],
   extends: [
     "eslint:recommended",
     "prettier",
+    "plugin:react/recommended",
+    "plugin:react/jsx-runtime",
     "plugin:react-hooks/recommended",
     "plugin:@tanstack/eslint-plugin-query/recommended",
   ],
   rules: {
-    "prefer-const": "error",
-    "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "off",
+    "react-refresh/only-export-components": "warn",
   },
   overrides: [
     {
@@ -54,8 +54,23 @@ module.exports = {
 
     // Only uses Testing Library lint rules in test files
     {
-      files: ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],
+      files: [
+        "**/__tests__/**/*.[jt]s?(x)",
+        "**/?(*.)+(spec|test).[jt]s?(x)",
+        "test.utils.tsx",
+      ],
       extends: ["plugin:testing-library/react"],
+      rules: {
+        "react-refresh/only-export-components": "off",
+      },
     },
   ],
+  settings: {
+    react: {
+      version: "detect", // React version. "detect" automatically picks the version you have installed.
+    },
+    linkComponents: [
+      { name: "Link", linkAttribute: "to" }, // allows specifying multiple properties if necessary
+    ],
+  },
 };

@@ -1,7 +1,7 @@
 import { PendingFlow } from "@/types/types";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { StorageKeys } from "@/storage/types";
+import { StorageKeys } from "@/store/types";
 
 type PendingFlowState = {
   pendingFlow: PendingFlow | undefined;

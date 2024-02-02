@@ -1,4 +1,4 @@
-import { EthTransaction } from "@/helpers/converters";
+import { EthTransaction } from "@/utils/converters";
 
 export type NetworkConfig = {
   chainId: number;
@@ -52,3 +52,7 @@ export type PendingFlow = {
   txHadSomeData?: boolean;
   send?: boolean;
 };
+export enum TabsIndexes {
+  Connect = 0,
+  Sessions = 1,
+}

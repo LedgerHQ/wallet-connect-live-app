@@ -1,5 +1,5 @@
 import { SUPPORTED_NETWORK } from "@/data/network.config";
-import { getCurrencyByChainId, getDisplayName } from "@/helpers/helper.util";
+import { getCurrencyByChainId, getDisplayName } from "@/utils/helper.util";
 import { Account } from "@ledgerhq/wallet-api-client";
 import { Web3WalletTypes } from "@walletconnect/web3wallet";
 

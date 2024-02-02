@@ -1,23 +1,27 @@
 import { describe, expect, it } from "vitest";
 import { InfoSessionProposal } from "@/components/screens/sessionProposal/InfoSessionProposal";
-import { render, screen } from "@/tests-tools/test.utils";
+import { render, screen } from "@/tests/test.utils";
 
 describe("InfoSessionProposal", () => {
-  it("renders in session details", () => {
+  it("renders in session details", async () => {
     render(<InfoSessionProposal isInSessionDetails={true} />);
 
-    expect(screen.getByText("sessionProposal.info2")).toBeInTheDocument();
+    expect(
+      await screen.findByText("sessionProposal.info2")
+    ).toBeInTheDocument();
   });
 
-  it("renders in normal session", () => {
+  it("renders in normal session", async () => {
     render(<InfoSessionProposal />);
 
-    expect(screen.getByText("sessionProposal.info")).toBeInTheDocument();
+    expect(await screen.findByText("sessionProposal.info")).toBeInTheDocument();
   });
 
-  it("renders two bullet points", () => {
+  it("renders two bullet points", async () => {
     render(<InfoSessionProposal />);
-    const bulletPoints = screen.getAllByText(/sessionProposal.infoBullet./i);
+    const bulletPoints = await screen.findAllByText(
+      /sessionProposal.infoBullet./i
+    );
     expect(bulletPoints).toHaveLength(2);
   });
 });

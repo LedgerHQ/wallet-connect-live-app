@@ -1,16 +1,16 @@
 /* eslint-disable testing-library/no-debugging-utils */
 import "@testing-library/react/dont-cleanup-after-each";
-import { cleanup, render, waitFor, screen } from "@/tests-tools/test.utils";
-import { initialParamsHomePage } from "@/tests-tools/mocks/initialParams.mock";
+import { cleanup, render, waitFor, screen } from "@/tests/test.utils";
+import { initialParamsHomePage } from "@/tests/mocks/initialParams.mock";
 // import AppScreen from "@/pages/index";
 import sessionProposal from "@/data/mocks/sessionProposal.example.json";
 import SessionProposal from "@/components/screens/SessionProposal";
 import SessionDetail from "@/components/screens/SessionDetail";
 import userEvent from "@testing-library/user-event";
-import { createWeb3Wallet } from "@/helpers/walletConnect.util";
 import { vi, describe, it, expect } from "vitest";
 import { createRoute, useNavigate } from "@tanstack/react-router";
-import AppScreen from "@/components/screens/Home";
+import AppScreen from "@/components/screens/App";
+import { TabsIndexes } from "@/types/types";
 
 // mock useRouter
 // jest.mock("next/router", () => ({
@@ -82,7 +82,7 @@ const proposalRouter = () =>
   });
 describe.skip("Proposal Flow tests", () => {
   it("Should connect throught an uri, initialize Session proposal Screen", async () => {
-    const { user } = render(<AppScreen />);
+    const { user } = render(<AppScreen tab={TabsIndexes.Connect} />);
 
     await waitFor(
       () => {
@@ -98,7 +98,6 @@ describe.skip("Proposal Flow tests", () => {
     cleanup();
     proposalRouter();
     render(<SessionProposal />);
-    await createWeb3Wallet();
 
     await waitFor(
       () => {
@@ -142,7 +141,7 @@ describe.skip("Proposal Flow tests", () => {
 
     cleanup();
 
-    render(<AppScreen />);
+    render(<AppScreen tab={TabsIndexes.Connect} />);
 
     await waitFor(
       () => {

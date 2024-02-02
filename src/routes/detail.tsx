@@ -1,5 +1,5 @@
 import { createRoute } from "@tanstack/react-router";
-import { rootRoute } from ".";
+import { rootRoute } from "@/routes/root";
 import SessionDetail from "@/components/screens/SessionDetail";
 
 export const detailRoute = createRoute({

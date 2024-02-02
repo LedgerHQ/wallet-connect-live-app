@@ -23,7 +23,12 @@ export default defineConfig({
   // },
   plugins: [
     tsconfigPaths(),
-    react(),
+    react({
+      babel: {
+        presets: ["jotai/babel/preset"],
+        plugins: ["babel-plugin-styled-components"],
+      },
+    }),
     // react({
     //   include: /\.(jsx|tsx)$/,
     //   babel: {

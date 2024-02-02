@@ -1,38 +1,38 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { Connect } from "@/components/screens/Connect";
-import useAnalytics from "@/hooks/useAnalytics";
-import { render, screen, renderHook } from "@/tests-tools/test.utils";
-
-const onConnectMock = vi.fn();
+import { renderWithRouter, screen } from "@/tests/test.utils";
+import userEvent from "@testing-library/user-event";
 
 describe("Connect Screen", () => {
-  it("Page should appears", () => {
-    renderHook(() => useAnalytics());
-    render(<Connect onConnect={onConnectMock} />);
-    const scan = screen.getByTestId("scan-button");
-    const input = screen.getByTestId("input-uri");
-    const connectButton = screen.getByTestId("connect-button");
+  it("Page should appears", async () => {
+    await renderWithRouter(() => <Connect />);
+    const scan = await screen.findByTestId("scan-button");
+    const input = await screen.findByTestId("input-uri");
+    const connectButton = await screen.findByTestId("connect-button");
     expect(scan).toBeInTheDocument();
     expect(input).toBeInTheDocument();
     expect(connectButton).toBeInTheDocument();
   });
+
+  // TODO update to use router and params to check this
   it("Page should appears with Connect button and on click triggers action", async () => {
-    renderHook(() => useAnalytics());
     const url = "https://jestjs.io/docs/jest-object";
-    const { user } = render(<Connect onConnect={onConnectMock} mode="text" />);
-    const connect = screen.getByTestId("connect-button");
-    const input = screen.getByTestId("input-uri");
+    await renderWithRouter(() => <Connect />);
+    const user = userEvent.setup();
+    const connect = await screen.findByTestId("connect-button");
+    const input = await screen.findByTestId("input-uri");
     await user.type(input, url);
 
     expect(connect).toBeInTheDocument();
     expect(input).toHaveValue(url);
     await user.click(connect);
-    expect(onConnectMock).toHaveBeenCalled();
   });
 
-  it("disables connect button when input is empty", () => {
-    render(<Connect onConnect={onConnectMock} />);
-    const connectButton = screen.getByRole("button", { name: /connect.cta/ });
+  it("disables connect button when input is empty", async () => {
+    await renderWithRouter(() => <Connect />);
+    const connectButton = await screen.findByRole("button", {
+      name: /connect.cta/,
+    });
 
     expect(connectButton).toBeDisabled();
   });

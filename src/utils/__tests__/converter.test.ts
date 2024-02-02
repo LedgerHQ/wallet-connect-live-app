@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import BigNumber from "bignumber.js";
 import { EthTransaction, convertEthToLiveTX } from "../converters";
 import eip55 from "eip55";
-import { ethTx, to } from "@/tests-tools/mocks/eth-transaction.mock";
+import { ethTx, to } from "@/tests/mocks/eth-transaction.mock";
 
 describe("Converter File", () => {
   it("convertEthToLiveTX correclty formatted", () => {

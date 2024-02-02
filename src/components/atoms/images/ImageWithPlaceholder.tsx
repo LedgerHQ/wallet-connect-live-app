@@ -1,4 +1,4 @@
-import { tryDecodeURI } from "@/helpers/image";
+import { tryDecodeURI } from "@/utils/image";
 import { WalletConnectMedium } from "@ledgerhq/react-ui/assets/icons";
 import { useTheme } from "styled-components";
 

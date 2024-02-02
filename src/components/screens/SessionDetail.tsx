@@ -5,14 +5,15 @@ import {
   truncate,
   getDisplayName,
   getColor,
-} from "@/helpers/helper.util";
+} from "@/utils/helper.util";
 import { Box, Button, CryptoIcon, Flex, Text } from "@ledgerhq/react-ui";
 import { ArrowLeftMedium } from "@ledgerhq/react-ui/assets/icons";
 import { useCallback, useEffect, useMemo } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { Account } from "@ledgerhq/wallet-api-client";
-import { GenericRow, RowType } from "@/components/atoms/GenericRow";
+import { GenericRow } from "@/components/atoms/GenericRow";
+import { RowType } from "@/components/atoms/types";
 import { InfoSessionProposal } from "@/components/screens/sessionProposal/InfoSessionProposal";
 import { space } from "@ledgerhq/react-ui/styles/theme";
 import {
@@ -21,15 +22,16 @@ import {
   Row,
 } from "@/components/atoms/containers/Elements";
 import { ResponsiveContainer } from "@/styles/styles";
-import { sessionSelector, useSessionsStore } from "@/storage/sessions.store";
-import { web3wallet } from "@/helpers/walletConnect.util";
 import { ImageWithPlaceholder } from "@/components/atoms/images/ImageWithPlaceholder";
 import useAnalytics from "@/hooks/useAnalytics";
-import { TabsIndexes } from "@/routes";
-import { Link, useNavigate } from "@tanstack/react-router";
-import { getAccounts } from "@/hooks/useWalletConnectEventsManager";
-import { useQuery } from "@tanstack/react-query";
-import { useWalletAPIClient } from "@ledgerhq/wallet-api-client-react";
+import { TabsIndexes } from "@/types/types";
+import { useNavigate } from "@tanstack/react-router";
+import { useAtomValue } from "jotai";
+import { web3walletAtom } from "@/store/web3wallet.store";
+import useSessions, { queryKey as sessionsQueryKey } from "@/hooks/useSessions";
+import useAccounts from "@/hooks/useAccounts";
+import { walletAPIClientAtom } from "@/store/wallet-api.store";
+import { useQueryClient } from "@tanstack/react-query";
 
 const DetailContainer = styled(Flex)`
   border-radius: 12px;
@@ -75,31 +77,29 @@ type Props = {
   topic: string;
 };
 
-// Created to have a stable ref in case of undefined accounts data
-const initialAccounts: Account[] = [];
-
 export default function SessionDetail({ topic }: Props) {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const { client } = useWalletAPIClient();
+  const queryClient = useQueryClient();
 
-  const accounts = useQuery({
-    queryKey: ["accounts"],
-    queryFn: getAccounts(client),
-    initialData: initialAccounts,
-  });
+  const client = useAtomValue(walletAPIClientAtom);
 
-  const sessions = useSessionsStore(sessionSelector.selectSessions);
+  const accounts = useAccounts(client);
+
+  const web3wallet = useAtomValue(web3walletAtom);
+  const sessions = useSessions(web3wallet);
   const session = useMemo(
-    () => sessions.find((elem) => elem.topic === topic),
-    []
+    () => sessions.data.find((elem) => elem.topic === topic),
+    [sessions.data, topic]
   );
-  const removeSession = useSessionsStore(sessionSelector.removeSession);
 
   const navigateToSessionsHomeTab = useCallback(() => {
-    return navigate({ to: "/", search: { tab: TabsIndexes.Sessions } });
-  }, []);
+    return navigate({
+      to: "/",
+      search: (search) => ({ ...search, tab: TabsIndexes.Sessions }),
+    });
+  }, [navigate]);
 
   const analytics = useAnalytics();
 
@@ -111,36 +111,42 @@ export default function SessionDetail({ topic }: Props) {
       dapp: session?.peer?.metadata?.name ?? "Dapp name undefined",
       url: session?.peer?.metadata?.url ?? "Dapp url undefined",
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
   const handleDelete = useCallback(() => {
     if (!session) return;
-    try {
-      void web3wallet.disconnectSession({
+    void web3wallet
+      .disconnectSession({
         topic: session.topic,
         reason: {
           code: 3,
           message: "Disconnect Session",
         },
+      })
+      .then(() => {
+        analytics.track("button_clicked", {
+          button: "WC-Disconnect Session",
+          page: "Wallet Connect Session Detail",
+        });
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {
+        void queryClient
+          .invalidateQueries({ queryKey: sessionsQueryKey })
+          .then(() => navigateToSessionsHomeTab());
       });
-      analytics.track("button_clicked", {
-        button: "WC-Disconnect Session",
-        page: "Wallet Connect Session Detail",
-      });
-    } catch (error) {
-      console.error(error);
-    }
-    removeSession(session.topic);
-    void navigateToSessionsHomeTab();
-  }, [session]);
+  }, [analytics, navigateToSessionsHomeTab, queryClient, session, web3wallet]);
 
-  const onGoBack = () => {
+  const onGoBack = useCallback(() => {
     void navigateToSessionsHomeTab();
     analytics.track("button_clicked", {
       button: "WC-Back",
       page: "Wallet Connect Session Detail",
     });
-  };
+  }, [analytics, navigateToSessionsHomeTab]);
 
   const metadata = session?.peer.metadata;
   const fullAddresses = useMemo(
@@ -156,7 +162,7 @@ export default function SessionDetail({ topic }: Props) {
 
   const sessionAccounts = useMemo(
     () => getAccountsFromAddresses(fullAddresses, accounts.data),
-    [fullAddresses, accounts]
+    [accounts.data, fullAddresses]
   );
 
   return (
@@ -299,11 +305,9 @@ export default function SessionDetail({ topic }: Props) {
               flex={1}
               onClick={handleDelete}
             >
-              <Link to="/" search={{ tab: TabsIndexes.Connect }}>
-                <Text variant="body" fontWeight="semiBold" color="neutral.c100">
-                  {t("sessions.detail.disconnect")}
-                </Text>
-              </Link>
+              <Text variant="body" fontWeight="semiBold" color="neutral.c100">
+                {t("sessions.detail.disconnect")}
+              </Text>
             </Button>
           </ButtonsContainer>
         </Flex>

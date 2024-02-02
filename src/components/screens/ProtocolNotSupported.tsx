@@ -7,7 +7,7 @@ import { ResponsiveContainer } from "@/styles/styles";
 import { device } from "@/styles/breakpoints";
 import useAnalytics from "@/hooks/useAnalytics";
 import { useNavigate } from "@tanstack/react-router";
-import { TabsIndexes } from "@/routes";
+import { TabsIndexes } from "@/types/types";
 
 const LogoContainer = styled(Flex)`
   border-radius: 50%;
@@ -46,11 +46,15 @@ export default function ProtocolNotSupported() {
 
   useEffect(() => {
     analytics.page("Wallet Connect Error Unsupported Protocol V1");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const goHome = useCallback(() => {
-    void navigate({ to: "/", search: { tab: TabsIndexes.Connect } });
-  }, []);
+    void navigate({
+      to: "/",
+      search: (search) => ({ ...search, tab: TabsIndexes.Connect }),
+    });
+  }, [navigate]);
 
   return (
     <Flex alignItems="center" flexDirection="column" height="100%" width="100%">
