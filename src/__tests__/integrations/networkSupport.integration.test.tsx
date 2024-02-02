@@ -3,6 +3,7 @@ import { cleanup, render, waitFor, screen } from "@/tests-tools/test.utils";
 import AppScreen from "@/components/screens/App";
 import SessionProposal from "@/components/screens/SessionProposal";
 import { vi, describe, it, expect } from "vitest";
+import { TabsIndexes } from "@/types/types";
 
 // mock useRouter
 vi.mock("next/router", () => ({
@@ -43,7 +44,7 @@ afterAll(() => cleanup());
 
 describe.skip("Network Support tests", () => {
   it("Should connect throught an uri and redirect to Error Support screen, then go back to Index Page", async () => {
-    const { user: userApp } = render(<AppScreen />);
+    const { user: userApp } = render(<AppScreen tab={TabsIndexes.Connect} />);
 
     await waitFor(
       () => {
@@ -73,6 +74,6 @@ describe.skip("Network Support tests", () => {
 
     cleanup();
 
-    render(<AppScreen />);
+    render(<AppScreen tab={TabsIndexes.Connect} />);
   });
 });

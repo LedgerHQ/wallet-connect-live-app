@@ -10,6 +10,7 @@ import userEvent from "@testing-library/user-event";
 import { vi, describe, it, expect } from "vitest";
 import { createRoute, useNavigate } from "@tanstack/react-router";
 import AppScreen from "@/components/screens/App";
+import { TabsIndexes } from "@/types/types";
 
 // mock useRouter
 // jest.mock("next/router", () => ({
@@ -81,7 +82,7 @@ const proposalRouter = () =>
   });
 describe.skip("Proposal Flow tests", () => {
   it("Should connect throught an uri, initialize Session proposal Screen", async () => {
-    const { user } = render(<AppScreen />);
+    const { user } = render(<AppScreen tab={TabsIndexes.Connect} />);
 
     await waitFor(
       () => {
@@ -140,7 +141,7 @@ describe.skip("Proposal Flow tests", () => {
 
     cleanup();
 
-    render(<AppScreen />);
+    render(<AppScreen tab={TabsIndexes.Connect} />);
 
     await waitFor(
       () => {
