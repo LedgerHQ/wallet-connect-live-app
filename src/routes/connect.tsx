@@ -6,7 +6,7 @@ export const connectRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/connect",
   component: function ConnectRoute() {
-    const { mode } = rootRoute.useSearch();
+    const { mode } = connectRoute.useSearch();
 
     return <Connect mode={mode} />;
   },
