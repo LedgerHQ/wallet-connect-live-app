@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from "vitest";
 import { SUPPORTED_NETWORK } from "@/data/network.config";
 import {
   formatUrl,
@@ -8,7 +8,6 @@ import {
   getNamespace,
   getNetwork,
   getTicker,
-  isDataInvalid,
   isEIP155Chain,
   truncate,
 } from "../helper.util";
@@ -58,21 +57,6 @@ describe("Helper Util", () => {
   it("getColor", () => {
     const matic = getColor("polygon");
     expect(matic).toEqual(SUPPORTED_NETWORK.polygon.color);
-  });
-});
-
-describe("isDataInvalid", () => {
-  it("returns true for undefined data", () => {
-    expect(isDataInvalid(undefined)).toBe(true);
-  });
-
-  it("returns true for empty data", () => {
-    expect(isDataInvalid(Buffer.from("", "hex"))).toBe(true);
-  });
-
-  it("returns false for valid data", () => {
-    const validData = Buffer.from("0123456789abcdef", "hex");
-    expect(isDataInvalid(validData)).toBe(false);
   });
 });
 

@@ -1,6 +1,6 @@
 {
   "id": "ledger-wallet-connect",
-  "name": "WalletConnect",
+  "name": "WalletConnect local",
   "url": "http://localhost:3000/",
   "params": {},
   "homepageUrl": "https://walletconnect.com/",

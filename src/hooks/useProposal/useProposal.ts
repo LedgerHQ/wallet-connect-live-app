@@ -3,34 +3,27 @@ import { getNamespace } from "@/utils/helper.util";
 import { EIP155_SIGNING_METHODS } from "@/data/methods/EIP155Data.methods";
 import useAnalytics from "@/hooks/useAnalytics";
 import { SupportedNamespace } from "@/data/network.config";
-import { TabsIndexes } from "@/types/types";
 import { buildApprovedNamespaces } from "@walletconnect/utils";
 import { formatAccountsByChain } from "@/hooks/useProposal/util";
 import { useNavigate } from "@tanstack/react-router";
-import { Web3WalletTypes } from "@walletconnect/web3wallet";
 import { useQueryClient } from "@tanstack/react-query";
 import { web3walletAtom } from "@/store/web3wallet.store";
 import { useAtomValue } from "jotai";
 import useAccounts, { queryKey as accountsQueryKey } from "@/hooks/useAccounts";
 import { walletAPIClientAtom } from "@/store/wallet-api.store";
 import { queryKey as sessionsQueryKey } from "../useSessions";
+import { queryKey as pendingSessionsProposalsQueryKey } from "../usePendingSessionsProposals";
+import { ProposalTypes } from "@walletconnect/types";
 
-export function useProposal(proposal?: Web3WalletTypes.SessionProposal) {
+export function useProposal(proposal: ProposalTypes.Struct) {
   const navigate = useNavigate();
-
   const queryClient = useQueryClient();
-
   const client = useAtomValue(walletAPIClientAtom);
-
   const accounts = useAccounts(client);
-
   const web3wallet = useAtomValue(web3walletAtom);
-
   const analytics = useAnalytics();
 
   const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
-
-  const proposer = proposal?.params.proposer;
 
   const handleClick = useCallback(
     (account: string) => {
@@ -43,19 +36,23 @@ export function useProposal(proposal?: Web3WalletTypes.SessionProposal) {
     [selectedAccounts]
   );
 
-  const handleClose = useCallback(() => {
-    void navigate({
+  const navigateToHome = useCallback(() => {
+    return navigate({
       to: "/",
-      search: (search) => ({ ...search, tab: TabsIndexes.Connect }),
+      search: (search) => search,
     });
+  }, [navigate]);
+
+  const handleClose = useCallback(() => {
+    void navigateToHome();
     analytics.track("button_clicked", {
       button: "Close",
       page: "Wallet Connect Error Unsupported Blockchains",
     });
-  }, [analytics, navigate]);
+  }, [analytics, navigateToHome]);
 
   const buildSupportedNamespaces = useCallback(
-    (proposal: Web3WalletTypes.SessionProposal) => {
+    (proposal: ProposalTypes.Struct) => {
       const accountsByChain = formatAccountsByChain(
         proposal,
         accounts.data
@@ -75,7 +72,7 @@ export function useProposal(proposal?: Web3WalletTypes.SessionProposal) {
         []
       );
 
-      const requiredNamespaces = proposal.params.requiredNamespaces;
+      const requiredNamespaces = proposal.requiredNamespaces;
       const namespace =
         requiredNamespaces && Object.keys(requiredNamespaces).length > 0
           ? requiredNamespaces[SupportedNamespace.EIP155]
@@ -110,19 +107,18 @@ export function useProposal(proposal?: Web3WalletTypes.SessionProposal) {
   );
 
   const approveSession = useCallback(async () => {
-    if (!proposal) {
-      return;
-    }
-
     try {
       const session = await web3wallet.approveSession({
         id: proposal.id,
         namespaces: buildApprovedNamespaces({
-          proposal: proposal.params,
+          proposal,
           supportedNamespaces: buildSupportedNamespaces(proposal),
         }),
       });
       await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
+      await queryClient.invalidateQueries({
+        queryKey: pendingSessionsProposalsQueryKey,
+      });
       await navigate({
         to: "/detail/$topic",
         params: { topic: session.topic },
@@ -132,19 +128,17 @@ export function useProposal(proposal?: Web3WalletTypes.SessionProposal) {
       // TODO : display error toast
       console.error(error);
       await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
-      // void navigate({ to: "/", search: (search) => search }); // cannot be typed correctly with default fallback
+      await queryClient.invalidateQueries({
+        queryKey: pendingSessionsProposalsQueryKey,
+      });
       await navigate({
         to: "/",
-        search: (search) => ({ ...search, tab: TabsIndexes.Connect }),
+        search: (search) => search,
       });
     }
   }, [buildSupportedNamespaces, navigate, proposal, queryClient, web3wallet]);
 
   const rejectSession = useCallback(async () => {
-    if (!proposal) {
-      return;
-    }
-
     await web3wallet.rejectSession({
       id: proposal.id,
       reason: {
@@ -153,17 +147,17 @@ export function useProposal(proposal?: Web3WalletTypes.SessionProposal) {
       },
     });
     await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
+    await queryClient.invalidateQueries({
+      queryKey: pendingSessionsProposalsQueryKey,
+    });
     await navigate({
       to: "/",
-      search: (search) => ({ ...search, tab: TabsIndexes.Connect }),
+      search: (search) => search,
     });
   }, [navigate, proposal, queryClient, web3wallet]);
 
   const addNewAccount = useCallback(
     async (currency: string) => {
-      if (!client) {
-        return;
-      }
       try {
         await client.account.request({
           currencyIds: [currency],
@@ -182,11 +176,11 @@ export function useProposal(proposal?: Web3WalletTypes.SessionProposal) {
   return {
     approveSession,
     rejectSession,
-    proposer,
     handleClose,
     handleClick,
     accounts: accounts.data,
     selectedAccounts,
     addNewAccount,
+    navigateToHome,
   };
 }

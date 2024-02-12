@@ -7,7 +7,6 @@ import { ResponsiveContainer } from "@/styles/styles";
 import { device } from "@/styles/breakpoints";
 import useAnalytics from "@/hooks/useAnalytics";
 import { useNavigate } from "@tanstack/react-router";
-import { TabsIndexes } from "@/types/types";
 
 const LogoContainer = styled(Flex)`
   border-radius: 50%;
@@ -42,7 +41,7 @@ const ButtonsContainer = styled(Flex)`
 export default function ProtocolNotSupported() {
   const { t } = useTranslation();
   const analytics = useAnalytics();
-  const navigate = useNavigate();
+  const navigate = useNavigate({ from: "/protocol-not-supported" });
 
   useEffect(() => {
     analytics.page("Wallet Connect Error Unsupported Protocol V1");
@@ -52,7 +51,7 @@ export default function ProtocolNotSupported() {
   const goHome = useCallback(() => {
     void navigate({
       to: "/",
-      search: (search) => ({ ...search, tab: TabsIndexes.Connect }),
+      search: (search) => search,
     });
   }, [navigate]);
 

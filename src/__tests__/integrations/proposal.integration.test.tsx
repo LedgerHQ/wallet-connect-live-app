@@ -2,27 +2,21 @@
 import "@testing-library/react/dont-cleanup-after-each";
 import { cleanup, render, waitFor, screen } from "@/tests/test.utils";
 import { initialParamsHomePage } from "@/tests/mocks/initialParams.mock";
-// import AppScreen from "@/pages/index";
+import sessionExample from "@/data/mocks/session.example.json";
 import sessionProposal from "@/data/mocks/sessionProposal.example.json";
 import SessionProposal from "@/components/screens/SessionProposal";
 import SessionDetail from "@/components/screens/SessionDetail";
 import userEvent from "@testing-library/user-event";
 import { vi, describe, it, expect } from "vitest";
-import { createRoute, useNavigate } from "@tanstack/react-router";
+import { createRoute } from "@tanstack/react-router";
 import AppScreen from "@/components/screens/App";
-import { TabsIndexes } from "@/types/types";
+import { ProposalTypes, SessionTypes } from "@walletconnect/types";
 
-// mock useRouter
-// jest.mock("next/router", () => ({
-//   useRouter: jest.fn(() => ({
-//     query: {},
-//     push: jest.fn(),
-//   })),
-// }));
+const proposal = sessionProposal as ProposalTypes.Struct;
+const session = sessionExample as SessionTypes.Struct;
 
 vi.doMock("@tanstack/react-router", () => {
   return {
-    // ...requireA
     createRoute: createRoute,
     useRouter: () => {
       console.log("HI");
@@ -30,7 +24,6 @@ vi.doMock("@tanstack/react-router", () => {
     useNavigate: vi.fn(() => {
       return {
         router: {
-          // ...jest.requireActual("next/router"),
           query: initialParamsHomePage,
           push: mockPush,
         },
@@ -48,6 +41,7 @@ const mockAcceptSession = vi.fn(() =>
   Promise.resolve(() => console.log("ACCEPT DONE"))
 );
 
+// TODO maybe remove as we already have a mock in the setup
 vi.mock("@walletconnect/web3wallet", () => {
   return {
     Web3Wallet: {
@@ -73,16 +67,9 @@ beforeAll(() => {
 afterEach(() => vi.clearAllMocks());
 afterAll(() => cleanup());
 
-const proposalRouter = () =>
-  (useNavigate as jest.Mock).mockReturnValue({
-    router: {
-      query: { data: JSON.stringify(sessionProposal) },
-    },
-    navigate: jest.fn(),
-  });
 describe.skip("Proposal Flow tests", () => {
   it("Should connect throught an uri, initialize Session proposal Screen", async () => {
-    const { user } = render(<AppScreen tab={TabsIndexes.Connect} />);
+    const { user } = render(<AppScreen />);
 
     await waitFor(
       () => {
@@ -96,8 +83,7 @@ describe.skip("Proposal Flow tests", () => {
     await user.click(screen.getByRole("button", { name: /connect.cta/i }));
 
     cleanup();
-    proposalRouter();
-    render(<SessionProposal />);
+    render(<SessionProposal proposal={proposal} />);
 
     await waitFor(
       () => {
@@ -132,16 +118,10 @@ describe.skip("Proposal Flow tests", () => {
         name: /sessionProposal.reject/i,
       })
     );
-    (useNavigate as jest.Mock).mockReturnValue({
-      router: {
-        query: initialParamsHomePage,
-      },
-      navigate: jest.fn(),
-    });
 
     cleanup();
 
-    render(<AppScreen tab={TabsIndexes.Connect} />);
+    render(<AppScreen />);
 
     await waitFor(
       () => {
@@ -159,9 +139,10 @@ describe.skip("Proposal Flow tests", () => {
     console.log({ screen: screen.debug() });
     await userEvent.click(screen.getByRole("button", { name: /connect.cta/i }));
     cleanup();
-    proposalRouter();
 
-    const { user: userProposal } = render(<SessionProposal />);
+    const { user: userProposal } = render(
+      <SessionProposal proposal={proposal} />
+    );
 
     await userProposal.click(
       screen.getByRole("button", {
@@ -170,7 +151,7 @@ describe.skip("Proposal Flow tests", () => {
     );
 
     cleanup();
-    render(<SessionDetail topic="" />);
+    render(<SessionDetail session={session} />);
 
     expect(screen.getByText(/sessions\.detail\.title/i)).toBeInTheDocument();
     expect(

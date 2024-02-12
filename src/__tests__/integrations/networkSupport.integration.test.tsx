@@ -1,50 +1,19 @@
 import "@testing-library/react/dont-cleanup-after-each";
 import { cleanup, render, waitFor, screen } from "@/tests/test.utils";
 import AppScreen from "@/components/screens/App";
+import sessionProposal from "@/data/mocks/sessionProposal.example.json";
 import SessionProposal from "@/components/screens/SessionProposal";
 import { vi, describe, it, expect } from "vitest";
-import { TabsIndexes } from "@/types/types";
+import { ProposalTypes } from "@walletconnect/types";
 
-// mock useRouter
-vi.mock("next/router", () => ({
-  useRouter: vi.fn(() => ({
-    query: {},
-    push: vi.fn(),
-  })),
-}));
-
-// jest.mock("@/hooks/common/useNavigation", () => {
-//   return {
-//     useNavigation: jest.fn(() => {
-//       return {
-//         router: {
-//           ...jest.requireActual("next/router"),
-//           query: initialParamsHomePage,
-//           push: mockPush,
-//         },
-//         navigate: jest.fn(),
-//       };
-//     }),
-//   };
-// });
-
-// const mockPush = vi.fn();
+const proposal = sessionProposal as ProposalTypes.Struct;
 
 afterEach(() => vi.clearAllMocks());
 afterAll(() => cleanup());
 
-// const proposalRouter = () =>
-//   (useNavigate as jest.Mock).mockReturnValue({
-//     router: {
-//       query: { data: JSON.stringify(sessionProposalNotSupported) },
-//       push: jest.fn(),
-//     },
-//     navigate: jest.fn(),
-//   });
-
 describe.skip("Network Support tests", () => {
   it("Should connect throught an uri and redirect to Error Support screen, then go back to Index Page", async () => {
-    const { user: userApp } = render(<AppScreen tab={TabsIndexes.Connect} />);
+    const { user: userApp } = render(<AppScreen />);
 
     await waitFor(
       () => {
@@ -60,7 +29,9 @@ describe.skip("Network Support tests", () => {
     cleanup();
     // proposalRouter();
 
-    const { user: userProposal } = render(<SessionProposal />);
+    const { user: userProposal } = render(
+      <SessionProposal proposal={proposal} />
+    );
 
     expect(
       screen.getByText(/sessionProposal.error.title/i)
@@ -74,6 +45,6 @@ describe.skip("Network Support tests", () => {
 
     cleanup();
 
-    render(<AppScreen tab={TabsIndexes.Connect} />);
+    render(<AppScreen />);
   });
 });

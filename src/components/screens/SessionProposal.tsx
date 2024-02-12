@@ -12,6 +12,7 @@ import { Flex, Button, Box, CryptoIcon, Text } from "@ledgerhq/react-ui";
 import {
   WalletConnectMedium,
   CircledCrossSolidMedium,
+  ArrowLeftMedium,
 } from "@ledgerhq/react-ui/assets/icons";
 import { space } from "@ledgerhq/react-ui/styles/theme";
 import { useTranslation } from "react-i18next";
@@ -21,15 +22,22 @@ import styled, { useTheme } from "styled-components";
 import useAnalytics from "@/hooks/useAnalytics";
 import { tryDecodeURI } from "@/utils/image";
 import { formatAccountsByChain, sortChains } from "@/hooks/useProposal/util";
-import { proposalAtom } from "@/store/web3wallet.store";
-import { useAtomValue } from "jotai";
+import { ProposalTypes } from "@walletconnect/types";
 
-const emptyAccounts: ReturnType<typeof formatAccountsByChain> = [];
+const BackButton = styled(Flex)`
+  cursor: pointer;
+  &:hover {
+    opacity: 0.7;
+  }
+`;
 
-export default function SessionProposal() {
+type Props = {
+  proposal: ProposalTypes.Struct;
+};
+
+export default function SessionProposal({ proposal }: Props) {
   const { colors } = useTheme();
   const { t } = useTranslation();
-  const proposal = useAtomValue(proposalAtom);
   const {
     handleClick,
     handleClose,
@@ -37,12 +45,12 @@ export default function SessionProposal() {
     rejectSession,
     accounts,
     selectedAccounts,
-    proposer,
     addNewAccount,
+    navigateToHome,
   } = useProposal(proposal);
   const analytics = useAnalytics();
-  const dApp = proposer?.metadata?.name ?? "Dapp name undefined";
-  const dAppUrl = proposer?.metadata?.url ?? "Dapp url undefined";
+  const dApp = proposal.proposer.metadata.name;
+  const dAppUrl = proposal.proposer.metadata.url;
 
   useEffect(() => {
     analytics.page("Wallet Connect Session Request", {
@@ -51,6 +59,14 @@ export default function SessionProposal() {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const onGoBack = useCallback(() => {
+    void navigateToHome();
+    analytics.track("button_clicked", {
+      button: "WC-Back",
+      page: "Wallet Connect Session Detail",
+    });
+  }, [analytics, navigateToHome]);
 
   const onApprove = useCallback(() => {
     analytics.track("button_clicked", {
@@ -73,8 +89,7 @@ export default function SessionProposal() {
   }, [analytics, dApp, dAppUrl, rejectSession]);
 
   const accountsByChain = useMemo(
-    () =>
-      proposal ? formatAccountsByChain(proposal, accounts) : emptyAccounts,
+    () => formatAccountsByChain(proposal, accounts),
     [proposal, accounts]
   );
 
@@ -107,8 +122,8 @@ export default function SessionProposal() {
   );
 
   const iconProposer = useMemo(
-    () => tryDecodeURI(proposer?.metadata?.icons[0] ?? undefined),
-    [proposer?.metadata?.icons]
+    () => tryDecodeURI(proposal.proposer.metadata.icons[0]),
+    [proposal.proposer.metadata.icons]
   );
 
   return (
@@ -122,6 +137,12 @@ export default function SessionProposal() {
       }
     >
       <ResponsiveContainer>
+        <BackButton onClick={onGoBack} alignSelf="flex-start">
+          <Flex mt={8}>
+            <ArrowLeftMedium size={24} color="neutral.c100" />
+          </Flex>
+        </BackButton>
+
         {noChainsSupported || !everyRequiredChainsSupported ? (
           <Flex flex={1} flexDirection="column" height="100%">
             <ErrorBlockchainSupport appName={dApp} chains={accountsByChain} />
@@ -147,7 +168,7 @@ export default function SessionProposal() {
             flexDirection="column"
           >
             <Flex flexDirection="column">
-              <Header mt={12} mb={10}>
+              <Header mb={10}>
                 {iconProposer ? (
                   <Container>
                     <LogoContainer>

@@ -1,13 +1,6 @@
 import { EIP155_REQUESTS } from "@/data/methods/EIP155Data.methods";
 import { SUPPORTED_NETWORK } from "@/data/network.config";
 
-export function isDataInvalid(data: Buffer | undefined) {
-  return (
-    !data ||
-    Buffer.from(data.toString("hex"), "hex").toString("hex").length === 0
-  );
-}
-
 /**
  * Truncates string (in the middle) via given lenght value
  */

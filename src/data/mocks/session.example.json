@@ -1,0 +1,63 @@
+{
+  "relay": {
+    "protocol": "irn"
+  },
+  "namespaces": {
+    "eip155": {
+      "chains": ["eip155:1"],
+      "methods": [
+        "eth_sendTransaction",
+        "personal_sign",
+        "eth_sign",
+        "eth_signTransaction",
+        "eth_signTypedData",
+        "eth_signTypedData_v4"
+      ],
+      "events": ["chainChanged", "accountsChanged"],
+      "accounts": ["eip155:1:0x0b6d51060f37487761b471144F2d00393b5908b5"]
+    }
+  },
+  "pairingTopic": "1b34a524086737b4a9c79089274e72cf7947ca2a352ff3d7e7dd8cb3e2eeb9de",
+  "controller": "aa8b6c7a5a00a19105700ae318f9c48fdf1fa9b6fe4c2cdd3f4e2121744e9849",
+  "expiry": 1708362476,
+  "topic": "3f555b883fc87ce360809bf2ea3db67e74e3d2e08d40a63619890fe2454cb290",
+  "requiredNamespaces": {
+    "eip155": {
+      "methods": ["eth_sendTransaction", "personal_sign"],
+      "chains": ["eip155:1"],
+      "events": ["chainChanged", "accountsChanged"]
+    }
+  },
+  "optionalNamespaces": {
+    "eip155": {
+      "methods": [
+        "eth_signTransaction",
+        "eth_sign",
+        "eth_signTypedData",
+        "eth_signTypedData_v4"
+      ],
+      "chains": ["eip155:1"],
+      "events": []
+    }
+  },
+  "acknowledged": true,
+  "self": {
+    "publicKey": "aa8b6c7a5a00a19105700ae318f9c48fdf1fa9b6fe4c2cdd3f4e2121744e9849",
+    "metadata": {
+      "name": "Ledger Wallet",
+      "description": "Ledger Live Wallet with WalletConnect",
+      "url": "https://walletconnect.com/",
+      "icons": ["https://avatars.githubusercontent.com/u/37784886"]
+    }
+  },
+  "peer": {
+    "publicKey": "7df5b7eb1ca9c02838a9253d93e3537f0bc8d62fdda03f067afe6c59a1433773",
+    "metadata": {
+      "description": "React App for WalletConnect",
+      "url": "https://react-app.walletconnect.com",
+      "icons": ["https://avatars.githubusercontent.com/u/37784886"],
+      "name": "React App",
+      "verifyUrl": "https://verify.walletconnect.com"
+    }
+  }
+}
