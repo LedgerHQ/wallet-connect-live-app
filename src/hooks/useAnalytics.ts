@@ -1,23 +1,32 @@
-import { useCallback, useMemo } from "react";
-import { WalletInfo } from "@ledgerhq/wallet-api-client";
+import { useCallback, useEffect, useMemo } from "react";
 import { AnalyticsBrowser } from "@segment/analytics-next";
-import { web3walletAtom } from "@/store/web3wallet.store";
 import { useAtomValue } from "jotai";
+import { web3walletAtom } from "@/store/web3wallet.store";
 import useSessions from "./useSessions";
-import { useState } from "react";
+import {
+  walletAPIuserIdAtom,
+  walletAPIwalletInfoAtom,
+} from "@/store/wallet-api.store";
+import { analyticsWriteKeyAtom } from "@/store/analytics.store";
 
 const analyticsOptions = { ip: "0.0.0.0" };
-
-let analytics: AnalyticsBrowser | undefined;
 
 const APP_NAME = "Wallet Connect v2";
 const version = import.meta.env.VITE_APP_VERSION;
 
 export default function useAnalytics() {
-  const [userId, setUserId] = useState<string>();
   const web3wallet = useAtomValue(web3walletAtom);
   const sessions = useSessions(web3wallet);
   const sessionsLength = sessions.data.length;
+  const { data: userId } = useAtomValue(walletAPIuserIdAtom);
+  const { data: walletInfo } = useAtomValue(walletAPIwalletInfoAtom);
+  const writeKey = useAtomValue(analyticsWriteKeyAtom);
+
+  // Delayed Loading, benefits of not having to check for analytics in function calls
+  // https://github.com/segmentio/analytics-next/tree/master/packages/browser#lazy--delayed-loading
+  const analytics = useMemo(() => {
+    return new AnalyticsBrowser();
+  }, []);
 
   const userProperties = useMemo(() => {
     return {
@@ -29,50 +38,36 @@ export default function useAnalytics() {
   }, [sessionsLength, userId]);
 
   const identify = useCallback(() => {
-    if (!analytics) return;
-
     void analytics.identify(userId, userProperties, analyticsOptions);
-  }, [userId, userProperties]);
+  }, [analytics, userId, userProperties]);
 
-  const start = useCallback(
-    (userIdReceived?: string, walletInfo?: WalletInfo["result"]) => {
-      if (analytics ?? !userIdReceived ?? !walletInfo) return;
-      setUserId(userIdReceived);
+  useEffect(() => {
+    identify();
+  }, [analytics, identify]);
 
-      const walletName = walletInfo.wallet.name;
+  useEffect(() => {
+    if (walletInfo.tracking && writeKey) {
+      // NOTE: can only be called once !
+      // https://segment.com/docs/connections/sources/catalog/libraries/website/javascript/#load
 
-      let writeKey: string | undefined = undefined;
-      if (walletName === "ledger-live-desktop") {
-        writeKey = import.meta.env.VITE_PUBLIC_SEGMENT_API_KEY_DESKTOP;
-      } else if (walletName === "ledger-live-mobile") {
-        writeKey = import.meta.env.VITE_PUBLIC_SEGMENT_API_KEY_MOBILE;
-      }
-
-      if (walletInfo.tracking && writeKey) {
-        analytics = AnalyticsBrowser.load({ writeKey });
-        identify();
-      }
-    },
-    [identify]
-  );
+      analytics.load({ writeKey }); // destinations loaded, enqueued events are flushed
+    }
+  }, [analytics, walletInfo, writeKey]);
 
   const track = useCallback(
     (eventName: string, eventProperties?: Record<string, unknown>) => {
-      if (!analytics) return;
-
+      console.log(`TRACKING - ${eventName}`);
       const allProperties = {
         ...userProperties,
         ...eventProperties,
       };
       void analytics.track(eventName, allProperties, analyticsOptions);
     },
-    [userProperties]
+    [analytics, userProperties]
   );
 
   const page = useCallback(
     (pageName: string, eventProperties?: Record<string, unknown>) => {
-      if (!analytics) return;
-
       const category = APP_NAME;
 
       const allProperties = {
@@ -81,16 +76,15 @@ export default function useAnalytics() {
       };
       void analytics.page(category, pageName, allProperties, analyticsOptions);
     },
-    [userProperties]
+    [analytics, userProperties]
   );
 
   return useMemo(
     () => ({
-      start,
       identify,
-      track,
       page,
+      track,
     }),
-    [start, identify, track, page]
+    [identify, page, track]
   );
 }

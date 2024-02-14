@@ -43,3 +43,15 @@ vi.mock("@walletconnect/core", () => {
     }),
   };
 });
+
+vi.mock("@/hooks/useAnalytics", () => {
+  return {
+    default: () => {
+      return {
+        track: vi.fn(),
+        identify: vi.fn(),
+        page: vi.fn(),
+      };
+    },
+  };
+});

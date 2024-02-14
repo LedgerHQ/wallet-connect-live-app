@@ -65,6 +65,9 @@ dependencies:
   jotai:
     specifier: ^2.6.4
     version: 2.6.4(@types/react@18.2.55)(react@18.2.0)
+  jotai-tanstack-query:
+    specifier: ^0.8.5
+    version: 0.8.5(@tanstack/query-core@5.20.2)(jotai@2.6.4)(wonka@6.3.4)
   react:
     specifier: ^18.2.0
     version: 18.2.0
@@ -83,6 +86,9 @@ dependencies:
   styled-components:
     specifier: ^5.3.11
     version: 5.3.11(@babel/core@7.23.9)(react-dom@18.2.0)(react-is@18.2.0)(react@18.2.0)
+  wonka:
+    specifier: ^6.3.4
+    version: 6.3.4
   zustand:
     specifier: ^4.3.3
     version: 4.5.0(@types/react@18.2.55)(react@18.2.0)
@@ -1608,6 +1614,7 @@ packages:
     dependencies:
       is-glob: 4.0.3
       micromatch: 4.0.5
+      napi-wasm: 1.1.0
     bundledDependencies:
       - napi-wasm
 
@@ -6345,6 +6352,18 @@ packages:
     resolution: {integrity: sha512-gFqAIbuKyyso/3G2qhiO2OM6shY6EPP/R0+mkDbyspxKazh8BXDC5FiFsUjlczgdNz/vfra0da2y+aHrusLG/Q==}
     hasBin: true
 
+  /jotai-tanstack-query@0.8.5(@tanstack/query-core@5.20.2)(jotai@2.6.4)(wonka@6.3.4):
+    resolution: {integrity: sha512-cFq+1sE7Qkt7Kh9Db2KE8LXdbPiGwCiy8S5YSEnjUDxF59A4XhoXTDJBuPiMIA1dD1/yMsNKr1ADfN5CvscYZw==}
+    peerDependencies:
+      '@tanstack/query-core': '*'
+      jotai: '>=2.0.0'
+      wonka: ^6.3.4
+    dependencies:
+      '@tanstack/query-core': 5.20.2
+      jotai: 2.6.4(@types/react@18.2.55)(react@18.2.0)
+      wonka: 6.3.4
+    dev: false
+
   /jotai@2.6.4(@types/react@18.2.55)(react@18.2.0):
     resolution: {integrity: sha512-RniwQPX4893YlNR1muOtyUGHYaTD1fhEN4qnOuZJSrDHj6xdEMrqlRSN/hCm2fshwk78ruecB/P2l+NCVWe6TQ==}
     engines: {node: '>=12.20.0'}
@@ -6738,6 +6757,9 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
     dev: true
+
+  /napi-wasm@1.1.0:
+    resolution: {integrity: sha512-lHwIAJbmLSjF9VDRm9GoVOy9AGp3aIvkjv+Kvz9h16QR3uSVYH78PNQUnT2U4X53mhlnV2M7wrhibQ3GHicDmg==}
 
   /natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
@@ -8422,6 +8444,10 @@ packages:
       siginfo: 2.0.0
       stackback: 0.0.2
     dev: true
+
+  /wonka@6.3.4:
+    resolution: {integrity: sha512-CjpbqNtBGNAeyNS/9W6q3kSkKE52+FjIj7AkFlLr11s/VWGUu6a2CdYSdGxocIhIVjaW/zchesBQUKPVU69Cqg==}
+    dev: false
 
   /wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}

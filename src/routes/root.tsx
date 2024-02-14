@@ -13,7 +13,6 @@ import useWalletConnect from "@/hooks/useWalletConnect";
 import { InputMode } from "@/types/types";
 import i18n from "@/i18n";
 import { useConnect } from "@/hooks/useConnect";
-// import useAnalytics from "@/hooks/common/useAnalytics";
 
 // eslint-disable-next-line react-refresh/only-export-components
 const TanStackRouterDevtools = import.meta.env.PROD
@@ -51,18 +50,6 @@ function WalletConnectInit() {
 
   return null;
 }
-
-// // TODO Migrate to analytics provider or jotai atom that will get the wallet-api infos by itself
-// // eslint-disable-next-line react-refresh/only-export-components
-// function AnalyticsInit() {
-//   const analytics = useAnalytics();
-
-//   useEffect(() => {
-//     analytics.start(userId, walletInfo);
-//   }, [analytics]);
-
-//   return null;
-// }
 
 // Create a client
 const twentyFourHoursInMs = 1000 * 60 * 60 * 24;

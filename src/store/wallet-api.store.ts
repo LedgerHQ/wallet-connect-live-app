@@ -3,6 +3,7 @@ import {
   WalletAPIClient,
   WindowMessageTransport,
 } from "@ledgerhq/wallet-api-client";
+import { atomWithSuspenseQuery } from "jotai-tanstack-query";
 // import {
 //   getSimulatorTransport,
 //   profiles,
@@ -35,4 +36,26 @@ export const walletAPIClientAtom = atom((get) => {
   const transport = get(transportAtom);
 
   return new WalletAPIClient(transport);
+});
+
+export const walletAPIuserIdAtom = atomWithSuspenseQuery((get) => {
+  const client = get(walletAPIClientAtom);
+  return {
+    queryKey: ["userId", client.notify], // TODO: have a better way to differentiate clients
+    queryFn: async () => {
+      const client = get(walletAPIClientAtom);
+      return client.wallet.userId();
+    },
+  };
+});
+
+export const walletAPIwalletInfoAtom = atomWithSuspenseQuery((get) => {
+  const client = get(walletAPIClientAtom);
+  return {
+    queryKey: ["walletInfo", client.notify], // TODO : have a better way to differentiate clients
+    queryFn: async () => {
+      const client = get(walletAPIClientAtom);
+      return client.wallet.info();
+    },
+  };
 });

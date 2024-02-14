@@ -35,12 +35,14 @@
     "i18next": "^23.8.2",
     "i18next-http-backend": "^2.4.3",
     "jotai": "^2.6.4",
+    "jotai-tanstack-query": "^0.8.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-i18next": "^14.0.5",
     "react-qr-reader": "2.2.1",
     "react-transition-group": "^4.4.2",
     "styled-components": "^5.3.11",
+    "wonka": "^6.3.4",
     "zustand": "^4.3.3"
   },
   "devDependencies": {
