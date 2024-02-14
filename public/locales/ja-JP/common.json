@@ -1,0 +1,73 @@
+{
+  "applicationDisabled" : {
+    "title" : "現在、WalletConnect v2の統合で一時的な問題が発生しています。",
+    "desc" : "当社はできるだけ早く機能を復元するため、解決策の特定と実装に取り組んでおります。ご不便をおかけして申し訳ありません。"
+  },
+  "errorBoundary" : {
+    "title" : "問題が発生しました。",
+    "desc" : "当社はこのエラーについて通知を受け取りました。ページを更新してもう一度お試しください。"
+  },
+  "back" : "戻る",
+  "close" : "閉じる",
+  "error" : {
+    "noInput" : "入力値なし",
+    "invalidUri" : "無効なURI"
+  },
+  "connect" : {
+    "title" : "接続",
+    "cta" : "接続",
+    "scanQRCode" : "QRコードをスキャン",
+    "useWalletConnectUrl" : "または、WalletConnect URLを使用",
+    "pasteUrl" : "URLを貼り付け",
+    "switchToText" : "テキストに切り替える",
+    "switchToScanner" : "スキャナーに切り替える",
+    "errorProtocol" : {
+      "title" : "接続しようとしているDappは最新ではありません",
+      "desc" : "WalletConnect V1は現在サポートされておりません。スムーズで安全な接続を確保するには、使用されているDappをWalletConnect V2にアップグレードする必要があります。"
+    }
+  },
+  "sessionProposal" : {
+    "connectTo" : "{{name}}に接続",
+    "connect" : "接続",
+    "reject" : "拒否",
+    "close" : "閉じる",
+    "notSupported" : "このブロックチェーンはサポートされていません",
+    "notSupported_plural" : "これらのブロックチェーンはサポートされていません",
+    "info" : "このアプリでは以下が可能となります。 ",
+    "info2" : "このアプリでは以下が可能です。 ",
+    "info3" : "接続した場合： ",
+    "infoBullet" : {
+      "0" : "アカウントの残高とアクティビティを確認する",
+      "1" : "トランザクションの承認を要求する",
+      "2" : "{{dAppName}}から切断されます"
+    },
+    "error" : {
+      "title" : "{{appName}}が、まだサポートされていないチェーンへの接続を要求しました",
+      "desc" : "当社は現在、Ethereum、Polygon、Binance Smart Chain、Arbitrum、Optimism、Avalanche C-Chain、Ethereum Goerli、Optimism Goerliをサポートしています。今後、さらに新しいブロックチェーンを追加していく予定です。"
+    },
+    "addAccount" : "アカウントを追加"
+  },
+  "sessions" : {
+    "title" : "セッション",
+    "disconnectAll" : "すべて切断する",
+    "modal" : {
+      "title" : "すべてのセッションを切断してもよろしいですか？",
+      "desc" : "接続されていたすべてのアプリを操作できるようにするには、再接続する必要があります。",
+      "continue" : "接続を切断",
+      "cancel" : "キャンセル"
+    },
+    "detail" : {
+      "title" : "セッションの詳細",
+      "account" : "アカウント",
+      "accounts" : "アカウント",
+      "connected" : "接続済み",
+      "expires" : "期限切れ",
+      "disconnect" : "接続を切断"
+    },
+    "emptyState" : {
+      "title" : "まだ有効なセッションがありません",
+      "desc" : "アプリに接続して開始します。",
+      "goToConnect" : "接続"
+    }
+  }
+}
