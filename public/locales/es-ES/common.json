@@ -1,0 +1,73 @@
+{
+  "applicationDisabled" : {
+    "title" : "Tenemos un problema temporal con la integración de WalletConnect v2.",
+    "desc" : "Estamos trabajando para identificar e implementar una solución que restaure la funcionalidad lo antes posible. Gracias por tu comprensión."
+  },
+  "errorBoundary" : {
+    "title" : "¡Vaya! Algo ha salido mal.",
+    "desc" : "Se nos ha notificado este error. Inténtalo de nuevo actualizando la página."
+  },
+  "back" : "Atrás",
+  "close" : "Cerrar",
+  "error" : {
+    "noInput" : "No hay ningún valor de entrada",
+    "invalidUri" : "URI inválido"
+  },
+  "connect" : {
+    "title" : "Conectar",
+    "cta" : "Conectar",
+    "scanQRCode" : "Escanear código QR",
+    "useWalletConnectUrl" : "También puedes usar una URL de WalletConnect",
+    "pasteUrl" : "Pegar URL",
+    "switchToText" : "Cambiar a texto",
+    "switchToScanner" : "Cambiar a escáner",
+    "errorProtocol" : {
+      "title" : "La dApp a la que intentas conectarte no está actualizada",
+      "desc" : "WalletConnect V1 ya no es compatible; para garantizar una conexión segura y sin problemas, la dApp que usas debe actualizarse a WalletConnect V2."
+    }
+  },
+  "sessionProposal" : {
+    "connectTo" : "Conectar a {{name}}",
+    "connect" : "Conectar",
+    "reject" : "Rechazar",
+    "close" : "Cerrar",
+    "notSupported" : "Esta cadena de bloques no es compatible",
+    "notSupported_plural" : "Estas cadenas de bloques no son compatibles",
+    "info" : "Esta aplicación podrá: ",
+    "info2" : "Esta aplicación puede: ",
+    "info3" : "Si conectas: ",
+    "infoBullet" : {
+      "0" : "Consultar el saldo y la actividad de tu cuenta",
+      "1" : "Solicitar aprobaciones de transacciones",
+      "2" : "Se te desconectará de {{dAppName}}"
+    },
+    "error" : {
+      "title" : "{{appName}} ha solicitado conectarse a cadenas que aún no son compatibles",
+      "desc" : "Actualmente son compatibles Ethereum, Polygon, Binance Smart Chain, Arbitrum, Optimism, Avalanche C-Chain, Ethereum Goerli y Optimism Goerli. Añadiremos nuevas cadenas gradualmente."
+    },
+    "addAccount" : "Agregar cuenta"
+  },
+  "sessions" : {
+    "title" : "Sesiones",
+    "disconnectAll" : "Desconectar todo",
+    "modal" : {
+      "title" : "¿Seguro que deseas desconectar todas tus sesiones?",
+      "desc" : "Deberás restablecer la conexión para poder interactuar con todas las aplicaciones con las que tenías conexión.",
+      "continue" : "Desconectar",
+      "cancel" : "Cancelar"
+    },
+    "detail" : {
+      "title" : "Detalles de sesión",
+      "account" : "Cuenta",
+      "accounts" : "Cuentas",
+      "connected" : "Conectado",
+      "expires" : "Caduca",
+      "disconnect" : "Desconectar"
+    },
+    "emptyState" : {
+      "title" : "Aún no hay ninguna sesión activa",
+      "desc" : "Empieza conectándote a una aplicación.",
+      "goToConnect" : "Conectar"
+    }
+  }
+}
