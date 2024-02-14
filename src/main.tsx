@@ -26,6 +26,7 @@ if (SENTRY_DSN) {
     sendClientReports: false, // https://docs.sentry.io/platforms/javascript/configuration/options/#send-client-reports
     // NOTE: routing instrumentation only supports react-router out of the box https://docs.sentry.io/platforms/javascript/guides/react/features/react-router/
   });
+  console.log(`Sentry init with env mode = ${import.meta.env.MODE}`)
 } else {
   console.error("NO CONFIG FOR SENTRY (S)");
 }

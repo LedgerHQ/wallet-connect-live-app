@@ -166,6 +166,8 @@ export function Connect({ mode }: Props) {
           justifyContent="space-between"
         >
           <Flex justifyContent="center" width="100%" my={14}>
+
+            <button onClick={() => {throw new Error()}}>crash</button>
             <QRScannerContainer>
               {scanner ? (
                 <QRScanner onQRScan={tryConnect} />
