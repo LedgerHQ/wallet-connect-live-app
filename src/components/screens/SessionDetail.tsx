@@ -24,14 +24,14 @@ import {
 import { ResponsiveContainer } from "@/styles/styles";
 import { ImageWithPlaceholder } from "@/components/atoms/images/ImageWithPlaceholder";
 import useAnalytics from "@/hooks/useAnalytics";
-import { TabsIndexes } from "@/types/types";
 import { useNavigate } from "@tanstack/react-router";
 import { useAtomValue } from "jotai";
 import { web3walletAtom } from "@/store/web3wallet.store";
-import useSessions, { queryKey as sessionsQueryKey } from "@/hooks/useSessions";
+import { queryKey as sessionsQueryKey } from "@/hooks/useSessions";
 import useAccounts from "@/hooks/useAccounts";
 import { walletAPIClientAtom } from "@/store/wallet-api.store";
 import { useQueryClient } from "@tanstack/react-query";
+import { SessionTypes } from "@walletconnect/types";
 
 const DetailContainer = styled(Flex)`
   border-radius: 12px;
@@ -74,48 +74,34 @@ const getAccountsFromAddresses = (addresses: string[], accounts: Account[]) => {
 };
 
 type Props = {
-  topic: string;
+  session: SessionTypes.Struct;
 };
 
-export default function SessionDetail({ topic }: Props) {
+export default function SessionDetail({ session }: Props) {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-
+  const navigate = useNavigate({ from: "/detail/$topic" });
   const queryClient = useQueryClient();
-
   const client = useAtomValue(walletAPIClientAtom);
-
   const accounts = useAccounts(client);
-
   const web3wallet = useAtomValue(web3walletAtom);
-  const sessions = useSessions(web3wallet);
-  const session = useMemo(
-    () => sessions.data.find((elem) => elem.topic === topic),
-    [sessions.data, topic]
-  );
-
-  const navigateToSessionsHomeTab = useCallback(() => {
-    return navigate({
-      to: "/",
-      search: (search) => ({ ...search, tab: TabsIndexes.Sessions }),
-    });
-  }, [navigate]);
-
   const analytics = useAnalytics();
 
   useEffect(() => {
-    if (!session) {
-      void navigateToSessionsHomeTab();
-    }
     analytics.page("Wallet Connect Session Detail", {
-      dapp: session?.peer?.metadata?.name ?? "Dapp name undefined",
-      url: session?.peer?.metadata?.url ?? "Dapp url undefined",
+      dapp: session.peer.metadata.name,
+      url: session.peer.metadata.url,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session]);
+  }, []);
+
+  const navigateToHome = useCallback(() => {
+    return navigate({
+      to: "/",
+      search: (search) => search,
+    });
+  }, [navigate]);
 
   const handleDelete = useCallback(() => {
-    if (!session) return;
     void web3wallet
       .disconnectSession({
         topic: session.topic,
@@ -136,27 +122,25 @@ export default function SessionDetail({ topic }: Props) {
       .finally(() => {
         void queryClient
           .invalidateQueries({ queryKey: sessionsQueryKey })
-          .then(() => navigateToSessionsHomeTab());
+          .then(() => navigateToHome());
       });
-  }, [analytics, navigateToSessionsHomeTab, queryClient, session, web3wallet]);
+  }, [analytics, navigateToHome, queryClient, session, web3wallet]);
 
   const onGoBack = useCallback(() => {
-    void navigateToSessionsHomeTab();
+    void navigateToHome();
     analytics.track("button_clicked", {
       button: "WC-Back",
       page: "Wallet Connect Session Detail",
     });
-  }, [analytics, navigateToSessionsHomeTab]);
+  }, [analytics, navigateToHome]);
 
-  const metadata = session?.peer.metadata;
+  const metadata = session.peer.metadata;
   const fullAddresses = useMemo(
     () =>
-      !session
-        ? []
-        : Object.entries(session.namespaces).reduce(
-            (acc, elem) => acc.concat(elem[1].accounts),
-            [] as string[]
-          ),
+      Object.entries(session.namespaces).reduce(
+        (acc, elem) => acc.concat(elem[1].accounts),
+        [] as string[]
+      ),
     [session]
   );
 
@@ -183,15 +167,15 @@ export default function SessionDetail({ topic }: Props) {
           justifyContent="space-between"
         >
           <Flex flexDirection="column" width="100%">
-            <BackButton onClick={onGoBack}>
-              <Flex mt={8} mb={8}>
+            <Flex mt={8} mb={8} alignItems="center">
+              <BackButton onClick={onGoBack}>
                 <ArrowLeftMedium size={24} color="neutral.c100" />
-              </Flex>
-            </BackButton>
+              </BackButton>
 
-            <Text variant="h4" mb={8} color="neutral.c100">
-              {t("sessions.detail.title")}
-            </Text>
+              <Text variant="h3" ml={5} color="neutral.c100">
+                {t("sessions.detail.title")}
+              </Text>
+            </Flex>
 
             <DetailContainer>
               <Row justifyContent="space-between" alignItems="center">
@@ -200,7 +184,7 @@ export default function SessionDetail({ topic }: Props) {
                   justifyContent="space-between"
                   alignItems="center"
                 >
-                  <ImageWithPlaceholder icon={metadata?.icons[0] ?? null} />
+                  <ImageWithPlaceholder icon={metadata.icons[0]} />
 
                   <Flex flexDirection="column" ml={5}>
                     <Text
@@ -208,7 +192,7 @@ export default function SessionDetail({ topic }: Props) {
                       fontWeight="semiBold"
                       color="neutral.c100"
                     >
-                      {metadata?.name}
+                      {metadata.name}
                     </Text>
 
                     <Text
@@ -217,7 +201,7 @@ export default function SessionDetail({ topic }: Props) {
                       color="neutral.c70"
                       mt={1}
                     >
-                      {formatUrl(metadata?.url ?? "")}
+                      {formatUrl(metadata.url)}
                     </Text>
                   </Flex>
                 </Flex>
@@ -236,14 +220,12 @@ export default function SessionDetail({ topic }: Props) {
                 <Text variant="small" fontWeight="medium" color="neutral.c100">
                   {t("sessions.detail.expires")}
                 </Text>
-                {session && (
-                  <Text variant="small" fontWeight="medium" color="neutral.c70">
-                    {
-                      //https://stackoverflow.com/a/37001827
-                      new Date(session.expiry * 1000).toDateString()
-                    }
-                  </Text>
-                )}
+                <Text variant="small" fontWeight="medium" color="neutral.c70">
+                  {
+                    //https://stackoverflow.com/a/37001827
+                    new Date(session.expiry * 1000).toDateString()
+                  }
+                </Text>
               </Row>
             </DetailContainer>
 

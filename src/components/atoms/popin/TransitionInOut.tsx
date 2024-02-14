@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { CSSTransition } from "react-transition-group";
 import { CSSTransitionProps } from "react-transition-group/CSSTransition";
 import styled from "styled-components";
@@ -37,15 +38,23 @@ const TransitionInOut = ({
   in: inProp,
   timeout = duration,
   ...TransitionProps
-}: TransitionInOutProps): JSX.Element => (
-  <CSSTransition
-    {...TransitionProps}
-    in={inProp}
-    timeout={timeout}
-    classNames="transition-inout"
-  >
-    <ChildrenWrapper timeout={timeout}>{children}</ChildrenWrapper>
-  </CSSTransition>
-);
+}: TransitionInOutProps): JSX.Element => {
+  // Using a ref to avoid StrictMode warning
+  // https://github.com/reactjs/react-transition-group/issues/820#issuecomment-1248508631
+  const nodeRef = useRef(null);
+  return (
+    <CSSTransition
+      {...TransitionProps}
+      in={inProp}
+      timeout={timeout}
+      classNames="transition-inout"
+      nodeRef={nodeRef}
+    >
+      <ChildrenWrapper ref={nodeRef} timeout={timeout}>
+        {children}
+      </ChildrenWrapper>
+    </CSSTransition>
+  );
+};
 
 export default TransitionInOut;

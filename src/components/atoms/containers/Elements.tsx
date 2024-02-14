@@ -4,12 +4,10 @@ import styled from "styled-components";
 const WalletConnectContainer = styled.div`
   display: flex;
   flex-direction: column;
-  position: relative;
-  padding-left: 160px;
-  padding-right: 160px;
+  align-items: center;
   justify-content: center;
+  width: 100%;
   height: 100%;
-  user-select: none;
   background: ${({ theme }) => theme.colors.background.main};
 `;
 

@@ -9,9 +9,9 @@ import sessionProposal from "@/data/mocks/sessionProposal.example.json";
 import sessionProposalNotSupported from "@/data/mocks/sessionProposalNotSupported.example.json";
 
 import { ACCOUNT_MOCK } from "@/tests/mocks/account.mock";
-import { Web3WalletTypes } from "@walletconnect/web3wallet";
+import { ProposalTypes } from "@walletconnect/types";
 
-type Proposal = Web3WalletTypes.SessionProposal;
+type Proposal = ProposalTypes.Struct;
 
 describe("getChains", () => {
   it("should return an array with required and optional namespaces", () => {
@@ -70,23 +70,20 @@ describe("formatAccountsByChain", () => {
   const dataFromJSON = JSON.parse(JSON.stringify(sessionProposal)) as Proposal;
   const proposalFormated: Proposal = {
     ...dataFromJSON,
-    params: {
-      ...dataFromJSON.params,
-      requiredNamespaces: {
-        eip155: {
-          methods: [
-            "eth_sendTransaction",
-            "eth_signTransaction",
-            "eth_sign",
-            "personal_sign",
-            "eth_signTypedData",
-          ],
-          chains: ["eip155:1", "eip155:137", "eip155:23"],
-          events: ["chainChanged", "accountsChanged"],
-        },
+    requiredNamespaces: {
+      eip155: {
+        methods: [
+          "eth_sendTransaction",
+          "eth_signTransaction",
+          "eth_sign",
+          "personal_sign",
+          "eth_signTypedData",
+        ],
+        chains: ["eip155:1", "eip155:137", "eip155:23"],
+        events: ["chainChanged", "accountsChanged"],
       },
-      optionalNamespaces: {},
     },
+    optionalNamespaces: {},
   };
 
   const accountsFormatted = [

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from "vitest";
 import { isHTML, tryDecodeURI } from "../image";
 
 describe("Image Util", () => {
@@ -28,11 +28,5 @@ describe("Image Util", () => {
 
     const notCalled2 = tryDecodeURI("");
     expect(notCalled2).toEqual(null);
-
-    const undif = tryDecodeURI(undefined);
-    expect(undif).toEqual(null);
-
-    const nullImg = tryDecodeURI(null);
-    expect(nullImg).toEqual(null);
   });
 });

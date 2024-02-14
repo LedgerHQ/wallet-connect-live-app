@@ -8,20 +8,15 @@ import {
   EIP155_REQUESTS,
   EIP155_SIGNING_METHODS,
 } from "@/data/methods/EIP155Data.methods";
-import { proposalAtom, web3walletAtom } from "@/store/web3wallet.store";
-import {
-  pendingFlowSelector,
-  usePendingFlowStore,
-} from "@/store/pendingFlow.store";
-import { captureException } from "@sentry/react";
-import { isEIP155Chain, isDataInvalid } from "@/utils/helper.util";
-import { useNavigate } from "@tanstack/react-router";
-import { WalletAPIClient } from "@ledgerhq/wallet-api-client";
-import { useAtomValue, useSetAtom } from "jotai";
+import { web3walletAtom } from "@/store/web3wallet.store";
+import { isEIP155Chain } from "@/utils/helper.util";
+import { useNavigate, useParams } from "@tanstack/react-router";
+import { useAtomValue } from "jotai";
 import { Web3Wallet } from "@walletconnect/web3wallet/dist/types/client";
 import useAccounts from "./useAccounts";
 import { walletAPIClientAtom } from "@/store/wallet-api.store";
 import { queryKey as sessionsQueryKey } from "./useSessions";
+import { queryKey as pendingSessionsProposalsQueryKey } from "./usePendingSessionsProposals";
 import { useQueryClient } from "@tanstack/react-query";
 
 enum Errors {
@@ -74,90 +69,8 @@ const rejectRequest = (
   });
 };
 
-function usePendingFlow(
-  web3wallet: Web3Wallet,
-  clearPendingFlow: () => void,
-  client: WalletAPIClient
-) {
-  const pendingFlow = usePendingFlowStore(
-    pendingFlowSelector.selectPendingFlow
-  );
-
-  const triggerPendingFlow = useCallback(async () => {
-    if (pendingFlow) {
-      try {
-        clearPendingFlow();
-        if (pendingFlow.message) {
-          const signedMessage = await client.message.sign(
-            pendingFlow.accountId,
-            pendingFlow.isHex
-              ? Buffer.from(pendingFlow.message, "hex")
-              : Buffer.from(pendingFlow.message)
-          );
-          return acceptRequest(
-            web3wallet,
-            pendingFlow.topic,
-            pendingFlow.id,
-            formatMessage(signedMessage)
-          );
-        }
-        if (pendingFlow.ethTx) {
-          const liveTx = convertEthToLiveTX(pendingFlow.ethTx);
-          // If the transaction initally had some data and we somehow lost them
-          // then we don't signAndBroadcast the transaction to protect our users funds
-          if (pendingFlow.txHadSomeData && isDataInvalid(liveTx.data)) {
-            const error = new Error(
-              "The pending transaction triggered was expected to have some data but its data was empty"
-            );
-            captureException(error);
-            throw error;
-          }
-          if (pendingFlow.send) {
-            const hash = await client.transaction.signAndBroadcast(
-              pendingFlow.accountId,
-              liveTx
-            );
-            return acceptRequest(
-              web3wallet,
-              pendingFlow.topic,
-              pendingFlow.id,
-              hash
-            );
-          } else {
-            const hash = await client.transaction.sign(
-              pendingFlow.accountId,
-              liveTx
-            );
-            return acceptRequest(
-              web3wallet,
-              pendingFlow.topic,
-              pendingFlow.id,
-              hash.toString()
-            );
-          }
-        }
-      } catch (error) {
-        console.error(error);
-        return rejectRequest(
-          web3wallet,
-          pendingFlow.topic,
-          pendingFlow.id,
-          Errors.userDecline
-        );
-      }
-    }
-  }, [pendingFlow, clearPendingFlow, client, web3wallet]);
-
-  useEffect(() => {
-    if (pendingFlow) {
-      void triggerPendingFlow();
-    }
-  }, [pendingFlow, triggerPendingFlow]);
-}
-
 export default function useWalletConnect() {
   const navigate = useNavigate();
-  const setProposal = useSetAtom(proposalAtom);
   const web3wallet = useAtomValue(web3walletAtom);
 
   const queryClient = useQueryClient();
@@ -166,19 +79,40 @@ export default function useWalletConnect() {
 
   const accounts = useAccounts(client);
 
-  const addPendingFlow = usePendingFlowStore(
-    pendingFlowSelector.addPendingFlow
-  );
-  const clearPendingFlow = usePendingFlowStore(
-    pendingFlowSelector.clearPendingFlow
+  const proposalParams = useParams({ from: "/proposal/$id" });
+
+  const onProposalExpire = useCallback(
+    (proposalExpire: Web3WalletTypes.ProposalExpire) => {
+      void queryClient
+        .invalidateQueries({
+          queryKey: pendingSessionsProposalsQueryKey,
+        })
+        .then(() => {
+          // TODO maybe remove and instead find proposal in the array from usePendingSessionsProposals on proposal route
+          // Instead of using the current get from wallet connect store, so we're react just by invalidating the queries above
+          if (Number(proposalParams.id) === proposalExpire.id) {
+            return navigate({
+              to: "/",
+              search: (search) => search,
+            });
+          }
+        });
+    },
+    [navigate, proposalParams.id, queryClient]
   );
 
   const onSessionProposal = useCallback(
     (proposal: Web3WalletTypes.SessionProposal) => {
-      setProposal(proposal);
-      void navigate({ to: "/proposal", search: (search) => search });
+      void queryClient.invalidateQueries({
+        queryKey: pendingSessionsProposalsQueryKey,
+      });
+      void navigate({
+        to: "/proposal/$id",
+        params: { id: proposal.id.toString() },
+        search: (search) => search,
+      });
     },
-    [setProposal, navigate]
+    [navigate, queryClient]
   );
 
   const handleEIP155Request = useCallback(
@@ -204,13 +138,6 @@ export default function useWalletConnect() {
                 isPersonalSign ? request.params[0] : request.params[1]
               );
 
-              addPendingFlow({
-                id,
-                topic,
-                accountId: accountSign.id,
-                message,
-                isHex: true,
-              });
               const signedMessage = await client.message.sign(
                 accountSign.id,
                 Buffer.from(message, "hex")
@@ -225,7 +152,6 @@ export default function useWalletConnect() {
               void rejectRequest(web3wallet, topic, id, Errors.userDecline);
               console.error(error);
             }
-            clearPendingFlow();
           } else {
             void rejectRequest(web3wallet, topic, id, Errors.userDecline);
           }
@@ -243,12 +169,6 @@ export default function useWalletConnect() {
             try {
               const message = stripHexPrefix(request.params[1]);
 
-              addPendingFlow({
-                id,
-                topic,
-                accountId: accountSignTyped.id,
-                message,
-              });
               const signedMessage = await client.message.sign(
                 accountSignTyped.id,
                 Buffer.from(message)
@@ -263,7 +183,6 @@ export default function useWalletConnect() {
               void rejectRequest(web3wallet, topic, id, Errors.msgDecline);
               console.error(error);
             }
-            clearPendingFlow();
           } else {
             void rejectRequest(web3wallet, topic, id, Errors.msgDecline);
           }
@@ -279,14 +198,6 @@ export default function useWalletConnect() {
           if (accountTX) {
             try {
               const liveTx = convertEthToLiveTX(ethTx);
-              addPendingFlow({
-                id,
-                topic,
-                accountId: accountTX.id,
-                ethTx,
-                txHadSomeData: ethTx.data ? ethTx.data.length > 0 : false,
-                send: true,
-              });
               const hash = await client.transaction.signAndBroadcast(
                 accountTX.id,
                 liveTx
@@ -296,7 +207,6 @@ export default function useWalletConnect() {
               void rejectRequest(web3wallet, topic, id, Errors.txDeclined);
               console.error(error);
             }
-            clearPendingFlow();
           } else {
             void rejectRequest(web3wallet, topic, id, Errors.txDeclined);
           }
@@ -312,20 +222,12 @@ export default function useWalletConnect() {
           if (accountTX) {
             try {
               const liveTx = convertEthToLiveTX(ethTx);
-              addPendingFlow({
-                id,
-                topic,
-                accountId: accountTX.id,
-                ethTx,
-                txHadSomeData: ethTx.data ? ethTx.data.length > 0 : false,
-              });
               const hash = await client.transaction.sign(accountTX.id, liveTx);
               void acceptRequest(web3wallet, topic, id, hash.toString());
             } catch (error) {
               void rejectRequest(web3wallet, topic, id, Errors.txDeclined);
               console.error(error);
             }
-            clearPendingFlow();
           } else {
             void rejectRequest(web3wallet, topic, id, Errors.txDeclined);
           }
@@ -336,7 +238,7 @@ export default function useWalletConnect() {
           return; // ModalStore.open('SessionUnsuportedMethodModal', { requestEvent, requestSession })
       }
     },
-    [accounts.data, addPendingFlow, clearPendingFlow, client, web3wallet]
+    [accounts.data, client, web3wallet]
   );
 
   const onSessionRequest = useCallback(
@@ -365,6 +267,7 @@ export default function useWalletConnect() {
   useEffect(() => {
     console.log("web3wallet setup listeners");
     // sign
+    web3wallet.on("proposal_expire", onProposalExpire);
     web3wallet.on("session_proposal", onSessionProposal);
     web3wallet.on("session_request", onSessionRequest);
     web3wallet.on("session_delete", onSessionDeleted);
@@ -374,6 +277,7 @@ export default function useWalletConnect() {
     return () => {
       console.log("web3wallet cleanup listeners");
       // sign
+      web3wallet.off("proposal_expire", onProposalExpire);
       web3wallet.off("session_proposal", onSessionProposal);
       web3wallet.off("session_request", onSessionRequest);
       web3wallet.off("session_delete", onSessionDeleted);
@@ -381,9 +285,11 @@ export default function useWalletConnect() {
       // auth
       // web3wallet.off("auth_request", onAuthRequest);
     };
-  }, [web3wallet, onSessionProposal, onSessionRequest, onSessionDeleted]);
-
-  // TODO maybe redo differently and need to test if we get the last message when reconnecting to wc by default
-  // After listeners created
-  usePendingFlow(web3wallet, clearPendingFlow, client);
+  }, [
+    web3wallet,
+    onSessionProposal,
+    onSessionRequest,
+    onSessionDeleted,
+    onProposalExpire,
+  ]);
 }

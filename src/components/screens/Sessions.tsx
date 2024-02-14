@@ -10,21 +10,23 @@ import { useCallback, useEffect } from "react";
 import useModal from "@/hooks/useModal";
 import useAnalytics from "@/hooks/useAnalytics";
 import { useNavigate } from "@tanstack/react-router";
-import { TabsIndexes } from "@/types/types";
 import { useAtomValue } from "jotai";
 import { web3walletAtom } from "@/store/web3wallet.store";
 import useSessions, { queryKey as sessionsQueryKey } from "@/hooks/useSessions";
 import { useQueryClient } from "@tanstack/react-query";
+import usePendingSessionsProposals from "@/hooks/usePendingSessionsProposals";
 
 export default function Sessions() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  const navigate = useNavigate({ from: "/" });
   const { openModal, closeModal, isModalOpen } = useModal();
   const queryClient = useQueryClient();
   const web3wallet = useAtomValue(web3walletAtom);
   const sessions = useSessions(web3wallet);
+  const pendingSessionsProposals = usePendingSessionsProposals(web3wallet);
   const sessionsLength = sessions.data.length;
   const isEmptyState = sessionsLength === 0;
+  const hasProposals = pendingSessionsProposals.data.length > 0;
   const analytics = useAnalytics();
 
   // TODO look at improving the analytics here maybe
@@ -43,6 +45,29 @@ export default function Sessions() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const goToConnect = useCallback(() => {
+    void navigate({ to: "/connect", search: (search) => search });
+    analytics.track("button_clicked", {
+      button: "Connect",
+      page: "Wallet Connect Sessions",
+    });
+  }, [analytics, navigate]);
+
+  const goToSessionProposal = useCallback(
+    (id: number) => {
+      void navigate({
+        to: "/proposal/$id",
+        params: { id: id.toString() },
+        search: (search) => search,
+      });
+      analytics.track("button_clicked", {
+        button: "Session Proposal",
+        page: "Wallet Connect Sessions",
+      });
+    },
+    [analytics, navigate]
+  );
+
   const goToDetailSession = useCallback(
     (topic: string) => {
       void navigate({
@@ -57,17 +82,6 @@ export default function Sessions() {
     },
     [analytics, navigate]
   );
-
-  const onGoToConnect = useCallback(() => {
-    analytics.track("button_clicked", {
-      button: "Connect",
-      page: "Wallet Connect Sessions",
-    });
-    void navigate({
-      params: (params) => params,
-      search: (search) => ({ ...search, tab: TabsIndexes.Connect }),
-    });
-  }, [analytics, navigate]);
 
   const disconnect = useCallback(() => {
     void Promise.all(
@@ -96,39 +110,46 @@ export default function Sessions() {
       });
   }, [analytics, closeModal, queryClient, sessions.data, web3wallet]);
 
-  if (isEmptyState) {
-    return (
-      <Flex
-        flexDirection="column"
-        width="100%"
-        height="100%"
-        alignItems="center"
-        justifyContent="center"
-        my={6}
-      >
-        <Text variant="h2" fontWeight="medium" textAlign="center">
-          {t("sessions.emptyState.title")}
-        </Text>
-        <Text
-          variant="bodyLineHeight"
-          fontWeight="medium"
-          color="neutral.c80"
-          mt={6}
-          textAlign="center"
-        >
-          {t("sessions.emptyState.desc")}
-        </Text>
-        <Button variant="main" size="large" mt={10} onClick={onGoToConnect}>
-          <Text variant="body" fontWeight="semiBold" color="neutral.c00">
-            {t("sessions.emptyState.goToConnect")}
+  return (
+    <Flex flexDirection="column" width="100%" height="100%" mt={8}>
+      {hasProposals ? (
+        <>
+          <Text variant="h3" mb={5} color="neutral.c100">
+            {t("sessions.proposals.title")}
           </Text>
+
+          <List>
+            {pendingSessionsProposals.data.map((proposal) => (
+              <Box key={proposal.id} mt={3}>
+                <GenericRow
+                  key={proposal.id}
+                  title={proposal.proposer.metadata.name}
+                  subtitle={formatUrl(proposal.proposer.metadata.url)}
+                  LeftIcon={
+                    <ImageWithPlaceholder
+                      icon={proposal.proposer.metadata.icons[0] ?? null}
+                    />
+                  }
+                  rowType={RowType.Detail}
+                  onClick={() => goToSessionProposal(proposal.id)}
+                />
+              </Box>
+            ))}
+          </List>
+          <Flex mb={8} />
+        </>
+      ) : null}
+
+      <Flex>
+        <Text variant="h3" mb={5} color="neutral.c100">
+          {t("sessions.title")}
+        </Text>
+        <Flex flex={1} />
+        <Button onClick={goToConnect} variant="main" size="small">
+          {t("sessions.goToConnect")}
         </Button>
       </Flex>
-    );
-  }
 
-  return (
-    <Flex flexDirection="column" width="100%" height="100%" mt={6}>
       <List>
         {sessions.data.map((session) => (
           <Box key={session.topic} mt={3}>

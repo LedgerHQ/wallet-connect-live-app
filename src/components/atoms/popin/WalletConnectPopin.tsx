@@ -1,6 +1,5 @@
 import { Flex } from "@ledgerhq/react-ui";
 import { CloseMedium } from "@ledgerhq/react-ui/assets/icons";
-import { TransitionGroup } from "react-transition-group";
 import { ReactNode } from "react";
 import styled from "styled-components";
 import Popin from "./Popin";
@@ -40,13 +39,11 @@ export function WalletConnectPopin({
   onClose,
 }: Readonly<Props>) {
   return (
-    <TransitionGroup>
-      <CustomPopin isOpen={isOpen}>
-        <CloseButton onClick={onClose} data-testid="close-button">
-          <CloseMedium size={16} color="neutral.c100" />
-        </CloseButton>
-        {children}
-      </CustomPopin>
-    </TransitionGroup>
+    <CustomPopin isOpen={isOpen}>
+      <CloseButton onClick={onClose} data-testid="close-button">
+        <CloseMedium size={16} color="neutral.c100" />
+      </CloseButton>
+      {children}
+    </CustomPopin>
   );
 }

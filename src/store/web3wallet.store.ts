@@ -1,6 +1,6 @@
 import { atom } from "jotai";
 import { Core } from "@walletconnect/core";
-import { Web3Wallet, Web3WalletTypes } from "@walletconnect/web3wallet";
+import { Web3Wallet } from "@walletconnect/web3wallet";
 
 const relayerURL = "wss://relay.walletconnect.com";
 
@@ -25,7 +25,3 @@ export const web3walletAtom = atom((get) => {
     },
   });
 });
-
-export const proposalAtom = atom<Web3WalletTypes.SessionProposal | undefined>(
-  undefined
-);

@@ -1,7 +1,7 @@
 import { SUPPORTED_NETWORK } from "@/data/network.config";
 import { getCurrencyByChainId, getDisplayName } from "@/utils/helper.util";
 import { Account } from "@ledgerhq/wallet-api-client";
-import { Web3WalletTypes } from "@walletconnect/web3wallet";
+import { ProposalTypes } from "@walletconnect/types";
 
 export type AccountsInChain = {
   chain: string;
@@ -41,15 +41,15 @@ export function sortChains(chains: AccountsInChain[]) {
   return newOrder;
 }
 
-export const getChains = (proposal: Web3WalletTypes.SessionProposal) => {
-  const requiredNamespaces = Object.values(
-    proposal.params.requiredNamespaces
-  ).map((namespace) => ({
-    ...namespace,
-    required: true,
-  }));
-  const optionalNamespaces = proposal.params.optionalNamespaces
-    ? Object.values(proposal.params.optionalNamespaces).map((namespace) => ({
+export const getChains = (proposal: ProposalTypes.Struct) => {
+  const requiredNamespaces = Object.values(proposal.requiredNamespaces).map(
+    (namespace) => ({
+      ...namespace,
+      required: true,
+    })
+  );
+  const optionalNamespaces = proposal.optionalNamespaces
+    ? Object.values(proposal.optionalNamespaces).map((namespace) => ({
         ...namespace,
         required: false,
       }))
@@ -59,7 +59,7 @@ export const getChains = (proposal: Web3WalletTypes.SessionProposal) => {
 };
 
 export const formatAccountsByChain = (
-  proposal: Web3WalletTypes.SessionProposal,
+  proposal: ProposalTypes.Struct,
   accounts: Account[]
 ) => {
   const families = getChains(proposal);

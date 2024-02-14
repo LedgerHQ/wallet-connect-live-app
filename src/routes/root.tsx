@@ -10,7 +10,9 @@ import { ErrorBoundary } from "@sentry/react";
 import { ThemeNames } from "@ledgerhq/react-ui/styles/index";
 import { Suspense, lazy, useEffect } from "react";
 import useWalletConnect from "@/hooks/useWalletConnect";
+import { InputMode } from "@/types/types";
 import i18n from "@/i18n";
+import { useConnect } from "@/hooks/useConnect";
 // import useAnalytics from "@/hooks/common/useAnalytics";
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -28,6 +30,24 @@ const TanStackRouterDevtools = import.meta.env.PROD
 // eslint-disable-next-line react-refresh/only-export-components
 function WalletConnectInit() {
   useWalletConnect();
+
+  const { uri: initialURI } = rootRoute.useSearch();
+  const { onConnect } = useConnect();
+
+  // Try connecting only once with the provided uri
+  useEffect(() => {
+    if (initialURI) {
+      try {
+        const uri = new URL(initialURI);
+
+        void onConnect(uri);
+      } catch (error) {
+        // TODO maybe improve this error handling
+        console.error("Invalid initialURI: ", error);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return null;
 }
@@ -49,9 +69,9 @@ const twentyFourHoursInMs = 1000 * 60 * 60 * 24;
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
+      // refetchOnWindowFocus: false,
+      // refetchOnMount: false,
+      // refetchOnReconnect: false,
       staleTime: twentyFourHoursInMs,
     },
   },
@@ -65,23 +85,37 @@ const isApplicationDisabled = Boolean(
 type RootSearch = {
   theme: ThemeNames;
   lang: string;
+  uri?: string;
+  mode?: InputMode;
 };
 
 // All providers should be declared here
 export const rootRoute = createRootRoute({
   validateSearch: (search: Record<string, unknown>): RootSearch => {
+    // TODO use a validation lib instead of manually checking
     const theme =
       search.theme &&
       typeof search.theme === "string" &&
       (search.theme === "dark" || search.theme === "light")
         ? search.theme
         : "dark";
+
     const lang =
       search.lang && typeof search.lang === "string" ? search.lang : "en";
+
+    const uri =
+      search.uri && typeof search.uri === "string" ? search.uri : undefined;
+
+    const mode =
+      search.mode === "scan" || search.mode === "text"
+        ? search.mode
+        : undefined;
 
     return {
       theme,
       lang,
+      uri,
+      mode,
     };
   },
   component: function Root() {
