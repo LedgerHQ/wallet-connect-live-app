@@ -16,9 +16,10 @@ i18n
       loadPath: '/locales/{{lng}}/{{ns}}.json',
     },
     fallbackLng: {
-      'es': ['es-ES'],
       'ar': ['ar-AR'],
       'de': ['de-DE'],
+      'es': ['es-ES'],
+      'fr': ['fr-FR'],
       'ja': ['ja-JP'],
       'ko': ['ko-KR'],
       'pt': ['pt-BR'],
