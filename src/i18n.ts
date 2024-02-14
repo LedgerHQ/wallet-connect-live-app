@@ -11,7 +11,8 @@ i18n
     load: 'all',
     // resources: {}, // Where we can put translations' files, not needed if using react Backend
     lng: "en",     // Set the initial language of the App
-    defaultNS: 'common',
+    ns: 'common',
+    // defaultNS: 'common',
     backend: {
       loadPath: '/locales/{{lng}}/{{ns}}.json',
     },
