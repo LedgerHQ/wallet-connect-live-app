@@ -48,6 +48,10 @@ const BackButton = styled(Flex)`
   }
 `;
 
+const isRunningInAndroidWebview =
+  navigator.userAgent.includes("; wv") &&
+  navigator.userAgent.includes("Android");
+
 type Props = {
   mode?: InputMode;
 };
@@ -59,10 +63,6 @@ export function Connect({ mode }: Props) {
   const [errorValue, setErrorValue] = useState<string | undefined>(undefined);
   const [scanner, setScanner] = useState(mode === "scan");
   const analytics = useAnalytics();
-
-  const isRunningInAndroidWebview =
-    navigator.userAgent?.includes("; wv") &&
-    navigator.userAgent?.includes("Android");
 
   const { onConnect } = useConnect();
 
