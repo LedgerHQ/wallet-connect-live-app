@@ -1,0 +1,73 @@
+{
+  "applicationDisabled" : {
+    "title" : "No momento, estamos enfrentando um problema temporário com a integração da WalletConnect v2.",
+    "desc" : "Estamos trabalhando ativamente para identificar e implementar uma solução e restaurar o funcionamento assim que possível. Obrigado pela compreensão."
+  },
+  "errorBoundary" : {
+    "title" : "Algo deu errado!",
+    "desc" : "Já sabemos sobre este erro. Tente atualizar a página novamente."
+  },
+  "back" : "Voltar",
+  "close" : "Fechar",
+  "error" : {
+    "noInput" : "Sem valor de entrada",
+    "invalidUri" : "URI inválida"
+  },
+  "connect" : {
+    "title" : "Conectar",
+    "cta" : "Conectar",
+    "scanQRCode" : "Escanear QR Code",
+    "useWalletConnectUrl" : "Ou use a URL do WalletConnect",
+    "pasteUrl" : "Colar URL",
+    "switchToText" : "Mudar para Texto",
+    "switchToScanner" : "Mude para Scanner",
+    "errorProtocol" : {
+      "title" : "O DApp ao qual você está tentando se conectar não está atualizado",
+      "desc" : "A WalletConnect V1 não é mais compatível e, para garantir uma conexão tranquila e segura, o DApp que você está usando deve ser atualizado para a WalletConnect V2."
+    }
+  },
+  "sessionProposal" : {
+    "connectTo" : "Conectar a {{name}}",
+    "connect" : "Conectar",
+    "reject" : "Rejeitar",
+    "close" : "Fechar",
+    "notSupported" : "Essa blockchain não é compatível",
+    "notSupported_plural" : "Essas blockchains não são compatíveis",
+    "info" : "Este aplicativo será capaz de: ",
+    "info2" : "Este aplicativo é capaz de: ",
+    "info3" : "Se você conectar: ",
+    "infoBullet" : {
+      "0" : "Verifique a atividade e o saldo da sua conta",
+      "1" : "Solicitar aprovações para transacionar",
+      "2" : "Você vai desconectar-se de {{dAppName}}"
+    },
+    "error" : {
+      "title" : "{{appName}} solicitou conectar-se a cadeias com as quais ainda não somos compatíveis",
+      "desc" : "No momento, somos compatíveis com Ethereum, Polygon, Binance Smart Chain, Arbitrum, Optimism, Avalanche C-Chain, Ethereum Goerli e Optimism Goerli. Adicionamos suporte a novas cadeias gradualmente."
+    },
+    "addAccount" : "Adicionar conta"
+  },
+  "sessions" : {
+    "title" : "Sessões",
+    "disconnectAll" : "Desconectar todas",
+    "modal" : {
+      "title" : "Você realmente deseja desconectar todas as suas sessões?",
+      "desc" : "Para interagir com todos os aplicativos aos quais estava conectado, você precisará reconectar-se.",
+      "continue" : "Desconectar",
+      "cancel" : "Cancelar"
+    },
+    "detail" : {
+      "title" : "Detalhes da sessão",
+      "account" : "Conta",
+      "accounts" : "Contas",
+      "connected" : "Conectado",
+      "expires" : "Expira em",
+      "disconnect" : "Desconectar"
+    },
+    "emptyState" : {
+      "title" : "Ainda não há sessão ativa",
+      "desc" : "Comece conectando-se a um aplicativo.",
+      "goToConnect" : "Conectar"
+    }
+  }
+}
