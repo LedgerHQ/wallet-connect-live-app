@@ -1,7 +1,7 @@
-import { createRoute, useNavigate } from "@tanstack/react-router";
+import { Navigate, createRoute } from "@tanstack/react-router";
 import { rootRoute } from "@/routes/root";
 import SessionDetail from "@/components/screens/SessionDetail";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { useAtomValue } from "jotai";
 import { web3walletAtom } from "@/store/web3wallet.store";
 import useSessions from "@/hooks/useSessions";
@@ -10,7 +10,6 @@ export const detailRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/detail/$topic",
   component: function Detail() {
-    const navigate = useNavigate({ from: "/detail/$topic" });
     const params = detailRoute.useParams();
 
     const web3wallet = useAtomValue(web3walletAtom);
@@ -20,14 +19,8 @@ export const detailRoute = createRoute({
       [params.topic, sessions.data]
     );
 
-    useEffect(() => {
-      if (!session) {
-        void navigate({ to: "/", search: (search) => search });
-      }
-    }, [navigate, session]);
-
     if (!session) {
-      return null;
+      return <Navigate to="/" search={(search) => search} />;
     }
 
     return <SessionDetail session={session} />;
