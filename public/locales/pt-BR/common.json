@@ -1,73 +1,77 @@
 {
   "applicationDisabled" : {
-    "title" : "No momento, estamos enfrentando um problema temporário com a integração da WalletConnect v2.",
-    "desc" : "Estamos trabalhando ativamente para identificar e implementar uma solução e restaurar o funcionamento assim que possível. Obrigado pela compreensão."
+    "title" : "We are currently experiencing a temporary issue with WalletConnect v2 integration.",
+    "desc" : "We are actively working to identify and implement a solution to restore the functionality as soon as possible. Thank you for your understanding."
   },
   "errorBoundary" : {
-    "title" : "Algo deu errado!",
-    "desc" : "Já sabemos sobre este erro. Tente atualizar a página novamente."
+    "title" : "Oops, something went wrong!",
+    "desc" : "We have been notified of this error. Please try again by refreshing the page."
   },
-  "back" : "Voltar",
-  "close" : "Fechar",
+  "back" : "Back",
+  "close" : "Close",
   "error" : {
-    "noInput" : "Sem valor de entrada",
-    "invalidUri" : "URI inválida"
+    "noInput" : "No input value",
+    "invalidUri" : "Invalid URI"
   },
   "connect" : {
-    "title" : "Conectar",
-    "cta" : "Conectar",
-    "scanQRCode" : "Escanear QR Code",
-    "useWalletConnectUrl" : "Ou use a URL do WalletConnect",
-    "pasteUrl" : "Colar URL",
-    "switchToText" : "Mudar para Texto",
-    "switchToScanner" : "Mude para Scanner",
+    "title" : "Connect",
+    "cta" : "Connect",
+    "scanQRCode" : "Scan QR code",
+    "useWalletConnectUrl" : "Or use a WalletConnect URL",
+    "pasteUrl" : "Paste URL",
+    "switchToText" : "Switch to Text",
+    "switchToScanner" : "Switch to Scanner",
     "errorProtocol" : {
-      "title" : "O DApp ao qual você está tentando se conectar não está atualizado",
-      "desc" : "A WalletConnect V1 não é mais compatível e, para garantir uma conexão tranquila e segura, o DApp que você está usando deve ser atualizado para a WalletConnect V2."
+      "title" : "The Dapp you’re trying to connect to isn’t up to date",
+      "desc" : "WalletConnect V1 is no longer supported, and to ensure a smooth and secure connection, the Dapp you’re using must upgrade to WalletConnect V2."
     }
   },
   "sessionProposal" : {
-    "connectTo" : "Conectar a {{name}}",
-    "connect" : "Conectar",
-    "reject" : "Rejeitar",
-    "close" : "Fechar",
-    "notSupported" : "Essa blockchain não é compatível",
-    "notSupported_plural" : "Essas blockchains não são compatíveis",
-    "info" : "Este aplicativo será capaz de: ",
-    "info2" : "Este aplicativo é capaz de: ",
-    "info3" : "Se você conectar: ",
+    "connectTo" : "Connect to {{name}}",
+    "connect" : "Connect",
+    "reject" : "Reject",
+    "close" : "Close",
+    "notSupported" : "This blockchain is not supported",
+    "notSupported_plural" : "These blockchains are not supported",
+    "info" : "This app will be able to: ",
+    "info2" : "This app is able to: ",
+    "info3" : "If you connect: ",
     "infoBullet" : {
-      "0" : "Verifique a atividade e o saldo da sua conta",
-      "1" : "Solicitar aprovações para transacionar",
-      "2" : "Você vai desconectar-se de {{dAppName}}"
+      "0" : "Check your account balance and activity",
+      "1" : "Request approvals for transactions",
+      "2" : "You will be disconnected from {{dAppName}}"
     },
     "error" : {
-      "title" : "{{appName}} solicitou conectar-se a cadeias com as quais ainda não somos compatíveis",
-      "desc" : "No momento, somos compatíveis com Ethereum, Polygon, Binance Smart Chain, Arbitrum, Optimism, Avalanche C-Chain, Ethereum Goerli e Optimism Goerli. Adicionamos suporte a novas cadeias gradualmente."
+      "title" : "{{appName}} requested to connect to chains we don't support yet",
+      "desc" : "We currently support Ethereum, Polygon, Binance Smart Chain, Arbitrum, Optimism, Avalanche C-Chain, Ethereum Goerli and Optimism Goerli. We are adding new ones gradually."
     },
-    "addAccount" : "Adicionar conta"
+    "addAccount" : "Add account"
   },
   "sessions" : {
-    "title" : "Sessões",
-    "disconnectAll" : "Desconectar todas",
+    "title" : "Sessions",
+    "goToConnect" : "Connect",
+    "disconnectAll" : "Disconnect All",
     "modal" : {
-      "title" : "Você realmente deseja desconectar todas as suas sessões?",
-      "desc" : "Para interagir com todos os aplicativos aos quais estava conectado, você precisará reconectar-se.",
-      "continue" : "Desconectar",
-      "cancel" : "Cancelar"
+      "title" : "Do you really want to disconnect all your sessions?",
+      "desc" : "You will need to re-connect to be able to interact with all the apps you were connected to.",
+      "continue" : "Disconnect",
+      "cancel" : "Cancel"
+    },
+    "proposals" : {
+      "title" : "Proposals"
     },
     "detail" : {
-      "title" : "Detalhes da sessão",
-      "account" : "Conta",
-      "accounts" : "Contas",
-      "connected" : "Conectado",
-      "expires" : "Expira em",
-      "disconnect" : "Desconectar"
+      "title" : "Session details",
+      "account" : "Account",
+      "accounts" : "Accounts",
+      "connected" : "Connected",
+      "expires" : "Expires",
+      "disconnect" : "Disconnect"
     },
     "emptyState" : {
-      "title" : "Ainda não há sessão ativa",
-      "desc" : "Comece conectando-se a um aplicativo.",
-      "goToConnect" : "Conectar"
+      "title" : "No active session, yet",
+      "desc" : "Get started by connecting to an app.",
+      "goToConnect" : "Connect"
     }
   }
 }
