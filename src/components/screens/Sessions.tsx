@@ -34,14 +34,9 @@ export default function Sessions() {
     analytics.page("Wallet Connect Sessions", {
       isEmptyState,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
     analytics.track("equipment_connected", {
       sessionsConnected: sessionsLength,
     });
-    analytics.identify();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -65,7 +60,7 @@ export default function Sessions() {
         page: "Wallet Connect Sessions",
       });
     },
-    [analytics, navigate]
+    [analytics, navigate],
   );
 
   const goToDetailSession = useCallback(
@@ -80,7 +75,7 @@ export default function Sessions() {
         page: "Wallet Connect Sessions",
       });
     },
-    [analytics, navigate]
+    [analytics, navigate],
   );
 
   const disconnect = useCallback(() => {
@@ -92,8 +87,8 @@ export default function Sessions() {
             code: 3,
             message: "Disconnect Session",
           },
-        })
-      )
+        }),
+      ),
     )
       .catch((err) => {
         console.error(err);
