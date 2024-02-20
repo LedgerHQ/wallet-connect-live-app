@@ -1,73 +1,77 @@
 {
   "applicationDisabled" : {
-    "title" : "現在、WalletConnect v2の統合で一時的な問題が発生しています。",
-    "desc" : "当社はできるだけ早く機能を復元するため、解決策の特定と実装に取り組んでおります。ご不便をおかけして申し訳ありません。"
+    "title" : "We are currently experiencing a temporary issue with WalletConnect v2 integration.",
+    "desc" : "We are actively working to identify and implement a solution to restore the functionality as soon as possible. Thank you for your understanding."
   },
   "errorBoundary" : {
-    "title" : "問題が発生しました。",
-    "desc" : "当社はこのエラーについて通知を受け取りました。ページを更新してもう一度お試しください。"
+    "title" : "Oops, something went wrong!",
+    "desc" : "We have been notified of this error. Please try again by refreshing the page."
   },
-  "back" : "戻る",
-  "close" : "閉じる",
+  "back" : "Back",
+  "close" : "Close",
   "error" : {
-    "noInput" : "入力値なし",
-    "invalidUri" : "無効なURI"
+    "noInput" : "No input value",
+    "invalidUri" : "Invalid URI"
   },
   "connect" : {
-    "title" : "接続",
-    "cta" : "接続",
-    "scanQRCode" : "QRコードをスキャン",
-    "useWalletConnectUrl" : "または、WalletConnect URLを使用",
-    "pasteUrl" : "URLを貼り付け",
-    "switchToText" : "テキストに切り替える",
-    "switchToScanner" : "スキャナーに切り替える",
+    "title" : "Connect",
+    "cta" : "Connect",
+    "scanQRCode" : "Scan QR code",
+    "useWalletConnectUrl" : "Or use a WalletConnect URL",
+    "pasteUrl" : "Paste URL",
+    "switchToText" : "Switch to Text",
+    "switchToScanner" : "Switch to Scanner",
     "errorProtocol" : {
-      "title" : "接続しようとしているDappは最新ではありません",
-      "desc" : "WalletConnect V1は現在サポートされておりません。スムーズで安全な接続を確保するには、使用されているDappをWalletConnect V2にアップグレードする必要があります。"
+      "title" : "The Dapp you’re trying to connect to isn’t up to date",
+      "desc" : "WalletConnect V1 is no longer supported, and to ensure a smooth and secure connection, the Dapp you’re using must upgrade to WalletConnect V2."
     }
   },
   "sessionProposal" : {
-    "connectTo" : "{{name}}に接続",
-    "connect" : "接続",
-    "reject" : "拒否",
-    "close" : "閉じる",
-    "notSupported" : "このブロックチェーンはサポートされていません",
-    "notSupported_plural" : "これらのブロックチェーンはサポートされていません",
-    "info" : "このアプリでは以下が可能となります。 ",
-    "info2" : "このアプリでは以下が可能です。 ",
-    "info3" : "接続した場合： ",
+    "connectTo" : "Connect to {{name}}",
+    "connect" : "Connect",
+    "reject" : "Reject",
+    "close" : "Close",
+    "notSupported" : "This blockchain is not supported",
+    "notSupported_plural" : "These blockchains are not supported",
+    "info" : "This app will be able to: ",
+    "info2" : "This app is able to: ",
+    "info3" : "If you connect: ",
     "infoBullet" : {
-      "0" : "アカウントの残高とアクティビティを確認する",
-      "1" : "トランザクションの承認を要求する",
-      "2" : "{{dAppName}}から切断されます"
+      "0" : "Check your account balance and activity",
+      "1" : "Request approvals for transactions",
+      "2" : "You will be disconnected from {{dAppName}}"
     },
     "error" : {
-      "title" : "{{appName}}が、まだサポートされていないチェーンへの接続を要求しました",
-      "desc" : "当社は現在、Ethereum、Polygon、Binance Smart Chain、Arbitrum、Optimism、Avalanche C-Chain、Ethereum Goerli、Optimism Goerliをサポートしています。今後、さらに新しいブロックチェーンを追加していく予定です。"
+      "title" : "{{appName}} requested to connect to chains we don't support yet",
+      "desc" : "We currently support Ethereum, Polygon, Binance Smart Chain, Arbitrum, Optimism, Avalanche C-Chain, Ethereum Goerli and Optimism Goerli. We are adding new ones gradually."
     },
-    "addAccount" : "アカウントを追加"
+    "addAccount" : "Add account"
   },
   "sessions" : {
-    "title" : "セッション",
-    "disconnectAll" : "すべて切断する",
+    "title" : "Sessions",
+    "goToConnect" : "Connect",
+    "disconnectAll" : "Disconnect All",
     "modal" : {
-      "title" : "すべてのセッションを切断してもよろしいですか？",
-      "desc" : "接続されていたすべてのアプリを操作できるようにするには、再接続する必要があります。",
-      "continue" : "接続を切断",
-      "cancel" : "キャンセル"
+      "title" : "Do you really want to disconnect all your sessions?",
+      "desc" : "You will need to re-connect to be able to interact with all the apps you were connected to.",
+      "continue" : "Disconnect",
+      "cancel" : "Cancel"
+    },
+    "proposals" : {
+      "title" : "Proposals"
     },
     "detail" : {
-      "title" : "セッションの詳細",
-      "account" : "アカウント",
-      "accounts" : "アカウント",
-      "connected" : "接続済み",
-      "expires" : "期限切れ",
-      "disconnect" : "接続を切断"
+      "title" : "Session details",
+      "account" : "Account",
+      "accounts" : "Accounts",
+      "connected" : "Connected",
+      "expires" : "Expires",
+      "disconnect" : "Disconnect"
     },
     "emptyState" : {
-      "title" : "まだ有効なセッションがありません",
-      "desc" : "アプリに接続して開始します。",
-      "goToConnect" : "接続"
+      "title" : "No active session, yet",
+      "desc" : "Get started by connecting to an app.",
+      "goToConnect" : "Connect"
     }
   }
 }
