@@ -8,61 +8,11 @@ import { Container } from "@/styles/styles";
 import { ErrorFallback } from "@/components/screens/ErrorFallback";
 import { ErrorBoundary } from "@sentry/react";
 import { ThemeNames } from "@ledgerhq/react-ui/styles/index";
-import { Suspense, lazy, useEffect } from "react";
-import useWalletConnect from "@/hooks/useWalletConnect";
+import { Suspense, useEffect } from "react";
 import { InputMode } from "@/types/types";
 import i18n from "@/i18n";
-import { useConnect } from "@/hooks/useConnect";
-// import useAnalytics from "@/hooks/common/useAnalytics";
-
-// eslint-disable-next-line react-refresh/only-export-components
-const TanStackRouterDevtools = import.meta.env.PROD
-  ? () => null // Render nothing in production
-  : lazy(() =>
-      // Lazy load in development
-      import("@tanstack/router-devtools").then((res) => ({
-        default: res.TanStackRouterDevtools,
-        // For Embedded Mode
-        // default: res.TanStackRouterDevtoolsPanel
-      }))
-    );
-
-// eslint-disable-next-line react-refresh/only-export-components
-function WalletConnectInit() {
-  useWalletConnect();
-
-  const { uri: initialURI } = rootRoute.useSearch();
-  const { onConnect } = useConnect();
-
-  // Try connecting only once with the provided uri
-  useEffect(() => {
-    if (initialURI) {
-      try {
-        const uri = new URL(initialURI);
-
-        void onConnect(uri);
-      } catch (error) {
-        // TODO maybe improve this error handling
-        console.error("Invalid initialURI: ", error);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  return null;
-}
-
-// // TODO Migrate to analytics provider or jotai atom that will get the wallet-api infos by itself
-// // eslint-disable-next-line react-refresh/only-export-components
-// function AnalyticsInit() {
-//   const analytics = useAnalytics();
-
-//   useEffect(() => {
-//     analytics.start(userId, walletInfo);
-//   }, [analytics]);
-
-//   return null;
-// }
+import { TanStackRouterDevtools } from "@/components/TanStackRouterDevtools";
+import { WalletConnectInit } from "@/components/WalletConnectInit";
 
 // Create a client
 const twentyFourHoursInMs = 1000 * 60 * 60 * 24;
@@ -119,7 +69,7 @@ export const rootRoute = createRootRoute({
     };
   },
   component: function Root() {
-    const { lang, theme } = rootRoute.useSearch();
+    const { lang, theme, uri } = rootRoute.useSearch();
 
     useEffect(() => {
       void i18n.changeLanguage(lang);
@@ -143,8 +93,7 @@ export const rootRoute = createRootRoute({
               }
             >
               <ErrorBoundary fallback={<ErrorFallback />}>
-                <WalletConnectInit />
-                {/* <AnalyticsInit /> */}
+                <WalletConnectInit initialURI={uri} />
                 {isApplicationDisabled ? <ApplicationDisabled /> : <Outlet />}
               </ErrorBoundary>
             </Suspense>
