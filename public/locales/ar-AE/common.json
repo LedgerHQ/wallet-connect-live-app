@@ -1,73 +1,77 @@
 {
   "applicationDisabled" : {
-    "title" : "نواجه حالياً مشكلة مؤقتة في دمج الإصدار 2 من WalletConnect.",
-    "desc" : "نحن نعمل بجهد على تحديد وتنفيذ حل لاستعادة الوظائف في أقرب وقت ممكن. شكراً على تفهمك."
+    "title" : "We are currently experiencing a temporary issue with WalletConnect v2 integration.",
+    "desc" : "We are actively working to identify and implement a solution to restore the functionality as soon as possible. Thank you for your understanding."
   },
   "errorBoundary" : {
-    "title" : "عذراً، حدث خطأ ما!",
-    "desc" : "لقد تم إخطارنا بهذا الخطأ. يُرجى المحاولة مرةً أخرى عن طريق تنشيط الصفحة."
+    "title" : "Oops, something went wrong!",
+    "desc" : "We have been notified of this error. Please try again by refreshing the page."
   },
-  "back" : "عودة",
-  "close" : "إغلاق",
+  "back" : "Back",
+  "close" : "Close",
   "error" : {
-    "noInput" : "لا توجد قيمة الإدخال",
-    "invalidUri" : "مُعرف الموارد المنتظم (URI) غير صالح"
+    "noInput" : "No input value",
+    "invalidUri" : "Invalid URI"
   },
   "connect" : {
-    "title" : "اتصال",
-    "cta" : "اتصال",
-    "scanQRCode" : "مسح ضوئي لكود QR",
-    "useWalletConnectUrl" : "أو استخدم عنوان URL خاص بـ WalletConnect",
-    "pasteUrl" : "لصق رابط URL",
-    "switchToText" : "تبديل إلى النص",
-    "switchToScanner" : "تبديل إلى الماسح الضوئي",
+    "title" : "Connect",
+    "cta" : "Connect",
+    "scanQRCode" : "Scan QR code",
+    "useWalletConnectUrl" : "Or use a WalletConnect URL",
+    "pasteUrl" : "Paste URL",
+    "switchToText" : "Switch to Text",
+    "switchToScanner" : "Switch to Scanner",
     "errorProtocol" : {
-      "title" : "التطبيق اللامركزي (Dapp) الذي تحاول الاتصال به ليس مُحدّثاً",
-      "desc" : "الإصدار 1 من WalletConnect لم يعد مدعوماً، ولضمان اتصال سلس وآمن، فإن التطبيق اللامركزي (Dapp) الذي تستخدمه يجب ترقيته إلى الإصدار 2 من WalletConnect."
+      "title" : "The Dapp you’re trying to connect to isn’t up to date",
+      "desc" : "WalletConnect V1 is no longer supported, and to ensure a smooth and secure connection, the Dapp you’re using must upgrade to WalletConnect V2."
     }
   },
   "sessionProposal" : {
-    "connectTo" : "الاتصال بـ {{name}}",
-    "connect" : "اتصال",
-    "reject" : "رفض",
-    "close" : "إغلاق",
-    "notSupported" : "سلسلة الكتل هذه غير مدعومة",
-    "notSupported_plural" : "سلاسل الكتل هذه غير مدعومة",
-    "info" : "هذا التطبيق سيكون قادراً على: ",
-    "info2" : "هذا التطبيق قادر على: ",
-    "info3" : "إذا قمت بالاتصال: ",
+    "connectTo" : "Connect to {{name}}",
+    "connect" : "Connect",
+    "reject" : "Reject",
+    "close" : "Close",
+    "notSupported" : "This blockchain is not supported",
+    "notSupported_plural" : "These blockchains are not supported",
+    "info" : "This app will be able to: ",
+    "info2" : "This app is able to: ",
+    "info3" : "If you connect: ",
     "infoBullet" : {
-      "0" : "تحقق من رصيد حسابك ونشاطه",
-      "1" : "اطلب موافقات على المعاملات",
-      "2" : "سيتم قطع اتصالك مع {{dAppName}}"
+      "0" : "Check your account balance and activity",
+      "1" : "Request approvals for transactions",
+      "2" : "You will be disconnected from {{dAppName}}"
     },
     "error" : {
-      "title" : "{{appName}} طلب الاتصال بسلاسل لا ندعمها بعد",
-      "desc" : "نحن ندعم حالياً إيثريوم و Polygon وسلسلة بينانس الذكية و Arbitrum و Optimism و Avalanche C-Chain و Ethereum Goerli و Optimism Goerli. ونضيف سلاسل جديدة تدريجياً."
+      "title" : "{{appName}} requested to connect to chains we don't support yet",
+      "desc" : "We currently support Ethereum, Polygon, Binance Smart Chain, Arbitrum, Optimism, Avalanche C-Chain, Ethereum Goerli and Optimism Goerli. We are adding new ones gradually."
     },
-    "addAccount" : "إضافة حساب"
+    "addAccount" : "Add account"
   },
   "sessions" : {
-    "title" : "الجلسات",
-    "disconnectAll" : "قطع الاتصال مع الكل",
+    "title" : "Sessions",
+    "goToConnect" : "Connect",
+    "disconnectAll" : "Disconnect All",
     "modal" : {
-      "title" : "هل تريد حقاً أن تقطع الاتصال بكل جلساتك؟",
-      "desc" : "ستحتاج إلى إعادة الاتصال لتتمكن من التفاعل مع كل التطبيقات التي كنت متصلاً بها.",
-      "continue" : "قطع الاتصال",
-      "cancel" : "إلغاء"
+      "title" : "Do you really want to disconnect all your sessions?",
+      "desc" : "You will need to re-connect to be able to interact with all the apps you were connected to.",
+      "continue" : "Disconnect",
+      "cancel" : "Cancel"
+    },
+    "proposals" : {
+      "title" : "Proposals"
     },
     "detail" : {
-      "title" : "تفاصيل الجلسة",
-      "account" : "الحساب",
-      "accounts" : "الحسابات",
-      "connected" : "متصل",
-      "expires" : "تنتهي صلاحيته",
-      "disconnect" : "قطع الاتصال"
+      "title" : "Session details",
+      "account" : "Account",
+      "accounts" : "Accounts",
+      "connected" : "Connected",
+      "expires" : "Expires",
+      "disconnect" : "Disconnect"
     },
     "emptyState" : {
-      "title" : "ليس هناك جلسة نشطة بعد",
-      "desc" : "ابدأ من خلال الاتصال بتطبيق.",
-      "goToConnect" : "اتصال"
+      "title" : "No active session, yet",
+      "desc" : "Get started by connecting to an app.",
+      "goToConnect" : "Connect"
     }
   }
 }
