@@ -4,6 +4,7 @@ import { rootRoute } from "@/routes/root";
 import { useMemo } from "react";
 import { useAtomValue } from "jotai";
 import { web3walletAtom } from "@/store/web3wallet.store";
+import usePendingProposals from "@/hooks/usePendingProposals";
 
 export const proposalRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -12,13 +13,11 @@ export const proposalRoute = createRoute({
     const params = proposalRoute.useParams();
 
     const web3wallet = useAtomValue(web3walletAtom);
-    const proposal = useMemo(() => {
-      try {
-        return web3wallet.engine.signClient.proposal.get(Number(params.id));
-      } catch {
-        return undefined;
-      }
-    }, [params.id, web3wallet.engine.signClient.proposal]);
+    const pendingProposals = usePendingProposals(web3wallet);
+    const proposal = useMemo(
+      () => pendingProposals.data.find((elem) => elem.id === Number(params.id)),
+      [params.id, pendingProposals.data]
+    );
 
     if (!proposal) {
       return <Navigate to="/" search={(search) => search} />;

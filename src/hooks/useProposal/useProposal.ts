@@ -11,8 +11,11 @@ import { web3walletAtom } from "@/store/web3wallet.store";
 import { useAtomValue } from "jotai";
 import useAccounts, { queryKey as accountsQueryKey } from "@/hooks/useAccounts";
 import { walletAPIClientAtom } from "@/store/wallet-api.store";
-import { queryKey as sessionsQueryKey } from "../useSessions";
-import { queryKey as pendingSessionsProposalsQueryKey } from "../usePendingSessionsProposals";
+import {
+  queryKey as sessionsQueryKey,
+  useQueryFn as useSessionsQueryFn,
+} from "../useSessions";
+import { queryKey as pendingProposalsQueryKey } from "../usePendingProposals";
 import { ProposalTypes } from "@walletconnect/types";
 
 export function useProposal(proposal: ProposalTypes.Struct) {
@@ -106,6 +109,8 @@ export function useProposal(proposal: ProposalTypes.Struct) {
     [accounts.data, selectedAccounts]
   );
 
+  const sessionsQueryFn = useSessionsQueryFn(web3wallet);
+
   const approveSession = useCallback(async () => {
     try {
       const session = await web3wallet.approveSession({
@@ -117,7 +122,12 @@ export function useProposal(proposal: ProposalTypes.Struct) {
       });
       await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
       await queryClient.invalidateQueries({
-        queryKey: pendingSessionsProposalsQueryKey,
+        queryKey: pendingProposalsQueryKey,
+      });
+      // Prefetching as we need the data in the next route to avoid redirecting to home
+      await queryClient.prefetchQuery({
+        queryKey: sessionsQueryKey,
+        queryFn: sessionsQueryFn,
       });
       await navigate({
         to: "/detail/$topic",
@@ -129,14 +139,21 @@ export function useProposal(proposal: ProposalTypes.Struct) {
       console.error(error);
       await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
       await queryClient.invalidateQueries({
-        queryKey: pendingSessionsProposalsQueryKey,
+        queryKey: pendingProposalsQueryKey,
       });
       await navigate({
         to: "/",
         search: (search) => search,
       });
     }
-  }, [buildSupportedNamespaces, navigate, proposal, queryClient, web3wallet]);
+  }, [
+    buildSupportedNamespaces,
+    navigate,
+    proposal,
+    queryClient,
+    sessionsQueryFn,
+    web3wallet,
+  ]);
 
   const rejectSession = useCallback(async () => {
     await web3wallet.rejectSession({
@@ -148,7 +165,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
     });
     await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
     await queryClient.invalidateQueries({
-      queryKey: pendingSessionsProposalsQueryKey,
+      queryKey: pendingProposalsQueryKey,
     });
     await navigate({
       to: "/",

@@ -10,13 +10,16 @@ import {
 } from "@/data/methods/EIP155Data.methods";
 import { web3walletAtom } from "@/store/web3wallet.store";
 import { isEIP155Chain } from "@/utils/helper.util";
-import { useNavigate, useParams } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useAtomValue } from "jotai";
 import { Web3Wallet } from "@walletconnect/web3wallet/dist/types/client";
 import useAccounts from "./useAccounts";
 import { walletAPIClientAtom } from "@/store/wallet-api.store";
 import { queryKey as sessionsQueryKey } from "./useSessions";
-import { queryKey as pendingSessionsProposalsQueryKey } from "./usePendingSessionsProposals";
+import {
+  queryKey as pendingProposalsQueryKey,
+  useQueryFn as usePendingProposalsQueryFn,
+} from "./usePendingProposals";
 import { useQueryClient } from "@tanstack/react-query";
 
 enum Errors {
@@ -79,40 +82,36 @@ export default function useWalletConnect() {
 
   const accounts = useAccounts(client);
 
-  const proposalParams = useParams({ from: "/proposal/$id" });
+  const onProposalExpire = useCallback(() => {
+    void queryClient.invalidateQueries({
+      queryKey: pendingProposalsQueryKey,
+    });
+  }, [queryClient]);
 
-  const onProposalExpire = useCallback(
-    (proposalExpire: Web3WalletTypes.ProposalExpire) => {
-      void queryClient
-        .invalidateQueries({
-          queryKey: pendingSessionsProposalsQueryKey,
-        })
-        .then(() => {
-          // TODO maybe remove and instead find proposal in the array from usePendingSessionsProposals on proposal route
-          // Instead of using the current get from wallet connect store, so we're react just by invalidating the queries above
-          if (Number(proposalParams.id) === proposalExpire.id) {
-            return navigate({
-              to: "/",
-              search: (search) => search,
-            });
-          }
-        });
-    },
-    [navigate, proposalParams.id, queryClient]
-  );
+  const pendingProposalsQueryFn = usePendingProposalsQueryFn(web3wallet);
 
   const onSessionProposal = useCallback(
     (proposal: Web3WalletTypes.SessionProposal) => {
-      void queryClient.invalidateQueries({
-        queryKey: pendingSessionsProposalsQueryKey,
-      });
-      void navigate({
-        to: "/proposal/$id",
-        params: { id: proposal.id.toString() },
-        search: (search) => search,
-      });
+      void queryClient
+        .invalidateQueries({
+          queryKey: pendingProposalsQueryKey,
+        })
+        .then(() => {
+          // Prefetching as we need the data in the next route to avoid redirecting to home
+          return queryClient.prefetchQuery({
+            queryKey: pendingProposalsQueryKey,
+            queryFn: pendingProposalsQueryFn,
+          });
+        })
+        .then(() => {
+          return navigate({
+            to: "/proposal/$id",
+            params: { id: proposal.id.toString() },
+            search: (search) => search,
+          });
+        });
     },
-    [navigate, queryClient]
+    [navigate, pendingProposalsQueryFn, queryClient]
   );
 
   const handleEIP155Request = useCallback(

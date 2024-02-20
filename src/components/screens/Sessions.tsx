@@ -14,7 +14,7 @@ import { useAtomValue } from "jotai";
 import { web3walletAtom } from "@/store/web3wallet.store";
 import useSessions, { queryKey as sessionsQueryKey } from "@/hooks/useSessions";
 import { useQueryClient } from "@tanstack/react-query";
-import usePendingSessionsProposals from "@/hooks/usePendingSessionsProposals";
+import usePendingProposals from "@/hooks/usePendingProposals";
 
 export default function Sessions() {
   const { t } = useTranslation();
@@ -23,10 +23,10 @@ export default function Sessions() {
   const queryClient = useQueryClient();
   const web3wallet = useAtomValue(web3walletAtom);
   const sessions = useSessions(web3wallet);
-  const pendingSessionsProposals = usePendingSessionsProposals(web3wallet);
+  const pendingProposals = usePendingProposals(web3wallet);
   const sessionsLength = sessions.data.length;
   const isEmptyState = sessionsLength === 0;
-  const hasProposals = pendingSessionsProposals.data.length > 0;
+  const hasProposals = pendingProposals.data.length > 0;
   const analytics = useAnalytics();
 
   // TODO look at improving the analytics here maybe
@@ -119,7 +119,7 @@ export default function Sessions() {
           </Text>
 
           <List>
-            {pendingSessionsProposals.data.map((proposal) => (
+            {pendingProposals.data.map((proposal) => (
               <Box key={proposal.id} mt={3}>
                 <GenericRow
                   key={proposal.id}
