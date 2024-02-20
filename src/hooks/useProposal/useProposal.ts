@@ -46,14 +46,6 @@ export function useProposal(proposal: ProposalTypes.Struct) {
     });
   }, [navigate]);
 
-  const handleClose = useCallback(() => {
-    void navigateToHome();
-    analytics.track("button_clicked", {
-      button: "Close",
-      page: "Wallet Connect Error Unsupported Blockchains",
-    });
-  }, [analytics, navigateToHome]);
-
   const buildSupportedNamespaces = useCallback(
     (proposal: ProposalTypes.Struct) => {
       const accountsByChain = formatAccountsByChain(
@@ -172,6 +164,14 @@ export function useProposal(proposal: ProposalTypes.Struct) {
       search: (search) => search,
     });
   }, [navigate, proposal, queryClient, web3wallet]);
+
+  const handleClose = useCallback(() => {
+    void rejectSession();
+    analytics.track("button_clicked", {
+      button: "Close",
+      page: "Wallet Connect Error Unsupported Blockchains",
+    });
+  }, [analytics, rejectSession]);
 
   const addNewAccount = useCallback(
     async (currency: string) => {
