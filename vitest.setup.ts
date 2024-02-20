@@ -11,6 +11,9 @@ vi.mock("@walletconnect/web3wallet", () => {
             session: {
               getAll: vi.fn(() => []),
             },
+            proposal: {
+              getAll: vi.fn(() => []),
+            },
           },
         },
         on: vi.fn<Parameters<typeof window.addEventListener>>(
