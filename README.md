@@ -88,7 +88,7 @@ ethereum: {
 
 First, create an `.env.local` file locally at the root of the repository. You can duplicate `.env.example` and name the new copy `.env.local`.
 
-You will need to replace the value of the `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` variable with a working WalletConnect project id. You can find one in the environment variables of the wallet-connect-live-app project in [Vercel](https://vercel.com/ledgerhq/wallet-connect-live-app/settings/environment-variables).
+You will need to replace the value of the `VITE_WALLETCONNECT_PROJECT_ID` variable with a working WalletConnect project id. You can find one in the environment variables of the wallet-connect-live-app project in [Vercel](https://vercel.com/ledgerhq/wallet-connect-live-app/settings/environment-variables).
 
 ### Proto
 
@@ -106,13 +106,13 @@ proto use
 First, you should install dependencies
 
 ```bash
-yarn
+pnpm i
 ```
 
 Secondly, run the development server:
 
 ```bash
-yarn dev
+pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
@@ -125,45 +125,45 @@ All Live apps are defined with a manifest. Here is one that can be used for loca
 
 ```json
 {
- "id": "ledger-wallet-connect",
- "name": "WalletConnect",
- "url": "http://localhost:3000/",
- "params": {},
- "homepageUrl": "https://walletconnect.com/",
- "icon": "https://forum.zeroqode.com/uploads/default/original/2X/e/e363c6521db27335d44c1134d230b8992792dde4.png",
- "platform": "all",
- "apiVersion": "^2.0.0",
- "manifestVersion": "1",
- "branch": "stable",
- "categories": ["bridge", "defi"],
- "currencies": [
-  "ethereum",
-  "polygon",
-  "bsc",
-  "optimism",
-  "arbitrum",
-  "avalanche_c_chain",
-  "ethereum_goerli",
-  "optimism_goerli"
- ],
- "content": {
-  "shortDescription": {
-   "en": "WalletConnect is an open source protocol for connecting decentralised applications to mobile wallets with QR code scanning or deep linking. V2 introduces new features, including the ability to connect to multiple dapps in parallel with multiple accounts. It's important to note that not all dapps currently support V2"
+  "id": "ledger-wallet-connect",
+  "name": "WalletConnect",
+  "url": "http://localhost:3000/",
+  "params": {},
+  "homepageUrl": "https://walletconnect.com/",
+  "icon": "https://forum.zeroqode.com/uploads/default/original/2X/e/e363c6521db27335d44c1134d230b8992792dde4.png",
+  "platform": "all",
+  "apiVersion": "^2.0.0",
+  "manifestVersion": "1",
+  "branch": "stable",
+  "categories": ["bridge", "defi"],
+  "currencies": [
+    "ethereum",
+    "polygon",
+    "bsc",
+    "optimism",
+    "arbitrum",
+    "avalanche_c_chain",
+    "ethereum_goerli",
+    "optimism_goerli"
+  ],
+  "content": {
+    "shortDescription": {
+      "en": "WalletConnect is an open source protocol for connecting decentralised applications to mobile wallets with QR code scanning or deep linking. V2 introduces new features, including the ability to connect to multiple dapps in parallel with multiple accounts. It's important to note that not all dapps currently support V2"
+    },
+    "description": {
+      "en": "WalletConnect is an open source protocol for connecting decentralised applications to mobile wallets with QR code scanning or deep linking. V2 introduces new features, including the ability to connect to multiple dapps in parallel with multiple accounts. It's important to note that not all dapps currently support V2"
+    }
   },
-  "description": {
-   "en": "WalletConnect is an open source protocol for connecting decentralised applications to mobile wallets with QR code scanning or deep linking. V2 introduces new features, including the ability to connect to multiple dapps in parallel with multiple accounts. It's important to note that not all dapps currently support V2"
-  }
- },
- "permissions": [
-  "account.list",
-  "account.request",
-  "message.sign",
-  "transaction.sign",
-  "transaction.signAndBroadcast",
-  "wallet.userId",
-  "wallet.info"
- ],
- "domains": ["http://*", "https://*"]
+  "permissions": [
+    "account.list",
+    "account.request",
+    "message.sign",
+    "transaction.sign",
+    "transaction.signAndBroadcast",
+    "wallet.userId",
+    "wallet.info"
+  ],
+  "domains": ["http://*", "https://*"]
 }
 ```
 
@@ -175,22 +175,16 @@ We use [`Jest`](https://jestjs.io/) and
 #### Launch tests
 
 The live-app contains unit tests and integration tests.
-To run the unit tests :
+To run the tests :
 
 ```bash
-yarn test:unit
-```
-
-To run integration tests :
-
-```bash
-yarn test:integration
+pnpm test
 ```
 
 To run the tests and obtain coverage, simply run
 
 ```bash
-yarn test:coverage
+pnpm test:coverage
 ```
 
 #### Naming convention

@@ -1,0 +1,73 @@
+{
+  "applicationDisabled" : {
+    "title" : "Şu anda WalletConnect v2 entegrasyonuyla ilgili geçici bir sorun yaşıyoruz.",
+    "desc" : "İşlevi mümkün olan en kısa sürede yeniden kullanıma açacak bir çözümün belirlenmesi ve uygulanması için aktif olarak çalışıyoruz. Anlayışınız için teşekkür ederiz."
+  },
+  "errorBoundary" : {
+    "title" : "Hay aksi, bir hata oluştu!",
+    "desc" : "Bu hatanın farkındayız. Lütfen sayfayı yenileyip tekrar deneyin."
+  },
+  "back" : "Geri",
+  "close" : "Kapat",
+  "error" : {
+    "noInput" : "Değer girilmedi",
+    "invalidUri" : "Geçersiz URI"
+  },
+  "connect" : {
+    "title" : "Bağlan",
+    "cta" : "Bağlan",
+    "scanQRCode" : "Karekodu okutun",
+    "useWalletConnectUrl" : "Veya bir WalletConnect URL'si kullanın",
+    "pasteUrl" : "URL'yi yapıştırın",
+    "switchToText" : "Metne Geç",
+    "switchToScanner" : "Tarayıcıya Geç",
+    "errorProtocol" : {
+      "title" : "Bağlanmaya çalıştığınız Dapp güncel değil",
+      "desc" : "WalletConnect V1 artık desteklenmiyor ve sorunsuz ve güvenli bir bağlantı sağlamak için, kullandığınız Dapp'in WalletConnect V2'ye güncellenmesi gerekiyor."
+    }
+  },
+  "sessionProposal" : {
+    "connectTo" : "Şuraya bağlan: {{name}}",
+    "connect" : "Bağlan",
+    "reject" : "Reddet",
+    "close" : "Kapat",
+    "notSupported" : "Bu blok zinciri desteklenmiyor",
+    "notSupported_plural" : "Bu blok zincirleri desteklenmiyor",
+    "info" : "Bu uygulama şunları yapabilecektir: ",
+    "info2" : "Bu uygulama şunları yapabilir: ",
+    "info3" : "Bağlandığınız takdirde: ",
+    "infoBullet" : {
+      "0" : "Hesap bakiyenizi ve etkinliğinizi kontrol edin",
+      "1" : "İşlemler için onay isteyin",
+      "2" : "{{dAppName}} ile bağlantınız kesilecektir"
+    },
+    "error" : {
+      "title" : "{{appName}}, henüz desteklemediğimiz zincirlere bağlanma isteğinde bulundu",
+      "desc" : "Şu anda Ethereum, Polygon, Binance Smart Chain, Arbitrum, Optimism, Avalanche C-Chain, Ethereum Goerli ve Optimism Goerli'yi destekliyoruz. Kademeli olarak yeni zincirler ekliyoruz."
+    },
+    "addAccount" : "Hesap ekle"
+  },
+  "sessions" : {
+    "title" : "Oturumlar",
+    "disconnectAll" : "Tümünün Bağlantısını Kes",
+    "modal" : {
+      "title" : "Tüm oturumlarınızın bağlantısını kesmek istediğinizden emin misiniz?",
+      "desc" : "Bağlı olduğunuz tüm uygulamalarla etkileşim kurabilmek için yeniden bağlanmanız gerekecektir.",
+      "continue" : "Bağlantıyı Kes",
+      "cancel" : "İptal et"
+    },
+    "detail" : {
+      "title" : "Oturum ayrıntıları",
+      "account" : "Hesap",
+      "accounts" : "Hesaplar",
+      "connected" : "Bağlandı",
+      "expires" : "Sona erme tarihi:",
+      "disconnect" : "Bağlantıyı Kes"
+    },
+    "emptyState" : {
+      "title" : "Henüz hiçbir aktif oturum yok",
+      "desc" : "Bir uygulamaya bağlanarak başlayın.",
+      "goToConnect" : "Bağlan"
+    }
+  }
+}

@@ -1,39 +1,43 @@
 import { createGlobalStyle } from "styled-components";
 import reset from "./reset";
 
-const GlobalStyle = createGlobalStyle`
-    ${reset}
+// Workaround for prettier
+const styled = { createGlobalStyle };
 
-    body {
-        background-color: ${({ theme }) => theme.colors.background.main};
-    }
+const GlobalStyle = styled.createGlobalStyle`
+  ${reset}
 
-    * {
-        -webkit-tap-highlight-color: transparent;
-    }
+  body {
+    font-family: Inter;
+    background-color: ${({ theme }) => theme.colors.background.main};
+  }
 
-    #__next {
-        width: 100vw;
-        height: 100vh;
-    }
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
 
-    .fade-enter {
-        opacity: 0;
-    }
+  #app {
+    width: 100vw;
+    height: 100vh;
+  }
 
-    .fade-enter-active {
-        opacity: 1;
-        transition: opacity 200ms;
-    }
+  .fade-enter {
+    opacity: 0;
+  }
 
-    .fade-exit {
-        opacity: 1;
-    }
+  .fade-enter-active {
+    opacity: 1;
+    transition: opacity 200ms;
+  }
 
-    .fade-exit-active {
-        opacity: 0;
-        transition: opacity 200ms;
-    }
+  .fade-exit {
+    opacity: 1;
+  }
+
+  .fade-exit-active {
+    opacity: 0;
+    transition: opacity 200ms;
+  }
 `;
 
 export default GlobalStyle;

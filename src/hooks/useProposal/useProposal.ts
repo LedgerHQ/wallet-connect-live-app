@@ -1,30 +1,32 @@
 import { useCallback, useState } from "react";
-import { useNavigation } from "@/hooks/common/useNavigation";
-import { sessionSelector, useSessionsStore } from "@/storage/sessions.store";
-import { accountSelector, useAccountsStore } from "@/storage/accounts.store";
-import { getNamespace } from "@/helpers/helper.util";
+import { getNamespace } from "@/utils/helper.util";
 import { EIP155_SIGNING_METHODS } from "@/data/methods/EIP155Data.methods";
-import { web3wallet } from "@/helpers/walletConnect.util";
-import useAnalytics from "@/hooks/common/useAnalytics";
-import { useLedgerLive } from "../common/useLedgerLive";
+import useAnalytics from "@/hooks/useAnalytics";
 import { SupportedNamespace } from "@/data/network.config";
-import { Routes, TabsIndexes } from "@/shared/navigation";
 import { buildApprovedNamespaces } from "@walletconnect/utils";
-import { ProposalProps, formatAccountsByChain } from "@/hooks/useProposal/util";
+import { formatAccountsByChain } from "@/hooks/useProposal/util";
+import { useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { web3walletAtom } from "@/store/web3wallet.store";
+import { useAtomValue } from "jotai";
+import useAccounts, { queryKey as accountsQueryKey } from "@/hooks/useAccounts";
+import { walletAPIClientAtom } from "@/store/wallet-api.store";
+import {
+  queryKey as sessionsQueryKey,
+  useQueryFn as useSessionsQueryFn,
+} from "../useSessions";
+import { queryKey as pendingProposalsQueryKey } from "../usePendingProposals";
+import { ProposalTypes } from "@walletconnect/types";
 
-export function useProposal({ proposal }: ProposalProps) {
-  const { navigate, router } = useNavigation();
-
-  const addSession = useSessionsStore(sessionSelector.addSession);
-  const accounts = useAccountsStore(accountSelector.selectAccounts);
-  const addAccount = useAccountsStore(accountSelector.addAccount);
+export function useProposal(proposal: ProposalTypes.Struct) {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const client = useAtomValue(walletAPIClientAtom);
+  const accounts = useAccounts(client);
+  const web3wallet = useAtomValue(web3walletAtom);
   const analytics = useAnalytics();
 
-  const { initWalletApiClient, closeTransport } = useLedgerLive();
-
   const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
-
-  const proposer = proposal.params.proposer;
 
   const handleClick = useCallback(
     (account: string) => {
@@ -34,124 +36,168 @@ export function useProposal({ proposal }: ProposalProps) {
         setSelectedAccounts([...selectedAccounts, account]);
       }
     },
-    [selectedAccounts],
+    [selectedAccounts]
   );
 
-  const handleClose = () => {
-    router.push(Routes.Home);
+  const navigateToHome = useCallback(() => {
+    return navigate({
+      to: "/",
+      search: (search) => search,
+    });
+  }, [navigate]);
+
+  const buildSupportedNamespaces = useCallback(
+    (proposal: ProposalTypes.Struct) => {
+      const accountsByChain = formatAccountsByChain(
+        proposal,
+        accounts.data
+      ).filter((a) => a.accounts.length > 0 && a.isSupported);
+      const dataToSend = accountsByChain.reduce<
+        { account: string; chain: string }[]
+      >(
+        (accum, elem) =>
+          accum.concat(
+            elem.accounts
+              .filter((acc) => selectedAccounts.includes(acc.id))
+              .map((a) => ({
+                account: `${getNamespace(a.currency)}:${a.address}`,
+                chain: getNamespace(a.currency),
+              }))
+          ),
+        []
+      );
+
+      const requiredNamespaces = proposal.requiredNamespaces;
+      const namespace =
+        requiredNamespaces && Object.keys(requiredNamespaces).length > 0
+          ? requiredNamespaces[SupportedNamespace.EIP155]
+          : { methods: [] as string[], events: [] as string[] };
+
+      const methods = [
+        ...new Set(
+          namespace.methods.concat(Object.values(EIP155_SIGNING_METHODS))
+        ),
+      ];
+      const events = [
+        ...new Set(
+          namespace.events.concat([
+            "session_proposal",
+            "session_request",
+            "auth_request",
+            "session_delete",
+          ])
+        ),
+      ];
+
+      return {
+        [SupportedNamespace.EIP155]: {
+          chains: [...new Set(dataToSend.map((e) => e.chain))],
+          methods,
+          events,
+          accounts: dataToSend.map((e) => e.account),
+        },
+      };
+    },
+    [accounts.data, selectedAccounts]
+  );
+
+  const sessionsQueryFn = useSessionsQueryFn(web3wallet);
+
+  const approveSession = useCallback(async () => {
+    try {
+      const session = await web3wallet.approveSession({
+        id: proposal.id,
+        namespaces: buildApprovedNamespaces({
+          proposal,
+          supportedNamespaces: buildSupportedNamespaces(proposal),
+        }),
+      });
+      await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
+      await queryClient.invalidateQueries({
+        queryKey: pendingProposalsQueryKey,
+      });
+      // Prefetching as we need the data in the next route to avoid redirecting to home
+      await queryClient.prefetchQuery({
+        queryKey: sessionsQueryKey,
+        queryFn: sessionsQueryFn,
+      });
+      await navigate({
+        to: "/detail/$topic",
+        params: { topic: session.topic },
+        search: (search) => search,
+      });
+    } catch (error) {
+      // TODO : display error toast
+      console.error(error);
+      await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
+      await queryClient.invalidateQueries({
+        queryKey: pendingProposalsQueryKey,
+      });
+      await navigate({
+        to: "/",
+        search: (search) => search,
+      });
+    }
+  }, [
+    buildSupportedNamespaces,
+    navigate,
+    proposal,
+    queryClient,
+    sessionsQueryFn,
+    web3wallet,
+  ]);
+
+  const rejectSession = useCallback(async () => {
+    await web3wallet.rejectSession({
+      id: proposal.id,
+      reason: {
+        code: 5000,
+        message: "USER_REJECTED_METHODS",
+      },
+    });
+    await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
+    await queryClient.invalidateQueries({
+      queryKey: pendingProposalsQueryKey,
+    });
+    await navigate({
+      to: "/",
+      search: (search) => search,
+    });
+  }, [navigate, proposal, queryClient, web3wallet]);
+
+  const handleClose = useCallback(() => {
+    void rejectSession();
     analytics.track("button_clicked", {
       button: "Close",
       page: "Wallet Connect Error Unsupported Blockchains",
     });
-  };
+  }, [analytics, rejectSession]);
 
-  const buildSupportedNamespaces = (): Record<
-    string,
-    {
-      chains: string[];
-      methods: string[];
-      events: string[];
-      accounts: string[];
-    }
-  > => {
-    const accountsByChain = formatAccountsByChain(proposal, accounts).filter(
-      (a) => a.accounts.length > 0 && a.isSupported,
-    );
-    const dataToSend = accountsByChain.reduce<{ account: string; chain: string }[]>(
-      (accum, elem) =>
-        accum.concat(
-          elem.accounts
-            .filter((acc) => selectedAccounts.includes(acc.id))
-            .map((a) => ({
-              account: `${getNamespace(a.currency)}:${a.address}`,
-              chain: getNamespace(a.currency),
-            })),
-        ),
-      [],
-    );
+  const addNewAccount = useCallback(
+    async (currency: string) => {
+      try {
+        await client.account.request({
+          currencyIds: [currency],
+        });
+        // TODO Maybe we should also select the requested account
+      } catch (error) {
+        console.error("request account canceled by user");
+      }
+      // refetch accounts
+      await queryClient.invalidateQueries({ queryKey: accountsQueryKey });
+    },
+    [client, queryClient]
+  );
 
-    const requiredNamespaces = proposal.params.requiredNamespaces;
-    const namespace =
-      requiredNamespaces && Object.keys(requiredNamespaces).length > 0
-        ? requiredNamespaces[SupportedNamespace.EIP155]
-        : { methods: [] as string[], events: [] as string[] };
-
-    const methods = [...new Set(namespace.methods.concat(Object.values(EIP155_SIGNING_METHODS)))];
-    const events = [
-      ...new Set(
-        namespace.events.concat([
-          "session_proposal",
-          "session_request",
-          "auth_request",
-          "session_delete",
-        ]),
-      ),
-    ];
-
-    return {
-      [SupportedNamespace.EIP155]: {
-        chains: [...new Set(dataToSend.map((e) => e.chain))],
-        methods,
-        events,
-        accounts: dataToSend.map((e) => e.account),
-      },
-    };
-  };
-
-  const approveSession = () => {
-    web3wallet
-      .approveSession({
-        id: proposal.id,
-        namespaces: buildApprovedNamespaces({
-          proposal: proposal.params,
-          supportedNamespaces: buildSupportedNamespaces(),
-        }),
-      })
-      .then((res) => {
-        addSession(res);
-        navigate(Routes.SessionDetails, res.topic);
-      })
-      .catch((error) => {
-        console.error(error);
-        // TODO : display error toast
-        navigate(Routes.Home, { tab: TabsIndexes.Connect });
-      });
-  };
-
-  const rejectSession = () => {
-    web3wallet
-      .rejectSession({
-        id: proposal.id,
-        reason: {
-          code: 5000,
-          message: "USER_REJECTED_METHODS",
-        },
-      })
-      .finally(() => navigate(Routes.Home));
-  };
-
-  const addNewAccount = async (currency: string) => {
-    const walletApiClient = initWalletApiClient();
-    try {
-      const newAccount = await walletApiClient.account.request({
-        currencyIds: [currency],
-      });
-      addAccount(newAccount);
-    } catch (error) {
-      console.error("request account canceled by user");
-    }
-    closeTransport();
-  };
-
+  // No need for a memo as it's directly spread on usage
   return {
     approveSession,
     rejectSession,
-    proposer,
     handleClose,
     handleClick,
-    accounts,
+    accounts: accounts.data,
     selectedAccounts,
-    formatAccountsByChain,
     addNewAccount,
+    navigateToHome,
   };
 }

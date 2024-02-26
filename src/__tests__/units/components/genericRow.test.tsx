@@ -1,6 +1,7 @@
-import React from "react";
-import { GenericRow, RowType } from "@/components/atoms/GenericRow";
-import { fireEvent, render, screen } from "@/tests-tools/test.utils";
+import { GenericRow } from "@/components/atoms/GenericRow";
+import { RowType } from "@/components/atoms/types";
+import { fireEvent, render, screen } from "@/tests/test.utils";
+import { vi, describe, it, expect } from "vitest";
 
 describe("GenericRow", () => {
   const defaultProps = {
@@ -23,9 +24,14 @@ describe("GenericRow", () => {
   });
 
   it("should render GenericRow with Select type correctly", () => {
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     render(
-      <GenericRow {...defaultProps} rowType={RowType.Select} onClick={onClick} isSelected={true} />,
+      <GenericRow
+        {...defaultProps}
+        rowType={RowType.Select}
+        onClick={onClick}
+        isSelected={true}
+      />
     );
 
     const titleElement = screen.getByText("Title");
@@ -40,9 +46,14 @@ describe("GenericRow", () => {
   });
 
   it("should call onClick when GenericRow with Select type is clicked", () => {
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     const { container } = render(
-      <GenericRow {...defaultProps} rowType={RowType.Select} onClick={onClick} isSelected={true} />,
+      <GenericRow
+        {...defaultProps}
+        rowType={RowType.Select}
+        onClick={onClick}
+        isSelected={true}
+      />
     );
     if (container.firstChild) fireEvent.click(container.firstChild);
 

@@ -1,45 +1,30 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
     "skipLibCheck": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "node",
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+
+    /* Paths */
     "baseUrl": ".",
     "paths": {
-      "@/components/*": ["src/components/*"],
-      "@/pages/*": ["src/pages/*"],
-      "@/data/*": ["src/data/*"],
-      "@/hooks/*": ["src/hooks/*"],
-      "@/storage/*": ["src/storage/*"],
-      "@/styles/*": ["src/styles/*"],
-      "@/shared/*": ["src/shared/*"],
-      "@/utils/*": ["src/shared/utils/*"],
-      "@/constants/*": ["src/shared/constants/*"],
-      "@/helpers/*": ["src/shared/helpers/*"],
-      "@/types/*": ["src/shared/types/*"],
-      "@/tests-tools/*": ["src/tests-tools/*"],
-      "@/icons/*": ["src/icons/*"],
-      "@/lib/*": ["src/lib/*"],
-      "react": ["./node_modules/@types/react"]
-    }
+      "@/*": ["src/*"],
+    },
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    "jest.integration.config.js",
-    "jest.config.js",
-    "jest.setup.js"
-  ],
-  "exclude": ["node_modules"]
+  "include": ["**/*.ts", "**/*.tsx"],
 }

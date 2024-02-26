@@ -1,4 +1,11 @@
-export const Logo = ({ size = 16, color = "currentColor" }: { size: number; color?: string }) => (
+// TODO maybe migrate to svgr ?
+export const Logo = ({
+  size = 16,
+  color = "currentColor",
+}: {
+  size: number;
+  color?: string;
+}) => (
   <svg
     width={size}
     height={(size / 148) * 128}

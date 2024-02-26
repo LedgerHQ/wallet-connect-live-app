@@ -1,14 +1,13 @@
-import React from "react";
 import styled from "styled-components";
 
 import { Flex } from "@ledgerhq/react-ui";
 import TransitionInOut from "./TransitionInOut";
 import TransitionScale from "./TransitionScale";
 
-export interface PopinProps {
+export type PopinProps = {
   isOpen: boolean;
   children: React.ReactNode;
-}
+};
 
 const Wrapper = styled(Flex).attrs((p) => ({
   flexDirection: "column",
@@ -38,7 +37,10 @@ const Popin = ({ isOpen, children, ...props }: PopinProps) => (
   </TransitionInOut>
 );
 
-const PopinWrapper = ({ children, ...popinProps }: PopinProps): React.ReactElement => {
+const PopinWrapper = ({
+  children,
+  ...popinProps
+}: PopinProps): React.ReactElement => {
   return <Popin {...popinProps}>{children}</Popin>;
 };
 

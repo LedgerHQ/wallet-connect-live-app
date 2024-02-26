@@ -1,17 +1,21 @@
+import { describe, expect, it, vi } from "vitest";
 import {
   formatAccountsByChain,
   getChains,
   sortChains,
   sortAlphabetic,
 } from "@/hooks/useProposal/util";
-import { Proposal } from "@/shared/types/types";
 import sessionProposal from "@/data/mocks/sessionProposal.example.json";
 import sessionProposalNotSupported from "@/data/mocks/sessionProposalNotSupported.example.json";
 
-import { ACCOUNT_MOCK } from "@/tests-tools/mocks/account.mock";
+import { ACCOUNT_MOCK } from "@/tests/mocks/account.mock";
+import { ProposalTypes } from "@walletconnect/types";
+
+type Proposal = ProposalTypes.Struct;
 
 describe("getChains", () => {
   it("should return an array with required and optional namespaces", () => {
+    // TODO: check here (types and mock)
     const proposal = JSON.parse(JSON.stringify(sessionProposal)) as Proposal;
 
     const result = getChains(proposal);
@@ -33,12 +37,15 @@ describe("getChains", () => {
         methods: ["someMethod"],
         chains: ["optionalChain:1"],
         events: ["optionalEvent"],
+        required: false,
       },
     ]);
   });
 
   it("should return an array with multiple chains", () => {
-    const proposal = JSON.parse(JSON.stringify(sessionProposalNotSupported)) as Proposal;
+    const proposal = JSON.parse(
+      JSON.stringify(sessionProposalNotSupported)
+    ) as Proposal;
 
     const result = getChains(proposal);
 
@@ -63,23 +70,20 @@ describe("formatAccountsByChain", () => {
   const dataFromJSON = JSON.parse(JSON.stringify(sessionProposal)) as Proposal;
   const proposalFormated: Proposal = {
     ...dataFromJSON,
-    params: {
-      ...dataFromJSON.params,
-      requiredNamespaces: {
-        eip155: {
-          methods: [
-            "eth_sendTransaction",
-            "eth_signTransaction",
-            "eth_sign",
-            "personal_sign",
-            "eth_signTypedData",
-          ],
-          chains: ["eip155:1", "eip155:137", "eip155:23"],
-          events: ["chainChanged", "accountsChanged"],
-        },
+    requiredNamespaces: {
+      eip155: {
+        methods: [
+          "eth_sendTransaction",
+          "eth_signTransaction",
+          "eth_sign",
+          "personal_sign",
+          "eth_signTypedData",
+        ],
+        chains: ["eip155:1", "eip155:137", "eip155:23"],
+        events: ["chainChanged", "accountsChanged"],
       },
-      optionalNamespaces: {},
     },
+    optionalNamespaces: {},
   };
 
   const accountsFormatted = [
@@ -95,10 +99,10 @@ describe("formatAccountsByChain", () => {
     },
   ];
 
-  const getCurrencyByChainId = jest.fn();
+  const getCurrencyByChainId = vi.fn();
   getCurrencyByChainId.mockImplementation((chainId) => `${chainId}`);
 
-  jest.mock("@/shared/helpers/helper.util", () => ({
+  vi.doMock("@/shared/helpers/helper.util", () => ({
     getCurrencyByChainId,
   }));
 

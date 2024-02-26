@@ -1,11 +1,23 @@
 import styled from "styled-components";
 import { Input, Button, Text, Flex } from "@ledgerhq/react-ui";
-import { useCallback, useEffect, useState } from "react";
-import { PasteMedium, QrCodeMedium } from "@ledgerhq/react-ui/assets/icons";
-import { QRScanner } from "./QRScanner";
+import { useCallback, useState } from "react";
+import {
+  ArrowLeftMedium,
+  PasteMedium,
+  QrCodeMedium,
+} from "@ledgerhq/react-ui/assets/icons";
+import { QRScanner } from "../QRScanner";
+import { useTranslation } from "react-i18next";
+import useAnalytics from "@/hooks/useAnalytics";
+import { useNavigate } from "@tanstack/react-router";
+import { WalletConnectContainer } from "../atoms/containers/Elements";
+import { ResponsiveContainer } from "@/styles/styles";
+import { useConnect } from "@/hooks/useConnect";
 import { InputMode } from "@/types/types";
-import { useTranslation } from "next-i18next";
-import useAnalytics from "@/hooks/common/useAnalytics";
+import useSessions from "@/hooks/useSessions";
+import usePendingProposals from "@/hooks/usePendingProposals";
+import { useAtomValue } from "jotai";
+import { web3walletAtom } from "@/store/web3wallet.store";
 
 const QRScannerContainer = styled.div`
   display: flex;
@@ -33,28 +45,41 @@ const QrCodeButton = styled.div`
   }
 `;
 
-export type ConnectProps = {
-  initialURI?: string;
-  onConnect: (uri: string) => void;
+const BackButton = styled(Flex)`
+  cursor: pointer;
+  &:hover {
+    opacity: 0.7;
+  }
+`;
+
+const isRunningInAndroidWebview =
+  navigator.userAgent.includes("; wv") &&
+  navigator.userAgent.includes("Android");
+
+type Props = {
   mode?: InputMode;
 };
 
-export function Connect({ initialURI, onConnect, mode }: Readonly<ConnectProps>) {
+export function Connect({ mode }: Props) {
+  const navigate = useNavigate({ from: "/connect" });
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState<string>("");
   const [errorValue, setErrorValue] = useState<string | undefined>(undefined);
   const [scanner, setScanner] = useState(mode === "scan");
   const analytics = useAnalytics();
+  const web3wallet = useAtomValue(web3walletAtom);
+  const pendingProposals = usePendingProposals(web3wallet);
+  const sessions = useSessions(web3wallet);
+  const showBackButton = pendingProposals.data.length || sessions.data.length;
 
-  const isRunningInAndroidWebview =
-    navigator.userAgent?.includes("; wv") && navigator.userAgent?.includes("Android");
+  const { onConnect } = useConnect();
 
   const handleConnect = useCallback(() => {
     try {
       const uri = new URL(inputValue);
       setInputValue("");
 
-      onConnect(uri.toString());
+      void onConnect(uri);
       analytics.track("button_clicked", {
         button: "WC-Connect",
         page: "Connect",
@@ -62,36 +87,27 @@ export function Connect({ initialURI, onConnect, mode }: Readonly<ConnectProps>)
     } catch (error) {
       setErrorValue(t("error.invalidUri"));
     }
-  }, [onConnect, inputValue]);
+  }, [inputValue, onConnect, analytics, t]);
 
-  const startScanning = () => {
+  const startScanning = useCallback(() => {
     setScanner(true);
     analytics.track("button_clicked", {
       button: "WC-Scan QR Code",
       page: "Connect",
     });
-  };
+  }, [analytics]);
 
-  useEffect(() => {
-    if (initialURI) {
-      onConnect(initialURI);
-    }
-    analytics.page("Wallet Connect");
-  }, [initialURI]);
-
-  const handlePasteClick = async () => {
-    try {
-      const text = await navigator.clipboard.readText();
+  const handlePasteClick = useCallback(() => {
+    navigator.clipboard.readText().then((text) => {
       setInputValue(text);
       analytics.track("button_clicked", {
         button: "WC-Paste Url",
         page: "Connect",
       });
-    } catch (err) {
-      console.error(err);
-    }
-  };
+    }, console.error);
+  }, [analytics]);
 
+  // TODO improve looks like we have some duplication of logic with onConnect
   const tryConnect = useCallback(
     (rawURI: string) => {
       try {
@@ -100,7 +116,7 @@ export function Connect({ initialURI, onConnect, mode }: Readonly<ConnectProps>)
         switch (url.protocol) {
           // handle usual wallet connect URIs
           case "wc:": {
-            onConnect(url.toString());
+            void onConnect(url);
             break;
           }
 
@@ -122,75 +138,116 @@ export function Connect({ initialURI, onConnect, mode }: Readonly<ConnectProps>)
         throw error;
       }
     },
-    [onConnect],
+    [onConnect]
   );
 
+  const navigateToHome = useCallback(() => {
+    return navigate({
+      to: "/",
+      search: (search) => search,
+    });
+  }, [navigate]);
+
+  const onGoBack = useCallback(() => {
+    void navigateToHome();
+    analytics.track("button_clicked", {
+      button: "WC-Back",
+      page: "Wallet Connect Session Detail",
+    });
+  }, [analytics, navigateToHome]);
+
   return (
-    <Flex flexDirection="column" width="100%" height="100%" justifyContent="space-between">
-      <Flex justifyContent="center" width="100%" my={14}>
-        <QRScannerContainer>
-          {scanner ? (
-            <QRScanner onQRScan={tryConnect} />
-          ) : (
-            <>
-              <QrCodeMedium size={32} color="neutral.c100" />
-              <Flex position="absolute" bottom={6}>
-                <Button
-                  onClick={startScanning}
-                  data-testid="scan-button"
-                  variant="main"
-                  size="medium"
-                >
-                  <Text fontSize="body" fontWeight="semiBold" color="neutral.c00">
-                    {t("connect.scanQRCode")}
-                  </Text>
-                </Button>
-              </Flex>
-            </>
-          )}
-        </QRScannerContainer>
-      </Flex>
-      <Flex flexDirection="column" width="100%" mb={6}>
-        <Text
-          variant="paragraph"
-          fontWeight="medium"
-          color="neutral.c100"
-          mb={6}
-          textAlign="center"
-        >
-          {t("connect.useWalletConnectUrl")}
-        </Text>
-        <Input
-          value={inputValue}
-          onChange={setInputValue}
-          error={errorValue}
-          data-testid="input-uri"
-          renderRight={
-            !isRunningInAndroidWebview ? (
-              <QrCodeButton onClick={handlePasteClick} data-test="copy-button">
-                <PasteMedium size={18} color="neutral.c100" />
-              </QrCodeButton>
-            ) : null
-          }
-          placeholder={t("connect.pasteUrl")}
-        />
-        <Button
-          mt={6}
-          onClick={handleConnect}
-          data-testid="connect-button"
-          variant="main"
-          size="large"
-          disabled={!inputValue}
-        >
-          <Text
-            fontSize="body"
-            fontWeight="semiBold"
-            color={!inputValue ? "neutral.c50" : "neutral.c00"}
-          >
-            {t("connect.cta")}
+    <WalletConnectContainer>
+      <ResponsiveContainer>
+        <Flex mt={8} alignSelf="flex-start" alignItems="center">
+          {showBackButton ? (
+            <BackButton onClick={onGoBack}>
+              <ArrowLeftMedium size={24} color="neutral.c100" />
+            </BackButton>
+          ) : null}
+          <Text variant="h3" ml={5} color="neutral.c100">
+            {t("connect.title")}
           </Text>
-        </Button>
-      </Flex>
-    </Flex>
+        </Flex>
+        <Flex
+          flexDirection="column"
+          width="100%"
+          height="100%"
+          justifyContent="space-between"
+        >
+          <Flex justifyContent="center" width="100%" my={14}>
+            <QRScannerContainer>
+              {scanner ? (
+                <QRScanner onQRScan={tryConnect} />
+              ) : (
+                <>
+                  <QrCodeMedium size={32} color="neutral.c100" />
+                  <Flex position="absolute" bottom={6}>
+                    <Button
+                      onClick={startScanning}
+                      data-testid="scan-button"
+                      variant="main"
+                      size="medium"
+                    >
+                      <Text
+                        fontSize="body"
+                        fontWeight="semiBold"
+                        color="neutral.c00"
+                      >
+                        {t("connect.scanQRCode")}
+                      </Text>
+                    </Button>
+                  </Flex>
+                </>
+              )}
+            </QRScannerContainer>
+          </Flex>
+          <Flex flexDirection="column" width="100%" mb={6}>
+            <Text
+              variant="paragraph"
+              fontWeight="medium"
+              color="neutral.c100"
+              mb={6}
+              textAlign="center"
+            >
+              {t("connect.useWalletConnectUrl")}
+            </Text>
+            <Input
+              value={inputValue}
+              onChange={setInputValue}
+              error={errorValue}
+              data-testid="input-uri"
+              renderRight={
+                !isRunningInAndroidWebview ? (
+                  <QrCodeButton
+                    onClick={handlePasteClick}
+                    data-test="copy-button"
+                  >
+                    <PasteMedium size={18} color="neutral.c100" />
+                  </QrCodeButton>
+                ) : null
+              }
+              placeholder={t("connect.pasteUrl")}
+            />
+            <Button
+              mt={6}
+              onClick={handleConnect}
+              data-testid="connect-button"
+              variant="main"
+              size="large"
+              disabled={!inputValue}
+            >
+              <Text
+                fontSize="body"
+                fontWeight="semiBold"
+                color={!inputValue ? "neutral.c50" : "neutral.c00"}
+              >
+                {t("connect.cta")}
+              </Text>
+            </Button>
+          </Flex>
+        </Flex>
+      </ResponsiveContainer>
+    </WalletConnectContainer>
   );
 }

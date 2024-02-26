@@ -1,6 +1,7 @@
 import { Flex, Text, Checkbox } from "@ledgerhq/react-ui";
 import { ChevronRightMedium } from "@ledgerhq/react-ui/assets/icons";
 import styled from "styled-components";
+import { RowType } from "./types";
 
 type Props = {
   title: string;
@@ -11,12 +12,6 @@ type Props = {
   onClick?: () => void;
   rowType: RowType;
 };
-
-export enum RowType {
-  Select = "select",
-  Detail = "detail",
-  Default = "default",
-}
 
 const Row = styled(Flex)`
   border-radius: 12px;
@@ -42,7 +37,11 @@ export function GenericRow({
       }}
       alignItems="center"
     >
-      <Flex flexDirection="row" justifyContent="space-between" alignItems="center">
+      <Flex
+        flexDirection="row"
+        justifyContent="space-between"
+        alignItems="center"
+      >
         {LeftIcon}
         <Flex flexDirection="column" ml={5}>
           <Text variant="body" fontWeight="semiBold" color="neutral.c100">
@@ -57,9 +56,16 @@ export function GenericRow({
       <Flex alignItems="center" data-testid="rightComp">
         {rightElement ?? null}
         {rowType === RowType.Select && onClick && (
-          <Checkbox isChecked={isSelected} name={""} onChange={onClick} data-testid="checkbox" />
+          <Checkbox
+            isChecked={isSelected}
+            name={""}
+            onChange={onClick}
+            data-testid="checkbox"
+          />
         )}
-        {rowType === RowType.Detail && <ChevronRightMedium size={24} color="neutral.c70" />}
+        {rowType === RowType.Detail && (
+          <ChevronRightMedium size={24} color="neutral.c70" />
+        )}
       </Flex>
     </Row>
   );

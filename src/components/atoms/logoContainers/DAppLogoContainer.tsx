@@ -1,12 +1,14 @@
 import { Flex } from "@ledgerhq/react-ui";
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import styled from "styled-components";
 
 type Props = {
   children: ReactNode;
 };
 function DAppLogoContainer(props: Props) {
-  return <AppLogoContainer data-test-id="logo">{props.children}</AppLogoContainer>;
+  return (
+    <AppLogoContainer data-test-id="logo">{props.children}</AppLogoContainer>
+  );
 }
 
 const AppLogoContainer = styled(Flex).attrs(() => ({

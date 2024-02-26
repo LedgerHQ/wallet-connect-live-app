@@ -1,0 +1,73 @@
+{
+  "applicationDisabled" : {
+    "title" : "Nous rencontrons actuellement un problème temporaire avec l’intégration de WalletConnect v2.",
+    "desc" : "Nous mettons tout en œuvre pour trouver et déployer un correctif afin de rétablir cette fonctionnalité dans les plus brefs délais. Merci pour votre compréhension."
+  },
+  "errorBoundary" : {
+    "title" : "Une erreur est survenue.",
+    "desc" : "Cette erreur nous a été signalée. Veuillez réessayer en rafraîchissant la page."
+  },
+  "back" : "Retour",
+  "close" : "Fermer",
+  "error" : {
+    "noInput" : "Aucune saisie",
+    "invalidUri" : "URI invalide"
+  },
+  "connect" : {
+    "title" : "Connexion",
+    "cta" : "Connecter",
+    "scanQRCode" : "Scannez un code QR",
+    "useWalletConnectUrl" : "Ou utilisez une URL WalletConnect",
+    "pasteUrl" : "Collez l’URL ici",
+    "switchToText" : "Passer en mode texte",
+    "switchToScanner" : "Utiliser le scanner",
+    "errorProtocol" : {
+      "title" : "La dApp à laquelle vous essayez de vous connecter n’est pas à jour",
+      "desc" : "WalletConnect v1 n’est plus pris en charge. Pour une connexion fluide et sécurisée, la dApp que vous utilisez doit être mise à niveau vers WalletConnect v2."
+    }
+  },
+  "sessionProposal" : {
+    "connectTo" : "Connexion à {{name}}",
+    "connect" : "Connecter",
+    "reject" : "Refuser",
+    "close" : "Fermer",
+    "notSupported" : "Blockchain non prise en charge :",
+    "notSupported_plural" : "Blockchains non prises en charge :",
+    "info" : "Cette app pourra : ",
+    "info2" : "Cette app peut : ",
+    "info3" : "Si vous connectez : ",
+    "infoBullet" : {
+      "0" : "Vérifier le solde et l’activité de votre compte",
+      "1" : "Vous demander d’approuver des opérations",
+      "2" : "Vous serez déconnecté(e) de {{dAppName}}"
+    },
+    "error" : {
+      "title" : "{{appName}} a demandé à se connecter à des chaînes pas encore prises en charge",
+      "desc" : "Les chaînes que nous prenons actuellement en charge sont : Ethereum, Polygon, Binance Smart Chain, Arbitrum, Optimism, Avalanche C-Chain, Ethereum Goerli et Optimism Goerli. Nous en ajoutons de nouvelles progressivement."
+    },
+    "addAccount" : "Ajouter un compte"
+  },
+  "sessions" : {
+    "title" : "Sessions",
+    "disconnectAll" : "Déconnecter tout",
+    "modal" : {
+      "title" : "Voulez-vous vraiment déconnecter toutes vos sessions ?",
+      "desc" : "Pour pouvoir utiliser toutes les applications auxquelles vous étiez connecté(e), vous devrez vous reconnecter.",
+      "continue" : "Déconnecter",
+      "cancel" : "Annuler"
+    },
+    "detail" : {
+      "title" : "Détails de la session",
+      "account" : "Compte",
+      "accounts" : "Comptes",
+      "connected" : "Connecté",
+      "expires" : "Expire",
+      "disconnect" : "Déconnecter"
+    },
+    "emptyState" : {
+      "title" : "Pas encore de session active",
+      "desc" : "Pour commencer, connectez-vous à une application.",
+      "goToConnect" : "Connecter"
+    }
+  }
+}

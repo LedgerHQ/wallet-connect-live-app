@@ -1,0 +1,73 @@
+{
+  "applicationDisabled" : {
+    "title" : "WalletConnect v2 集成暂时存在问题。",
+    "desc" : "我们正在积极寻找和实施解决方案，将尽快恢复此功能。感谢您的理解。"
+  },
+  "errorBoundary" : {
+    "title" : "哎呀，出错了！",
+    "desc" : "我们已知晓此错误。请刷新页面重试。"
+  },
+  "back" : "返回",
+  "close" : "关闭",
+  "error" : {
+    "noInput" : "无输入值",
+    "invalidUri" : "URI 无效"
+  },
+  "connect" : {
+    "title" : "连接",
+    "cta" : "连接",
+    "scanQRCode" : "扫描二维码",
+    "useWalletConnectUrl" : "或使用 WalletConnect 网址",
+    "pasteUrl" : "粘贴网址",
+    "switchToText" : "切换到文本",
+    "switchToScanner" : "切换到扫描工具",
+    "errorProtocol" : {
+      "title" : "您尝试连接的去中心化应用程序 (Dapp) 不是最新版本",
+      "desc" : "系统不再支持 WalletConnect V1。为确保顺利、安全地连接，您使用的 Dapp 必须升级到 WalletConnect V2。"
+    }
+  },
+  "sessionProposal" : {
+    "connectTo" : "连接到 {{name}}",
+    "connect" : "连接",
+    "reject" : "拒绝",
+    "close" : "关闭",
+    "notSupported" : "不支持此区块链",
+    "notSupported_plural" : "不支持这些区块链",
+    "info" : "此应用程序将能够： ",
+    "info2" : "此应用程序能够： ",
+    "info3" : "如果您连接： ",
+    "infoBullet" : {
+      "0" : "查看您的账户余额和活动",
+      "1" : "请求批准交易",
+      "2" : "您将与 {{dAppName}} 断开连接"
+    },
+    "error" : {
+      "title" : "{{appName}} 请求连接的是我们暂不支持的链",
+      "desc" : "我们目前支持以太坊、Polygon、币安智能链 (BSC)、Arbitrum、Optimism、Avalanche C-Chain、Ethereum Goerli 和 Optimism Goerli。我们还在逐步添加新的链。"
+    },
+    "addAccount" : "添加账户"
+  },
+  "sessions" : {
+    "title" : "会话",
+    "disconnectAll" : "断开所有",
+    "modal" : {
+      "title" : "确实想断开所有会话吗？",
+      "desc" : "您将需要重新连接，才能与您之前连接的所有应用程序进行交互。",
+      "continue" : "断开连接",
+      "cancel" : "取消"
+    },
+    "detail" : {
+      "title" : "会话详情",
+      "account" : "账户",
+      "accounts" : "账户",
+      "connected" : "已连接",
+      "expires" : "过期",
+      "disconnect" : "断开连接"
+    },
+    "emptyState" : {
+      "title" : "目前没有活动的会话",
+      "desc" : "连接一个应用程序即可开始。",
+      "goToConnect" : "连接"
+    }
+  }
+}

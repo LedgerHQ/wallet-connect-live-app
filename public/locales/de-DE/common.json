@@ -1,0 +1,73 @@
+{
+  "applicationDisabled" : {
+    "title" : "Aktuell gibt es ein vorübergehendes Problem mit der WalletConnect v2-Integration.",
+    "desc" : "Wir sind intensiv damit beschäftigt, eine Lösung zu erarbeiten, um die Funktionalität so schnell wie möglich wiederherzustellen. Wir bitten Sie vielmals um Verständnis."
+  },
+  "errorBoundary" : {
+    "title" : "Ein Problem ist aufgetreten",
+    "desc" : "Wir wurden über diesen Fehler informiert. Bitte laden Sie die Seite versuchsweise neu."
+  },
+  "back" : "Zurück",
+  "close" : "Schließen",
+  "error" : {
+    "noInput" : "Kein Eingabewert",
+    "invalidUri" : "Ungültige URI"
+  },
+  "connect" : {
+    "title" : "Verbinden",
+    "cta" : "Verbinden",
+    "scanQRCode" : "QR-Code scannen",
+    "useWalletConnectUrl" : "Sie können auch eine WalletConnect-URL verwenden.",
+    "pasteUrl" : "URL einfügen",
+    "switchToText" : "Zu Text wechseln",
+    "switchToScanner" : "Zum Scanner wechseln",
+    "errorProtocol" : {
+      "title" : "Die DApp, mit der Sie sich verbinden möchten, ist nicht auf dem neuesten Stand",
+      "desc" : "WalletConnect V1 wird nicht mehr unterstützt. Für eine sichere und problemlose Nutzung ist ein Upgrade der DApp auf WalletConnect V2 erforderlich."
+    }
+  },
+  "sessionProposal" : {
+    "connectTo" : "Mit {{name}} verbinden",
+    "connect" : "Verbinden",
+    "reject" : "Ablehnen",
+    "close" : "Schließen",
+    "notSupported" : "Diese Blockchain wird nicht unterstützt",
+    "notSupported_plural" : "Diese Blockchains werden nicht unterstützt",
+    "info" : "Diese App wird folgende Funktionalität bieten: ",
+    "info2" : "Diese App bietet folgende Funktionalität: ",
+    "info3" : "Wenn Sie eine Verbindung herstellen: ",
+    "infoBullet" : {
+      "0" : "Kontostand und eigene Aktivitäten kontrollieren",
+      "1" : "Genehmigungen für Transaktionen anfordern",
+      "2" : "Ihre Verbindung zu {{dAppName}} wird getrennt"
+    },
+    "error" : {
+      "title" : "{{appName}} möchte sich mit Blockchains verbinden, die wir aktuell noch nicht unterstützen",
+      "desc" : "Derzeit unterstützen wir Ethereum, Polygon, Binance Smart Chain, Arbitrum, Optimism, Avalanche C-Chain, Ethereum Goerli und Optimism Goerli. Weitere werden schrittweise hinzugefügt."
+    },
+    "addAccount" : "Konto hinzufügen"
+  },
+  "sessions" : {
+    "title" : "Sitzungen",
+    "disconnectAll" : "Alle trennen",
+    "modal" : {
+      "title" : "Möchten Sie wirklich alle Ihre Sitzungen trennen?",
+      "desc" : "Wenn Sie mit den Apps, mit denen Sie verbunden waren, weiter interagieren möchten, müssen Sie erneut eine Verbindung herstellen.",
+      "continue" : "Trennen",
+      "cancel" : "Abbrechen"
+    },
+    "detail" : {
+      "title" : "Sitzungsdetails",
+      "account" : "Konto",
+      "accounts" : "Konten",
+      "connected" : "Verbunden",
+      "expires" : "Läuft ab",
+      "disconnect" : "Trennen"
+    },
+    "emptyState" : {
+      "title" : "Noch keine aktive Sitzung",
+      "desc" : "Stellen Sie zunächst eine Verbindung mit einer App her.",
+      "goToConnect" : "Verbinden"
+    }
+  }
+}

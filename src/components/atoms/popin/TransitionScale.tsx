@@ -1,4 +1,4 @@
-import React from "react";
+import { useRef } from "react";
 import { CSSTransition } from "react-transition-group";
 import { CSSTransitionProps } from "react-transition-group/CSSTransition";
 import styled from "styled-components";
@@ -38,10 +38,21 @@ const TransitionScale = ({
   in: inProp,
   timeout = duration,
   ...TransitionProps
-}: TransitionScaleProps) => (
-  <CSSTransition {...TransitionProps} in={inProp} timeout={timeout} classNames="transition-scale">
-    <ChildrenWrapper>{children}</ChildrenWrapper>
-  </CSSTransition>
-);
+}: TransitionScaleProps) => {
+  // Using a ref to avoid StrictMode warning
+  // https://github.com/reactjs/react-transition-group/issues/820#issuecomment-1248508631
+  const nodeRef = useRef(null);
+  return (
+    <CSSTransition
+      {...TransitionProps}
+      in={inProp}
+      timeout={timeout}
+      classNames="transition-scale"
+      nodeRef={nodeRef}
+    >
+      <ChildrenWrapper ref={nodeRef}>{children}</ChildrenWrapper>
+    </CSSTransition>
+  );
+};
 
 export default TransitionScale;

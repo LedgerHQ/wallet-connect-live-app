@@ -1,12 +1,11 @@
-import { render, screen, renderHook } from "@/tests-tools/test.utils";
-import useAnalytics from "@/hooks/common/useAnalytics";
-import ProtocolNotSupported from "@/pages/protocol-not-supported";
+import { describe, expect, it } from "vitest";
+import { renderWithRouter, screen } from "@/tests/test.utils";
+import ProtocolNotSupported from "@/components/screens/ProtocolNotSupported";
 
 describe("ProtocolNotSupported Screen", () => {
   it("Page should appears", async () => {
-    renderHook(() => useAnalytics());
-    render(<ProtocolNotSupported />);
-    const button = screen.getByRole("button", { name: /close/i });
+    await renderWithRouter(ProtocolNotSupported);
+    const button = await screen.findByRole("button", { name: /close/i });
     expect(button).toBeInTheDocument();
   });
 });
