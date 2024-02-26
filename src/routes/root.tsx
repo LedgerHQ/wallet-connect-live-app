@@ -29,7 +29,7 @@ const queryClient = new QueryClient({
 
 // We could make everything lazy at the top to avoid downloading code for the app when disabled
 const isApplicationDisabled = Boolean(
-  import.meta.env.VITE_APPLICATION_DISABLED === "true"
+  import.meta.env.VITE_APPLICATION_DISABLED === "true",
 );
 
 type RootSearch = {
@@ -93,8 +93,14 @@ export const rootRoute = createRootRoute({
               }
             >
               <ErrorBoundary fallback={<ErrorFallback />}>
-                <WalletConnectInit initialURI={uri} />
-                {isApplicationDisabled ? <ApplicationDisabled /> : <Outlet />}
+                {isApplicationDisabled ? (
+                  <ApplicationDisabled />
+                ) : (
+                  <>
+                    <WalletConnectInit initialURI={uri} />
+                    <Outlet />
+                  </>
+                )}
               </ErrorBoundary>
             </Suspense>
           </Container>
