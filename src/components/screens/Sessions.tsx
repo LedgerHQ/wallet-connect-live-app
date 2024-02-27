@@ -168,13 +168,15 @@ export default function Sessions() {
         ))}
       </List>
 
-      <ButtonsContainer my={6}>
-        <Button variant="shade" size="large" flex={1} onClick={openModal}>
-          <Text variant="body" fontWeight="semiBold" color="neutral.c100">
-            {t("sessions.disconnectAll")}
-          </Text>
-        </Button>
-      </ButtonsContainer>
+      {!isEmptyState ? (
+        <ButtonsContainer my={6}>
+          <Button variant="shade" size="large" flex={1} onClick={openModal}>
+            <Text variant="body" fontWeight="semiBold" color="neutral.c100">
+              {t("sessions.disconnectAll")}
+            </Text>
+          </Button>
+        </ButtonsContainer>
+      ) : null}
 
       <WalletConnectPopin isOpen={isModalOpen} onClose={closeModal}>
         <Flex flexDirection="column" mx={6}>
