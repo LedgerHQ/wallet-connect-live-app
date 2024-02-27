@@ -168,7 +168,7 @@ export default function Sessions() {
         ))}
       </List>
 
-      {!isEmptyState && (
+      {!isEmptyState ? (
         <ButtonsContainer my={6}>
           <Button variant="shade" size="large" flex={1} onClick={openModal}>
             <Text variant="body" fontWeight="semiBold" color="neutral.c100">
@@ -176,7 +176,7 @@ export default function Sessions() {
             </Text>
           </Button>
         </ButtonsContainer>
-      )}
+      ) : null}
 
       <WalletConnectPopin isOpen={isModalOpen} onClose={closeModal}>
         <Flex flexDirection="column" mx={6}>

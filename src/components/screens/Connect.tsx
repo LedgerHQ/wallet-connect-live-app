@@ -138,7 +138,7 @@ export function Connect({ mode }: Props) {
         throw error;
       }
     },
-    [onConnect]
+    [onConnect],
   );
 
   const navigateToHome = useCallback(() => {
@@ -159,7 +159,7 @@ export function Connect({ mode }: Props) {
   return (
     <WalletConnectContainer>
       <ResponsiveContainer>
-        <Flex mt={8} width="100%" alignSelf="flex-start" alignItems="center">
+        <Flex mt={8} width="100%" alignItems="center">
           {showBackButton ? (
             <BackButton onClick={onGoBack}>
               <ArrowLeftMedium size={24} color="neutral.c100" />
@@ -168,10 +168,12 @@ export function Connect({ mode }: Props) {
 
           <Text
             display="flex"
+            flexGrow={1}
             justifyContent="center"
-            width="100%"
             variant="h3"
             color="neutral.c100"
+            // Add margin to center the text when the back button is present
+            mr={showBackButton ? 8 : undefined}
           >
             {t("connect.title")}
           </Text>
