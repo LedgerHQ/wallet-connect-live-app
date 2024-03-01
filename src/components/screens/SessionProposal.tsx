@@ -64,7 +64,7 @@ export default function SessionProposal({ proposal }: Props) {
     void navigateToHome();
     analytics.track("button_clicked", {
       button: "WC-Back",
-      page: "Wallet Connect Session Detail",
+      page: "Wallet Connect Session Request",
     });
   }, [analytics, navigateToHome]);
 
