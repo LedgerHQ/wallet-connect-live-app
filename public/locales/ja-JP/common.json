@@ -42,19 +42,23 @@
       "2" : "{{dAppName}}から切断されます"
     },
     "error" : {
-      "title" : "{{appName}}が、まだサポートされていないチェーンへの接続を要求しました",
+      "title" : "{{appName}}が、未対応のチェーンへの接続をリクエストしました",
       "desc" : "当社は現在、Ethereum、Polygon、Binance Smart Chain、Arbitrum、Optimism、Avalanche C-Chain、Ethereum Goerli、Optimism Goerliをサポートしています。今後、さらに新しいブロックチェーンを追加していく予定です。"
     },
     "addAccount" : "アカウントを追加"
   },
   "sessions" : {
     "title" : "セッション",
+    "goToConnect" : "接続",
     "disconnectAll" : "すべて切断する",
     "modal" : {
       "title" : "すべてのセッションを切断してもよろしいですか？",
       "desc" : "接続されていたすべてのアプリを操作できるようにするには、再接続する必要があります。",
       "continue" : "接続を切断",
       "cancel" : "キャンセル"
+    },
+    "proposals" : {
+      "title" : "提案"
     },
     "detail" : {
       "title" : "セッションの詳細",
