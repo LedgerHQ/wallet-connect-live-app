@@ -49,12 +49,16 @@
   },
   "sessions" : {
     "title" : "Sessions",
+    "goToConnect" : "Connecter",
     "disconnectAll" : "Déconnecter tout",
     "modal" : {
       "title" : "Voulez-vous vraiment déconnecter toutes vos sessions ?",
       "desc" : "Pour pouvoir utiliser toutes les applications auxquelles vous étiez connecté(e), vous devrez vous reconnecter.",
       "continue" : "Déconnecter",
       "cancel" : "Annuler"
+    },
+    "proposals" : {
+      "title" : "Demandes"
     },
     "detail" : {
       "title" : "Détails de la session",
