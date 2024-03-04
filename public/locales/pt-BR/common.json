@@ -42,19 +42,23 @@
       "2" : "Você vai desconectar-se de {{dAppName}}"
     },
     "error" : {
-      "title" : "{{appName}} solicitou conectar-se a cadeias com as quais ainda não somos compatíveis",
+      "title" : "{{appName}} quer conectar-se a cadeias que ainda são incompatíveis",
       "desc" : "No momento, somos compatíveis com Ethereum, Polygon, Binance Smart Chain, Arbitrum, Optimism, Avalanche C-Chain, Ethereum Goerli e Optimism Goerli. Adicionamos suporte a novas cadeias gradualmente."
     },
     "addAccount" : "Adicionar conta"
   },
   "sessions" : {
     "title" : "Sessões",
+    "goToConnect" : "Conectar",
     "disconnectAll" : "Desconectar todas",
     "modal" : {
       "title" : "Você realmente deseja desconectar todas as suas sessões?",
       "desc" : "Para interagir com todos os aplicativos aos quais estava conectado, você precisará reconectar-se.",
       "continue" : "Desconectar",
       "cancel" : "Cancelar"
+    },
+    "proposals" : {
+      "title" : "Propostas"
     },
     "detail" : {
       "title" : "Detalhes da sessão",
