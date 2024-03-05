@@ -49,12 +49,16 @@
   },
   "sessions" : {
     "title" : "会话",
+    "goToConnect" : "连接",
     "disconnectAll" : "断开所有",
     "modal" : {
       "title" : "确实想断开所有会话吗？",
       "desc" : "您将需要重新连接，才能与您之前连接的所有应用程序进行交互。",
       "continue" : "断开连接",
       "cancel" : "取消"
+    },
+    "proposals" : {
+      "title" : "提案"
     },
     "detail" : {
       "title" : "会话详情",

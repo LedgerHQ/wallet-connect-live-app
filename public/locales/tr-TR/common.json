@@ -49,12 +49,16 @@
   },
   "sessions" : {
     "title" : "Oturumlar",
+    "goToConnect" : "Bağlan",
     "disconnectAll" : "Tümünün Bağlantısını Kes",
     "modal" : {
       "title" : "Tüm oturumlarınızın bağlantısını kesmek istediğinizden emin misiniz?",
       "desc" : "Bağlı olduğunuz tüm uygulamalarla etkileşim kurabilmek için yeniden bağlanmanız gerekecektir.",
       "continue" : "Bağlantıyı Kes",
       "cancel" : "İptal et"
+    },
+    "proposals" : {
+      "title" : "Teklifler"
     },
     "detail" : {
       "title" : "Oturum ayrıntıları",

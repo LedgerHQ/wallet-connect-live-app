@@ -49,12 +49,16 @@
   },
   "sessions" : {
     "title" : "Sitzungen",
+    "goToConnect" : "Verbinden",
     "disconnectAll" : "Alle trennen",
     "modal" : {
       "title" : "Möchten Sie wirklich alle Ihre Sitzungen trennen?",
       "desc" : "Wenn Sie mit den Apps, mit denen Sie verbunden waren, weiter interagieren möchten, müssen Sie erneut eine Verbindung herstellen.",
       "continue" : "Trennen",
       "cancel" : "Abbrechen"
+    },
+    "proposals" : {
+      "title" : "Vorschläge"
     },
     "detail" : {
       "title" : "Sitzungsdetails",
