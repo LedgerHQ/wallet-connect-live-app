@@ -32,7 +32,7 @@ const formatMessage = (buffer: Buffer) => {
   const message = stripHexPrefix(
     buffer.toString().match(/^ *(0x)?([a-fA-F0-9]+) *$/)
       ? buffer.toString()
-      : buffer.toString("hex")
+      : buffer.toString("hex"),
   );
   return "0x" + message;
 };
@@ -41,7 +41,7 @@ const acceptRequest = (
   web3wallet: Web3Wallet,
   topic: string,
   id: number,
-  signedMessage: string
+  signedMessage: string,
 ) => {
   return web3wallet.respondSessionRequest({
     topic,
@@ -57,7 +57,7 @@ const rejectRequest = (
   web3wallet: Web3Wallet,
   topic: string,
   id: number,
-  message: Errors
+  message: Errors,
 ) => {
   return web3wallet.respondSessionRequest({
     topic,
@@ -111,7 +111,7 @@ export default function useWalletConnect() {
           });
         });
     },
-    [navigate, pendingProposalsQueryFn, queryClient]
+    [navigate, pendingProposalsQueryFn, queryClient],
   );
 
   const handleEIP155Request = useCallback(
@@ -119,7 +119,7 @@ export default function useWalletConnect() {
       request: EIP155_REQUESTS,
       topic: string,
       id: number,
-      chainId: string
+      chainId: string,
     ) => {
       switch (request.method) {
         case EIP155_SIGNING_METHODS.ETH_SIGN:
@@ -129,23 +129,23 @@ export default function useWalletConnect() {
           const accountSign = getAccountWithAddressAndChainId(
             accounts.data,
             isPersonalSign ? request.params[1] : request.params[0],
-            chainId
+            chainId,
           );
           if (accountSign) {
             try {
               const message = stripHexPrefix(
-                isPersonalSign ? request.params[0] : request.params[1]
+                isPersonalSign ? request.params[0] : request.params[1],
               );
 
               const signedMessage = await client.message.sign(
                 accountSign.id,
-                Buffer.from(message, "hex")
+                Buffer.from(message, "hex"),
               );
               void acceptRequest(
                 web3wallet,
                 topic,
                 id,
-                formatMessage(signedMessage)
+                formatMessage(signedMessage),
               );
             } catch (error) {
               void rejectRequest(web3wallet, topic, id, Errors.userDecline);
@@ -162,7 +162,7 @@ export default function useWalletConnect() {
           const accountSignTyped = getAccountWithAddressAndChainId(
             accounts.data,
             request.params[0],
-            chainId
+            chainId,
           );
           if (accountSignTyped) {
             try {
@@ -170,13 +170,13 @@ export default function useWalletConnect() {
 
               const signedMessage = await client.message.sign(
                 accountSignTyped.id,
-                Buffer.from(message)
+                Buffer.from(message),
               );
               void acceptRequest(
                 web3wallet,
                 topic,
                 id,
-                formatMessage(signedMessage)
+                formatMessage(signedMessage),
               );
             } catch (error) {
               void rejectRequest(web3wallet, topic, id, Errors.msgDecline);
@@ -192,14 +192,14 @@ export default function useWalletConnect() {
           const accountTX = getAccountWithAddressAndChainId(
             accounts.data,
             ethTx.from,
-            chainId
+            chainId,
           );
           if (accountTX) {
             try {
               const liveTx = convertEthToLiveTX(ethTx);
               const hash = await client.transaction.signAndBroadcast(
                 accountTX.id,
-                liveTx
+                liveTx,
               );
               void acceptRequest(web3wallet, topic, id, hash);
             } catch (error) {
@@ -216,12 +216,16 @@ export default function useWalletConnect() {
           const accountTX = getAccountWithAddressAndChainId(
             accounts.data,
             ethTx.from,
-            chainId
+            chainId,
           );
           if (accountTX) {
             try {
               const liveTx = convertEthToLiveTX(ethTx);
-              const hash = await client.transaction.sign(accountTX.id, liveTx);
+              // Doing a signAndBroadcast to make sure the transaction is not saved for later by the dApp
+              const hash = await client.transaction.signAndBroadcast(
+                accountTX.id,
+                liveTx,
+              );
               void acceptRequest(web3wallet, topic, id, hash.toString());
             } catch (error) {
               void rejectRequest(web3wallet, topic, id, Errors.txDeclined);
@@ -237,7 +241,7 @@ export default function useWalletConnect() {
           return; // ModalStore.open('SessionUnsuportedMethodModal', { requestEvent, requestSession })
       }
     },
-    [accounts.data, client, web3wallet]
+    [accounts.data, client, web3wallet],
   );
 
   const onSessionRequest = useCallback(
@@ -256,7 +260,7 @@ export default function useWalletConnect() {
         console.error("Not Supported Chain");
       }
     },
-    [handleEIP155Request]
+    [handleEIP155Request],
   );
 
   const onSessionDeleted = useCallback(() => {
