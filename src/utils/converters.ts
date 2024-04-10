@@ -1,6 +1,9 @@
 import { BigNumber } from "bignumber.js";
 import eip55 from "eip55";
-import { EthereumTransaction } from "@ledgerhq/wallet-api-client";
+import {
+  ElrondTransaction,
+  EthereumTransaction,
+} from "@ledgerhq/wallet-api-client";
 
 export type EthTransaction = {
   value: string;
@@ -22,7 +25,40 @@ export function convertEthToLiveTX(ethTX: EthTransaction): EthereumTransaction {
       ethTX.gasPrice !== undefined
         ? new BigNumber(ethTX.gasPrice.replace("0x", ""), 16)
         : undefined,
-    gasLimit: ethTX.gas !== undefined ? new BigNumber(ethTX.gas.replace("0x", ""), 16) : undefined,
-    data: ethTX.data ? Buffer.from(ethTX.data.replace("0x", ""), "hex") : undefined,
+    gasLimit:
+      ethTX.gas !== undefined
+        ? new BigNumber(ethTX.gas.replace("0x", ""), 16)
+        : undefined,
+    data: ethTX.data
+      ? Buffer.from(ethTX.data.replace("0x", ""), "hex")
+      : undefined,
+  };
+}
+
+export type MvxTransaction = {
+  nonce: string;
+  value: string;
+  receiver: string;
+  sender: string;
+  gasPrice: number;
+  gasLimit: number;
+  data?: string;
+  chainID: string;
+  version?: string;
+  options?: string;
+  guardian?: string;
+  receiverUsername?: string;
+  senderUsername?: string;
+};
+
+export function convertMvxToLiveTX(tx: MvxTransaction): ElrondTransaction {
+  return {
+    family: "elrond",
+    mode: "send",
+    amount: tx.value !== undefined ? new BigNumber(tx.value) : new BigNumber(0),
+    recipient: tx.receiver,
+    // NOTE: defaulting to 0, might be better to default to undefined
+    gasLimit: tx.gasLimit ?? 0,
+    data: tx.data,
   };
 }

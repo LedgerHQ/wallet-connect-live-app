@@ -1,4 +1,5 @@
 import { EIP155_REQUESTS } from "@/data/methods/EIP155Data.methods";
+import { MULTIVERSX_REQUESTS } from "@/data/methods/MultiversX.methods";
 import { SUPPORTED_NETWORK } from "@/data/network.config";
 
 /**
@@ -31,6 +32,15 @@ export function isEIP155Chain(
   _request?: { method: string; params: any }
 ): _request is EIP155_REQUESTS {
   return chain.includes("eip155");
+}
+
+export function isMultiversXChain(
+  chain: string,
+  // request is passed and used here only for type narrowing
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  _request?: { method: string; params: any }
+): _request is MULTIVERSX_REQUESTS {
+  return chain.includes("mvx");
 }
 
 /**

@@ -50,9 +50,9 @@ export const getChains = (proposal: ProposalTypes.Struct) => {
   );
   const optionalNamespaces = proposal.optionalNamespaces
     ? Object.values(proposal.optionalNamespaces).map((namespace) => ({
-        ...namespace,
-        required: false,
-      }))
+      ...namespace,
+      required: false,
+    }))
     : [];
 
   return [...requiredNamespaces, ...optionalNamespaces];
@@ -81,7 +81,10 @@ export const formatAccountsByChain = (
         isRequired: families.some(
           (family) => family.required && family.chains?.includes(chain)
         ),
-        accounts: accounts.filter((acc) => acc.currency === formatedChain),
+        accounts: accounts.filter((acc) => {
+          if (formatedChain === 'mvx:1' && acc.currency === 'elrond') return true;
+          return (acc.currency === formatedChain)
+        }),
       };
     }
   );
