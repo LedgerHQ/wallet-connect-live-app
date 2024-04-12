@@ -1,6 +1,8 @@
 import { coreAtom } from "@/store/web3wallet.store";
+import { getErrorMessage } from "@/utils/helper.util";
 import { useNavigate } from "@tanstack/react-router";
 import { useAtomValue } from "jotai";
+import { enqueueSnackbar } from "notistack";
 import { useCallback, useMemo } from "react";
 
 export function useConnect() {
@@ -52,6 +54,13 @@ export function useConnect() {
           await startProposal(uri);
         }
       } catch (error: unknown) {
+        enqueueSnackbar(getErrorMessage(error), {
+          errorType: "Connection error",
+          variant: "errorNotification", anchorOrigin: {
+            vertical: 'top',
+            horizontal: 'right'
+          }
+        })
         console.error(error);
       } finally {
         await navigate({

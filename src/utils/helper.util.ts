@@ -55,3 +55,8 @@ export const getCurrencyByChainId = (chainId: string) => {
   );
   return elem?.[0] ?? chainId;
 };
+
+export const getErrorMessage = (error: unknown) => {
+  if (error instanceof Error) return error.message
+  return String(error)
+}

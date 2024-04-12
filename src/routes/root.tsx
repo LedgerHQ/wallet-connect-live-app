@@ -1,6 +1,8 @@
 import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { SnackbarProvider } from 'notistack';
+
 import { Flex, ProgressLoader, StyleProvider } from "@ledgerhq/react-ui";
 import GlobalStyle from "@/styles/globalStyle";
 import { ApplicationDisabled } from "@/components/ApplicationDisabled";
@@ -13,6 +15,7 @@ import { InputMode } from "@/types/types";
 import i18n from "@/i18n";
 import { TanStackRouterDevtools } from "@/components/TanStackRouterDevtools";
 import { WalletConnectInit } from "@/components/WalletConnectInit";
+import { ErrorNotification } from "@/components/atoms/Notification";
 
 // Create a client
 const twentyFourHoursInMs = 1000 * 60 * 60 * 24;
@@ -97,8 +100,14 @@ export const rootRoute = createRootRoute({
                   <ApplicationDisabled />
                 ) : (
                   <>
-                    <WalletConnectInit initialURI={uri} />
+                    <SnackbarProvider
+                      Components={{
+                        errorNotification: ErrorNotification,
+                      }}
+                    >
+                      <WalletConnectInit initialURI={uri} />
                     <Outlet />
+                    </SnackbarProvider>
                   </>
                 )}
               </ErrorBoundary>
