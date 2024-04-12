@@ -4,6 +4,7 @@ import React from "react";
 
 // NOTE: https://notistack.com/features/customization#custom-variant-(typescript)
 declare module "notistack" {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
   interface VariantOverrides {
     errorNotification: {
       errorType: string;
