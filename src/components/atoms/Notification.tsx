@@ -1,5 +1,5 @@
 import { Notification, Icon } from "@ledgerhq/react-ui";
-import { CustomContentProps } from "notistack";
+import { CustomContentProps, SnackbarContent } from "notistack";
 import React from "react";
 
 // NOTE: https://notistack.com/features/customization#custom-variant-(typescript)
@@ -32,16 +32,15 @@ export const ErrorNotification = React.forwardRef<
   const { id, errorType, message } = props;
 
   return (
-    <div ref={ref} key={id}>
+    <SnackbarContent ref={ref} key={id}>
       <Notification
         badge={warningBadge}
         hasBackground={true}
-        height={16}
         title={errorType}
         description={message?.toString() ?? ""}
         role="alert"
       />
-    </div>
+    </SnackbarContent>
   );
 });
 
