@@ -240,6 +240,7 @@ export default function useWalletConnect() {
           break;
         }
         default:
+          // TODO handle default case ?
           return;
       }
     },

@@ -82,7 +82,6 @@ export const formatAccountsByChain = (
           (family) => family.required && family.chains?.includes(chain)
         ),
         accounts: accounts.filter((acc) => {
-          if (formatedChain === 'mvx:1' && acc.currency === 'elrond') return true;
           return (acc.currency === formatedChain)
         }),
       };

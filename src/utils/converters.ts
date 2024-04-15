@@ -57,8 +57,7 @@ export function convertMvxToLiveTX(tx: MvxTransaction): ElrondTransaction {
     mode: "send",
     amount: tx.value !== undefined ? new BigNumber(tx.value) : new BigNumber(0),
     recipient: tx.receiver,
-    // NOTE: defaulting to 0, might be better to default to undefined
-    gasLimit: tx.gasLimit ?? 0,
+    gasLimit: tx.gasLimit,
     data: tx.data,
   };
 }

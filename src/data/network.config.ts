@@ -82,7 +82,7 @@ const EIP155_GOERLI_CHAINS: Record<string, Network> = {
 };
 
 export const MULTIVERS_X_CHAINS: Record<string, Network> = {
-  "mvx:1": {
+  "elrond": {
     chainId: "1",
     namespace: "mvx:1",
     ticker: "EGLD",

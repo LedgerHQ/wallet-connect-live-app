@@ -60,6 +60,9 @@ export const getNamespace = (chain: string) =>
   SUPPORTED_NETWORK[chain]?.namespace ?? chain;
 
 export const getCurrencyByChainId = (chainId: string) => {
+  if (chainId === 'mvx:1') {
+    return 'elrond';
+  }
   const elem = Object.entries(SUPPORTED_NETWORK).find(
     ([, network]) => network.namespace === chainId.toLowerCase()
   );
