@@ -127,8 +127,8 @@ export function useProposal(proposal: ProposalTypes.Struct) {
             elem.accounts
               .filter((acc) => selectedAccounts.includes(acc.id))
               .map((a) => ({
-                account: `mvx:1:${a.address}`,
-                chain: 'mvx:1',
+                account: `${getNamespace(a.currency)}:${a.address}`,
+                chain: getNamespace(a.currency),
               })),
           ),
         [],
