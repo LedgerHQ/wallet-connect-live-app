@@ -29,7 +29,7 @@ export const ErrorNotification = React.forwardRef<
   HTMLDivElement,
   ErrorNotificationProps
 >((props, ref) => {
-  const { id, errorType, message, ...other } = props;
+  const { id: _id, errorType, message, ...other } = props;
 
   return (
     <SnackbarContent ref={ref} role="alert" {...other}>
