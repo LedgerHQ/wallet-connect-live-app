@@ -29,10 +29,10 @@ export const ErrorNotification = React.forwardRef<
   HTMLDivElement,
   ErrorNotificationProps
 >((props, ref) => {
-  const { id, errorType, message } = props;
+  const { id, errorType, message, ...other } = props;
 
   return (
-    <SnackbarContent ref={ref} key={id}>
+    <SnackbarContent ref={ref} role="alert" {...other}>
       <Notification
         badge={warningBadge}
         hasBackground={true}
