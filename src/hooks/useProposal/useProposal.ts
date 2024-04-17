@@ -158,15 +158,16 @@ export function useProposal(proposal: ProposalTypes.Struct) {
 
   const buildSupportedNamespaces = useCallback(
     (proposal: ProposalTypes.Struct) => {
-      const requiredNamespaces = proposal.requiredNamespaces;
+      const { requiredNamespaces, optionalNamespaces } = proposal;
+
       const supportedNamespaces: BuildApprovedNamespacesParams["supportedNamespaces"] =
         {};
 
-      if ("eip155" in requiredNamespaces) {
+      if ("eip155" in requiredNamespaces || "eip155" in optionalNamespaces) {
         supportedNamespaces[SupportedNamespace.EIP155] =
           buildEip155Namespace(requiredNamespaces);
       }
-      if ("mvx" in requiredNamespaces) {
+      if ("mvx" in requiredNamespaces || "mvx" in optionalNamespaces) {
         supportedNamespaces[SupportedNamespace.MVX] =
           buildMvxNamespace(requiredNamespaces);
       }
@@ -180,12 +181,13 @@ export function useProposal(proposal: ProposalTypes.Struct) {
   const approveSession = useCallback(async () => {
     try {
       const supportedNs = buildSupportedNamespaces(proposal);
+      const approvedNs = buildApprovedNamespaces({
+        proposal,
+        supportedNamespaces: supportedNs,
+      })
       const session = await web3wallet.approveSession({
         id: proposal.id,
-        namespaces: buildApprovedNamespaces({
-          proposal,
-          supportedNamespaces: supportedNs,
-        }),
+        namespaces: approvedNs,
       });
       await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
       await queryClient.invalidateQueries({
