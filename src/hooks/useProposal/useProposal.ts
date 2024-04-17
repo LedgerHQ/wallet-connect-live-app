@@ -2,8 +2,15 @@ import { useCallback, useState } from "react";
 import { getNamespace } from "@/utils/helper.util";
 import { EIP155_SIGNING_METHODS } from "@/data/methods/EIP155Data.methods";
 import useAnalytics from "@/hooks/useAnalytics";
-import { SupportedNamespace } from "@/data/network.config";
-import { buildApprovedNamespaces } from "@walletconnect/utils";
+import {
+  EIP155_CHAINS,
+  MULTIVERS_X_CHAINS,
+  SupportedNamespace,
+} from "@/data/network.config";
+import {
+  BuildApprovedNamespacesParams,
+  buildApprovedNamespaces,
+} from "@walletconnect/utils";
 import { formatAccountsByChain } from "@/hooks/useProposal/util";
 import { useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
@@ -36,7 +43,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
         setSelectedAccounts([...selectedAccounts, account]);
       }
     },
-    [selectedAccounts]
+    [selectedAccounts],
   );
 
   const navigateToHome = useCallback(() => {
@@ -46,12 +53,17 @@ export function useProposal(proposal: ProposalTypes.Struct) {
     });
   }, [navigate]);
 
-  const buildSupportedNamespaces = useCallback(
-    (proposal: ProposalTypes.Struct) => {
+  const buildEip155Namespace = useCallback(
+    (requiredNamespaces: ProposalTypes.RequiredNamespaces) => {
       const accountsByChain = formatAccountsByChain(
         proposal,
-        accounts.data
-      ).filter((a) => a.accounts.length > 0 && a.isSupported);
+        accounts.data,
+      ).filter(
+        (a) =>
+          a.accounts.length > 0 &&
+          a.isSupported &&
+          Object.keys(EIP155_CHAINS).includes(a.chain),
+      );
       const dataToSend = accountsByChain.reduce<
         { account: string; chain: string }[]
       >(
@@ -62,54 +74,117 @@ export function useProposal(proposal: ProposalTypes.Struct) {
               .map((a) => ({
                 account: `${getNamespace(a.currency)}:${a.address}`,
                 chain: getNamespace(a.currency),
-              }))
+              })),
           ),
-        []
+        [],
       );
-
-      const requiredNamespaces = proposal.requiredNamespaces;
       const namespace =
         requiredNamespaces && Object.keys(requiredNamespaces).length > 0
           ? requiredNamespaces[SupportedNamespace.EIP155]
           : { methods: [] as string[], events: [] as string[] };
 
-      const methods = [
-        ...new Set(
-          namespace.methods.concat(Object.values(EIP155_SIGNING_METHODS))
-        ),
+      const methods: string[] = [
+        ...new Set([
+          ...namespace.methods,
+          ...Object.values(EIP155_SIGNING_METHODS),
+        ]),
       ];
       const events = [
-        ...new Set(
-          namespace.events.concat([
-            "session_proposal",
-            "session_request",
-            "auth_request",
-            "session_delete",
-          ])
-        ),
+        ...new Set([
+          ...namespace.events,
+          "session_proposal",
+          "session_request",
+          "auth_request",
+          "session_delete",
+        ]),
       ];
 
       return {
-        [SupportedNamespace.EIP155]: {
-          chains: [...new Set(dataToSend.map((e) => e.chain))],
-          methods,
-          events,
-          accounts: dataToSend.map((e) => e.account),
-        },
+        chains: [...new Set(dataToSend.map((e) => e.chain))],
+        methods,
+        events,
+        accounts: dataToSend.map((e) => e.account),
       };
+    }
+    , [accounts.data, proposal, selectedAccounts])
+
+  const buildMvxNamespace = useCallback(
+    (requiredNamespaces: ProposalTypes.RequiredNamespaces) => {
+      const accountsByChain = formatAccountsByChain(
+        proposal,
+        accounts.data,
+      ).filter(
+        (a) =>
+          a.accounts.length > 0 &&
+          a.isSupported &&
+          Object.keys(MULTIVERS_X_CHAINS).includes(a.chain),
+      );
+      const dataToSend = accountsByChain.reduce<
+        { account: string; chain: string }[]
+      >(
+        (accum, elem) =>
+          accum.concat(
+            elem.accounts
+              .filter((acc) => selectedAccounts.includes(acc.id))
+              .map((a) => ({
+                account: `${getNamespace(a.currency)}:${a.address}`,
+                chain: getNamespace(a.currency),
+              })),
+          ),
+        [],
+      );
+      const namespace = requiredNamespaces[SupportedNamespace.MVX];
+
+      const methods: string[] = namespace.methods;
+
+      const events = [
+        ...new Set([
+          ...namespace.events,
+          "session_proposal",
+          "session_request",
+          "auth_request",
+          "session_delete",
+        ]),
+      ];
+
+      return {
+        chains: [...new Set(dataToSend.map((e) => e.chain))],
+        methods,
+        events,
+        accounts: dataToSend.map((e) => e.account),
+      };
+    }
+    , [accounts.data, proposal, selectedAccounts])
+
+  const buildSupportedNamespaces = useCallback(
+    (proposal: ProposalTypes.Struct) => {
+      const requiredNamespaces = proposal.requiredNamespaces;
+      const supportedNamespaces: BuildApprovedNamespacesParams["supportedNamespaces"] =
+        {};
+
+      if ("eip155" in requiredNamespaces) {
+        supportedNamespaces[SupportedNamespace.EIP155] =
+          buildEip155Namespace(requiredNamespaces);
+      }
+      if ("mvx" in requiredNamespaces) {
+        supportedNamespaces[SupportedNamespace.MVX] =
+          buildMvxNamespace(requiredNamespaces);
+      }
+      return supportedNamespaces;
     },
-    [accounts.data, selectedAccounts]
+    [buildEip155Namespace, buildMvxNamespace],
   );
 
   const sessionsQueryFn = useSessionsQueryFn(web3wallet);
 
   const approveSession = useCallback(async () => {
     try {
+      const supportedNs = buildSupportedNamespaces(proposal);
       const session = await web3wallet.approveSession({
         id: proposal.id,
         namespaces: buildApprovedNamespaces({
           proposal,
-          supportedNamespaces: buildSupportedNamespaces(proposal),
+          supportedNamespaces: supportedNs,
         }),
       });
       await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
@@ -186,7 +261,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
       // refetch accounts
       await queryClient.invalidateQueries({ queryKey: accountsQueryKey });
     },
-    [client, queryClient]
+    [client, queryClient],
   );
 
   // No need for a memo as it's directly spread on usage

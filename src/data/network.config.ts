@@ -5,7 +5,7 @@
 
 import { Network } from "./types";
 
-const EIP155_CHAINS: Record<string, Network> = {
+export const EIP155_CHAINS: Record<string, Network> = {
   ethereum: {
     chainId: 1,
     namespace: "eip155:1",
@@ -81,11 +81,23 @@ const EIP155_GOERLI_CHAINS: Record<string, Network> = {
   },
 };
 
+export const MULTIVERS_X_CHAINS: Record<string, Network> = {
+  "elrond": {
+    chainId: "1",
+    namespace: "mvx:1",
+    ticker: "EGLD",
+    displayName: "MultiversX",
+    color: "#23F7DD",
+  }
+}
+
 export const SUPPORTED_NETWORK: Record<string, Network> = {
   ...EIP155_CHAINS,
   ...EIP155_GOERLI_CHAINS,
+  ...MULTIVERS_X_CHAINS
 };
 
 export enum SupportedNamespace {
   EIP155 = "eip155",
+  MVX = "mvx"
 }
