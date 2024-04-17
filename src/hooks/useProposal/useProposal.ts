@@ -54,7 +54,9 @@ export function useProposal(proposal: ProposalTypes.Struct) {
   }, [navigate]);
 
   const buildEip155Namespace = useCallback(
-    (requiredNamespaces: ProposalTypes.RequiredNamespaces) => {
+    (requiredNamespaces: ProposalTypes.RequiredNamespaces,
+      optionalNamespaces: ProposalTypes.OptionalNamespaces
+    ) => {
       const accountsByChain = formatAccountsByChain(
         proposal,
         accounts.data,
@@ -78,10 +80,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
           ),
         [],
       );
-      const namespace =
-        requiredNamespaces && Object.keys(requiredNamespaces).length > 0
-          ? requiredNamespaces[SupportedNamespace.EIP155]
-          : { methods: [] as string[], events: [] as string[] };
+      const namespace = requiredNamespaces[SupportedNamespace.EIP155] || optionalNamespaces[SupportedNamespace.EIP155];
 
       const methods: string[] = [
         ...new Set([
@@ -109,7 +108,8 @@ export function useProposal(proposal: ProposalTypes.Struct) {
     , [accounts.data, proposal, selectedAccounts])
 
   const buildMvxNamespace = useCallback(
-    (requiredNamespaces: ProposalTypes.RequiredNamespaces) => {
+    (requiredNamespaces: ProposalTypes.RequiredNamespaces,
+      optionalNamespaces: ProposalTypes.OptionalNamespaces) => {
       const accountsByChain = formatAccountsByChain(
         proposal,
         accounts.data,
@@ -133,7 +133,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
           ),
         [],
       );
-      const namespace = requiredNamespaces[SupportedNamespace.MVX];
+      const namespace = requiredNamespaces[SupportedNamespace.MVX] || optionalNamespaces[SupportedNamespace.MVX];
 
       const methods: string[] = namespace.methods;
 
@@ -165,11 +165,11 @@ export function useProposal(proposal: ProposalTypes.Struct) {
 
       if ("eip155" in requiredNamespaces || "eip155" in optionalNamespaces) {
         supportedNamespaces[SupportedNamespace.EIP155] =
-          buildEip155Namespace(requiredNamespaces);
+          buildEip155Namespace(requiredNamespaces, optionalNamespaces);
       }
       if ("mvx" in requiredNamespaces || "mvx" in optionalNamespaces) {
         supportedNamespaces[SupportedNamespace.MVX] =
-          buildMvxNamespace(requiredNamespaces);
+          buildMvxNamespace(requiredNamespaces, optionalNamespaces);
       }
       return supportedNamespaces;
     },
