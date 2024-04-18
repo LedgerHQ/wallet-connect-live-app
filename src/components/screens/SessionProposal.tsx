@@ -113,12 +113,18 @@ export default function SessionProposal({ proposal }: Props) {
     [requiredChains]
   );
 
-  const disabled = useMemo(
+  const everyRequiredChainsSelected = useMemo(
     () =>
-      !requiredChains.every((entry) =>
+      requiredChains.every((entry) =>
         entry.accounts.some((account) => selectedAccounts.includes(account.id))
       ),
     [requiredChains, selectedAccounts]
+  )
+
+  const disabled = useMemo(
+    () => !(everyRequiredChainsSelected && selectedAccounts.length > 0)
+    ,
+    [everyRequiredChainsSelected, selectedAccounts]
   );
 
   const iconProposer = useMemo(
