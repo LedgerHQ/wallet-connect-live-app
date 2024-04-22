@@ -43,7 +43,7 @@
     },
     "error": {
       "title": "{{appName}} requested to connect to chains we don't support yet",
-      "desc": "We currently support Ethereum, Polygon, Binance Smart Chain, Arbitrum, Optimism, Avalanche C-Chain, Ethereum Goerli and Optimism Goerli. We are adding new ones gradually."
+      "desc": "We currently support "
     },
     "addAccount": "Add account"
   },

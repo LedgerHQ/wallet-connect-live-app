@@ -46,24 +46,24 @@ describe("SUPPORTED_NETWORK", () => {
   });
 });
 
-describe("EIP155_GOERLI_CHAINS", () => {
-  it("contains Ethereum Goerli", () => {
-    const ethereumGoerli: Network | undefined =
-      SUPPORTED_NETWORK.ethereum_goerli;
+describe("EIP155_SEPOLIA_CHAINS", () => {
+  it("contains Ethereum Sepolia", () => {
+    const ethereumSepolia: Network | undefined =
+      SUPPORTED_NETWORK.ethereum_sepolia;
 
-    expect(ethereumGoerli?.displayName).toBe("Ethereum Goerli");
+    expect(ethereumSepolia?.displayName).toBe("Ethereum Sepolia");
   });
 
-  it("contains Optimism Goerli", () => {
-    const optimismGoerli: Network | undefined =
-      SUPPORTED_NETWORK.optimism_goerli;
+  it("contains Optimism Sepolia", () => {
+    const optimismSepolia: Network | undefined =
+      SUPPORTED_NETWORK.optimism_sepolia;
 
-    expect(optimismGoerli?.displayName).toBe("Optimism Goerli");
+    expect(optimismSepolia?.displayName).toBe("Optimism Sepolia");
   });
 
-  it("contains Base Goerli", () => {
-    const baseGoerli: Network | undefined = SUPPORTED_NETWORK.base_goerli;
+  it("contains Base Sepolia", () => {
+    const baseSepolia: Network | undefined = SUPPORTED_NETWORK.base_sepolia;
 
-    expect(baseGoerli?.displayName).toBe("Base Goerli");
+    expect(baseSepolia?.displayName).toBe("Base Sepolia");
   });
 });

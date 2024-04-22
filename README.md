@@ -7,16 +7,17 @@ and is intended to be integrated within ledger products, enabling users to seaml
 
 ## Supported Currencies
 
-| Currency          | Supported ? | Goerli Supported? |
-| ----------------- | ----------- | ----------------- |
-| Bitcoin           | ❌          | -                 |
-| Ethereum          | ✅          | ✅                |
-| Polygon           | ✅          | ❌                |
-| Arbitrum          | ✅          | ❌                |
-| Optimism          | ✅          | ✅                |
-| Avalanche C-Chain | ✅          | -                 |
-| Base              | ✅          | ✅                |
-| Cosmos            | ⏳          | -                 |
+| Currency          | Supported ? | Sepolia Supported? | Holesky Supported? |
+| ----------------- | ----------- | ----------------- | --- |
+| Bitcoin           | ❌          | -                 | -   |
+| Ethereum          | ✅          | ✅                | ✅   |
+| Polygon           | ✅          | ❌                |   |
+| Arbitrum          | ✅          | ✅                |   |
+| Optimism          | ✅          | ✅                |   |
+| Avalanche C-Chain | ✅          | -                 |   |
+| Base              | ✅          | ✅                |   |
+| Cosmos            | ⏳          | -                 |   |
+| Multivers-X       | ✅          | -                 |   |
 
 ## Hosting
 
@@ -143,8 +144,8 @@ All Live apps are defined with a manifest. Here is one that can be used for loca
     "optimism",
     "arbitrum",
     "avalanche_c_chain",
-    "ethereum_goerli",
-    "optimism_goerli"
+    "ethereum_sepolia",
+    "optimism_sepolia"
   ],
   "content": {
     "shortDescription": {

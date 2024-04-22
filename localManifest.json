@@ -19,9 +19,11 @@
     "avalanche_c_chain",
     "base",
     "elrond",
-    "ethereum_goerli",
-    "optimism_goerli",
-    "base_goerli"
+    "ethereum_sepolia",
+    "arbitrum_sepolia",
+    "optimism_sepolia",
+    "base_sepolia",
+    "ethereum_holesky"
   ],
   "content": {
     "shortDescription": {

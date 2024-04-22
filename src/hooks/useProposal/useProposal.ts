@@ -4,6 +4,7 @@ import { EIP155_SIGNING_METHODS } from "@/data/methods/EIP155Data.methods";
 import useAnalytics from "@/hooks/useAnalytics";
 import {
   EIP155_CHAINS,
+  EIP155_SEPOLIA_CHAINS,
   MULTIVERS_X_CHAINS,
   SupportedNamespace,
 } from "@/data/network.config";
@@ -61,10 +62,12 @@ export function useProposal(proposal: ProposalTypes.Struct) {
         proposal,
         accounts.data,
       ).filter(
-        (a) =>
-          a.accounts.length > 0 &&
-          a.isSupported &&
-          Object.keys(EIP155_CHAINS).includes(a.chain),
+        (a) => {
+          return (a.accounts.length > 0 &&
+            a.isSupported &&
+            Object.keys(EIP155_CHAINS).includes(a.chain)
+          )
+        }
       );
       const dataToSend = accountsByChain.reduce<
         { account: string; chain: string }[]
