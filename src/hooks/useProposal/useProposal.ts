@@ -4,7 +4,6 @@ import { EIP155_SIGNING_METHODS } from "@/data/methods/EIP155Data.methods";
 import useAnalytics from "@/hooks/useAnalytics";
 import {
   EIP155_CHAINS,
-  EIP155_SEPOLIA_CHAINS,
   MULTIVERS_X_CHAINS,
   SupportedNamespace,
 } from "@/data/network.config";

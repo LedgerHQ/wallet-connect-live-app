@@ -121,7 +121,7 @@ export const SUPPORTED_NETWORK: Record<string, Network> = {
   ...MULTIVERS_X_CHAINS,
 };
 
-export const SUPPORTED_NETWORK_NAMES: String[] = Object.values(SUPPORTED_NETWORK).map((network: Network) => network.displayName);
+export const SUPPORTED_NETWORK_NAMES: string[] = Object.values(SUPPORTED_NETWORK).map((network: Network) => network.displayName);
 
 export enum SupportedNamespace {
   EIP155 = "eip155",
