@@ -61,10 +61,12 @@ export function useProposal(proposal: ProposalTypes.Struct) {
         proposal,
         accounts.data,
       ).filter(
-        (a) =>
-          a.accounts.length > 0 &&
-          a.isSupported &&
-          Object.keys(EIP155_CHAINS).includes(a.chain),
+        (a) => {
+          return (a.accounts.length > 0 &&
+            a.isSupported &&
+            Object.keys(EIP155_CHAINS).includes(a.chain)
+          )
+        }
       );
       const dataToSend = accountsByChain.reduce<
         { account: string; chain: string }[]

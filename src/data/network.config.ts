@@ -5,7 +5,7 @@
 
 import { Network } from "./types";
 
-export const EIP155_CHAINS: Record<string, Network> = {
+export const EIP155_CHAINS_MAINNET: Record<string, Network> = {
   ethereum: {
     chainId: 1,
     namespace: "eip155:1",
@@ -57,47 +57,73 @@ export const EIP155_CHAINS: Record<string, Network> = {
   },
 };
 
-const EIP155_GOERLI_CHAINS: Record<string, Network> = {
-  ethereum_goerli: {
-    chainId: 5,
-    namespace: "eip155:5",
+
+export const EIP155_SEPOLIA_CHAINS: Record<string, Network> = {
+  ethereum_sepolia: {
+    chainId: 11155111,
+    namespace: "eip155:11155111",
     ticker: "ETH",
-    displayName: "Ethereum Goerli",
+    displayName: "Ethereum Sepolia",
     color: "#00ff00",
   },
-  optimism_goerli: {
-    chainId: 420,
-    namespace: "eip155:420",
+  arbitrum_sepolia: {
+    chainId: 421614,
+    namespace: "eip155:421614",
     ticker: "ETH",
-    displayName: "Optimism Goerli",
+    displayName: "Arbitrum Sepolia",
+    color: "#28a0f0",
+  },
+  optimism_sepolia: {
+    chainId: 11155420,
+    namespace: "eip155:11155420",
+    ticker: "ETH",
+    displayName: "Optimism Sepolia",
     color: "#00ff00",
   },
-  base_goerli: {
+  base_sepolia: {
     chainId: 84531,
     namespace: "eip155:84531",
     ticker: "ETH",
-    displayName: "Base Goerli",
+    displayName: "Base Sepolia",
     color: "#FF0052",
   },
 };
 
+export const EIP155_HOLESKY_CHAINS: Record<string, Network> = {
+  ethereum_holesky: {
+    chainId: 17000,
+    namespace: "eip155:17000",
+    ticker: "ETH",
+    displayName: "Ethereum Holesky",
+    color: "#00ff00",
+  }
+}
+
 export const MULTIVERS_X_CHAINS: Record<string, Network> = {
-  "elrond": {
+  elrond: {
     chainId: "1",
     namespace: "mvx:1",
     ticker: "EGLD",
     displayName: "MultiversX",
     color: "#23F7DD",
-  }
+  },
+};
+
+
+export const EIP155_CHAINS = {
+  ...EIP155_CHAINS_MAINNET,
+  ...EIP155_SEPOLIA_CHAINS,
+  ...EIP155_HOLESKY_CHAINS,
 }
 
 export const SUPPORTED_NETWORK: Record<string, Network> = {
   ...EIP155_CHAINS,
-  ...EIP155_GOERLI_CHAINS,
-  ...MULTIVERS_X_CHAINS
+  ...MULTIVERS_X_CHAINS,
 };
+
+export const SUPPORTED_NETWORK_NAMES: string[] = Object.values(SUPPORTED_NETWORK).map((network: Network) => network.displayName);
 
 export enum SupportedNamespace {
   EIP155 = "eip155",
-  MVX = "mvx"
+  MVX = "mvx",
 }

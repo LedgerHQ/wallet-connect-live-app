@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 import useAnalytics from "@/hooks/useAnalytics";
 import styled from "styled-components";
+import { SUPPORTED_NETWORK_NAMES } from "@/data/network.config";
 
 const LogoContainer = styled(Flex)`
   border-radius: 50%;
@@ -68,7 +69,8 @@ export function ErrorBlockchainSupport({ appName, chains }: Props) {
         mt={10}
         textAlign="center"
       >
-        {t("sessionProposal.error.desc")}
+        {t("sessionProposal.error.info")}
+        {SUPPORTED_NETWORK_NAMES.join(", ")}
       </Text>
     </Flex>
   );
