@@ -69,7 +69,7 @@ export function ErrorBlockchainSupport({ appName, chains }: Props) {
         mt={10}
         textAlign="center"
       >
-        {t("sessionProposal.error.desc")}
+        {t("sessionProposal.error.info")}
         {SUPPORTED_NETWORK_NAMES.join(", ")}
       </Text>
     </Flex>
