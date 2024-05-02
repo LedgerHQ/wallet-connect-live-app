@@ -43,7 +43,7 @@
     },
     "error" : {
       "title" : "Для {{appName}} необходимы блокчейны, которые пока не поддерживаются",
-      "desc" : "В данный момент поддерживаются сети Ethereum, Polygon, Binance Smart Chain, Arbitrum, Optimism, Avalanche C-Chain, Ethereum Goerli и Optimism Goerli. Новые блокчейны добавляются постепенно."
+      "info" : "На данный момент мы поддерживаем: "
     },
     "addAccount" : "Добавить счёт"
   },
