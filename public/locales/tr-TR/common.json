@@ -43,7 +43,7 @@
     },
     "error" : {
       "title" : "{{appName}}, henüz desteklemediğimiz zincirlere bağlanma isteğinde bulundu",
-      "desc" : "Şu anda Ethereum, Polygon, Binance Smart Chain, Arbitrum, Optimism, Avalanche C-Chain, Ethereum Goerli ve Optimism Goerli'yi destekliyoruz. Kademeli olarak yeni zincirler ekliyoruz."
+      "info" : "Şu anda desteklenenler: "
     },
     "addAccount" : "Hesap ekle"
   },
