@@ -43,7 +43,7 @@
     },
     "error" : {
       "title" : "{{appName}} a demandé à se connecter à des chaînes pas encore prises en charge",
-      "desc" : "Les chaînes que nous prenons actuellement en charge sont : Ethereum, Polygon, Binance Smart Chain, Arbitrum, Optimism, Avalanche C-Chain, Ethereum Goerli et Optimism Goerli. Nous en ajoutons de nouvelles progressivement."
+      "info" : "Nous prenons en charge : "
     },
     "addAccount" : "Ajouter un compte"
   },
