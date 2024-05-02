@@ -43,7 +43,7 @@
     },
     "error" : {
       "title" : "{{appName}} طلب الاتصال بسلاسل لا ندعمها بعد",
-      "desc" : "نحن ندعم حالياً إيثريوم و Polygon وسلسلة بينانس الذكية و Arbitrum و Optimism و Avalanche C-Chain و Ethereum Goerli و Optimism Goerli. ونضيف سلاسل جديدة تدريجياً."
+      "info" : "في الوقت الحالي نحن ندعم: "
     },
     "addAccount" : "إضافة حساب"
   },
