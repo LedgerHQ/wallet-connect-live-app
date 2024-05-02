@@ -43,7 +43,7 @@
     },
     "error" : {
       "title" : "{{appName}} 请求连接的是我们暂不支持的链",
-      "desc" : "我们目前支持以太坊、Polygon、币安智能链 (BSC)、Arbitrum、Optimism、Avalanche C-Chain、Ethereum Goerli 和 Optimism Goerli。我们还在逐步添加新的链。"
+      "info" : "我们目前支持： "
     },
     "addAccount" : "添加账户"
   },
