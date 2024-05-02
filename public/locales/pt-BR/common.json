@@ -43,7 +43,7 @@
     },
     "error" : {
       "title" : "{{appName}} quer conectar-se a cadeias que ainda são incompatíveis",
-      "desc" : "No momento, somos compatíveis com Ethereum, Polygon, Binance Smart Chain, Arbitrum, Optimism, Avalanche C-Chain, Ethereum Goerli e Optimism Goerli. Adicionamos suporte a novas cadeias gradualmente."
+      "info" : "No momento, suportamos: "
     },
     "addAccount" : "Adicionar conta"
   },
