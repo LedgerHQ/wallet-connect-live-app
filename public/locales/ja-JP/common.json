@@ -43,7 +43,7 @@
     },
     "error" : {
       "title" : "{{appName}}が、未対応のチェーンへの接続をリクエストしました",
-      "desc" : "当社は現在、Ethereum、Polygon、Binance Smart Chain、Arbitrum、Optimism、Avalanche C-Chain、Ethereum Goerli、Optimism Goerliをサポートしています。今後、さらに新しいブロックチェーンを追加していく予定です。"
+      "info" : "現在対応済み： "
     },
     "addAccount" : "アカウントを追加"
   },
