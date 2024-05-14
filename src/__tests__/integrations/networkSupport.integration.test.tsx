@@ -2,7 +2,7 @@ import "@testing-library/react/dont-cleanup-after-each";
 import { cleanup, render, waitFor, screen } from "@/tests/test.utils";
 import AppScreen from "@/components/screens/App";
 import sessionProposal from "@/data/mocks/sessionProposal.example.json";
-import SessionProposal from "@/components/screens/SessionProposal";
+import SessionProposal from "@/components/screens/SessionProposal.1";
 import { vi, describe, it, expect } from "vitest";
 import { ProposalTypes } from "@walletconnect/types";
 
