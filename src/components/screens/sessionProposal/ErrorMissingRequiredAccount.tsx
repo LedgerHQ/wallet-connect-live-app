@@ -6,6 +6,7 @@ import { useEffect, useMemo } from "react";
 import useAnalytics from "@/hooks/useAnalytics";
 import styled from "styled-components";
 import { SUPPORTED_NETWORK_NAMES } from "@/data/network.config";
+import LogoHeader from "./LogoHeader";
 
 const LogoContainer = styled(Flex)`
   border-radius: 50%;
@@ -18,6 +19,7 @@ const LogoContainer = styled(Flex)`
 
 type Props = {
   appName: string;
+  iconProposer: string | null;
   chains: {
     chain: string;
     isSupported: boolean;
@@ -26,22 +28,24 @@ type Props = {
   }[];
 };
 
-export function ErrorBlockchainSupport({ appName, chains }: Props) {
+export function ErrorMissingRequiredAccount({
+  appName,
+  iconProposer,
+  chains,
+}: Props) {
   const { t } = useTranslation();
   const analytics = useAnalytics();
 
+  const requiredChains = useMemo(
+    () => chains.filter((entry) => entry.isRequired),
+    [chains],
+  );
 
-  useEffect(() => {
-    analytics.page("Wallet Connect Error Unsupported Blockchains", {
-      dapp: appName,
-      chains: chains.map((chain) => ({
-        chain: chain.chain,
-        isSupported: chain.isSupported,
-        isRequired: chain.isRequired,
-      })),
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const requiredChainsWhereNoAccounts = useMemo(
+    () => requiredChains.filter((entry) => entry.accounts.length === 0),
+    [requiredChains],
+  );
+  // NOTE: analytics
 
   return (
     <Flex
@@ -50,9 +54,7 @@ export function ErrorBlockchainSupport({ appName, chains }: Props) {
       flexDirection="column"
       flex={1}
     >
-      <LogoContainer>
-        <CloseMedium size={32} color="background.main" />
-      </LogoContainer>
+      <LogoHeader iconProposer={iconProposer} error={true} />
       <Text
         variant="h4"
         fontWeight="medium"
@@ -61,7 +63,7 @@ export function ErrorBlockchainSupport({ appName, chains }: Props) {
         textAlign="center"
         data-testid="error-title-blockchain-support"
       >
-        {t("sessionProposal.error.title", { appName })}
+        {t("sessionProposal.missingRequired.title", { appName })}
       </Text>
       <Text
         variant="bodyLineHeight"
