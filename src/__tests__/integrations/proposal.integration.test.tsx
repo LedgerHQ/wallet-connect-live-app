@@ -4,7 +4,7 @@ import { cleanup, render, waitFor, screen } from "@/tests/test.utils";
 import { initialParamsHomePage } from "@/tests/mocks/initialParams.mock";
 import sessionExample from "@/data/mocks/session.example.json";
 import sessionProposal from "@/data/mocks/sessionProposal.example.json";
-import SessionProposal from "@/components/screens/SessionProposal.1";
+import SessionProposal from "@/components/screens/SessionProposal";
 import SessionDetail from "@/components/screens/SessionDetail";
 import userEvent from "@testing-library/user-event";
 import { vi, describe, it, expect } from "vitest";

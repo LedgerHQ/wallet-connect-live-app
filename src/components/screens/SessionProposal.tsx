@@ -120,10 +120,65 @@ const mocked = {
       },
     },
   },
+  required: {
+    id: 1715804846589986,
+    pairingTopic:
+      "97a873822e39de495546088218ff06fc8bcbf0f4cae883803be071794baf1d59",
+    expiryTimestamp: 1715805146,
+    requiredNamespaces: {
+      eip155: {
+        methods: ["eth_sendTransaction", "personal_sign"],
+        // chains: ["eip155:1", "eip155:10", "eip155:137"],
+        // 10 = Optimism, 137 = Polygon, 1 = Ethereum
+        chains: ["eip155:1", "eip155:10"],
+        events: ["chainChanged", "accountsChanged"],
+      },
+    },
+    optionalNamespaces: {
+      eip155: {
+        methods: [
+          "eth_signTransaction",
+          "eth_sign",
+          "eth_signTypedData",
+          "eth_signTypedData_v4",
+          "wallet_getCapabilities",
+          "wallet_sendCalls",
+          "wallet_getCallsStatus",
+        ],
+        chains: ["eip155:1", "eip155:10", "eip155:137", "eip155:43114", 
+      
+          "eip155:11155111",
+          "eip155:84532",
+          "eip155:80001",
+          "eip155:11155420",
+          "eip155:421614",
+      ],
+        events: [],
+      },
+    },
+    relays: [
+      {
+        protocol: "irn",
+      },
+    ],
+    proposer: {
+      publicKey:
+        "564f9d64a931901961d3349187e21b623daa5b1cbf98bb0f357ecf7bf6906538",
+      metadata: {
+        description: "React App for WalletConnect",
+        url: "https://react-app.walletconnect.com",
+        icons: ["https://avatars.githubusercontent.com/u/37784886"],
+        name: "React App",
+        verifyUrl: "https://verify.walletconnect.com",
+      },
+    },
+  },
 };
 
 export default function SessionProposal({ proposal }: Props) {
-  proposal = mocked.many;
+  console.log({ proposal });
+  // proposal = mocked.many;
+  proposal = mocked.required;
   const { colors } = useTheme();
   const { t } = useTranslation();
   const {
@@ -134,6 +189,7 @@ export default function SessionProposal({ proposal }: Props) {
     accounts,
     selectedAccounts,
     addNewAccount,
+    addNewAccounts,
     navigateToHome,
   } = useProposal(proposal);
   const analytics = useAnalytics();
@@ -220,12 +276,25 @@ export default function SessionProposal({ proposal }: Props) {
     [proposal.proposer.metadata.icons],
   );
 
-  const createAccountDisplayed = useMemo(
+  const chainsWhereNoAccounts = useMemo(
     () =>
       accountsByChain
         .filter((entry) => entry.isSupported)
-        .filter((entry) => entry.accounts.length === 0).length > 0,
+        .filter((entry) => entry.accounts.length === 0),
     [accountsByChain],
+  );
+  
+  const requiredChainsWhereNoAccounts = useMemo(
+    () =>
+      requiredChains.filter((entry) => entry.accounts.length === 0),
+    [requiredChains],
+  )
+
+  console.log({ chainsWhereNoAccounts, accountsByChain });
+
+  const createAccountDisplayed = useMemo(
+    () => chainsWhereNoAccounts.length > 0,
+    [chainsWhereNoAccounts],
   );
 
   console.log({ createAccountDisplayed });
@@ -346,8 +415,10 @@ export default function SessionProposal({ proposal }: Props) {
                   })}
                 {createAccountDisplayed && (
                   <AddAccountPlaceholder
+                    chains={chainsWhereNoAccounts}
+                    addNewAccounts={addNewAccounts}
                     // onClick={() => void addNewAccount(entry.chain)}
-                    onClick={() => {}}
+                    // onClick={() => {}}
                   />
                 )}
                 <Box mt={6}>
@@ -358,16 +429,26 @@ export default function SessionProposal({ proposal }: Props) {
 
             <Flex
               style={{
-                background: colors.background.main,
+                backdropFilter: "blur(7px)",
                 position: "sticky",
                 bottom: "0px",
               }}
             >
               <ButtonsContainer>
+                <Button size="large" flex={0.3} mr={6} onClick={onReject}>
+                  <Text
+                    variant="body"
+                    fontWeight="semiBold"
+                    color="neutral.c100"
+                  >
+                    {t("sessionProposal.reject")}
+                  </Text>
+                </Button>
+                  {JSON.stringify(requiredChainsWhereNoAccounts)}
                 <Button
                   variant="main"
                   size="large"
-                  flex={1}
+                  flex={0.9}
                   onClick={onApprove}
                   disabled={disabled}
                 >

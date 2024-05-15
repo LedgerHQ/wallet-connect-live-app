@@ -42,15 +42,22 @@ export function GenericRow({
         justifyContent="space-between"
         alignItems="center"
       >
-        {LeftIcon}
-        <Flex flexDirection="column" ml={5}>
+        <Flex flexDirection="column" rowGap={3}>
           <Text variant="body" fontWeight="semiBold" color="neutral.c100">
             {title}
           </Text>
 
-          <Text variant="small" fontWeight="medium" color="neutral.c70" mt={2}>
-            {subtitle}
-          </Text>
+          <Flex flexDirection="row" columnGap={2}>
+            <Text
+              variant="small"
+              fontWeight="medium"
+              color="neutral.c70"
+              mt={2}
+            >
+              {subtitle}
+            </Text>
+            {LeftIcon}
+          </Flex>
         </Flex>
       </Flex>
       <Flex alignItems="center" data-testid="rightComp">

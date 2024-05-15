@@ -45,7 +45,8 @@
       "title": "{{appName}} requested to connect to chains we don't support yet",
       "info": "We currently support: "
     },
-    "addAccount": "Add account"
+    "addAccount": "Add account",
+    "createAccount": "Create a new account"
   },
   "sessions": {
     "title": "Sessions",

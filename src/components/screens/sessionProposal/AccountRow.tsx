@@ -51,7 +51,7 @@ export function AccountRow(
     >
       <GenericRow
         title={account.name}
-        subtitle={truncate(account.address, 30)}
+        subtitle={truncate(account.address, 10)}
         isSelected={selectedAccounts.includes(account.id)}
         rightElement={AccountBalance({ account, entry })}
         onClick={() => handleClick(account.id)}
@@ -59,7 +59,7 @@ export function AccountRow(
           <CryptoIcon
             name={getTicker(entry.chain)}
             circleIcon
-            size={24}
+            size={20}
             color={getColor(entry.chain)}
           />
         }
