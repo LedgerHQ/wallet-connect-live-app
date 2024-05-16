@@ -2,7 +2,7 @@ import { Account } from "@ledgerhq/wallet-api-client";
 import { Flex, Text } from "@ledgerhq/react-ui";
 import { CloseMedium } from "@ledgerhq/react-ui/assets/icons";
 import { useTranslation } from "react-i18next";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import useAnalytics from "@/hooks/useAnalytics";
 import styled from "styled-components";
 import { SUPPORTED_NETWORK_NAMES } from "@/data/network.config";
@@ -29,7 +29,6 @@ type Props = {
 export function ErrorBlockchainSupport({ appName, chains }: Props) {
   const { t } = useTranslation();
   const analytics = useAnalytics();
-
 
   useEffect(() => {
     analytics.page("Wallet Connect Error Unsupported Blockchains", {

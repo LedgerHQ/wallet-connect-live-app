@@ -1,11 +1,8 @@
-import ChainBadge from "@/components/atoms/ChainBadge";
 import { AccountsInChain } from "@/hooks/useProposal/util";
 import { getColor, getTicker } from "@/utils/helper.util";
 import { CryptoIcon, Flex, Text } from "@ledgerhq/react-ui";
-import { CheckAloneMedium, PlusMedium } from "@ledgerhq/react-ui/assets/icons";
+import { CheckAloneMedium } from "@ledgerhq/react-ui/assets/icons";
 import { useMemo } from "react";
-import { useTranslation } from "react-i18next";
-import styled from "styled-components";
 
 type Props = {
   entry: AccountsInChain;
@@ -33,8 +30,6 @@ export const ChainRow = ({ entry, selectedAccounts }: Props) => {
       padding={2}
       paddingRight={3}
       borderRadius={2}
-      // borderTopLeftRadius={2}
-      // borderTopRightRadius={2}
     >
       <CryptoIcon
         name={getTicker(entry.chain)}

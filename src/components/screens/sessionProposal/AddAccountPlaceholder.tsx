@@ -13,9 +13,7 @@ type Props = {
 export const AddAccountPlaceholder = ({ chains, addNewAccounts }: Props) => {
   const { t } = useTranslation();
   const chainIds = useMemo(() => chains.map((chain) => chain.chain), [chains]);
-  // {chainIds.join(", ")}
 
-  /* <AddAccountButton onClick={() => addNewAccounts(chains[0].chain)}> */
   return (
     <AddAccountButton onClick={() => addNewAccounts(chainIds)}>
       <Flex
@@ -25,9 +23,11 @@ export const AddAccountPlaceholder = ({ chains, addNewAccounts }: Props) => {
         marginBottom={2}
       >
         <Text ml={2} variant="bodyLineHeight" color="neutral.c100">
-          {chains.length === 1 
-          ? t("sessionProposal.createAccountForChain", { chain: chains[0].displayName })
-          : t("sessionProposal.createAccount")}
+          {chains.length === 1
+            ? t("sessionProposal.createAccountForChain", {
+                chain: chains[0].displayName,
+              })
+            : t("sessionProposal.createAccount")}
         </Text>
         <PlusMedium />
       </Flex>
@@ -74,7 +74,7 @@ export const AddAccountPlaceholder = ({ chains, addNewAccounts }: Props) => {
 
 const AddAccountButton = styled.button`
   border: 1px dashed rgba(153, 153, 153, 0.3);
-margin-top: 12px;
+  margin-top: 12px;
   cursor: pointer;
   border-radius: 12px;
   padding: 12px;
