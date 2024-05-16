@@ -1,7 +1,4 @@
 import { ButtonsContainer, List } from "@/components/atoms/containers/Elements";
-import { GenericRow } from "@/components/atoms/GenericRow";
-import { RowType } from "@/components/atoms/types";
-import LogoContainer from "@/components/atoms/logoContainers/LedgerLogoContainer";
 import { AddAccountPlaceholder } from "@/components/screens/sessionProposal/AddAccountPlaceholder";
 import { ErrorBlockchainSupport } from "@/components/screens/sessionProposal/ErrorBlockchainSupport";
 import { InfoSessionProposal } from "@/components/screens/sessionProposal/InfoSessionProposal";
@@ -9,14 +6,9 @@ import { formatUrl } from "@/utils/helper.util";
 import { useProposal } from "@/hooks/useProposal/useProposal";
 import { ResponsiveContainer } from "@/styles/styles";
 import { Flex, Button, Box, Text } from "@ledgerhq/react-ui";
-import {
-  WalletConnectMedium,
-  CircledCrossSolidMedium,
-  ArrowLeftMedium,
-} from "@ledgerhq/react-ui/assets/icons";
+import { ArrowLeftMedium } from "@ledgerhq/react-ui/assets/icons";
 import { useTranslation } from "react-i18next";
 import { useCallback, useEffect, useMemo } from "react";
-import { Logo } from "@/icons/LedgerLiveLogo";
 import styled, { useTheme } from "styled-components";
 import useAnalytics from "@/hooks/useAnalytics";
 import { tryDecodeURI } from "@/utils/image";
@@ -25,7 +17,6 @@ import { ProposalTypes } from "@walletconnect/types";
 import { AccountRow } from "./sessionProposal/AccountRow";
 import { ErrorMissingRequiredAccount } from "./sessionProposal/ErrorMissingRequiredAccount";
 import LogoHeader from "./sessionProposal/LogoHeader";
-import ChainBadge from "../atoms/ChainBadge";
 import { ChainRow } from "./sessionProposal/ChainRow";
 
 const BackButton = styled(Flex)`
@@ -40,9 +31,6 @@ type Props = {
 };
 
 export default function SessionProposal({ proposal }: Props) {
-  console.log({ proposal });
-  // proposal = mocked.many;
-  // proposal = mocked.required;
   const { colors } = useTheme();
   const { t } = useTranslation();
   const {
@@ -52,7 +40,6 @@ export default function SessionProposal({ proposal }: Props) {
     rejectSession,
     accounts,
     selectedAccounts,
-    addNewAccount,
     addNewAccounts,
     navigateToHome,
   } = useProposal(proposal);
@@ -109,11 +96,6 @@ export default function SessionProposal({ proposal }: Props) {
   const requiredChainsWhereNoAccounts = useMemo(
     () => requiredChains.filter((entry) => entry.accounts.length === 0),
     [requiredChains],
-  );
-
-  const chainsNotSupported = useMemo(
-    () => accountsByChain.filter((entry) => !entry.isSupported),
-    [accountsByChain],
   );
 
   const noChainsSupported = useMemo(
@@ -248,7 +230,10 @@ export default function SessionProposal({ proposal }: Props) {
                   .map((entry) => {
                     return (
                       <Box key={entry.chain}>
-                          <ChainRow entry={entry} selectedAccounts={selectedAccounts} />
+                        <ChainRow
+                          entry={entry}
+                          selectedAccounts={selectedAccounts}
+                        />
                         <List>
                           {entry.accounts.map((account, index: number) =>
                             AccountRow(
@@ -265,11 +250,8 @@ export default function SessionProposal({ proposal }: Props) {
                   })}
                 {createAccountDisplayed && (
                   <AddAccountPlaceholder
-
                     chains={chainsWhereNoAccounts}
                     addNewAccounts={addNewAccounts}
-                    // onClick={() => void addNewAccount(entry.chain)}
-                    // onClick={() => {}}
                   />
                 )}
                 <Box mt={6}>
@@ -318,15 +300,6 @@ export default function SessionProposal({ proposal }: Props) {
     </Flex>
   );
 }
-
-const Container = styled(Flex).attrs((p: { size: number }) => ({
-  heigth: p.size,
-  width: p.size,
-  alignItems: "center",
-  justifyContent: "center",
-  position: "relative",
-  left: "-25px",
-}))<{ size: number }>``;
 
 const ListChains = styled(Flex)`
   flex-direction: column;
