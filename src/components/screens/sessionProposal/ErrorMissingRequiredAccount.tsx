@@ -42,7 +42,7 @@ export function ErrorMissingRequiredAccount({
     >
       <LogoHeader iconProposer={iconProposer} error={true} />
       <Text
-        variant="h4"
+        variant="large"
         fontWeight="medium"
         color="neutral.c100"
         mt={10}
