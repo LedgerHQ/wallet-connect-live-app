@@ -25,6 +25,8 @@ import { ProposalTypes } from "@walletconnect/types";
 import { AccountRow } from "./sessionProposal/AccountRow";
 import { ErrorMissingRequiredAccount } from "./sessionProposal/ErrorMissingRequiredAccount";
 import LogoHeader from "./sessionProposal/LogoHeader";
+import ChainBadge from "../atoms/ChainBadge";
+import { ChainRow } from "./sessionProposal/ChainRow";
 
 const BackButton = styled(Flex)`
   cursor: pointer;
@@ -113,7 +115,6 @@ export default function SessionProposal({ proposal }: Props) {
     () => accountsByChain.filter((entry) => !entry.isSupported),
     [accountsByChain],
   );
-  console.log({ chainsNotSupported });
 
   const noChainsSupported = useMemo(
     () => !accountsByChain.some((entry) => entry.isSupported),
@@ -179,13 +180,14 @@ export default function SessionProposal({ proposal }: Props) {
 
         {noChainsSupported ||
         !everyRequiredChainsSupported ||
-        requiredChainsWhereNoAccounts ? (
+        requiredChainsWhereNoAccounts.length > 0 ? (
           <Flex flex={1} flexDirection="column" height="100%">
             {noChainsSupported || !everyRequiredChainsSupported ? (
               <ErrorBlockchainSupport appName={dApp} chains={accountsByChain} />
             ) : (
               <ErrorMissingRequiredAccount
                 appName={dApp}
+                addNewAccounts={addNewAccounts}
                 iconProposer={iconProposer}
                 chains={accountsByChain}
               />
@@ -242,9 +244,11 @@ export default function SessionProposal({ proposal }: Props) {
               <ListChains>
                 {sortChains(accountsByChain)
                   .filter((entry) => entry.isSupported)
+                  .filter((entry) => entry.accounts.length > 0)
                   .map((entry) => {
                     return (
-                      <Box key={entry.chain} mb={3}>
+                      <Box key={entry.chain}>
+                          <ChainRow entry={entry} selectedAccounts={selectedAccounts} />
                         <List>
                           {entry.accounts.map((account, index: number) =>
                             AccountRow(

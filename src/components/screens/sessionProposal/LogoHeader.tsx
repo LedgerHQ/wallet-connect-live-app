@@ -2,11 +2,9 @@ import { Container } from "@/styles/styles";
 import { Logo } from "@/icons/LedgerLiveLogo";
 import LogoContainer from "@/components/atoms/logoContainers/LedgerLogoContainer";
 import styled, { useTheme } from "styled-components";
-import { Flex, Button, Box, Text } from "@ledgerhq/react-ui";
+import { Flex } from "@ledgerhq/react-ui";
 import {
   WalletConnectMedium,
-  CircledCrossSolidMedium,
-  ArrowLeftMedium,
   CloseMedium,
 } from "@ledgerhq/react-ui/assets/icons";
 
@@ -21,8 +19,8 @@ export default function LogoHeader({ iconProposer, error }: Props) {
     return (
       <Container>
         <Flex flexDirection="row" alignItems="center" justifyContent="center">
-          <LogoContainer>
-            <Logo size={30} />
+          <LogoContainer width="46px" height="46px">
+            <Logo size={22} />
           </LogoContainer>
           {error && (
             <>
@@ -32,8 +30,8 @@ export default function LogoHeader({ iconProposer, error }: Props) {
                 height="2px"
                 backgroundColor="neutral.c30"
               ></Flex>
-              <LogoContainer>
-                <CloseMedium size={32} color="error.c50" />
+              <LogoContainer width="40px" height="40px">
+                <CloseMedium size={20} color="error.c50" />
               </LogoContainer>
               <Flex
                 flexDirection="row"
@@ -45,19 +43,26 @@ export default function LogoHeader({ iconProposer, error }: Props) {
           )}
           <Flex
             style={{
-              transform: !error ? "translateX(-26px)" : "",
+              transform: !error ? "translateX(-10px)" : "",
             }}
           >
-            <LogoContainer>
+            <LogoContainer width="60px" height="60px">
+              <div
+                style={{
+                  position: "absolute",
+                  width: "52px",
+                  height: "52px",
+                  borderRadius: "50%",
+                  transform: "translateX(-4px)",
+                  zIndex: -1,
+                  border: `4px solid ${colors.background.main}`,
+                }}
+              ></div>
               <img
                 src={iconProposer}
                 alt="Picture of the proposer"
-                width={45}
-                style={{
-                  borderRadius: "50%",
-                  borderLeft: `3px solid ${colors.background.main}`,
-                }}
-                height={45}
+                width={40}
+                height={40}
               />
             </LogoContainer>
           </Flex>

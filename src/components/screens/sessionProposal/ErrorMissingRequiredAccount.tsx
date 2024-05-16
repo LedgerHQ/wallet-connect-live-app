@@ -7,29 +7,20 @@ import useAnalytics from "@/hooks/useAnalytics";
 import styled from "styled-components";
 import { SUPPORTED_NETWORK_NAMES } from "@/data/network.config";
 import LogoHeader from "./LogoHeader";
-
-const LogoContainer = styled(Flex)`
-  border-radius: 50%;
-  align-items: center;
-  justify-content: center;
-  background-color: ${(p) => p.theme.colors.error.c50};
-  height: 50px;
-  width: 50px;
-`;
+import ChainBadge from "@/components/atoms/ChainBadge";
+import { AddAccountPlaceholder } from "./AddAccountPlaceholder";
+import { AccountsInChain } from "@/hooks/useProposal/util";
 
 type Props = {
   appName: string;
   iconProposer: string | null;
-  chains: {
-    chain: string;
-    isSupported: boolean;
-    isRequired: boolean;
-    accounts: Account[];
-  }[];
+  addNewAccounts: (currencies: string[]) => Promise<void>;
+  chains: AccountsInChain[];
 };
 
 export function ErrorMissingRequiredAccount({
   appName,
+  addNewAccounts,
   iconProposer,
   chains,
 }: Props) {
@@ -40,12 +31,14 @@ export function ErrorMissingRequiredAccount({
     () => chains.filter((entry) => entry.isRequired),
     [chains],
   );
+  // NOTE: assuming all entries are supported here
 
   const requiredChainsWhereNoAccounts = useMemo(
     () => requiredChains.filter((entry) => entry.accounts.length === 0),
     [requiredChains],
   );
   // NOTE: analytics
+  console.log({requiredChainsWhereNoAccounts})
 
   return (
     <Flex
@@ -65,16 +58,23 @@ export function ErrorMissingRequiredAccount({
       >
         {t("sessionProposal.missingRequired.title", { appName })}
       </Text>
-      <Text
-        variant="bodyLineHeight"
-        fontWeight="medium"
-        color="neutral.c80"
-        mt={10}
-        textAlign="center"
-      >
-        {t("sessionProposal.error.info")}
-        {SUPPORTED_NETWORK_NAMES.join(", ")}
-      </Text>
+      <Flex justifyContent={"center"} marginY={8} flexDirection={"row"} rowGap={4} columnGap={4}             flexWrap={"wrap"}
+>
+      {requiredChains.map((entry) => (
+        <ChainBadge
+          key={entry.chain}
+          chain={entry}
+          success={entry.accounts.length > 0}
+        />
+      ))}
+      </Flex>
+
+      <AddAccountPlaceholder
+        chains={[requiredChainsWhereNoAccounts[0]]}
+        addNewAccounts={addNewAccounts}
+        // onClick={() => void addNewAccount(entry.chain)}
+        // onClick={() => {}}
+      />
     </Flex>
   );
 }

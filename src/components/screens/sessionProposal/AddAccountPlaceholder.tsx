@@ -25,7 +25,9 @@ export const AddAccountPlaceholder = ({ chains, addNewAccounts }: Props) => {
         marginBottom={2}
       >
         <Text ml={2} variant="bodyLineHeight" color="neutral.c100">
-          {t("sessionProposal.createAccount")}
+          {chains.length === 1 
+          ? t("sessionProposal.createAccountForChain", { chain: chains[0].displayName })
+          : t("sessionProposal.createAccount")}
         </Text>
         <PlusMedium />
       </Flex>
@@ -72,6 +74,7 @@ export const AddAccountPlaceholder = ({ chains, addNewAccounts }: Props) => {
 
 const AddAccountButton = styled.button`
   border: 1px dashed rgba(153, 153, 153, 0.3);
+margin-top: 12px;
   cursor: pointer;
   border-radius: 12px;
   padding: 12px;
