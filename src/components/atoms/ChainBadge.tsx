@@ -1,9 +1,7 @@
 import { AccountsInChain } from "@/hooks/useProposal/util";
 import { getColor, getTicker } from "@/utils/helper.util";
-import { Badge, CryptoIcon, Flex, Text } from "@ledgerhq/react-ui";
+import { CryptoIcon, Flex, Text } from "@ledgerhq/react-ui";
 import { CheckAloneMedium } from "@ledgerhq/react-ui/assets/icons";
-import { ReactNode } from "react";
-import styled from "styled-components";
 
 type Props = {
   chain: AccountsInChain;
@@ -32,7 +30,7 @@ function ChainBadge({ chain, success }: Props) {
         fontWeight="medium"
         color="neutral.c100"
         textAlign="center"
-                style={{textWrap: "nowrap"}}
+        style={{ textWrap: "nowrap" }}
       >
         {chain.displayName}
       </Text>
