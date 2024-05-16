@@ -34,13 +34,6 @@ export default function Sessions() {
     analytics.page("Wallet Connect Sessions", {
       isEmptyState,
     });
-    // NOTE: MOCK
-    void navigate({
-      to: "/proposal/$id",
-      params: { id: "OK",}, //id.toString() },
-      search: (search) => search,
-    });
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

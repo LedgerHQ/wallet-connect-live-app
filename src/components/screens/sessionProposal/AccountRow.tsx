@@ -4,36 +4,9 @@ import { Account } from "@ledgerhq/wallet-api-client";
 import { RowType } from "@/components/atoms/types";
 import { getColor, getTicker, truncate } from "@/utils/helper.util";
 import { space } from "@ledgerhq/react-ui/styles/theme";
-import { CryptoIcon, Flex, Text } from "@ledgerhq/react-ui";
-import { formatCurrencyUnit } from "@/utils/currencyFormatter/formatCurrency";
+import { CryptoIcon } from "@ledgerhq/react-ui";
+import { AccountBalance } from "@/components/atoms/AccountBalance";
 
-const AccountBalance = ({
-  account,
-  entry,
-}: {
-  account: Account;
-  entry: AccountsInChain;
-}) => {
-  const unit = {
-    code: getTicker(entry.chain),
-    magnitude: 18,
-    name: entry.displayName,
-  };
-  const currencyBalance = formatCurrencyUnit(unit, account.balance, {
-    showCode: true,
-  });
-  return (
-    <Flex flexDirection="column" mr={5}>
-      <Text variant="body" fontWeight="semiBold" color="neutral.c100">
-        {/* NOTE: is there an easy way to get $ (fiat) value of currency from liveapp */}
-      </Text>
-
-      <Text variant="small" fontWeight="medium" color="neutral.c70" mt={2}>
-        {currencyBalance}
-      </Text>
-    </Flex>
-  );
-};
 export function AccountRow(
   account: Account,
   index: number,
@@ -53,7 +26,7 @@ export function AccountRow(
         title={account.name}
         subtitle={truncate(account.address, 10)}
         isSelected={selectedAccounts.includes(account.id)}
-        rightElement={AccountBalance({ account, entry })}
+        rightElement={AccountBalance({ account })}
         onClick={() => handleClick(account.id)}
         LeftIcon={
           <CryptoIcon
