@@ -80,12 +80,3 @@ export default function LogoHeader({ iconProposer, error }: Props) {
     );
   }
 }
-
-const DAppContainer = styled(Flex).attrs(
-  (p: { size: number; borderColor: string; backgroundColor: string }) => ({
-    borderRadius: 50.0,
-    border: `3px solid ${p.borderColor}`,
-    backgroundColor: p.backgroundColor,
-    zIndex: 0,
-  }),
-)<{ size: number }>``;
