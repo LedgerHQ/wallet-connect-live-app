@@ -50,7 +50,8 @@
     },
     "addAccount": "Add account",
     "createAccount": "Create a new account",
-    "createAccountForChain": "Create a new {{chain}} account"
+    "createAccountForChain": "Create a new {{chain}} account",
+    "noRequiredChains": "Select at least one account to connect"
   },
   "sessions": {
     "title": "Sessions",

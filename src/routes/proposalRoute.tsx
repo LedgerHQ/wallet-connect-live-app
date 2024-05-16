@@ -19,11 +19,11 @@ export const proposalRoute = createRoute({
     // const proposal = sessionProposals.required;
     // const proposal = sessionProposals.requiredMissingOne;
     // const proposal = sessionProposals.requiredMissingMultiples;
-    // const proposal = sessionProposals.many;
-    const proposal = useMemo(
-      () => pendingProposals.data.find((elem) => elem.id === Number(params.id)),
-      [params.id, pendingProposals.data]
-    );
+    const proposal = sessionProposals.many;
+    // const proposal = useMemo(
+    //   () => pendingProposals.data.find((elem) => elem.id === Number(params.id)),
+    //   [params.id, pendingProposals.data]
+    // );
 
     if (!proposal) {
       return <Navigate to="/" search={(search) => search} />;

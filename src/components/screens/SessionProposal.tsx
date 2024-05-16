@@ -222,6 +222,17 @@ export default function SessionProposal({ proposal }: Props) {
                 >
                   {formatUrl(dAppUrl)}
                 </Text>
+                  
+                  {requiredChains.length === 0 && (
+                    <Text
+                      mt={6}
+                      variant="small"
+                      textAlign="center"
+                      color={colors.neutral.c90}
+                      uppercase={false}>
+                    {t("sessionProposal.noRequiredChains")}
+                      </Text>
+                    )}
               </Header>
               <ListChains>
                 {sortChains(accountsByChain)
