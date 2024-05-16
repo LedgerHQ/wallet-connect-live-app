@@ -27,6 +27,6 @@ export const ResponsiveContainer = styled.div`
   }
   @media ${device.desktop} {
     width: 100%;
-    max-width: 465px;
+    max-width: 865px;
   }
 `;

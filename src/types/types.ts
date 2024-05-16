@@ -40,3 +40,11 @@ export type Proposal = {
     proposer: Proposer;
   };
 };
+
+export type App = {
+  id: string;
+  name: string;
+  category: string;
+  icon: string;
+  url: string;
+};

@@ -160,11 +160,9 @@ export function Connect({ mode }: Props) {
     <WalletConnectContainer>
       <ResponsiveContainer>
         <Flex mt={8} width="100%" alignItems="center">
-          {showBackButton ? (
-            <BackButton onClick={onGoBack}>
-              <ArrowLeftMedium size={24} color="neutral.c100" />
-            </BackButton>
-          ) : null}
+          <BackButton onClick={onGoBack} position={"absolute"}>
+            <ArrowLeftMedium size={24} color="neutral.c100" />
+          </BackButton>
 
           <Text
             display="flex"
