@@ -265,6 +265,7 @@ export default function SessionProposal({ proposal }: Props) {
                   })}
                 {createAccountDisplayed && (
                   <AddAccountPlaceholder
+
                     chains={chainsWhereNoAccounts}
                     addNewAccounts={addNewAccounts}
                     // onClick={() => void addNewAccount(entry.chain)}

@@ -46,12 +46,12 @@ export default function LogoHeader({ iconProposer, error }: Props) {
               transform: !error ? "translateX(-10px)" : "",
             }}
           >
-            <LogoContainer width="60px" height="60px">
+            <LogoContainer width="50px" height="50px">
               <div
                 style={{
                   position: "absolute",
-                  width: "52px",
-                  height: "52px",
+                  width: "40px",
+                  height: "40px",
                   borderRadius: "50%",
                   transform: "translateX(-4px)",
                   zIndex: -1,
@@ -61,8 +61,11 @@ export default function LogoHeader({ iconProposer, error }: Props) {
               <img
                 src={iconProposer}
                 alt="Picture of the proposer"
-                width={40}
-                height={40}
+                width={50}
+                style={{
+                  borderRadius: "50%",
+                }}
+                height={50}
               />
             </LogoContainer>
           </Flex>

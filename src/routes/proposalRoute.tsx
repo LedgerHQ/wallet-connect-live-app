@@ -17,9 +17,9 @@ export const proposalRoute = createRoute({
     const pendingProposals = usePendingProposals(web3wallet);
     // const proposal = sessionProposals.noSupport;
     // const proposal = sessionProposals.required;
-    // const proposal = sessionProposals.requiredMissingOne;
+    const proposal = sessionProposals.requiredMissingOne;
     // const proposal = sessionProposals.requiredMissingMultiples;
-    const proposal = sessionProposals.many;
+    // const proposal = sessionProposals.many;
     // const proposal = useMemo(
     //   () => pendingProposals.data.find((elem) => elem.id === Number(params.id)),
     //   [params.id, pendingProposals.data]
