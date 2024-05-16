@@ -1,9 +1,9 @@
-import { AccountsInChain } from "@/hooks/useProposal/util";
-import { Flex, Text } from "@ledgerhq/react-ui";
-import { PlusMedium } from "@ledgerhq/react-ui/assets/icons";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
+import { AccountsInChain } from "@/hooks/useProposal/util";
+import { Flex, Text } from "@ledgerhq/react-ui";
+import { PlusMedium } from "@ledgerhq/react-ui/assets/icons";
 
 type Props = {
   chains: AccountsInChain[];
@@ -12,7 +12,11 @@ type Props = {
 
 export const AddAccountPlaceholder = ({ chains, addNewAccounts }: Props) => {
   const { t } = useTranslation();
-  const chainIds = useMemo(() => chains.map((chain) => chain.chain), [chains]);
+
+  const chainIds = useMemo(() => {
+    if (!chains) return [];
+    return chains.map((chain) => chain.chain);
+  }, [chains]);
 
   return (
     <AddAccountButton onClick={() => addNewAccounts(chainIds)}>
