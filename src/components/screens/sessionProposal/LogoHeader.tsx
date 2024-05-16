@@ -1,7 +1,7 @@
 import { Container } from "@/styles/styles";
 import { Logo } from "@/icons/LedgerLiveLogo";
 import LogoContainer from "@/components/atoms/logoContainers/LedgerLogoContainer";
-import styled, { useTheme } from "styled-components";
+import { useTheme } from "styled-components";
 import { Flex } from "@ledgerhq/react-ui";
 import {
   WalletConnectMedium,

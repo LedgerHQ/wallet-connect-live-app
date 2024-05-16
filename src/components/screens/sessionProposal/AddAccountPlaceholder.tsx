@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { AccountsInChain } from "@/hooks/useProposal/util";
@@ -18,8 +18,12 @@ export const AddAccountPlaceholder = ({ chains, addNewAccounts }: Props) => {
     return chains.map((chain) => chain.chain);
   }, [chains]);
 
+  const handleClick = useCallback(() => {
+    void addNewAccounts(chainIds);
+  }, [addNewAccounts, chainIds]);
+
   return (
-    <AddAccountButton onClick={() => addNewAccounts(chainIds)}>
+    <AddAccountButton onClick={handleClick}>
       <Flex
         justifyContent="space-between"
         alignItems="center"
