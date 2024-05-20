@@ -17,6 +17,16 @@ import { useQueryClient } from "@tanstack/react-query";
 import usePendingProposals from "@/hooks/usePendingProposals";
 import SuggestedApps from "./SuggestedApps";
 import RecentlyUsedApps from "./RecentlyUsedApps";
+import { useAtom } from "jotai";
+import { atomWithStorage } from "jotai/utils";
+import { SessionTypes, SignClientTypes } from "@walletconnect/types";
+
+const recentConnectionApps = atomWithStorage<SignClientTypes.Metadata[]>(
+  "connectionApps",
+  [],
+  undefined,
+  { getOnInit: true },
+);
 
 export default function Sessions() {
   const { t } = useTranslation();
@@ -30,6 +40,8 @@ export default function Sessions() {
   const isEmptyState = sessionsLength === 0;
   const hasProposals = pendingProposals.data.length > 0;
   const analytics = useAnalytics();
+  const [lastConnectionApps, setLastConnectionApps] =
+    useAtom(recentConnectionApps);
 
   // TODO look at improving the analytics here maybe
   useEffect(() => {
@@ -45,6 +57,21 @@ export default function Sessions() {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionsLength]);
+
+  useEffect(() => {
+    if (sessions?.data) {
+      const unregisteredMetadata = sessions.data
+        .filter((session: SessionTypes.Struct) => {
+          return !lastConnectionApps.some(
+            (lastConnection) =>
+              lastConnection.url === session.peer.metadata.url,
+          );
+        })
+        .map((session: SessionTypes.Struct) => session.peer.metadata);
+
+      setLastConnectionApps((prev) => [...prev, ...unregisteredMetadata]);
+    }
+  }, []);
 
   const goToConnect = useCallback(() => {
     void navigate({ to: "/connect", search: (search) => search });

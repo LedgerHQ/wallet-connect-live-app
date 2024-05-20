@@ -171,7 +171,7 @@ export function Connect({ mode }: Props) {
             variant="h3"
             color="neutral.c100"
             // Add margin to center the text when the back button is present
-            mr={showBackButton ? 8 : undefined}
+            ml={8}
           >
             {t("connect.title")}
           </Text>
