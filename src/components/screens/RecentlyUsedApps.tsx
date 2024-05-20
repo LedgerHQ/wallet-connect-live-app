@@ -3,50 +3,16 @@ import { Text } from "@ledgerhq/react-ui";
 import { t } from "i18next";
 import styled from "styled-components";
 
-const appList = [
-  {
-    id: "test",
-    name: "Opensea.io",
-    category: "NFT",
-    icon: "https://cdn.live.ledger.com/icons/platform/1inch.png",
-    url: "https://dapp-browser.apps.ledger.com/v2/",
-  },
-  {
-    id: "test",
-    name: "Opensea.io",
-    category: "NFT",
-    icon: "https://cdn.live.ledger.com/icons/platform/1inch.png",
-    url: "https://dapp-browser.apps.ledger.com/v2/",
-  },
-  {
-    id: "test",
-    name: "Opensea.io",
-    category: "NFT",
-    icon: "https://cdn.live.ledger.com/icons/platform/1inch.png",
-    url: "https://dapp-browser.apps.ledger.com/v2/",
-  },
-  {
-    id: "test",
-    name: "Opensea.io",
-    category: "NFT",
-    icon: "https://cdn.live.ledger.com/icons/platform/1inch.png",
-    url: "https://dapp-browser.apps.ledger.com/v2/",
-  },
-  {
-    id: "test",
-    name: "Opensea.io",
-    category: "NFT",
-    icon: "https://cdn.live.ledger.com/icons/platform/1inch.png",
-    url: "https://dapp-browser.apps.ledger.com/v2/",
-  },
-  {
-    id: "test",
-    name: "Opensea.io",
-    category: "NFT",
-    icon: "https://cdn.live.ledger.com/icons/platform/1inch.png",
-    url: "https://dapp-browser.apps.ledger.com/v2/",
-  },
-];
+import { useAtom } from "jotai";
+import { atomWithStorage } from "jotai/utils";
+import { SessionTypes, SignClientTypes } from "@walletconnect/types";
+
+const recentConnectionApps = atomWithStorage<SignClientTypes.Metadata[]>(
+  "connectionApps",
+  [],
+  undefined,
+  { getOnInit: true },
+);
 
 const GridContainer = styled.div`
   width: 100%;
@@ -58,6 +24,9 @@ const GridContainer = styled.div`
 `;
 
 export default function RecentlyUsedApps() {
+  const [lastConnectionApps, setLastConnectionApps] =
+    useAtom(recentConnectionApps);
+
   return (
     <>
       <Text variant="extraSmall" color="neutral.c70" marginBottom={8}>
@@ -65,9 +34,14 @@ export default function RecentlyUsedApps() {
       </Text>
 
       <GridContainer>
-        {appList.map((app) => (
+        {lastConnectionApps.map((app) => (
           // eslint-disable-next-line react/jsx-key
-          <AppCard app={app} />
+          <AppCard
+            name={app.name}
+            category={app.url}
+            icon={app.icons[0]}
+            url={app.url}
+          />
         ))}
       </GridContainer>
     </>
