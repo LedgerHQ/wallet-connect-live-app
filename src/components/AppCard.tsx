@@ -1,11 +1,13 @@
 import styled from "styled-components";
 import { Flex, Text } from "@ledgerhq/react-ui";
-import { App } from "@/types/types";
 import { ImageWithPlaceholder } from "./atoms/images/ImageWithPlaceholder";
 import { Link } from "@tanstack/react-router";
 
-type Props = {
-  app: App;
+export type App = {
+  name: string;
+  category: string;
+  icon: string;
+  url: string;
 };
 
 const StyledLink = styled(Link)`
@@ -13,13 +15,15 @@ const StyledLink = styled(Link)`
   border-radius: 5px;
   width: 100%;
   min-width: 150px;
+  max-width: 300px;
+  height: 50px;
   cursor: pointer;
 `;
 
-const AppCard = ({ app }: Props) => {
+const AppCard = ({ name, category, icon, url }: App) => {
   return (
-    <StyledLink to={app.url} target="_blank" rel="noreferrer">
-      <div style={{ display: "flex", margin: "10px" }}>
+    <StyledLink to={url} target="_blank" rel="noreferrer">
+      <Flex margin={"10px"}>
         <div
           style={{
             aspectRatio: "1/1",
@@ -28,22 +32,33 @@ const AppCard = ({ app }: Props) => {
             marginRight: "10px",
           }}
         >
-          <ImageWithPlaceholder icon={app.icon} />
+          <ImageWithPlaceholder icon={icon} />
         </div>
 
         <Flex
           flexDirection={"column"}
-          width={"fit-content"}
-          justifyContent={"space-between"}
+          justifyContent={"center"}
+          width={"calc(100% - 40px)"}
+          rowGap={"5px"}
         >
-          <Text variant="paragraph" fontWeight="medium" color="neutral.c100">
-            {app.name}
+          <Text
+            variant="paragraph"
+            fontWeight="medium"
+            color="neutral.c100"
+            whiteSpace={"nowrap"}
+            textOverflow="ellipsis"
+            overflow="hidden"
+            width="100%"
+          >
+            {name}
           </Text>
-          <Text variant="paragraph" color="neutral.c50">
-            {app.category}
-          </Text>
+          {category && (
+            <Text variant="paragraph" color="neutral.c50">
+              {category}
+            </Text>
+          )}
         </Flex>
-      </div>
+      </Flex>
     </StyledLink>
   );
 };
