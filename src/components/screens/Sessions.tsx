@@ -195,17 +195,6 @@ export default function Sessions() {
           <List>
             {sessions.data.map((session) => (
               <Box key={session.topic} mt={3}>
-                <div
-                  style={{
-                    backgroundColor: "green",
-                    width: "10px",
-                    height: "10px",
-                    position: "absolute",
-                    borderRadius: "100%",
-                    top: "-0px",
-                    left: "-0px",
-                  }}
-                ></div>
                 <GenericRow
                   key={session.topic}
                   title={session.peer.metadata.name}
