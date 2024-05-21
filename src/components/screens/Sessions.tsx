@@ -60,17 +60,32 @@ export default function Sessions() {
 
   useEffect(() => {
     if (sessions?.data) {
-      const unregisteredMetadata = sessions.data
-        .filter((session: SessionTypes.Struct) => {
-          return !lastConnectionApps.some(
-            (lastConnection) =>
-              lastConnection.url === session.peer.metadata.url,
-          );
-        })
-        .map((session: SessionTypes.Struct) => session.peer.metadata);
+      const uniqueUrls = new Set();
+      const deduplicatedLastConnectionApps = lastConnectionApps.filter(
+        (app) => {
+          const isDuplicate = uniqueUrls.has(app.url);
+          uniqueUrls.add(app.url);
+          return !isDuplicate;
+        },
+      );
 
-      setLastConnectionApps((prev) => [...prev, ...unregisteredMetadata]);
+      const unregisteredMetadata = sessions.data
+        .filter((session) => {
+          const sessionUrl = session.peer.metadata.url;
+          const isDuplicate = uniqueUrls.has(sessionUrl);
+          if (!isDuplicate) {
+            uniqueUrls.add(sessionUrl);
+          }
+          return !isDuplicate;
+        })
+        .map((session) => session.peer.metadata);
+
+      setLastConnectionApps([
+        ...unregisteredMetadata,
+        ...deduplicatedLastConnectionApps,
+      ]);
     }
+    console.log("test");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -180,6 +195,17 @@ export default function Sessions() {
           <List>
             {sessions.data.map((session) => (
               <Box key={session.topic} mt={3}>
+                <div
+                  style={{
+                    backgroundColor: "green",
+                    width: "10px",
+                    height: "10px",
+                    position: "absolute",
+                    borderRadius: "100%",
+                    top: "-0px",
+                    left: "-0px",
+                  }}
+                ></div>
                 <GenericRow
                   key={session.topic}
                   title={session.peer.metadata.name}

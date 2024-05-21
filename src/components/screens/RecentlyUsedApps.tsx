@@ -25,6 +25,7 @@ const GridContainer = styled.div`
 
 const StyledDiv = styled.div`
   background: ${({ theme }) => theme.colors.opacityDefault.c05};
+  min-width: 250px;
   width: 250px;
   border-radius: 5px;
   cursor: pointer;
