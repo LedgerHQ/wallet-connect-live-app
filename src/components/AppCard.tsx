@@ -53,7 +53,13 @@ const AppCard = ({ name, category, icon, url }: App) => {
             {name}
           </Text>
           {category && (
-            <Text variant="paragraph" color="neutral.c50">
+            <Text
+              variant="paragraph"
+              color="neutral.c50"
+              textOverflow="ellipsis"
+              overflow="hidden"
+              whiteSpace={"nowrap"}
+            >
               {category}
             </Text>
           )}

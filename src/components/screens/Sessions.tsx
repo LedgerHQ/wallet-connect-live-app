@@ -71,6 +71,7 @@ export default function Sessions() {
 
       setLastConnectionApps((prev) => [...prev, ...unregisteredMetadata]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const goToConnect = useCallback(() => {
@@ -255,10 +256,12 @@ export default function Sessions() {
         </ButtonsContainer>
       ) : null}
 
-      <Flex flexDirection={"column"} marginTop={8}>
-        <RecentlyUsedApps />
-      </Flex>
-      <Flex flexDirection={"column"} marginTop={8}>
+      {lastConnectionApps.length > 1 && (
+        <Flex flexDirection={"column"} marginTop={6}>
+          <RecentlyUsedApps />
+        </Flex>
+      )}
+      <Flex flexDirection={"column"} marginTop={6}>
         <SuggestedApps />
       </Flex>
 
