@@ -5,7 +5,7 @@ import styled from "styled-components";
 
 import { useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
-import { SessionTypes, SignClientTypes } from "@walletconnect/types";
+import { SignClientTypes } from "@walletconnect/types";
 
 const recentConnectionApps = atomWithStorage<SignClientTypes.Metadata[]>(
   "connectionApps",
@@ -23,25 +23,33 @@ const GridContainer = styled.div`
   overflow-y: scroll;
 `;
 
+const StyledDiv = styled.div`
+  background: ${({ theme }) => theme.colors.opacityDefault.c05};
+  width: 250px;
+  border-radius: 5px;
+  cursor: pointer;
+`;
+
 export default function RecentlyUsedApps() {
-  const [lastConnectionApps, setLastConnectionApps] =
-    useAtom(recentConnectionApps);
+  const [lastConnectionApps] = useAtom(recentConnectionApps);
 
   return (
     <>
-      <Text variant="extraSmall" color="neutral.c70" marginBottom={8}>
+      <Text variant="extraSmall" color="neutral.c70" marginBottom={6}>
         {t("sessions.apps.lastConnection")}
       </Text>
 
       <GridContainer>
         {lastConnectionApps.map((app) => (
           // eslint-disable-next-line react/jsx-key
-          <AppCard
-            name={app.name}
-            category={app.url}
-            icon={app.icons[0]}
-            url={app.url}
-          />
+          <StyledDiv>
+            <AppCard
+              name={app.name}
+              category={app.url}
+              icon={app.icons[0] || ""}
+              url={app.url}
+            />
+          </StyledDiv>
         ))}
       </GridContainer>
     </>

@@ -69,7 +69,7 @@ const GridContainer = styled.div`
 export default function SuggestedApps() {
   return (
     <>
-      <Text variant="extraSmall" color="neutral.c70" marginBottom={8}>
+      <Text variant="extraSmall" color="neutral.c70" marginBottom={6}>
         {t("sessions.apps.dontKnow")}
       </Text>
 
