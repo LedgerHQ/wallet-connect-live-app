@@ -19,7 +19,7 @@ import SuggestedApps from "./SuggestedApps";
 import RecentlyUsedApps from "./RecentlyUsedApps";
 import { useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
-import { SessionTypes, SignClientTypes } from "@walletconnect/types";
+import { SignClientTypes } from "@walletconnect/types";
 
 const recentConnectionApps = atomWithStorage<SignClientTypes.Metadata[]>(
   "connectionApps",
