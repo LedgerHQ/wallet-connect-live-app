@@ -1,0 +1,48 @@
+{
+  "id": "ledger-wallet-connect",
+  "author": "ledger",
+  "name": "WalletConnect - Local",
+  "url": "http://localhost:3000",
+  "params": {},
+  "homepageUrl": "https://walletconnect.com/",
+  "icon": "https://cdn.live.ledger.com/icons/platform/wallet_connect.png",
+  "platforms": ["android", "ios", "desktop"],
+  "apiVersion": "^2.0.0 || ^1.0.0",
+  "manifestVersion": "1",
+  "branch": "stable",
+  "categories": ["ledger"],
+  "currencies": [
+    "ethereum",
+    "polygon",
+    "bsc",
+    "optimism",
+    "arbitrum",
+    "avalanche_c_chain",
+    "base",
+    "elrond",
+    "ethereum_sepolia",
+    "arbitrum_sepolia",
+    "optimism_sepolia",
+    "base_sepolia",
+    "ethereum_holesky"
+  ],
+  "content": {
+    "shortDescription": {
+      "en": "WalletConnect is an open source protocol for connecting decentralised applications to mobile wallets with QR code scanning or deep linking. V2 introduces new features, including the ability to connect to multiple dapps in parallel with multiple accounts. It's important to note that not all dapps currently support V2"
+    },
+    "description": {
+      "en": "WalletConnect is an open source protocol for connecting decentralised applications to mobile wallets with QR code scanning or deep linking. V2 introduces new features, including the ability to connect to multiple dapps in parallel with multiple accounts. It's important to note that not all dapps currently support V2"
+    }
+  },
+  "permissions": [
+    "account.list",
+    "account.request",
+    "message.sign",
+    "transaction.sign",
+    "transaction.signAndBroadcast",
+    "wallet.userId",
+    "wallet.info"
+  ],
+  "domains": ["http://*", "https://*"],
+  "visibility": "complete"
+}
