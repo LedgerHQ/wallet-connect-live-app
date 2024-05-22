@@ -134,14 +134,10 @@ export default function SessionProposal({ proposal }: Props) {
     [accountsByChain],
   );
 
-  console.log({ chainsWhereNoAccounts, accountsByChain });
-
   const createAccountDisplayed = useMemo(
     () => chainsWhereNoAccounts.length > 0,
     [chainsWhereNoAccounts],
   );
-
-  console.log({ createAccountDisplayed });
 
   return (
     <Flex

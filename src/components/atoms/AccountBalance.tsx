@@ -15,10 +15,6 @@ export const AccountBalance = ({ account }: { account: Account }) => {
   });
   return (
     <Flex flexDirection="column" mr={5}>
-      <Text variant="body" fontWeight="semiBold" color="neutral.c100">
-        {/* NOTE: is there an easy way to get $ (fiat) value of currency from liveapp */}
-      </Text>
-
       <Text variant="small" fontWeight="medium" color="neutral.c70" mt={2}>
         {currencyBalance}
       </Text>
