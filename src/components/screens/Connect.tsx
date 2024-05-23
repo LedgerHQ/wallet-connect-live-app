@@ -1,12 +1,5 @@
 import styled from "styled-components";
-import {
-  Input,
-  Button,
-  Text,
-  Flex,
-  BoxedIcon,
-  Icons,
-} from "@ledgerhq/react-ui";
+import { Input, Button, Text, Flex } from "@ledgerhq/react-ui";
 import { useCallback, useState } from "react";
 import {
   ArrowLeftMedium,
@@ -15,7 +8,6 @@ import {
 } from "@ledgerhq/react-ui/assets/icons";
 import { QRScanner } from "../QRScanner";
 import { WalletConnectContainer } from "../atoms/containers/Elements";
-import { StatusDot } from "../atoms/statusDot/StatusDot";
 import { useTranslation } from "react-i18next";
 import useAnalytics from "@/hooks/useAnalytics";
 import { useNavigate } from "@tanstack/react-router";
@@ -26,7 +18,7 @@ import { useAtomValue } from "jotai";
 import { web3walletAtom } from "@/store/web3wallet.store";
 import usePendingProposals from "@/hooks/usePendingProposals";
 import useSessions from "@/hooks/useSessions";
-
+import { RelayerStatus } from "./RelayerStatus";
 
 const QRScannerContainer = styled.div`
   display: flex;
@@ -248,35 +240,7 @@ export function Connect({ mode }: Props) {
               }
               placeholder={t("connect.pasteUrl")}
             />
-
-            <Flex
-              mt={6}
-              justifyContent={"center"}
-              flexDirection={"row"}
-              columnGap={2}
-            >
-              {web3wallet.core.relayer.connected ? (
-                <StatusDot status="success">Ready to connect</StatusDot>
-              ) : web3wallet.core.relayer.connecting ? (
-                <StatusDot status="loading">
-                  Connecting to wallet connect server
-                </StatusDot>
-              ) : (
-                <>
-                  <Flex>
-                    <StatusDot status="error">No internet connection</StatusDot>
-                  </Flex>
-                  <BoxedIcon
-                    Icon={Icons.NetworkWarning}
-                    iconColor="error.c50"
-                    size={28}
-                    variant="circle"
-                    borderColor="transparent"
-                  />
-                </>
-              )}
-            </Flex>
-
+            <RelayerStatus />
             <Button
               mt={1}
               onClick={handleConnect}
