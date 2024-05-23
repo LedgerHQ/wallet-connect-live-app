@@ -246,94 +246,8 @@ export function Connect({ mode }: Props) {
               )}
             </QRScannerContainer>
           </Flex>
-          <Text
-            variant="paragraph"
-            fontWeight="medium"
-            color="neutral.c100"
-            mb={6}
-            textAlign="center"
-          >
-            Connected ? {JSON.stringify(web3wallet.core.relayer.connected)}
-          </Text>
-          <Text
-            variant="paragraph"
-            fontWeight="medium"
-            color="neutral.c100"
-            mb={6}
-            textAlign="center"
-          >
-            Connectingo ? {JSON.stringify(web3wallet.core.relayer.connecting)}
-          </Text>
-          <InfiniteLoader size={10} color="warning.c20" />
-          <DotContainer>
-            <InfiniteLoader
-              size={10}
-              style={{ marginRight: "5px" }}
-              color="warning.c50"
-            />
-            <Text
-              variant="paragraph"
-              fontWeight="medium"
-              color="warning.c50"
-              textAlign="center"
-            >
-              Connecting
-            </Text>
-          </DotContainer>
-          <DotContainer>
-            <Flex style={{ display: "flex", alignItems: "center" }}>
-              <Text
-                fontWeight="small"
-                fontSize={"8px"}
-                color="error.c50"
-                marginRight={2}
-              >
-                ●
-              </Text>
-              <Dot />
-              <Text
-                variant="paragraph"
-                fontWeight="medium"
-                color="error.c50"
-                textAlign="center"
-              >
-                Disconnected
-              </Text>
-            </Flex>
-          </DotContainer>
-          <DotContainer>
-            {web3wallet.core.relayer.connecting ? (
-              <InfiniteLoader size={10} color="warning.c20" />
-            ) : (
-              <Dot />
-            )}
-            TOTO
-          </DotContainer>
-          <ul>
-            <li className="status open">
-              <Text>Connectedo</Text>
-            </li>
-            <li className="status in-progress">In Progress</li>
-            <li className="status dead">Dead</li>
-          </ul>
-          {web3wallet.core.relayer.connected ? (
-            <StatusDot status="success">Connected</StatusDot>
-          ) : web3wallet.core.relayer.connecting ? (
-            <StatusDot status="loading">
-              Connecting to wallet connect servers
-            </StatusDot>
-          ) : (
-            <StatusDot status="error">No internet connection</StatusDot>
-          )}
 
-          <BoxedIcon
-            Icon={Icons.NetworkWarning}
-            iconColor={"white"}
-            size={64}
-            variant="circle"
-            borderColor="transparent"
-          />
-          <Flex flexDirection="column" width="100%" mb={6}>
+          <Flex flexDirection="column" width="100%" mb={8}>
             <Text
               variant="paragraph"
               fontWeight="medium"
@@ -360,8 +274,32 @@ export function Connect({ mode }: Props) {
               }
               placeholder={t("connect.pasteUrl")}
             />
+
+            <Flex mt={6} justifyContent={"center"} flexDirection={"row"} columnGap={2}>
+              {web3wallet.core.relayer.connected ? (
+                <StatusDot status="success">Ready to connect</StatusDot>
+              ) : web3wallet.core.relayer.connecting ? (
+                <StatusDot status="loading">
+                  Connecting to wallet connect server
+                </StatusDot>
+              ) : (
+                <>
+                  <Flex>
+                    <StatusDot status="error">No internet connection</StatusDot>
+                  </Flex>
+                  <BoxedIcon
+                    Icon={Icons.NetworkWarning}
+                    iconColor="error.c50"
+                    size={28}
+                    variant="circle"
+                    borderColor="transparent"
+                  />
+                </>
+              )}
+            </Flex>
+
             <Button
-              mt={6}
+              mt={1}
               onClick={handleConnect}
               data-testid="connect-button"
               variant="main"

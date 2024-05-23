@@ -8,21 +8,19 @@ type Props = {
   status: "success" | "loading" | "error";
 };
 
-export function StatusDot({children, status} : Props) {
-    const dotClass = `dot-${status}`;
-    let textColor = "neutral.c100";//status === "error" ? "error.c50" : "success.c50";
-    if (status === "error") {
-        textColor = "error.c50";
-    }
+export function StatusDot({ children, status }: Props) {
+  const dotClass = `dot-${status}`;
+  let textColor = "neutral.c50"; //status === "error" ? "error.c50" : "success.c50";
+  if (status === "success") {
+    textColor = "success.c50";
+  } else if (status === "error") {
+    textColor = "error.c50";
+  }
   return (
     <div className="status-container">
       <div className={"dot " + dotClass}></div>
       <div className="text">
-        <Text
-          variant="paragraph"
-                    fontSize={3}
-          color={textColor}
-        >
+        <Text variant="paragraph" fontSize={"10px"} color={textColor}>
           {children}
         </Text>
       </div>
