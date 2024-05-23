@@ -15,14 +15,13 @@ export const coreAtom = atom(() => {
 export const web3walletAtom = atom((get) => {
   const core = get(coreAtom);
 
-  core.relayer.on("relayer_connect", () => {
-    // TODO: remove before merge
-    console.info("[web3wallet.store.ts] useEffect - relayer_connect");
-  });
+  // core.relayer.on("relayer_connect", () => {
+  //   console.info("[web3wallet.store.ts] useEffect - relayer_connect");
+  // });
 
   core.relayer.on("relayer_disconnect", () => {
-    console.log("[web3wallet.store.ts] useEffect - relayer_disconnect !");
-    core.relayer.restartTransport();
+    // console.info("[web3wallet.store.ts] useEffect - relayer_disconnect !");
+    return core.relayer.restartTransport();
   });
 
   return Web3Wallet.init({
