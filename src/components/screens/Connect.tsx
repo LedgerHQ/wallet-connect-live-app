@@ -6,9 +6,8 @@ import {
   Flex,
   BoxedIcon,
   Icons,
-  InfiniteLoader,
 } from "@ledgerhq/react-ui";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import {
   ArrowLeftMedium,
   PasteMedium,
@@ -19,14 +18,11 @@ import { useTranslation } from "react-i18next";
 import useAnalytics from "@/hooks/useAnalytics";
 import { useNavigate } from "@tanstack/react-router";
 import { WalletConnectContainer } from "../atoms/containers/Elements";
-import { Dot, DotContainer, ResponsiveContainer } from "@/styles/styles";
+import { ResponsiveContainer } from "@/styles/styles";
 import { useConnect } from "@/hooks/useConnect";
 import { InputMode } from "@/types/types";
 import { useAtomValue } from "jotai";
-import {
-  relayerConnectionStatusAtom,
-  web3walletAtom,
-} from "@/store/web3wallet.store";
+import { web3walletAtom } from "@/store/web3wallet.store";
 import usePendingProposals from "@/hooks/usePendingProposals";
 import useSessions from "@/hooks/useSessions";
 import "./status.css";
@@ -81,33 +77,11 @@ export function Connect({ mode }: Props) {
   const [scanner, setScanner] = useState(mode === "scan");
   const analytics = useAnalytics();
   const web3wallet = useAtomValue(web3walletAtom);
-  const relayerConnectionStatus = useAtomValue(relayerConnectionStatusAtom);
   const pendingProposals = usePendingProposals(web3wallet);
   const sessions = useSessions(web3wallet);
   const showBackButton = pendingProposals.data.length || sessions.data.length;
 
   const { onConnect } = useConnect();
-
-  // useEffect(() => {
-  //   console.log({ web3wallet });
-  //   web3wallet.core.relayer.on("connect", () => {
-  //     console.log("[Connect.tsx] useEffect - Connected");
-  //   });
-
-  //   web3wallet.core.relayer.on("disconnect", () => {
-  //     console.log("[Connect.tsx] useEffect - Disconnected");
-  //   });
-
-  //   web3wallet.core.relayer.on("relayer_connect", () => {
-  //     // connection to the relay server is established
-  //     console.log("[Connect.tsx] useEffect - relayer_connect");
-  //   });
-
-  //   web3wallet.core.relayer.on("relayer_disconnect", () => {
-  //     // connection to the relay server is established
-  //     console.log("[Connect.tsx] useEffect - relayer_disconnect");
-  //   });
-  // }, []);
 
   const handleConnect = useCallback(() => {
     try {
@@ -275,7 +249,12 @@ export function Connect({ mode }: Props) {
               placeholder={t("connect.pasteUrl")}
             />
 
-            <Flex mt={6} justifyContent={"center"} flexDirection={"row"} columnGap={2}>
+            <Flex
+              mt={6}
+              justifyContent={"center"}
+              flexDirection={"row"}
+              columnGap={2}
+            >
               {web3wallet.core.relayer.connected ? (
                 <StatusDot status="success">Ready to connect</StatusDot>
               ) : web3wallet.core.relayer.connecting ? (
