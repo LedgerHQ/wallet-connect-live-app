@@ -14,10 +14,11 @@ import {
   QrCodeMedium,
 } from "@ledgerhq/react-ui/assets/icons";
 import { QRScanner } from "../QRScanner";
+import { WalletConnectContainer } from "../atoms/containers/Elements";
+import { StatusDot } from "../atoms/statusDot/StatusDot";
 import { useTranslation } from "react-i18next";
 import useAnalytics from "@/hooks/useAnalytics";
 import { useNavigate } from "@tanstack/react-router";
-import { WalletConnectContainer } from "../atoms/containers/Elements";
 import { ResponsiveContainer } from "@/styles/styles";
 import { useConnect } from "@/hooks/useConnect";
 import { InputMode } from "@/types/types";
@@ -25,8 +26,7 @@ import { useAtomValue } from "jotai";
 import { web3walletAtom } from "@/store/web3wallet.store";
 import usePendingProposals from "@/hooks/usePendingProposals";
 import useSessions from "@/hooks/useSessions";
-import "./status.css";
-import { StatusDot } from "../atoms/statusDot/StatusDot";
+
 
 const QRScannerContainer = styled.div`
   display: flex;
