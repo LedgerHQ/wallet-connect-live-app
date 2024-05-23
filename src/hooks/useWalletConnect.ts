@@ -416,6 +416,9 @@ export default function useWalletConnect() {
 
   useEffect(() => {
     console.log("web3wallet setup listeners");
+    // TODO: handle session_request_expire
+    // web3wallet.on("session_request_expire", );
+
     // sign
     web3wallet.on("proposal_expire", onProposalExpire);
     web3wallet.on("session_proposal", onSessionProposal);
