@@ -1,0 +1,37 @@
+.status-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  user-select: none;
+}
+
+.dot {
+  display: block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(91, 150, 213, 0.2);
+  background-color: #5b96d5;
+  margin-right: 6px;
+}
+
+.dot-success {
+  background-color: rgb(147, 225, 132);
+  box-shadow: 0 0 0 3px rgb(147, 225, 132, 0.2);
+}
+
+.dot-loading {
+  background-color: rgb(255, 191, 128);
+  box-shadow: 0 0 0 3px rgb(255, 191, 128, 0.2);
+}
+
+.dot-error {
+  background-color: rgb(201, 64, 78);
+  box-shadow: 0 0 0 3px rgb(201, 64, 78, 0.2);
+}
+
+.text {
+  color: #8dbfff;
+  font-size: 12px;
+  font-weight: 600;
+}

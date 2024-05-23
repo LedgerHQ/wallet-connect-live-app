@@ -3,10 +3,7 @@ import { useCallback, useEffect } from "react";
 import { Web3WalletTypes } from "@walletconnect/web3wallet";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
 import { stripHexPrefix } from "@/utils/currencyFormatter/helpers";
-import {
-  convertEthToLiveTX,
-  convertMvxToLiveTX,
-} from "@/utils/converters";
+import { convertEthToLiveTX, convertMvxToLiveTX } from "@/utils/converters";
 import {
   EIP155_REQUESTS,
   EIP155_SIGNING_METHODS,
@@ -366,6 +363,9 @@ export default function useWalletConnect() {
 
   useEffect(() => {
     console.log("web3wallet setup listeners");
+    // TODO: handle session_request_expire
+    // web3wallet.on("session_request_expire", );
+
     // sign
     web3wallet.on("proposal_expire", onProposalExpire);
     web3wallet.on("session_proposal", onSessionProposal);
