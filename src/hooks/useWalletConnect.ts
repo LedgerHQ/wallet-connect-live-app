@@ -90,6 +90,7 @@ export default function useWalletConnect() {
   const accounts = useAccounts(client);
 
   const onProposalExpire = useCallback(() => {
+    console.log("PROPOSAL EXPIRED !")
     void queryClient.invalidateQueries({
       queryKey: pendingProposalsQueryKey,
     });
@@ -366,6 +367,29 @@ export default function useWalletConnect() {
 
   useEffect(() => {
     console.log("web3wallet setup listeners");
+    web3wallet.on("session_request_expire", (event) => {
+      console.log("session_request_expire: ", event);
+      // request expired and any modal displaying it should be removed
+      const { id } = event;
+  });
+    // relayer ws connection
+    // web3wallet.core.relayer.on("connect", () => {
+    //   console.log("[useWalletConnect.ts] useEffect - Connected");
+    // });
+
+    // web3wallet.core.relayer.on("disconnect", () => {
+    //   console.log("[useWalletConnect.ts] useEffect - Disconnected");
+    // });
+
+    // web3wallet.core.relayer.on("relayer_connect", () => {
+    //   // connection to the relay server is established
+    //   console.log("[useWalletConnect.ts] useEffect - relayer_connect");
+    // });
+
+    // web3wallet.core.relayer.on("relayer_disconnect", () => {
+    //   // connection to the relay server is established
+    //   console.log("[useWalletConnect.ts] useEffect - relayer_disconnect");
+    // });
     // sign
     web3wallet.on("proposal_expire", onProposalExpire);
     web3wallet.on("session_proposal", onSessionProposal);
