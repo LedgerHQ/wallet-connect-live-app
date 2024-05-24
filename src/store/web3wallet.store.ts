@@ -1,4 +1,4 @@
-import { atom } from "jotai";
+import { atom, useAtom } from "jotai";
 import { Core } from "@walletconnect/core";
 import { Web3Wallet } from "@walletconnect/web3wallet";
 
@@ -12,16 +12,21 @@ export const coreAtom = atom(() => {
   });
 });
 
+export const relayerConnectionStatusAtom = atom("disconnected"); // Create a new atom to store the connection status
+
 export const web3walletAtom = atom((get) => {
   const core = get(coreAtom);
+  const [_connectionStatus, setConnectionStatus] = useAtom(
+    relayerConnectionStatusAtom,
+  );
 
-  // core.relayer.on("relayer_connect", () => {
-  //   console.info("[web3wallet.store.ts] useEffect - relayer_connect");
-  // });
+  core.relayer.on("relayer_connect", () => {
+    setConnectionStatus("connected");
+  });
 
   core.relayer.on("relayer_disconnect", () => {
-    // console.info("[web3wallet.store.ts] useEffect - relayer_disconnect !");
-    return core.relayer.restartTransport();
+    setConnectionStatus("disconnected");
+    core.relayer.restartTransport();
   });
 
   return Web3Wallet.init({
