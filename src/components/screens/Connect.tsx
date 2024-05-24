@@ -18,7 +18,7 @@ import { useAtomValue } from "jotai";
 import { web3walletAtom } from "@/store/web3wallet.store";
 import usePendingProposals from "@/hooks/usePendingProposals";
 import useSessions from "@/hooks/useSessions";
-import { RelayerStatus } from "./RelayerStatus";
+import RelayerStatus from "./RelayerStatus";
 
 const QRScannerContainer = styled.div`
   display: flex;
