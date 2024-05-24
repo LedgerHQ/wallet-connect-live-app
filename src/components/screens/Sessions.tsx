@@ -85,7 +85,6 @@ export default function Sessions() {
         ...deduplicatedLastConnectionApps,
       ]);
     }
-    console.log("test");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
