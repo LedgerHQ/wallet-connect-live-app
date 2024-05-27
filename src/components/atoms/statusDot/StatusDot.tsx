@@ -7,14 +7,14 @@ type Props = {
   status: "success" | "loading" | "error";
 };
 
-export function StatusDot({ children, status }: Props) {
-  let textColor = "neutral.c50";
+const colors = {
+  success: "success.c50",
+  error: "error.c50",
+  loading: "neutral.c50",
+};
 
-  if (status === "success") {
-    textColor = "success.c50";
-  } else if (status === "error") {
-    textColor = "error.c50";
-  }
+export function StatusDot({ children, status }: Props) {
+  let textColor = colors[status];
 
   return (
     <div className="status-container">
