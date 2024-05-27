@@ -20,13 +20,7 @@ import RecentlyUsedApps from "./RecentlyUsedApps";
 import { useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import { SignClientTypes } from "@walletconnect/types";
-
-const recentConnectionApps = atomWithStorage<SignClientTypes.Metadata[]>(
-  "connectionApps",
-  [],
-  undefined,
-  { getOnInit: true },
-);
+import useRecentConnection from "@/hooks/useRecentConnection";
 
 export default function Sessions() {
   const { t } = useTranslation();
@@ -40,8 +34,8 @@ export default function Sessions() {
   const isEmptyState = sessionsLength === 0;
   const hasProposals = pendingProposals.data.length > 0;
   const analytics = useAnalytics();
-  const [lastConnectionApps, setLastConnectionApps] =
-    useAtom(recentConnectionApps);
+  const { lastConnectionApps, setLastConnectionApps } = useRecentConnection();
+  console.log(lastConnectionApps);
 
   // TODO look at improving the analytics here maybe
   useEffect(() => {
@@ -155,7 +149,7 @@ export default function Sessions() {
 
   return (
     <Flex flexDirection="column" width="100%" height="100%" mt={8}>
-      {hasProposals && (
+      {hasProposals ? (
         <>
           <Text variant="h3Inter" mb={5} color="neutral.c100">
             {t("sessions.title")}
@@ -184,7 +178,7 @@ export default function Sessions() {
           </List>
           <Flex mb={8} />
         </>
-      )}
+      ) : null}
 
       {!isEmptyState && (
         <>
@@ -212,47 +206,46 @@ export default function Sessions() {
         </>
       )}
 
-      {hasProposals ||
-        (isEmptyState && (
-          <>
-            <Flex flexDirection={"column"} rowGap={8}>
-              <Text
-                justifyContent="center"
-                variant="h4Inter"
-                color="neutral.c100"
-                textAlign="center"
+      {(hasProposals && isEmptyState) || isEmptyState ? (
+        <>
+          <Flex flexDirection={"column"} rowGap={8}>
+            <Text
+              justifyContent="center"
+              variant="h4Inter"
+              color="neutral.c100"
+              textAlign="center"
+            >
+              {t("connect.title")}
+            </Text>
+            <Text
+              display="flex"
+              justifyContent="center"
+              variant="extraSmall"
+              color="neutral.c70"
+              textAlign="center"
+            >
+              {t("sessions.apps.noAppsMessage")}
+            </Text>
+            <Flex justifyContent={"center"}>
+              <Button
+                onClick={goToConnect}
+                data-testid="connect-button"
+                variant={"main"}
+                size="small"
+                width={"min-content"}
               >
-                {t("connect.title")}
-              </Text>
-              <Text
-                display="flex"
-                justifyContent="center"
-                variant="extraSmall"
-                color="neutral.c70"
-                textAlign="center"
-              >
-                {t("sessions.apps.noAppsMessage")}
-              </Text>
-              <Flex justifyContent={"center"}>
-                <Button
-                  onClick={goToConnect}
-                  data-testid="connect-button"
-                  variant={"main"}
-                  size="small"
-                  width={"min-content"}
+                <Text
+                  fontSize="body"
+                  fontWeight="semiBold"
+                  color={"neutral.c00"}
                 >
-                  <Text
-                    fontSize="body"
-                    fontWeight="semiBold"
-                    color={"neutral.c00"}
-                  >
-                    {t("connect.cta")}
-                  </Text>
-                </Button>
-              </Flex>
+                  {t("connect.cta")}
+                </Text>
+              </Button>
             </Flex>
-          </>
-        ))}
+          </Flex>
+        </>
+      ) : null}
 
       {!isEmptyState ? (
         <ButtonsContainer columnGap={6}>
