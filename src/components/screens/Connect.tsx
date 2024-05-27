@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { Input, Button, Text, Flex } from "@ledgerhq/react-ui";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ArrowLeftMedium,
   PasteMedium,
@@ -14,8 +14,12 @@ import { useNavigate } from "@tanstack/react-router";
 import { ResponsiveContainer } from "@/styles/styles";
 import { useConnect } from "@/hooks/useConnect";
 import { InputMode } from "@/types/types";
-import { useAtomValue } from "jotai";
-import { web3walletAtom } from "@/store/web3wallet.store";
+import { useAtom, useAtomValue } from "jotai";
+import {
+  coreAtom,
+  relayerConnectionStatusAtom,
+  web3walletAtom,
+} from "@/store/web3wallet.store";
 import usePendingProposals from "@/hooks/usePendingProposals";
 import useSessions from "@/hooks/useSessions";
 import RelayerStatus from "./RelayerStatus";
@@ -68,10 +72,27 @@ export function Connect({ mode }: Props) {
   const [errorValue, setErrorValue] = useState<string | undefined>(undefined);
   const [scanner, setScanner] = useState(mode === "scan");
   const analytics = useAnalytics();
+  const core = useAtomValue(coreAtom);
   const web3wallet = useAtomValue(web3walletAtom);
   const pendingProposals = usePendingProposals(web3wallet);
   const sessions = useSessions(web3wallet);
   const showBackButton = pendingProposals.data.length || sessions.data.length;
+  const [_connectionStatus, setConnectionStatus] = useAtom(
+    relayerConnectionStatusAtom,
+  );
+
+  useEffect(() => {
+    core.relayer.on("relayer_connect", () => {
+      setConnectionStatus("connected");
+    });
+
+    core.relayer.on("relayer_disconnect", () => {
+      setConnectionStatus("disconnected");
+      core.relayer.restartTransport().catch(() => {
+        console.error("couldn't restart transport");
+      });
+    });
+  }, [core]);
 
   const { onConnect } = useConnect();
 
