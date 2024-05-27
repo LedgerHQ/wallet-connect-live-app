@@ -26,7 +26,9 @@ export const web3walletAtom = atom((get) => {
 
   core.relayer.on("relayer_disconnect", () => {
     setConnectionStatus("disconnected");
-    core.relayer.restartTransport();
+    core.relayer.restartTransport().catch(() => {
+      console.error("couldn't restart transport")
+    });
   });
 
   return Web3Wallet.init({
