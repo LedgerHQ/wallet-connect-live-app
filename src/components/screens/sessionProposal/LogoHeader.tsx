@@ -72,11 +72,10 @@ export default function LogoHeader({ iconProposer, error }: Props) {
         </Flex>
       </Container>
     );
-  } else {
-    return (
-      <LogoContainer>
-        <WalletConnectMedium size={30} />
-      </LogoContainer>
-    );
   }
+  return (
+    <LogoContainer>
+      <WalletConnectMedium size={30} />
+    </LogoContainer>
+  );
 }
