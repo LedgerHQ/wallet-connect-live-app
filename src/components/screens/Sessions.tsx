@@ -17,9 +17,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import usePendingProposals from "@/hooks/usePendingProposals";
 import SuggestedApps from "./SuggestedApps";
 import RecentlyUsedApps from "./RecentlyUsedApps";
-import { useAtom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
-import { SignClientTypes } from "@walletconnect/types";
 import useRecentConnection from "@/hooks/useRecentConnection";
 
 export default function Sessions() {
@@ -35,7 +32,6 @@ export default function Sessions() {
   const hasProposals = pendingProposals.data.length > 0;
   const analytics = useAnalytics();
   const { lastConnectionApps, setLastConnectionApps } = useRecentConnection();
-  console.log(lastConnectionApps);
 
   // TODO look at improving the analytics here maybe
   useEffect(() => {
