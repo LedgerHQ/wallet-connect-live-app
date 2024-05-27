@@ -1,18 +1,8 @@
+import useRecentConnection from "@/hooks/useRecentConnection";
 import AppCard from "../AppCard";
 import { Text } from "@ledgerhq/react-ui";
 import { t } from "i18next";
 import styled from "styled-components";
-
-import { useAtom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
-import { SignClientTypes } from "@walletconnect/types";
-
-const recentConnectionApps = atomWithStorage<SignClientTypes.Metadata[]>(
-  "connectionApps",
-  [],
-  undefined,
-  { getOnInit: true },
-);
 
 const GridContainer = styled.div`
   width: 100%;
@@ -32,7 +22,7 @@ const StyledDiv = styled.div`
 `;
 
 export default function RecentlyUsedApps() {
-  const [lastConnectionApps] = useAtom(recentConnectionApps);
+  const { lastConnectionApps } = useRecentConnection();
 
   return (
     <>
@@ -42,8 +32,7 @@ export default function RecentlyUsedApps() {
 
       <GridContainer>
         {lastConnectionApps.map((app) => (
-          // eslint-disable-next-line react/jsx-key
-          <StyledDiv>
+          <StyledDiv key={app.name}>
             <AppCard
               name={app.name}
               category={app.url}
