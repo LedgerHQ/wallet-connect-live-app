@@ -1,7 +1,10 @@
-import { BoxedIcon, Flex, Icons } from "@ledgerhq/react-ui/index";
+import { Flex, Icons } from "@ledgerhq/react-ui/index";
 import { StatusDot } from "../atoms/statusDot/StatusDot";
 import { useAtomValue } from "jotai";
-import { relayerConnectionStatusAtom, web3walletAtom } from "@/store/web3wallet.store";
+import {
+  relayerConnectionStatusAtom,
+  web3walletAtom,
+} from "@/store/web3wallet.store";
 import { useTranslation } from "react-i18next";
 
 export default function RelayerStatus() {
@@ -30,13 +33,7 @@ export default function RelayerStatus() {
               {t("connect.relayerStatus.offline")}
             </StatusDot>
           </Flex>
-          <BoxedIcon
-            Icon={Icons.NetworkWarning}
-            iconColor="error.c50"
-            size={28}
-            variant="circle"
-            borderColor="transparent"
-          />
+          <Icons.NetworkWarning size={"S"} color="error.c50" />
         </>
       )}
     </Flex>
