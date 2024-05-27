@@ -14,12 +14,10 @@ const colors = {
 };
 
 export function StatusDot({ children, status }: Props) {
-  let textColor = colors[status];
-
   return (
     <div className="status-container">
       <div className={"dot " + `dot-${status}`}></div>
-      <Text variant="paragraph" fontSize={"10px"} color={textColor}>
+      <Text variant="paragraph" fontSize={"10px"} color={colors[status]}>
         {children}
       </Text>
     </div>
