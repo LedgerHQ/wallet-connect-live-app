@@ -75,8 +75,8 @@ export default function SuggestedApps() {
 
       <GridContainer>
         {appList.map((app) => (
-          // eslint-disable-next-line react/jsx-key
           <AppCard
+            key={app.name}
             name={app.name}
             category={app.category}
             icon={app.icon}
