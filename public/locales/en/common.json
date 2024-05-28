@@ -45,7 +45,13 @@
       "title": "{{appName}} requested to connect to chains we don't support yet",
       "info": "We currently support: "
     },
-    "addAccount": "Add account"
+    "missingRequired": {
+      "title": "You need accounts on the following chains to connect to {{appName}}"
+    },
+    "addAccount": "Add account",
+    "createAccount": "Create a new account",
+    "createAccountForChain": "Create a new {{chain}} account",
+    "noRequiredChains": "Select at least one account to connect"
   },
   "sessions": {
     "title": "Sessions",

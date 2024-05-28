@@ -268,6 +268,22 @@ export function useProposal(proposal: ProposalTypes.Struct) {
     [client, queryClient],
   );
 
+  const addNewAccounts = useCallback(
+    async (currencies: string[]) => {
+      try {
+        await client.account.request({
+          currencyIds: currencies,
+        });
+        // TODO Maybe we should also select the requested account
+      } catch (error) {
+        console.error("request account canceled by user");
+      }
+      // refetch accounts
+      await queryClient.invalidateQueries({ queryKey: accountsQueryKey });
+    },
+    [client, queryClient],
+  );
+
   // No need for a memo as it's directly spread on usage
   return {
     approveSession,
@@ -277,6 +293,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
     accounts: accounts.data,
     selectedAccounts,
     addNewAccount,
+    addNewAccounts,
     navigateToHome,
   };
 }

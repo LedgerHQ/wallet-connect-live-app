@@ -1,28 +1,23 @@
 import { ButtonsContainer, List } from "@/components/atoms/containers/Elements";
-import { GenericRow } from "@/components/atoms/GenericRow";
-import { RowType } from "@/components/atoms/types";
-import LogoContainer from "@/components/atoms/logoContainers/LedgerLogoContainer";
 import { AddAccountPlaceholder } from "@/components/screens/sessionProposal/AddAccountPlaceholder";
 import { ErrorBlockchainSupport } from "@/components/screens/sessionProposal/ErrorBlockchainSupport";
 import { InfoSessionProposal } from "@/components/screens/sessionProposal/InfoSessionProposal";
-import { formatUrl, getColor, getTicker, truncate } from "@/utils/helper.util";
+import { formatUrl } from "@/utils/helper.util";
 import { useProposal } from "@/hooks/useProposal/useProposal";
 import { ResponsiveContainer } from "@/styles/styles";
-import { Flex, Button, Box, CryptoIcon, Text } from "@ledgerhq/react-ui";
-import {
-  WalletConnectMedium,
-  CircledCrossSolidMedium,
-  ArrowLeftMedium,
-} from "@ledgerhq/react-ui/assets/icons";
-import { space } from "@ledgerhq/react-ui/styles/theme";
+import { Flex, Button, Box, Text } from "@ledgerhq/react-ui";
+import { ArrowLeftMedium } from "@ledgerhq/react-ui/assets/icons";
 import { useTranslation } from "react-i18next";
 import { useCallback, useEffect, useMemo } from "react";
-import { Logo } from "@/icons/LedgerLiveLogo";
 import styled, { useTheme } from "styled-components";
 import useAnalytics from "@/hooks/useAnalytics";
 import { tryDecodeURI } from "@/utils/image";
 import { formatAccountsByChain, sortChains } from "@/hooks/useProposal/util";
 import { ProposalTypes } from "@walletconnect/types";
+import { AccountRow } from "./sessionProposal/AccountRow";
+import { ErrorMissingRequiredAccount } from "./sessionProposal/ErrorMissingRequiredAccount";
+import LogoHeader from "./sessionProposal/LogoHeader";
+import { ChainRow } from "./sessionProposal/ChainRow";
 
 const BackButton = styled(Flex)`
   cursor: pointer;
@@ -45,7 +40,7 @@ export default function SessionProposal({ proposal }: Props) {
     rejectSession,
     accounts,
     selectedAccounts,
-    addNewAccount,
+    addNewAccounts,
     navigateToHome,
   } = useProposal(proposal);
   const analytics = useAnalytics();
@@ -90,46 +85,58 @@ export default function SessionProposal({ proposal }: Props) {
 
   const accountsByChain = useMemo(
     () => formatAccountsByChain(proposal, accounts),
-    [proposal, accounts]
+    [proposal, accounts],
   );
 
   const requiredChains = useMemo(
     () => accountsByChain.filter((entry) => entry.isRequired),
-    [accountsByChain]
+    [accountsByChain],
   );
 
-  const chainsNotSupported = useMemo(
-    () => accountsByChain.filter((entry) => !entry.isSupported),
-    [accountsByChain]
+  const requiredChainsWhereNoAccounts = useMemo(
+    () => requiredChains.filter((entry) => entry.accounts.length === 0),
+    [requiredChains],
   );
 
   const noChainsSupported = useMemo(
     () => !accountsByChain.some((entry) => entry.isSupported),
-    [accountsByChain]
+    [accountsByChain],
   );
 
   const everyRequiredChainsSupported = useMemo(
     () => requiredChains.every((entry) => entry.isSupported),
-    [requiredChains]
+    [requiredChains],
   );
 
   const everyRequiredChainsSelected = useMemo(
     () =>
       requiredChains.every((entry) =>
-        entry.accounts.some((account) => selectedAccounts.includes(account.id))
+        entry.accounts.some((account) => selectedAccounts.includes(account.id)),
       ),
-    [requiredChains, selectedAccounts]
-  )
+    [requiredChains, selectedAccounts],
+  );
 
   const disabled = useMemo(
-    () => !(everyRequiredChainsSelected && selectedAccounts.length > 0)
-    ,
-    [everyRequiredChainsSelected, selectedAccounts]
+    () => !(everyRequiredChainsSelected && selectedAccounts.length > 0),
+    [everyRequiredChainsSelected, selectedAccounts],
   );
 
   const iconProposer = useMemo(
     () => tryDecodeURI(proposal.proposer.metadata.icons[0]),
-    [proposal.proposer.metadata.icons]
+    [proposal.proposer.metadata.icons],
+  );
+
+  const chainsWhereNoAccounts = useMemo(
+    () =>
+      accountsByChain
+        .filter((entry) => entry.isSupported)
+        .filter((entry) => entry.accounts.length === 0),
+    [accountsByChain],
+  );
+
+  const createAccountDisplayed = useMemo(
+    () => chainsWhereNoAccounts.length > 0,
+    [chainsWhereNoAccounts],
   );
 
   return (
@@ -149,9 +156,21 @@ export default function SessionProposal({ proposal }: Props) {
           </Flex>
         </BackButton>
 
-        {noChainsSupported || !everyRequiredChainsSupported ? (
+        {noChainsSupported ||
+        !everyRequiredChainsSupported ||
+        requiredChainsWhereNoAccounts.length > 0 ? (
           <Flex flex={1} flexDirection="column" height="100%">
-            <ErrorBlockchainSupport appName={dApp} chains={accountsByChain} />
+            {noChainsSupported || !everyRequiredChainsSupported ? (
+              <ErrorBlockchainSupport appName={dApp} chains={accountsByChain} />
+            ) : (
+              <ErrorMissingRequiredAccount
+                appName={dApp}
+                addNewAccounts={addNewAccounts}
+                iconProposer={iconProposer}
+                chains={accountsByChain}
+              />
+            )}
+
             <ButtonsContainer>
               <Button
                 variant="main"
@@ -168,40 +187,15 @@ export default function SessionProposal({ proposal }: Props) {
         ) : (
           <Flex
             width="100%"
-            height="100%"
+            height="300px"
             flex={1}
             justifyContent="space-between"
+            paddingBottom={12}
             flexDirection="column"
           >
             <Flex flexDirection="column">
               <Header mb={10}>
-                {iconProposer ? (
-                  <Container>
-                    <LogoContainer>
-                      <Logo size={30} />
-                    </LogoContainer>
-
-                    <DAppContainer borderColor={colors.background.main}>
-                      <LogoContainer>
-                        <img
-                          src={iconProposer}
-                          alt="Picture of the proposer"
-                          width={60}
-                          style={{
-                            borderRadius: "50%",
-                            borderLeft: `3px solid ${colors.background.main}`,
-                          }}
-                          height={60}
-                        />
-                      </LogoContainer>
-                    </DAppContainer>
-                  </Container>
-                ) : (
-                  <LogoContainer>
-                    <WalletConnectMedium size={30} />
-                  </LogoContainer>
-                )}
-
+                <LogoHeader iconProposer={iconProposer} error={false} />
                 <Text
                   variant="h4"
                   mt={3}
@@ -224,97 +218,64 @@ export default function SessionProposal({ proposal }: Props) {
                 >
                   {formatUrl(dAppUrl)}
                 </Text>
+                  
+                  {requiredChains.length === 0 && (
+                    <Text
+                      mt={6}
+                      variant="small"
+                      textAlign="center"
+                      color={colors.neutral.c90}
+                      uppercase={false}>
+                    {t("sessionProposal.noRequiredChains")}
+                      </Text>
+                    )}
               </Header>
               <ListChains>
                 {sortChains(accountsByChain)
                   .filter((entry) => entry.isSupported)
+                  .filter((entry) => entry.accounts.length > 0)
                   .map((entry) => {
                     return (
-                      <Box key={entry.chain} mb={6}>
-                        <Box mb={6}>
-                          <Text variant="subtitle" color={colors.neutral.c70}>
-                            {entry.displayName}
-                            {entry.isRequired ? (
-                              <Text color="error.c80" ml={1}>
-                                *
-                              </Text>
-                            ) : null}
-                          </Text>
-                        </Box>
-                        {entry.accounts.length > 0 ? (
-                          <List>
-                            {entry.accounts.map((account, index: number) => (
-                              <li
-                                key={account.id}
-                                style={{
-                                  marginBottom:
-                                    index !== entry.accounts.length - 1
-                                      ? space[3]
-                                      : 0,
-                                }}
-                              >
-                                <GenericRow
-                                  title={account.name}
-                                  subtitle={truncate(account.address, 30)}
-                                  isSelected={selectedAccounts.includes(
-                                    account.id
-                                  )}
-                                  onClick={() => handleClick(account.id)}
-                                  LeftIcon={
-                                    <CryptoIcon
-                                      name={getTicker(entry.chain)}
-                                      circleIcon
-                                      size={24}
-                                      color={getColor(entry.chain)}
-                                    />
-                                  }
-                                  rowType={RowType.Select}
-                                />
-                              </li>
-                            ))}
-                          </List>
-                        ) : (
-                          <AddAccountPlaceholder
-                            onClick={() => void addNewAccount(entry.chain)}
-                          />
-                        )}
+                      <Box key={entry.chain}>
+                        <ChainRow
+                          entry={entry}
+                          selectedAccounts={selectedAccounts}
+                        />
+                        <List>
+                          {entry.accounts.map((account, index: number) =>
+                            AccountRow(
+                              account,
+                              index,
+                              entry,
+                              selectedAccounts,
+                              handleClick,
+                            ),
+                          )}
+                        </List>
                       </Box>
                     );
                   })}
-                {chainsNotSupported && chainsNotSupported.length > 0 ? (
-                  <GenericRow
-                    title={
-                      chainsNotSupported.length > 1
-                        ? t("sessionProposal.notSupported_plural")
-                        : t("sessionProposal.notSupported")
-                    }
-                    subtitle={chainsNotSupported
-                      .map((entry) => entry.chain)
-                      .join(", ")
-                      .concat(".")}
-                    LeftIcon={
-                      <Flex p={3} bg="error.c100a025" borderRadius="50%">
-                        <CircledCrossSolidMedium size={16} color="error.c100" />
-                      </Flex>
-                    }
-                    rowType={RowType.Default}
+                {createAccountDisplayed && (
+                  <AddAccountPlaceholder
+                    chains={chainsWhereNoAccounts}
+                    addNewAccounts={addNewAccounts}
                   />
-                ) : null}
+                )}
                 <Box mt={6}>
                   <InfoSessionProposal />
                 </Box>
               </ListChains>
             </Flex>
 
-            <Flex>
+            <Flex
+              style={{
+                backdropFilter: "blur(7px)",
+                position: "sticky",
+                bottom: "0px",
+              }}
+            >
               <ButtonsContainer>
-                <Button
-                  variant="shade"
-                  size="large"
-                  flex={0.9}
-                  mr={6}
-                  onClick={onReject}
-                >
+                <Button size="large" flex={0.3} mr={6} onClick={onReject}>
                   <Text
                     variant="body"
                     fontWeight="semiBold"
@@ -323,7 +284,6 @@ export default function SessionProposal({ proposal }: Props) {
                     {t("sessionProposal.reject")}
                   </Text>
                 </Button>
-
                 <Button
                   variant="main"
                   size="large"
@@ -347,30 +307,6 @@ export default function SessionProposal({ proposal }: Props) {
     </Flex>
   );
 }
-
-const DAppContainer = styled(Flex).attrs(
-  (p: { size: number; borderColor: string; backgroundColor: string }) => ({
-    position: "absolute",
-    right: "-55px",
-    alignItems: "center",
-    justifyContent: "center",
-    heigth: p.size,
-    width: p.size,
-    borderRadius: 50.0,
-    border: `3px solid ${p.borderColor}`,
-    backgroundColor: p.backgroundColor,
-    zIndex: 0,
-  })
-)<{ size: number }>``;
-
-const Container = styled(Flex).attrs((p: { size: number }) => ({
-  heigth: p.size,
-  width: p.size,
-  alignItems: "center",
-  justifyContent: "center",
-  position: "relative",
-  left: "-25px",
-}))<{ size: number }>``;
 
 const ListChains = styled(Flex)`
   flex-direction: column;

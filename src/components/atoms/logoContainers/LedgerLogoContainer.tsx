@@ -3,12 +3,15 @@ import { ReactNode } from "react";
 import styled from "styled-components";
 
 type Props = {
+  width?: string;
+  height?: string;
+  style?: React.CSSProperties;
   children: ReactNode;
 };
-function LogoContainer(props: Props) {
+function LogoContainer({width, height, children, ...props}: Props) {
   return (
-    <LiveAppLogoContainer data-test-id="logo">
-      {props.children}
+    <LiveAppLogoContainer {...props} width={width} height={height} data-test-id="logo">
+      {children}
     </LiveAppLogoContainer>
   );
 }

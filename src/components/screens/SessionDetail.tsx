@@ -32,6 +32,7 @@ import useAccounts from "@/hooks/useAccounts";
 import { walletAPIClientAtom } from "@/store/wallet-api.store";
 import { useQueryClient } from "@tanstack/react-query";
 import { SessionTypes } from "@walletconnect/types";
+import { AccountBalance } from "../atoms/AccountBalance";
 
 const DetailContainer = styled(Flex)`
   border-radius: 12px;
@@ -56,7 +57,7 @@ const getAccountsFromAddresses = (addresses: string[], accounts: Account[]) => {
   addresses.forEach((addr) => {
     const addrSplitted = addr.split(":");
     const chain = getCurrencyByChainId(`${addrSplitted[0]}:${addrSplitted[1]}`);
-    let chainInLedgerLive = chain
+    let chainInLedgerLive = chain;
 
     if (chain.startsWith("mvx")) {
       chainInLedgerLive = "elrond";
@@ -65,13 +66,13 @@ const getAccountsFromAddresses = (addresses: string[], accounts: Account[]) => {
     const existingEntry = accountsByChain.get(chainInLedgerLive);
 
     const account = accounts.find(
-      (a) => a.address === addrSplitted[2] && chainInLedgerLive === a.currency
+      (a) => a.address === addrSplitted[2] && chainInLedgerLive === a.currency,
     );
 
     if (account) {
       accountsByChain.set(
         chain,
-        existingEntry ? [...existingEntry, account] : [account]
+        existingEntry ? [...existingEntry, account] : [account],
       );
     }
   });
@@ -144,14 +145,14 @@ export default function SessionDetail({ session }: Props) {
     () =>
       Object.entries(session.namespaces).reduce(
         (acc, elem) => acc.concat(elem[1].accounts),
-        [] as string[]
+        [] as string[],
       ),
-    [session]
+    [session],
   );
 
   const sessionAccounts = useMemo(
     () => getAccountsFromAddresses(fullAddresses, accounts.data),
-    [accounts.data, fullAddresses]
+    [accounts.data, fullAddresses],
   );
 
   return (
@@ -260,12 +261,13 @@ export default function SessionDetail({ session }: Props) {
                             >
                               <GenericRow
                                 title={account.name}
-                                subtitle={truncate(account.address, 30)}
+                                subtitle={truncate(account.address, 10)}
+                                rightElement={AccountBalance({ account })}
                                 LeftIcon={
                                   <CryptoIcon
                                     name={getTicker(chain)}
                                     circleIcon
-                                    size={24}
+                                    size={20}
                                     color={getColor(chain)}
                                   />
                                 }
