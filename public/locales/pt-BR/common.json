@@ -24,6 +24,11 @@
     "errorProtocol" : {
       "title" : "O DApp ao qual você está tentando se conectar não está atualizado",
       "desc" : "A WalletConnect V1 não é mais compatível e, para garantir uma conexão tranquila e segura, o DApp que você está usando deve ser atualizado para a WalletConnect V2."
+    },
+    "relayerStatus" : {
+      "connected" : "Pronto para conectar",
+      "connecting" : "Comunicando-se com o servidor de conexão de carteira",
+      "offline" : "Sem conexão de internet"
     }
   },
   "sessionProposal" : {
@@ -43,7 +48,7 @@
     },
     "error" : {
       "title" : "{{appName}} quer conectar-se a cadeias que ainda são incompatíveis",
-      "desc" : "No momento, somos compatíveis com Ethereum, Polygon, Binance Smart Chain, Arbitrum, Optimism, Avalanche C-Chain, Ethereum Goerli e Optimism Goerli. Adicionamos suporte a novas cadeias gradualmente."
+      "info" : "No momento, suportamos: "
     },
     "addAccount" : "Adicionar conta"
   },
