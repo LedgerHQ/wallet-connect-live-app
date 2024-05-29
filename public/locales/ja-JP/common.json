@@ -24,6 +24,11 @@
     "errorProtocol" : {
       "title" : "接続しようとしているDappは最新ではありません",
       "desc" : "WalletConnect V1は現在サポートされておりません。スムーズで安全な接続を確保するには、使用されているDappをWalletConnect V2にアップグレードする必要があります。"
+    },
+    "relayerStatus" : {
+      "connected" : "接続準備完了",
+      "connecting" : "ウォレット接続サーバーに接続中",
+      "offline" : "インターネット接続なし"
     }
   },
   "sessionProposal" : {
@@ -43,7 +48,7 @@
     },
     "error" : {
       "title" : "{{appName}}が、未対応のチェーンへの接続をリクエストしました",
-      "desc" : "当社は現在、Ethereum、Polygon、Binance Smart Chain、Arbitrum、Optimism、Avalanche C-Chain、Ethereum Goerli、Optimism Goerliをサポートしています。今後、さらに新しいブロックチェーンを追加していく予定です。"
+      "info" : "現在対応済み： "
     },
     "addAccount" : "アカウントを追加"
   },
