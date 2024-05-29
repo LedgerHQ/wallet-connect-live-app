@@ -14,7 +14,7 @@
     "invalidUri" : "URI 无效"
   },
   "connect" : {
-    "title" : "连接",
+    "title" : "连接到应用程序即可开始",
     "cta" : "连接",
     "scanQRCode" : "扫描二维码",
     "useWalletConnectUrl" : "或使用 WalletConnect 网址",
@@ -43,12 +43,19 @@
     },
     "error" : {
       "title" : "{{appName}} 请求连接的是我们暂不支持的链",
-      "desc" : "我们目前支持以太坊、Polygon、币安智能链 (BSC)、Arbitrum、Optimism、Avalanche C-Chain、Ethereum Goerli 和 Optimism Goerli。我们还在逐步添加新的链。"
+      "info" : "我们目前支持： "
     },
     "addAccount" : "添加账户"
   },
   "sessions" : {
     "title" : "会话",
+    "apps" : {
+      "title" : "已连接的应用程序",
+      "noAppsMessage" : "您连接的应用程序将在此处列出",
+      "dontKnow" : "不知道是哪个？尝试其中一个",
+      "lastConnection" : "最近的连接",
+      "tryNewApp" : "尝试新的应用程序"
+    },
     "goToConnect" : "连接",
     "disconnectAll" : "断开所有",
     "modal" : {
