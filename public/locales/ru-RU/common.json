@@ -14,7 +14,7 @@
     "invalidUri" : "Неверный URI"
   },
   "connect" : {
-    "title" : "Подключить",
+    "title" : "Подключитесь к приложению для начала",
     "cta" : "Подключить",
     "scanQRCode" : "Сканировать QR-код",
     "useWalletConnectUrl" : "Или используйте URL для WalletConnect",
@@ -43,12 +43,19 @@
     },
     "error" : {
       "title" : "Для {{appName}} необходимы блокчейны, которые пока не поддерживаются",
-      "desc" : "В данный момент поддерживаются сети Ethereum, Polygon, Binance Smart Chain, Arbitrum, Optimism, Avalanche C-Chain, Ethereum Goerli и Optimism Goerli. Новые блокчейны добавляются постепенно."
+      "info" : "На данный момент мы поддерживаем: "
     },
     "addAccount" : "Добавить счёт"
   },
   "sessions" : {
     "title" : "Сессии",
+    "apps" : {
+      "title" : "Подключённые приложения",
+      "noAppsMessage" : "Подключённые приложения будут отображаться здесь",
+      "dontKnow" : "Не используете приложения? Попробуйте эти",
+      "lastConnection" : "Последние подключения",
+      "tryNewApp" : "Попробовать новые"
+    },
     "goToConnect" : "Подключить",
     "disconnectAll" : "Отключить всё",
     "modal" : {
