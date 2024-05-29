@@ -24,6 +24,11 @@
     "errorProtocol" : {
       "title" : "연결하려는 디앱(Dapp)이 최신 상태가 아닙니다.",
       "desc" : "WalletConnect V1은 더 이상 지원되지 않으며, 원활하고 안전한 연결을 보장하기 위해 사용 중인 디앱을 WalletConnect V2로 업그레이드해야 합니다."
+    },
+    "relayerStatus" : {
+      "connected" : "연결 대기 중",
+      "connecting" : "지갑 연결 서버에 연결 중",
+      "offline" : "인터넷에 연결되지 않음"
     }
   },
   "sessionProposal" : {
@@ -43,7 +48,7 @@
     },
     "error" : {
       "title" : "{{appName}}에서 아직 지원되지 않는 체인에 연결을 요청했습니다",
-      "desc" : "현재 이더리움, 폴리곤, 바이낸스 스마트 체인, 아비트럼, 옵티미즘, 아발란체 C-체인, 이더리움 골리, 옵티미즘 골리가 지원되며, 지원 대상을 점차 늘려가고 있습니다."
+      "info" : "당사는 현재 다음을 지원합니다: "
     },
     "addAccount" : "계정 추가"
   },
