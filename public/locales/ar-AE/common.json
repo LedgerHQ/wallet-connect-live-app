@@ -14,7 +14,7 @@
     "invalidUri" : "مُعرف الموارد المنتظم (URI) غير صالح"
   },
   "connect" : {
-    "title" : "اتصال",
+    "title" : "اتّصل بتطبيق للبدء",
     "cta" : "اتصال",
     "scanQRCode" : "مسح ضوئي لكود QR",
     "useWalletConnectUrl" : "أو استخدم عنوان URL خاص بـ WalletConnect",
@@ -43,12 +43,19 @@
     },
     "error" : {
       "title" : "{{appName}} طلب الاتصال بسلاسل لا ندعمها بعد",
-      "desc" : "نحن ندعم حالياً إيثريوم و Polygon وسلسلة بينانس الذكية و Arbitrum و Optimism و Avalanche C-Chain و Ethereum Goerli و Optimism Goerli. ونضيف سلاسل جديدة تدريجياً."
+      "info" : "في الوقت الحالي نحن ندعم: "
     },
     "addAccount" : "إضافة حساب"
   },
   "sessions" : {
     "title" : "الجلسات",
+    "apps" : {
+      "title" : "التطبيقات المتصلة",
+      "noAppsMessage" : "تطبيقاتك المتصلة سيتمّ إدراجها هنا",
+      "dontKnow" : "لا تعرف أياً منها؟ جرّب أحد هؤلاء",
+      "lastConnection" : "أحدث الاتصالات",
+      "tryNewApp" : "جرّب تطبيقات جديدة"
+    },
     "goToConnect" : "اتصال",
     "disconnectAll" : "قطع الاتصال مع الكل",
     "modal" : {
