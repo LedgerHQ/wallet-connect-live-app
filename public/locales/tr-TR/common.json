@@ -24,6 +24,11 @@
     "errorProtocol" : {
       "title" : "Bağlanmaya çalıştığınız Dapp güncel değil",
       "desc" : "WalletConnect V1 artık desteklenmiyor ve sorunsuz ve güvenli bir bağlantı sağlamak için, kullandığınız Dapp'in WalletConnect V2'ye güncellenmesi gerekiyor."
+    },
+    "relayerStatus" : {
+      "connected" : "Bağlanmaya hazır",
+      "connecting" : "WalletConnect sunucusuna bağlanıyor",
+      "offline" : "İnternet bağlantısı yok"
     }
   },
   "sessionProposal" : {
@@ -43,7 +48,7 @@
     },
     "error" : {
       "title" : "{{appName}}, henüz desteklemediğimiz zincirlere bağlanma isteğinde bulundu",
-      "desc" : "Şu anda Ethereum, Polygon, Binance Smart Chain, Arbitrum, Optimism, Avalanche C-Chain, Ethereum Goerli ve Optimism Goerli'yi destekliyoruz. Kademeli olarak yeni zincirler ekliyoruz."
+      "info" : "Şu anda desteklenenler: "
     },
     "addAccount" : "Hesap ekle"
   },
