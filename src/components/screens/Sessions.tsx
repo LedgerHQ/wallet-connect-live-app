@@ -202,7 +202,7 @@ export default function Sessions() {
         </>
       )}
 
-      {(hasProposals && isEmptyState) || isEmptyState ? (
+      {(!hasProposals && isEmptyState) ? (
         <>
           <Flex flexDirection={"column"} rowGap={8}>
             <Text
@@ -222,42 +222,25 @@ export default function Sessions() {
             >
               {t("sessions.apps.noAppsMessage")}
             </Text>
-            <Flex justifyContent={"center"}>
-              <Button
-                onClick={goToConnect}
-                data-testid="connect-button"
-                variant={"main"}
-                size="small"
-                width={"min-content"}
-              >
-                <Text
-                  fontSize="body"
-                  fontWeight="semiBold"
-                  color={"neutral.c00"}
-                >
-                  {t("connect.cta")}
-                </Text>
-              </Button>
-            </Flex>
+           
           </Flex>
         </>
       ) : null}
 
-      {!isEmptyState ? (
-        <ButtonsContainer columnGap={6}>
-          <Button variant="shade" size="large" flex={1} onClick={openModal}>
+        <ButtonsContainer marginTop={2} columnGap={6}>
+          {!isEmptyState ? (
+          <Button variant="shade" size="medium" flex={1} onClick={openModal}>
             <Text variant="body" fontWeight="semiBold" color="neutral.c100">
               {t("sessions.disconnectAll")}
             </Text>
-          </Button>
+          </Button>) : null}
 
-          <Button variant="main" size="large" flex={1} onClick={goToConnect}>
+          <Button variant="main" size="medium" flex={1} onClick={goToConnect}>
             <Text variant="body" fontWeight="semiBold" color="neutral.c0">
               {t("connect.cta")}
             </Text>
-          </Button>
+          </Button>      
         </ButtonsContainer>
-      ) : null}
 
       {lastConnectionApps.length > 1 && (
         <Flex flexDirection={"column"} marginTop={6}>
