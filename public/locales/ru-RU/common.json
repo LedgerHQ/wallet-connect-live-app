@@ -24,6 +24,11 @@
     "errorProtocol" : {
       "title" : "Вы подключаетесь к неактуальной версии децентрализованного приложения",
       "desc" : "WalletConnect V1 больше не поддерживается. Для плавного и безопасного подключения используемое D dApp-приложение должно обновиться до версии WalletConnect V2."
+    },
+    "relayerStatus" : {
+      "connected" : "Готово к подключению",
+      "connecting" : "Подключение к серверу WalletConnect",
+      "offline" : "Отсутствует интернет-подключение"
     }
   },
   "sessionProposal" : {
@@ -43,9 +48,15 @@
     },
     "error" : {
       "title" : "Для {{appName}} необходимы блокчейны, которые пока не поддерживаются",
-      "desc" : "В данный момент поддерживаются сети Ethereum, Polygon, Binance Smart Chain, Arbitrum, Optimism, Avalanche C-Chain, Ethereum Goerli и Optimism Goerli. Новые блокчейны добавляются постепенно."
+      "info" : "На данный момент мы поддерживаем: "
     },
-    "addAccount" : "Добавить счёт"
+    "missingRequired" : {
+      "title" : "Для подключения к {{appName}} требуются счета в следующих блокчейнах"
+    },
+    "addAccount" : "Добавить счёт",
+    "createAccount" : "Создание нового счёта",
+    "createAccountForChain" : "Создать новый счёт {{chain}}",
+    "noRequiredChains" : "Выберите как минимум один счёт для подключения"
   },
   "sessions" : {
     "title" : "Сессии",
