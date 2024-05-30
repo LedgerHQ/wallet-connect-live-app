@@ -14,7 +14,7 @@
     "invalidUri" : "URI inválida"
   },
   "connect" : {
-    "title" : "Conectar",
+    "title" : "Conecte-se a um aplicativo para iniciar",
     "cta" : "Conectar",
     "scanQRCode" : "Escanear QR Code",
     "useWalletConnectUrl" : "Ou use a URL do WalletConnect",
@@ -43,12 +43,25 @@
     },
     "error" : {
       "title" : "{{appName}} quer conectar-se a cadeias que ainda são incompatíveis",
-      "desc" : "No momento, somos compatíveis com Ethereum, Polygon, Binance Smart Chain, Arbitrum, Optimism, Avalanche C-Chain, Ethereum Goerli e Optimism Goerli. Adicionamos suporte a novas cadeias gradualmente."
+      "info" : "No momento, suportamos: "
     },
-    "addAccount" : "Adicionar conta"
+    "missingRequired" : {
+      "title" : "Você precisa de contas nas seguintes cadeias para se conectar a {{appName}}"
+    },
+    "addAccount" : "Adicionar conta",
+    "createAccount" : "Criar uma nova conta",
+    "createAccountForChain" : "Criar uma nova conta {{chain}}",
+    "noRequiredChains" : "Selecione pelo menos uma conta para se conectar"
   },
   "sessions" : {
     "title" : "Sessões",
+    "apps" : {
+      "title" : "Aplicativos conectados",
+      "noAppsMessage" : "Seus aplicativos conectados serão exibidos aqui",
+      "dontKnow" : "Não conhece nenhum? Tente um destes",
+      "lastConnection" : "Últimas conexões",
+      "tryNewApp" : "Experimente novos aplicativos"
+    },
     "goToConnect" : "Conectar",
     "disconnectAll" : "Desconectar todas",
     "modal" : {
