@@ -24,6 +24,11 @@
     "errorProtocol" : {
       "title" : "التطبيق اللامركزي (Dapp) الذي تحاول الاتصال به ليس مُحدّثاً",
       "desc" : "الإصدار 1 من WalletConnect لم يعد مدعوماً، ولضمان اتصال سلس وآمن، فإن التطبيق اللامركزي (Dapp) الذي تستخدمه يجب ترقيته إلى الإصدار 2 من WalletConnect."
+    },
+    "relayerStatus" : {
+      "connected" : "مستعد للاتصال",
+      "connecting" : "جارِ الاتصال بخادم WalletConnect",
+      "offline" : "لا يوجد اتصال بالإنترنت"
     }
   },
   "sessionProposal" : {
@@ -43,9 +48,15 @@
     },
     "error" : {
       "title" : "{{appName}} طلب الاتصال بسلاسل لا ندعمها بعد",
-      "desc" : "نحن ندعم حالياً إيثريوم و Polygon وسلسلة بينانس الذكية و Arbitrum و Optimism و Avalanche C-Chain و Ethereum Goerli و Optimism Goerli. ونضيف سلاسل جديدة تدريجياً."
+      "info" : "في الوقت الحالي نحن ندعم: "
     },
-    "addAccount" : "إضافة حساب"
+    "missingRequired" : {
+      "title" : "أنت بحاجة إلى حسابات على السلاسل التالية للاتصال بـ {{appName}}"
+    },
+    "addAccount" : "إضافة حساب",
+    "createAccount" : "إنشاء حساب جديد",
+    "createAccountForChain" : "إنشاء حساب {{chain}} جديد",
+    "noRequiredChains" : "اختر حساباً واحداً على الأقل للاتصال"
   },
   "sessions" : {
     "title" : "الجلسات",
