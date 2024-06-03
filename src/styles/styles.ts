@@ -20,11 +20,9 @@ export const ResponsiveContainer = styled.div`
     width: calc(100% - 32px);
     padding-left: 16px;
     padding-right: 16px;
-    background-color: red;
   }
   @media ${device.tablet} {
     width: calc(100% - 32px);
-    max-width: 665px;
   }
   @media ${device.desktop} {
     width: calc(100% - 32px);
