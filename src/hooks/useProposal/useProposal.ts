@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { getNamespace } from "@/utils/helper.util";
+import { getErrorMessage, getNamespace } from "@/utils/helper.util";
 import { EIP155_SIGNING_METHODS } from "@/data/methods/EIP155Data.methods";
 import useAnalytics from "@/hooks/useAnalytics";
 import {
@@ -24,6 +24,7 @@ import {
 } from "../useSessions";
 import { queryKey as pendingProposalsQueryKey } from "../usePendingProposals";
 import { ProposalTypes } from "@walletconnect/types";
+import { enqueueSnackbar } from "notistack";
 
 export function useProposal(proposal: ProposalTypes.Struct) {
   const navigate = useNavigate();
@@ -260,7 +261,18 @@ export function useProposal(proposal: ProposalTypes.Struct) {
         });
         // TODO Maybe we should also select the requested account
       } catch (error) {
-        console.error("request account canceled by user");
+        if (error instanceof Error && error.message === "Canceled by user") {
+          console.error("request account canceled by user");
+          return;
+        }
+        enqueueSnackbar(getErrorMessage(error), {
+          errorType: "Error adding accounts",
+          variant: "errorNotification",
+          anchorOrigin: {
+            vertical: "top",
+            horizontal: "right",
+          },
+        });
       }
       // refetch accounts
       await queryClient.invalidateQueries({ queryKey: accountsQueryKey });
@@ -276,7 +288,18 @@ export function useProposal(proposal: ProposalTypes.Struct) {
         });
         // TODO Maybe we should also select the requested account
       } catch (error) {
-        console.error("request account canceled by user");
+        if (error instanceof Error && error.message === "Canceled by user") {
+          console.error("request account canceled by user");
+          return;
+        }
+        enqueueSnackbar(getErrorMessage(error), {
+          errorType: "Error adding accounts",
+          variant: "errorNotification",
+          anchorOrigin: {
+            vertical: "top",
+            horizontal: "right",
+          },
+        });
       }
       // refetch accounts
       await queryClient.invalidateQueries({ queryKey: accountsQueryKey });
