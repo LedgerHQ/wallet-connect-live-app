@@ -20,13 +20,14 @@ export const ResponsiveContainer = styled.div`
     width: calc(100% - 32px);
     padding-left: 16px;
     padding-right: 16px;
+    background-color: red;
   }
   @media ${device.tablet} {
-    width: 100%;
-    max-width: 465px;
+    width: calc(100% - 32px);
+    max-width: 665px;
   }
   @media ${device.desktop} {
-    width: 100%;
+    width: calc(100% - 32px);
     max-width: 865px;
   }
 `;
