@@ -48,7 +48,6 @@ export default function Sessions() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionsLength]);
 
-
   const goToConnect = useCallback(() => {
     void navigate({ to: "/connect", search: (search) => search });
     analytics.track("button_clicked", {

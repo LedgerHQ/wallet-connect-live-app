@@ -2,13 +2,11 @@ import { atomWithStorage } from 'jotai/utils';
 import { atom, useAtom } from 'jotai';
 import { SignClientTypes } from '@walletconnect/types';
 
-interface MetadataWithDate extends SignClientTypes.Metadata {
+type MetadataWithDate = SignClientTypes.Metadata & {
   date: Date;
-}
+};
 
-type StoredValueType = {
-  [url: string]: MetadataWithDate
-}
+type StoredValueType = Record<string, MetadataWithDate>;
 
 const recentConnectionApps = atomWithStorage<StoredValueType>(
   "connectionApps",
