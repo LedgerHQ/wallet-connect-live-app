@@ -31,7 +31,7 @@ export default function Sessions() {
   const isEmptyState = sessionsLength === 0;
   const hasProposals = pendingProposals.data.length > 0;
   const analytics = useAnalytics();
-  const { lastConnectionApps, setLastConnectionApps } = useRecentConnection();
+  const { lastConnectionApps } = useRecentConnection();
 
   // TODO look at improving the analytics here maybe
   useEffect(() => {
@@ -48,35 +48,6 @@ export default function Sessions() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionsLength]);
 
-  useEffect(() => {
-    if (sessions?.data) {
-      const uniqueUrls = new Set();
-      const deduplicatedLastConnectionApps = lastConnectionApps.filter(
-        (app) => {
-          const isDuplicate = uniqueUrls.has(app.url);
-          uniqueUrls.add(app.url);
-          return !isDuplicate;
-        },
-      );
-
-      const unregisteredMetadata = sessions.data
-        .filter((session) => {
-          const sessionUrl = session.peer.metadata.url;
-          const isDuplicate = uniqueUrls.has(sessionUrl);
-          if (!isDuplicate) {
-            uniqueUrls.add(sessionUrl);
-          }
-          return !isDuplicate;
-        })
-        .map((session) => session.peer.metadata);
-
-      setLastConnectionApps([
-        ...unregisteredMetadata,
-        ...deduplicatedLastConnectionApps,
-      ]);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const goToConnect = useCallback(() => {
     void navigate({ to: "/connect", search: (search) => search });

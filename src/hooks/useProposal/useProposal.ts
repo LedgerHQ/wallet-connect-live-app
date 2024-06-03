@@ -25,6 +25,7 @@ import {
 import { queryKey as pendingProposalsQueryKey } from "../usePendingProposals";
 import { ProposalTypes } from "@walletconnect/types";
 import { enqueueSnackbar } from "notistack";
+import useRecentConnection from "../useRecentConnection";
 
 export function useProposal(proposal: ProposalTypes.Struct) {
   const navigate = useNavigate();
@@ -33,6 +34,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
   const accounts = useAccounts(client);
   const web3wallet = useAtomValue(web3walletAtom);
   const analytics = useAnalytics();
+  const { addAppToLastConnectionApps } = useRecentConnection();
 
   const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
 
@@ -180,7 +182,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
   );
 
   const sessionsQueryFn = useSessionsQueryFn(web3wallet);
-
+  
   const approveSession = useCallback(async () => {
     try {
       const supportedNs = buildSupportedNamespaces(proposal);
@@ -201,6 +203,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
         queryKey: sessionsQueryKey,
         queryFn: sessionsQueryFn,
       });
+      addAppToLastConnectionApps(session.peer.metadata)
       await navigate({
         to: "/detail/$topic",
         params: { topic: session.topic },

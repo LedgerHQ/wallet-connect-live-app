@@ -1,17 +1,41 @@
-import { SignClientTypes } from "@walletconnect/types";
-import { useAtom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
+import { atomWithStorage } from 'jotai/utils';
+import { atom, useAtom } from 'jotai';
+import { SignClientTypes } from '@walletconnect/types';
 
-const recentConnectionApps = atomWithStorage<SignClientTypes.Metadata[]>(
+interface MetadataWithDate extends SignClientTypes.Metadata {
+  date: Date;
+}
+
+type StoredValueType = {
+  [url: string]: MetadataWithDate
+}
+
+const recentConnectionApps = atomWithStorage<StoredValueType>(
   "connectionApps",
-  [],
+  {},
   undefined,
-  { getOnInit: true },
+  { getOnInit: true }
+);
+
+//custom read and write in recentConnectionApps Atom
+const sortedRecentConnectionApps = atom(
+  (get): MetadataWithDate[] => {
+    const storedValue: StoredValueType = get(recentConnectionApps);
+    const flattenedArray = Object.values(storedValue);
+    return flattenedArray.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) || [];
+  },
+  (get, set, newMetadata: SignClientTypes.Metadata) => {
+    const storedValue: StoredValueType = get(recentConnectionApps);
+    const updatedStoredValue: StoredValueType = {
+      ...storedValue,
+      [newMetadata.url]: { ...newMetadata, date: new Date() }
+    };
+    set(recentConnectionApps, updatedStoredValue);
+  }
 );
 
 export default function useRecentConnection() {
-  const [lastConnectionApps, setLastConnectionApps] =
-    useAtom(recentConnectionApps);
+  const [lastConnectionApps, addAppToLastConnectionApps] = useAtom(sortedRecentConnectionApps);
 
-  return { lastConnectionApps, setLastConnectionApps };
+  return { lastConnectionApps, addAppToLastConnectionApps };
 }
