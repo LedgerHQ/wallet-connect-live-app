@@ -28,7 +28,7 @@ export function AccountRow(
         isSelected={selectedAccounts.includes(account.id)}
         rightElement={AccountBalance({ account })}
         onClick={() => handleClick(account.id)}
-        LeftIcon={
+        RightIcon={
           <CryptoIcon
             name={getTicker(entry.chain)}
             circleIcon

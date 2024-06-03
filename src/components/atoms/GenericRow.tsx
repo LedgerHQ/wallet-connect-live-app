@@ -1,4 +1,4 @@
-import { Flex, Text, Checkbox } from "@ledgerhq/react-ui";
+import { Flex, Text, Checkbox, Box } from "@ledgerhq/react-ui";
 import { ChevronRightMedium } from "@ledgerhq/react-ui/assets/icons";
 import styled from "styled-components";
 import { RowType } from "./types";
@@ -6,7 +6,8 @@ import { RowType } from "./types";
 type Props = {
   title: string;
   subtitle: string;
-  LeftIcon: React.ReactNode;
+  LeftIcon?: React.ReactNode;
+  RightIcon?: React.ReactNode;
   rightElement?: React.ReactNode;
   isSelected?: boolean;
   onClick?: () => void;
@@ -21,6 +22,7 @@ const Row = styled(Flex)`
 
 export function GenericRow({
   LeftIcon,
+  RightIcon,
   rightElement,
   title,
   subtitle,
@@ -46,8 +48,12 @@ export function GenericRow({
           <Text variant="body" fontWeight="semiBold" color="neutral.c100">
             {title}
           </Text>
-
-          <Flex flexDirection="row" columnGap={2}>
+          <Flex
+            flexDirection="row"
+            alignItems={"center"}
+            columnGap={2}
+          >
+            {LeftIcon && <Box mr={2}>{LeftIcon}</Box>}
             <Text
               variant="small"
               fontWeight="medium"
@@ -56,7 +62,7 @@ export function GenericRow({
             >
               {subtitle}
             </Text>
-            {LeftIcon}
+            {RightIcon}
           </Flex>
         </Flex>
       </Flex>

@@ -263,7 +263,7 @@ export default function SessionDetail({ session }: Props) {
                                 title={account.name}
                                 subtitle={truncate(account.address, 10)}
                                 rightElement={AccountBalance({ account })}
-                                LeftIcon={
+                                RightIcon={
                                   <CryptoIcon
                                     name={getTicker(chain)}
                                     circleIcon
