@@ -21,11 +21,7 @@ export const ResponsiveContainer = styled.div`
     padding-left: 16px;
     padding-right: 16px;
   }
-  @media ${device.tablet} {
-    width: calc(100% - 32px);
-  }
   @media ${device.desktop} {
-    width: calc(100% - 32px);
     max-width: 865px;
   }
 `;
