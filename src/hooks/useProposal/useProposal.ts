@@ -228,6 +228,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
     queryClient,
     sessionsQueryFn,
     web3wallet,
+    addAppToLastConnectionApps
   ]);
 
   const rejectSession = useCallback(async () => {
