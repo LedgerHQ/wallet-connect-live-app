@@ -60,7 +60,8 @@
       "noAppsMessage": "Your connected apps will be listed here",
       "dontKnow": "Don’t know any? Try one of these",
       "lastConnection": "Last connections",
-      "tryNewApp": "Try new apps"
+      "tryNewApp": "Try new apps",
+      "clearHistory": "Clear history"
     },
     "goToConnect": "Connect",
     "disconnectAll": "Disconnect All",

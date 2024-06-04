@@ -15,7 +15,7 @@ import { formatAccountsByChain } from "@/hooks/useProposal/util";
 import { useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { web3walletAtom } from "@/store/web3wallet.store";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import useAccounts, { queryKey as accountsQueryKey } from "@/hooks/useAccounts";
 import { walletAPIClientAtom } from "@/store/wallet-api.store";
 import {
@@ -25,7 +25,7 @@ import {
 import { queryKey as pendingProposalsQueryKey } from "../usePendingProposals";
 import { ProposalTypes } from "@walletconnect/types";
 import { enqueueSnackbar } from "notistack";
-import useRecentConnection from "../useRecentConnection";
+import sortedRecentConnectionAppsAtom from "../../atoms/recentConnectionAppsAtom";
 
 export function useProposal(proposal: ProposalTypes.Struct) {
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
   const accounts = useAccounts(client);
   const web3wallet = useAtomValue(web3walletAtom);
   const analytics = useAnalytics();
-  const { addAppToLastConnectionApps } = useRecentConnection();
+  const addAppToLastConnectionApps = useSetAtom(sortedRecentConnectionAppsAtom);;
 
   const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
 
@@ -182,7 +182,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
   );
 
   const sessionsQueryFn = useSessionsQueryFn(web3wallet);
-  
+
   const approveSession = useCallback(async () => {
     try {
       const supportedNs = buildSupportedNamespaces(proposal);

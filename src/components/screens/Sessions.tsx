@@ -17,7 +17,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import usePendingProposals from "@/hooks/usePendingProposals";
 import SuggestedApps from "./SuggestedApps";
 import RecentlyUsedApps from "./RecentlyUsedApps";
-import useRecentConnection from "@/hooks/useRecentConnection";
+import sortedRecentConnectionAppsAtom from "@/atoms/recentConnectionAppsAtom";
 
 export default function Sessions() {
   const { t } = useTranslation();
@@ -31,7 +31,7 @@ export default function Sessions() {
   const isEmptyState = sessionsLength === 0;
   const hasProposals = pendingProposals.data.length > 0;
   const analytics = useAnalytics();
-  const { lastConnectionApps } = useRecentConnection();
+  const lastConnectionApps = useAtomValue(sortedRecentConnectionAppsAtom);
 
   // TODO look at improving the analytics here maybe
   useEffect(() => {
