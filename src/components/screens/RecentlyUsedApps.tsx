@@ -1,4 +1,4 @@
-import sortedRecentConnectionAppsAtom, {recentConnectionAppsAtom, initialValue as recentConnectionAppsInitialValue} from "@/store/recentConnectionAppsAtom";
+import {sortedRecentConnectionAppsAtom, recentConnectionAppsAtom, initialValue as recentConnectionAppsInitialValue} from "@/store/recentConnectionAppsAtom";
 import AppCard from "../AppCard";
 import { Flex, Text } from "@ledgerhq/react-ui";
 import { t } from "i18next";

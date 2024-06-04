@@ -17,7 +17,7 @@ export const recentConnectionAppsAtom = atomWithStorage<StoredValueType>(
   { getOnInit: true }
 );
 
-const sortedRecentConnectionAppsAtom = atom(
+export const sortedRecentConnectionAppsAtom = atom(
   (get): MetadataWithDate[] => {
     const storedValue: StoredValueType = get(recentConnectionAppsAtom);
     const flattenedArray = Object.values(storedValue);
@@ -32,5 +32,3 @@ const sortedRecentConnectionAppsAtom = atom(
     }));
   },
 );
-
-export default sortedRecentConnectionAppsAtom;

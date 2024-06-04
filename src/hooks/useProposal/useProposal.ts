@@ -25,7 +25,7 @@ import {
 import { queryKey as pendingProposalsQueryKey } from "../usePendingProposals";
 import { ProposalTypes } from "@walletconnect/types";
 import { enqueueSnackbar } from "notistack";
-import sortedRecentConnectionAppsAtom from "../../atoms/recentConnectionAppsAtom";
+import {sortedRecentConnectionAppsAtom} from "../../store/recentConnectionAppsAtom";
 
 export function useProposal(proposal: ProposalTypes.Struct) {
   const navigate = useNavigate();
