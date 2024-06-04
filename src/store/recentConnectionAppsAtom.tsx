@@ -18,8 +18,8 @@ export const recentConnectionAppsAtom = atomWithStorage<StoredValueType>(
 );
 
 export const sortedRecentConnectionAppsAtom = atom(
-  (get): MetadataWithDate[] => {
-    const storedValue: StoredValueType = get(recentConnectionAppsAtom);
+  (get) => {
+    const storedValue = get(recentConnectionAppsAtom);
     const flattenedArray = Object.values(storedValue);
     return flattenedArray.sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
