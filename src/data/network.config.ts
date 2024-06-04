@@ -57,7 +57,6 @@ export const EIP155_CHAINS_MAINNET: Record<string, Network> = {
   },
 };
 
-
 export const EIP155_SEPOLIA_CHAINS: Record<string, Network> = {
   ethereum_sepolia: {
     chainId: 11155111,
@@ -96,8 +95,8 @@ export const EIP155_HOLESKY_CHAINS: Record<string, Network> = {
     ticker: "ETH",
     displayName: "Ethereum Holesky",
     color: "#00ff00",
-  }
-}
+  },
+};
 
 export const MULTIVERS_X_CHAINS: Record<string, Network> = {
   elrond: {
@@ -109,21 +108,63 @@ export const MULTIVERS_X_CHAINS: Record<string, Network> = {
   },
 };
 
+export const BIP122_MAINNET_CHAINS: Record<string, Network> = {
+  bitcoin: {
+    chainId: "000000000019d6689c085ae165831e93",
+    namespace: "bip122:000000000019d6689c085ae165831e93",
+    displayName: "Bitcoin",
+    ticker: "BTC",
+    color: "#F7931A",
+  },
+  litecoin: {
+    chainId: "12a765e31ffd4059bada1e25190f6e98",
+    namespace: "bip122:12a765e31ffd4059bada1e25190f6e98",
+    displayName: "Litecoin",
+    ticker: "LTC",
+    color: "#355DAF",
+  },
+  dogecoin: {
+    chainId: "82bc68038f6034c0596b6e313729793a",
+    namespace: "bip122:82bc68038f6034c0596b6e313729793a",
+    displayName: "Dogecoin",
+    ticker: "DOGE",
+    color: "#65d196",
+  },
+};
+
+export const BIP122_TEST_CHAINS: Record<string, Network> = {
+  bitcoin_testnet: {
+    chainId: "000000000933ea01ad0ee984209779ba",
+    namespace: "bip122:000000000933ea01ad0ee984209779ba",
+    displayName: "Bitcoin (Testnet)",
+    ticker: "TBTC",
+    color: "#F7931A",
+  },
+};
+
+export const BIP122_CHAINS = {
+  ...BIP122_MAINNET_CHAINS,
+  ...BIP122_TEST_CHAINS,
+};
 
 export const EIP155_CHAINS = {
   ...EIP155_CHAINS_MAINNET,
   ...EIP155_SEPOLIA_CHAINS,
   ...EIP155_HOLESKY_CHAINS,
-}
+};
 
 export const SUPPORTED_NETWORK: Record<string, Network> = {
   ...EIP155_CHAINS,
   ...MULTIVERS_X_CHAINS,
+  ...BIP122_CHAINS,
 };
 
-export const SUPPORTED_NETWORK_NAMES: string[] = Object.values(SUPPORTED_NETWORK).map((network: Network) => network.displayName);
+export const SUPPORTED_NETWORK_NAMES: string[] = Object.values(
+  SUPPORTED_NETWORK,
+).map((network: Network) => network.displayName);
 
 export enum SupportedNamespace {
+  BIP122 = "bip122",
   EIP155 = "eip155",
   MVX = "mvx",
 }

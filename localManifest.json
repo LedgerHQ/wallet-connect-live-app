@@ -11,6 +11,10 @@
   "branch": "stable",
   "categories": ["bridge", "defi"],
   "currencies": [
+    "bitcoin",
+    "bitcoin_testnet",
+    "litecoin",
+    "dogecoin",
     "ethereum",
     "polygon",
     "bsc",
