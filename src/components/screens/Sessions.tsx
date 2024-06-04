@@ -17,7 +17,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import usePendingProposals from "@/hooks/usePendingProposals";
 import SuggestedApps from "./SuggestedApps";
 import RecentlyUsedApps from "./RecentlyUsedApps";
-import sortedRecentConnectionAppsAtom from "@/atoms/recentConnectionAppsAtom";
+import sortedRecentConnectionAppsAtom from "@/store/recentConnectionAppsAtom";
 
 export default function Sessions() {
   const { t } = useTranslation();
