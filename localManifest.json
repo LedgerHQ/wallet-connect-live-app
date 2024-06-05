@@ -19,6 +19,7 @@
     "avalanche_c_chain",
     "base",
     "elrond",
+    "solana",
     "ethereum_sepolia",
     "arbitrum_sepolia",
     "optimism_sepolia",

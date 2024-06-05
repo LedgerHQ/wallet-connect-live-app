@@ -18,6 +18,7 @@ and is intended to be integrated within ledger products, enabling users to seaml
 | Base              | ✅          | ✅                |   |
 | Cosmos            | ⏳          | -                 |   |
 | Multivers-X       | ✅          | -                 |   |
+| Solana            | ✅          | -                 |   |
 
 ## Hosting
 
