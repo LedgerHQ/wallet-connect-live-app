@@ -1,9 +1,14 @@
 import { BigNumber } from "bignumber.js";
 import eip55 from "eip55";
-import { SolanaFMParser, checkIfInstructionParser, ParserType } from "@solanafm/explorer-kit"
 import {
-  decodeInstruction, decodeTransferInstruction,
-} from '@solana/spl-token';
+  SolanaFMParser,
+  checkIfInstructionParser,
+  ParserType,
+} from "@solanafm/explorer-kit";
+import {
+  decodeInstruction,
+  decodeTransferInstruction,
+} from "@solana/spl-token";
 import { getProgramIdl } from "@solanafm/explorer-kit-idls";
 import bs58 from "bs58";
 import {
@@ -126,9 +131,10 @@ export type SolanaTransaction = Transaction;
 
 export function convertSolanaToLiveTX(
   tx: SolanaTransaction,
-): Promise<SolanaTransactionLive> {
-  // let command: TransferCommand | null = null;
+): SolanaTransactionLive {
   let model: TransactionModel | null = null;
+  let amount: BigNumber = new BigNumber(0);
+  let recipient: string = "";
 
   debugger;
   if (tx.instructions && tx.instructions.length > 0) {
@@ -173,57 +179,34 @@ export function convertSolanaToLiveTX(
     ]
 }
       */
-      // const decoded = bs.decode(tx.instructions[0].data.toString())
-      // const data = tx.instructions[0].data
-      // data is [2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]
-      // const bytes = Uint8Array.from(data)
-      // const encoded = bs58.encode(bytes)
-      
-      // const inst = new SystemProgram()
-      debugger;
 
-      const data = tx.instructions[0].data
+      const data = tx.instructions[0].data;
       const decodedTransfer = SystemInstruction.decodeTransfer({
         ...tx.instructions[0],
-        data: Buffer.from(tx.instructions[0].data),
+        data: Buffer.from(data),
         // data: Uint8Array.from(data),
         programId: SystemProgram.programId,
-      })
+      });
+      /* 
+    {
+     fromPubkey : "AavRo1X6ZrArYAKqLP1UTJB7Hxij1CkkSW4zThvaetcc"
+     lamports :  1n
+     toPubkey: "8fKj2eAc2cR4rf9xmVtF3tmiQYHXJW2qWyspyJ7in2go"
+    }
+      */
       debugger;
-      // WOULD HAVE BEEN GOOD, BUT PARAMSID EQUALS ERROR!
-      
-      // decodeTransferInstruction
-      // const decodedInstruction = decodeInstruction(tx.instructions[0]);
-      
-      // const decodedInstruction = decodeInstruction({
-      //   ...tx.instructions[0],
-      //   data: Buffer.from(bytes),
-      // });
-        // NOTE: would have been good, also...
-      
+      const decodedAmount = decodedTransfer.lamports.toString()
 
-      // const programId = SystemProgram.programId.toString()
-      // const SFMIdlItem = getProgramIdl(programId);
-
-      // const bytes = Uint8Array.from(data)
-      // const encoded = bs58.encode(bytes)
-      // if (SFMIdlItem) {
-      // const parser = new SolanaFMParser(SFMIdlItem, programId);
-      // const instructionParser = parser.createParser(ParserType.INSTRUCTION);
-      // if (instructionParser && checkIfInstructionParser(instructionParser)) {
-      // const decodedData = instructionParser.parseInstructions(encoded);
-      // // const decoded = bs.decode(tx.instructions[0].data.toString())
-      // debugger;
-      // // TransactionInstruction(tx.instructions[0])
-      // }
-      // }
-      
       let command: TransferCommand = {
         kind: "transfer",
-        amount: 0,// bs58.decode(tx.instructions[0].data),
-        sender: String(tx.instructions[0].keys[0].pubkey),
-        recipient: String(tx.instructions[0].keys[1].pubkey),
+        amount: Number(decodedAmount), // bs58.decode(tx.instructions[0].data),
+        // sender: String(tx.instructions[0].keys[0].pubkey),
+        sender: String(decodedTransfer.fromPubkey),
+        // recipient: String(tx.instructions[0].keys[1].pubkey),
+        recipient: String(decodedTransfer.toPubkey),
       };
+      amount = new BigNumber(decodedAmount);
+      recipient = String(decodedTransfer.toPubkey);
 
       model = {
         commandDescriptor: {
@@ -235,17 +218,24 @@ export function convertSolanaToLiveTX(
         kind: "transfer",
         uiState: {},
       };
+    } else {
+      debugger;
+    throw new Error("Unsupported Solana instruction");
     }
+  } else {
+    debugger;
+    throw new Error("Unsupported Solana non-instruction");
   }
 
   if (model === null) {
     throw new Error("Unsupported Solana transaction");
   }
+  debugger;
 
   return {
     model,
     family: "solana",
-    amount: new BigNumber(0),
-    recipient: String(tx.instructions[0].keys[1].pubkey), //.toBase58(), //tx.signatures[0].publicKey.toBase58(),
+    amount: amount, // new BigNumber(0),
+    recipient: recipient, //String(tx.instructions[0].keys[1].pubkey), //.toBase58(), //tx.signatures[0].publicKey.toBase58(),
   };
 }
