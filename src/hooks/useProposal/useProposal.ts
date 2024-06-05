@@ -3,6 +3,15 @@ import { getErrorMessage } from "@/utils/helper.util";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
 import useAnalytics from "@/hooks/useAnalytics";
 import {
+  BIP122_CHAINS,
+  EIP155_CHAINS,
+  MULTIVERS_X_CHAINS,
+  RIPPLE_CHAINS,
+  SOLANA_CHAINS,
+  SupportedNamespace,
+} from "@/data/network.config";
+import {
+  BuildApprovedNamespacesParams,
   buildApprovedNamespaces,
   buildAuthObject,
   populateAuthPayload,
@@ -26,7 +35,7 @@ import { OneClickAuthPayload } from "@/types/types";
 import { enqueueSnackbar } from "notistack";
 import { sortedRecentConnectionAppsAtom } from "../../store/recentConnectionAppsAtom";
 import { useSupportedNamespaces } from "../useSupportedNamespaces";
-import { formatMessage } from "../requestHandlers/utils";
+import { formatMessage } from "../handleRequest/utils";
 
 export function useProposal(
   proposal: ProposalTypes.Struct,
