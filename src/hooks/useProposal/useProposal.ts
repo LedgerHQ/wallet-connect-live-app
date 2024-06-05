@@ -5,6 +5,7 @@ import useAnalytics from "@/hooks/useAnalytics";
 import {
   EIP155_CHAINS,
   MULTIVERS_X_CHAINS,
+  SOLANA_CHAINS,
   SupportedNamespace,
 } from "@/data/network.config";
 import {
@@ -55,20 +56,20 @@ export function useProposal(proposal: ProposalTypes.Struct) {
   }, [navigate]);
 
   const buildEip155Namespace = useCallback(
-    (requiredNamespaces: ProposalTypes.RequiredNamespaces,
-      optionalNamespaces: ProposalTypes.OptionalNamespaces
+    (
+      requiredNamespaces: ProposalTypes.RequiredNamespaces,
+      optionalNamespaces: ProposalTypes.OptionalNamespaces,
     ) => {
       const accountsByChain = formatAccountsByChain(
         proposal,
         accounts.data,
-      ).filter(
-        (a) => {
-          return (a.accounts.length > 0 &&
-            a.isSupported &&
-            Object.keys(EIP155_CHAINS).includes(a.chain)
-          )
-        }
-      );
+      ).filter((a) => {
+        return (
+          a.accounts.length > 0 &&
+          a.isSupported &&
+          Object.keys(EIP155_CHAINS).includes(a.chain)
+        );
+      });
       const dataToSend = accountsByChain.reduce<
         { account: string; chain: string }[]
       >(
@@ -83,7 +84,9 @@ export function useProposal(proposal: ProposalTypes.Struct) {
           ),
         [],
       );
-      const namespace = requiredNamespaces[SupportedNamespace.EIP155] || optionalNamespaces[SupportedNamespace.EIP155];
+      const namespace =
+        requiredNamespaces[SupportedNamespace.EIP155] ||
+        optionalNamespaces[SupportedNamespace.EIP155];
 
       const methods: string[] = [
         ...new Set([
@@ -107,12 +110,15 @@ export function useProposal(proposal: ProposalTypes.Struct) {
         events,
         accounts: dataToSend.map((e) => e.account),
       };
-    }
-    , [accounts.data, proposal, selectedAccounts])
+    },
+    [accounts.data, proposal, selectedAccounts],
+  );
 
   const buildMvxNamespace = useCallback(
-    (requiredNamespaces: ProposalTypes.RequiredNamespaces,
-      optionalNamespaces: ProposalTypes.OptionalNamespaces) => {
+    (
+      requiredNamespaces: ProposalTypes.RequiredNamespaces,
+      optionalNamespaces: ProposalTypes.OptionalNamespaces,
+    ) => {
       const accountsByChain = formatAccountsByChain(
         proposal,
         accounts.data,
@@ -136,7 +142,9 @@ export function useProposal(proposal: ProposalTypes.Struct) {
           ),
         [],
       );
-      const namespace = requiredNamespaces[SupportedNamespace.MVX] || optionalNamespaces[SupportedNamespace.MVX];
+      const namespace =
+        requiredNamespaces[SupportedNamespace.MVX] ||
+        optionalNamespaces[SupportedNamespace.MVX];
 
       const methods: string[] = namespace.methods;
 
@@ -156,24 +164,97 @@ export function useProposal(proposal: ProposalTypes.Struct) {
         events,
         accounts: dataToSend.map((e) => e.account),
       };
-    }
-    , [accounts.data, proposal, selectedAccounts])
+    },
+    [accounts.data, proposal, selectedAccounts],
+  );
+
+  const buildSolanaNamespace = useCallback(
+    (
+      requiredNamespaces: ProposalTypes.RequiredNamespaces,
+      optionalNamespaces: ProposalTypes.OptionalNamespaces,
+    ) => {
+      const accountsByChain = formatAccountsByChain(
+        proposal,
+        accounts.data,
+      ).filter(
+        (a) =>
+          a.accounts.length > 0 &&
+          a.isSupported &&
+          Object.keys(SOLANA_CHAINS).includes(a.chain),
+      );
+      const dataToSend = accountsByChain.reduce<
+        { account: string; chain: string }[]
+      >(
+        (accum, elem) =>
+          accum.concat(
+            elem.accounts
+              .filter((acc) => selectedAccounts.includes(acc.id))
+              .map((a) => ({
+                account: `${getNamespace(a.currency)}:${a.address}`,
+                chain: getNamespace(a.currency),
+              })),
+          ),
+        [],
+      );
+      const namespace =
+        requiredNamespaces[SupportedNamespace.SOLANA] ||
+        optionalNamespaces[SupportedNamespace.SOLANA];
+
+      console.log({namespace})
+
+      const methods: string[] = namespace.methods;
+
+      const events = [
+        ...new Set([
+          ...namespace.events,
+          "solana_getAccounts",
+          "solana_requestAccounts",
+          "solana_signTransaction",
+          "solana_signMessage",
+        ]),
+      ];
+
+      return {
+        chains: [...new Set(dataToSend.map((e) => e.chain))],
+        methods,
+        events,
+        accounts: dataToSend.map((e) => e.account),
+      };
+    },
+    [accounts.data, proposal, selectedAccounts],
+  );
 
   const buildSupportedNamespaces = useCallback(
     (proposal: ProposalTypes.Struct) => {
-      const { requiredNamespaces, optionalNamespaces } = proposal;
+      const { requiredNamespaces = {}, optionalNamespaces = {} } = proposal;
+      // despite wallet connect proposal type, i've encountered non existence of optionalNamespaces
+      // here https://deltaone.xyz/#/app/v1/vault/Farm-SOL-USDC
+      console.log({ proposal });
 
       const supportedNamespaces: BuildApprovedNamespacesParams["supportedNamespaces"] =
         {};
 
+      console.log({ requiredNamespaces, optionalNamespaces });
       if ("eip155" in requiredNamespaces || "eip155" in optionalNamespaces) {
-        supportedNamespaces[SupportedNamespace.EIP155] =
-          buildEip155Namespace(requiredNamespaces, optionalNamespaces);
+        supportedNamespaces[SupportedNamespace.EIP155] = buildEip155Namespace(
+          requiredNamespaces,
+          optionalNamespaces,
+        );
       }
       if ("mvx" in requiredNamespaces || "mvx" in optionalNamespaces) {
-        supportedNamespaces[SupportedNamespace.MVX] =
-          buildMvxNamespace(requiredNamespaces, optionalNamespaces);
+        supportedNamespaces[SupportedNamespace.MVX] = buildMvxNamespace(
+          requiredNamespaces,
+          optionalNamespaces,
+        );
       }
+
+      if ("solana" in requiredNamespaces || "solana" in optionalNamespaces) {
+        supportedNamespaces[SupportedNamespace.SOLANA] = buildSolanaNamespace(
+          requiredNamespaces,
+          optionalNamespaces,
+        );
+      }
+      console.log({SupportedNamespace})
       return supportedNamespaces;
     },
     [buildEip155Namespace, buildMvxNamespace],
@@ -183,11 +264,13 @@ export function useProposal(proposal: ProposalTypes.Struct) {
 
   const approveSession = useCallback(async () => {
     try {
+      console.log("HERE");
       const supportedNs = buildSupportedNamespaces(proposal);
+      console.log({supportedNs})
       const approvedNs = buildApprovedNamespaces({
         proposal,
         supportedNamespaces: supportedNs,
-      })
+      });
       const session = await web3wallet.approveSession({
         id: proposal.id,
         namespaces: approvedNs,

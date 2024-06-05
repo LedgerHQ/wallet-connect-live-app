@@ -1,9 +1,34 @@
 import { BigNumber } from "bignumber.js";
 import eip55 from "eip55";
+import { SolanaFMParser, checkIfInstructionParser, ParserType } from "@solanafm/explorer-kit"
+import {
+  decodeInstruction, decodeTransferInstruction,
+} from '@solana/spl-token';
+import { getProgramIdl } from "@solanafm/explorer-kit-idls";
+import bs58 from "bs58";
 import {
   ElrondTransaction,
   EthereumTransaction,
+  SolanaTransaction as SolanaTransactionLive,
+  TransactionModel,
 } from "@ledgerhq/wallet-api-client";
+
+import type {
+  // Transaction as solanaTransaction,
+  Command,
+  TransferCommand,
+} from "@ledgerhq/coin-solana/types";
+
+// import type { SystemProgram } from "@solana/web3.js";
+
+import {
+  // PublicKey,
+  Transaction,
+  SystemProgram,
+  SystemInstruction,
+  TransactionInstruction,
+  // VersionedTransaction,
+} from "@solana/web3.js";
 
 export type EthTransaction = {
   value: string;
@@ -59,5 +84,168 @@ export function convertMvxToLiveTX(tx: MvxTransaction): ElrondTransaction {
     recipient: tx.receiver,
     gasLimit: tx.gasLimit,
     data: tx.data,
+  };
+}
+
+// export type SolanaTransaction = {
+//   model: TransactionModel
+//   message: string;
+//   signature: string;
+//   publicKey: string;
+// };
+
+export type SolanaTransaction = Transaction;
+
+// type SolanaSignTransactionWithDeprecatedFields = {
+//   feePayer: string;
+//   instructions: [
+//     {
+//       programId: string;
+//       data?: string;
+//       keys: {
+//         isSigner: boolean;
+//         isWritable: boolean;
+//         pubkey: string;
+//       }[];
+//     },
+//   ];
+//   recentBlockhash: string;
+//   partialSignatures: {
+//     pubkey: string;
+//     signature: string;
+//   }[];
+//   signatures: {
+//     publicKey: string;
+//     signature: string;
+//   }[];
+// } & SolanaSignTransactionRequiredFields;
+
+// type SolanaSignTransactionRequiredFields = {
+//   transaction: string;
+// };
+
+export function convertSolanaToLiveTX(
+  tx: SolanaTransaction,
+): Promise<SolanaTransactionLive> {
+  // let command: TransferCommand | null = null;
+  let model: TransactionModel | null = null;
+
+  debugger;
+  if (tx.instructions && tx.instructions.length > 0) {
+    if (
+      String(tx.instructions[0].programId) ===
+      SystemProgram.programId.toString()
+    ) {
+      /*
+{
+    "feePayer": "AavRo1X6ZrArYAKqLP1UTJB7Hxij1CkkSW4zThvaetcc",
+    "recentBlockhash": "Fxqugym9P4xfsPhjKcKMvyDMVCtd4ehpWJwNvTQx653c",
+    "instructions": [
+        {
+            "programId": "11111111111111111111111111111111",
+            "data": [
+                2,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "keys": [
+                {
+                    "isSigner": true,
+                    "isWritable": true,
+                    "pubkey": "AavRo1X6ZrArYAKqLP1UTJB7Hxij1CkkSW4zThvaetcc"
+                },
+                {
+                    "isSigner": false,
+                    "isWritable": true,
+                    "pubkey": "6F7JxPshGc1JDLst62kg5hRk3s5CQSP1Z4YsmDaxkoVr"
+                }
+            ]
+        }
+    ]
+}
+      */
+      // const decoded = bs.decode(tx.instructions[0].data.toString())
+      // const data = tx.instructions[0].data
+      // data is [2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]
+      // const bytes = Uint8Array.from(data)
+      // const encoded = bs58.encode(bytes)
+      
+      // const inst = new SystemProgram()
+      debugger;
+
+      const data = tx.instructions[0].data
+      const decodedTransfer = SystemInstruction.decodeTransfer({
+        ...tx.instructions[0],
+        data: Buffer.from(tx.instructions[0].data),
+        // data: Uint8Array.from(data),
+        programId: SystemProgram.programId,
+      })
+      debugger;
+      // WOULD HAVE BEEN GOOD, BUT PARAMSID EQUALS ERROR!
+      
+      // decodeTransferInstruction
+      // const decodedInstruction = decodeInstruction(tx.instructions[0]);
+      
+      // const decodedInstruction = decodeInstruction({
+      //   ...tx.instructions[0],
+      //   data: Buffer.from(bytes),
+      // });
+        // NOTE: would have been good, also...
+      
+
+      // const programId = SystemProgram.programId.toString()
+      // const SFMIdlItem = getProgramIdl(programId);
+
+      // const bytes = Uint8Array.from(data)
+      // const encoded = bs58.encode(bytes)
+      // if (SFMIdlItem) {
+      // const parser = new SolanaFMParser(SFMIdlItem, programId);
+      // const instructionParser = parser.createParser(ParserType.INSTRUCTION);
+      // if (instructionParser && checkIfInstructionParser(instructionParser)) {
+      // const decodedData = instructionParser.parseInstructions(encoded);
+      // // const decoded = bs.decode(tx.instructions[0].data.toString())
+      // debugger;
+      // // TransactionInstruction(tx.instructions[0])
+      // }
+      // }
+      
+      let command: TransferCommand = {
+        kind: "transfer",
+        amount: 0,// bs58.decode(tx.instructions[0].data),
+        sender: String(tx.instructions[0].keys[0].pubkey),
+        recipient: String(tx.instructions[0].keys[1].pubkey),
+      };
+
+      model = {
+        commandDescriptor: {
+          command: command,
+          fee: 0,
+          warnings: {},
+          errors: {},
+        },
+        kind: "transfer",
+        uiState: {},
+      };
+    }
+  }
+
+  if (model === null) {
+    throw new Error("Unsupported Solana transaction");
+  }
+
+  return {
+    model,
+    family: "solana",
+    amount: new BigNumber(0),
+    recipient: String(tx.instructions[0].keys[1].pubkey), //.toBase58(), //tx.signatures[0].publicKey.toBase58(),
   };
 }

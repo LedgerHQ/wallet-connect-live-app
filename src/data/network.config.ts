@@ -109,6 +109,19 @@ export const MULTIVERS_X_CHAINS: Record<string, Network> = {
   },
 };
 
+export const SOLANA_CHAINS: Record<string, Network> = {
+  // "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp": {
+  "solana": {
+    chainId: "1",
+    namespace: "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+    // namespace: "solana:4sGjMW1sUnHzSxGspuhpqLDx6wiyjNtZ", // work with APPs (marinade)
+    ticker: "SOL",
+    displayName: "Solana",
+    color: "#00ff00",
+    decimals: 9,
+  },
+};
+
 
 export const EIP155_CHAINS = {
   ...EIP155_CHAINS_MAINNET,
@@ -119,6 +132,7 @@ export const EIP155_CHAINS = {
 export const SUPPORTED_NETWORK: Record<string, Network> = {
   ...EIP155_CHAINS,
   ...MULTIVERS_X_CHAINS,
+  ...SOLANA_CHAINS,
 };
 
 export const SUPPORTED_NETWORK_NAMES: string[] = Object.values(SUPPORTED_NETWORK).map((network: Network) => network.displayName);
@@ -126,4 +140,5 @@ export const SUPPORTED_NETWORK_NAMES: string[] = Object.values(SUPPORTED_NETWORK
 export enum SupportedNamespace {
   EIP155 = "eip155",
   MVX = "mvx",
+  SOLANA = "solana",
 }

@@ -6,13 +6,18 @@ import { stripHexPrefix } from "@/utils/currencyFormatter/helpers";
 import {
   convertEthToLiveTX,
   convertMvxToLiveTX,
+  convertSolanaToLiveTX,
 } from "@/utils/converters";
 import {
   EIP155_REQUESTS,
   EIP155_SIGNING_METHODS,
 } from "@/data/methods/EIP155Data.methods";
 import { web3walletAtom } from "@/store/web3wallet.store";
-import { isEIP155Chain, isMultiversXChain } from "@/utils/helper.util";
+import {
+  isEIP155Chain,
+  isMultiversXChain,
+  isSolanaChain,
+} from "@/utils/helper.util";
 import { useNavigate } from "@tanstack/react-router";
 import { useAtomValue } from "jotai";
 import { Web3Wallet } from "@walletconnect/web3wallet/dist/types/client";
@@ -28,6 +33,10 @@ import {
   MULTIVERSX_REQUESTS,
   MULTIVERSX_SIGNING_METHODS,
 } from "@/data/methods/MultiversX.methods";
+import {
+  SOLANA_REQUESTS,
+  SOLANA_SIGNING_METHODS,
+} from "@/data/methods/Solana.methods";
 
 enum Errors {
   userDecline = "User rejected",
@@ -339,6 +348,157 @@ export default function useWalletConnect() {
     [accounts.data, client, web3wallet],
   );
 
+  const handleSolanaRequest = useCallback(
+    async (
+      request: SOLANA_REQUESTS,
+      topic: string,
+      id: number,
+      chainId: string,
+    ) => {
+      // const ledgerLiveCurrency = "elrond";
+      console.log({ request });
+      /*
+{
+    "request": {
+        "method": "solana_signTransaction",
+        "params": {
+            "feePayer": "AavRo1X6ZrArYAKqLP1UTJB7Hxij1CkkSW4zThvaetcc",
+            "recentBlockhash": "8zFFNRaMtKobJMRXvnf7FbyL9qFU75WL1EwgUDEkicuT",
+            "instructions": [
+                {
+                    "programId": "11111111111111111111111111111111",
+                    "data": [
+                        2,
+                        0,
+                        0,
+                        0,
+                        1,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ],
+                    "keys": [
+                        {
+                            "isSigner": true,
+                            "isWritable": true,
+                            "pubkey": "AavRo1X6ZrArYAKqLP1UTJB7Hxij1CkkSW4zThvaetcc"
+                        },
+                        {
+                            "isSigner": false,
+                            "isWritable": true,
+                            "pubkey": "BZec6exEDU3XVjWem6V4zBQVTmGnx1EzGofLvTxjXuX5"
+                        }
+                    ]
+                }
+            ]
+        },
+        "expiryTimestamp": 1717441622
+    }
+}
+
+      */
+      switch (request.method) {
+        case SOLANA_SIGNING_METHODS.SOLANA_SIGNTRANSACTION: {
+          console.log("HERE");
+          debugger;
+          const liveTx = convertSolanaToLiveTX(request.params);
+          console.log({ liveTx });
+          debugger;
+          const pubkey: string = String(
+            request.params.instructions[0].keys[0].pubkey,
+          ); //.toBase58();
+          // request.params.feePayer,
+          // TODO: check if issigner ?
+          const accountTx = getAccountWithAddressAndChainId(
+            accounts.data,
+            pubkey,
+            chainId,
+          );
+          if (accountTx) {
+            console.log({ accountTx });
+
+            const hash = await client.transaction.signAndBroadcast(
+              accountTx.id,
+              liveTx,
+            );
+            console.log({ hash });
+          }
+
+          // const accountSign = getAccountWithAddressAndChainId(
+          //   accounts.data,
+          //   request.params.address,
+          //   ledgerLiveCurrency,
+          // );
+          // if (accountSign) {
+          //   try {
+          //     const message = request.params.message;
+          //     const signedMessage = await client.message.sign(
+          //       accountSign.id,
+          //       Buffer.from(message),
+          //     );
+          //     void acceptRequest(
+          //       web3wallet,
+          //       topic,
+          //       id,
+          //       formatMessage(signedMessage),
+          //     );
+          //   } catch (error) {
+          //     void rejectRequest(web3wallet, topic, id, Errors.userDecline);
+          //     console.error(error);
+          //   }
+          // } else {
+          //   void rejectRequest(web3wallet, topic, id, Errors.userDecline);
+          // }
+          break;
+        }
+        case SOLANA_SIGNING_METHODS.SOLANA_SIGNMESSAGE: {
+          /*
+           * 
+          {
+    "request": {
+        "method": "solana_signMessage",
+        "params": {
+            "pubkey": "AavRo1X6ZrArYAKqLP1UTJB7Hxij1CkkSW4zThvaetcc",
+            "message": "X3CUgCGzyn43DTAbUKnTMDzcGWMooJT2hPSZinjfN1QUgVNYYfeoJ5zg6i4NcLUGtnkHnZ1jG6j"
+        },
+        "expiryTimestamp": 1717442587
+    }
+
+          */
+          // convertSolanaToLiveTX(request.params)
+          // const accountTX = getAccountWithAddressAndChainId(
+          //   accounts.data,
+          //   request.params.transaction.sender,
+          //   ledgerLiveCurrency,
+          // );
+          // if (accountTX) {
+          //   try {
+          //     const liveTx = convertMvxToLiveTX(request.params.transaction);
+          //     const hash = await client.transaction.signAndBroadcast(
+          //       accountTX.id,
+          //       liveTx,
+          //     );
+          //     void acceptRequest(web3wallet, topic, id, hash);
+          //   } catch (error) {
+          //     void rejectRequest(web3wallet, topic, id, Errors.txDeclined);
+          //     console.error(error);
+          //   }
+          // } else {
+          //   void rejectRequest(web3wallet, topic, id, Errors.txDeclined);
+          // }
+          break;
+        }
+        default:
+          return;
+      }
+    },
+    [accounts.data, client, web3wallet],
+  );
+
   const onSessionRequest = useCallback(
     (requestEvent: SignClientTypes.EventArguments["session_request"]) => {
       const {
@@ -353,6 +513,8 @@ export default function useWalletConnect() {
         void handleEIP155Request(request, topic, id, chainId);
       } else if (isMultiversXChain(chainId, request)) {
         void handleMvxRequest(request, topic, id, chainId);
+      } else if (isSolanaChain(chainId, request)) {
+        void handleSolanaRequest(request, topic, id, chainId);
       } else {
         console.error("Not Supported Chain");
       }

@@ -14,7 +14,6 @@ export function AccountRow(
   selectedAccounts: string[],
   handleClick: (account: string) => void,
 ) {
-  // TODO: how to get unit / or at least magnitude for the currency, defaulting to 18 for now.
   return (
     <li
       key={account.id}

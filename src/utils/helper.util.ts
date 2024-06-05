@@ -1,5 +1,6 @@
 import { EIP155_REQUESTS } from "@/data/methods/EIP155Data.methods";
 import { MULTIVERSX_REQUESTS } from "@/data/methods/MultiversX.methods";
+import { SOLANA_REQUESTS } from "@/data/methods/Solana.methods";
 import { SUPPORTED_NETWORK } from "@/data/network.config";
 
 /**
@@ -43,6 +44,15 @@ export function isMultiversXChain(
   return chain.includes("mvx");
 }
 
+export function isSolanaChain(
+  chain: string,
+  // request is passed and used here only for type narrowing
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  _request?: { method: string; params: any }
+): _request is SOLANA_REQUESTS {
+  return chain.includes("solana");
+}
+
 /**
  * Formats url to to remove protocol
  */
@@ -60,6 +70,9 @@ export const getNamespace = (chain: string) =>
   SUPPORTED_NETWORK[chain]?.namespace ?? chain;
 
 export const getCurrencyByChainId = (chainId: string) => {
+  console.log({chainId})
+  if (chainId.startsWith("solana")) return "solana";
+
   const elem = Object.entries(SUPPORTED_NETWORK).find(
     ([, network]) => network.namespace === chainId.toLowerCase()
   );
