@@ -12,4 +12,5 @@ export type Network = {
   ticker: string;
   displayName: string;
   color: string;
+  decimals?: number;
 };

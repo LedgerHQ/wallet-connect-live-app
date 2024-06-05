@@ -7,6 +7,7 @@ import {
   EIP155_CHAINS,
   MULTIVERS_X_CHAINS,
   RIPPLE_CHAINS,
+  SOLANA_CHAINS,
   SupportedNamespace,
 } from "@/data/network.config";
 import {
@@ -35,6 +36,7 @@ import { WALLET_METHODS } from "@/data/methods/Wallet.methods";
 import { MULTIVERSX_SIGNING_METHODS } from "@/data/methods/MultiversX.methods";
 import { BIP122_SIGNING_METHODS } from "@/data/methods/BIP122.methods";
 import { RIPPLE_SIGNING_METHODS } from "@/data/methods/Ripple.methods";
+import { SOLANA_SIGNING_METHODS } from "@/data/methods/Solana.methods";
 
 export function useProposal(proposal: ProposalTypes.Struct) {
   const navigate = useNavigate({ from: "/proposal/$id" });
@@ -311,9 +313,86 @@ export function useProposal(proposal: ProposalTypes.Struct) {
     [accounts.data, proposal, selectedAccounts],
   );
 
+  const buildSolanaNamespace = useCallback(
+    (
+      requiredNamespaces: ProposalTypes.RequiredNamespaces,
+      optionalNamespaces: ProposalTypes.OptionalNamespaces,
+    ) => {
+      const accountsByChain = formatAccountsByChain(
+        proposal,
+        accounts.data,
+      ).filter(
+        (a) =>
+          a.accounts.length > 0 &&
+          a.isSupported &&
+          Object.keys(SOLANA_CHAINS).includes(a.chain),
+      );
+
+      const supportedMethods: string[] = [
+        ...Object.values(WALLET_METHODS),
+        ...Object.values(SOLANA_SIGNING_METHODS),
+      ];
+
+      const isLegacy =
+        requiredNamespaces[SupportedNamespace.SOLANA].chains?.[0] ===
+          "solana:4sGjMW1sUnHzSxGspuhpqLDx6wiyjNtZ" ||
+        optionalNamespaces[SupportedNamespace.SOLANA].chains?.[0] ===
+          "solana:4sGjMW1sUnHzSxGspuhpqLDx6wiyjNtZ";
+
+      const dataToSend = accountsByChain.reduce<
+        { account: string; chain: string }[]
+      >(
+        (accum, elem) =>
+          accum.concat(
+            elem.accounts
+              .filter((acc) => selectedAccounts.includes(acc.id))
+              .map((a) => {
+                let currency = a.currency;
+                if (isLegacy) {
+                  currency = "solana (legacy)";
+                }
+                return {
+                  account: `${getNamespace(currency)}:${a.address}`,
+                  chain: getNamespace(currency),
+                };
+              }),
+          ),
+        [],
+      );
+
+      const methods = [
+        ...new Set([
+          ...(requiredNamespaces[SupportedNamespace.SOLANA]?.methods.filter(
+            (method) => supportedMethods.includes(method),
+          ) ?? []),
+          ...(optionalNamespaces[SupportedNamespace.SOLANA]?.methods.filter(
+            (method) => supportedMethods.includes(method),
+          ) ?? []),
+        ]),
+      ];
+
+      const events = [
+        ...new Set([
+          ...(requiredNamespaces[SupportedNamespace.SOLANA]?.events ?? []),
+          ...(optionalNamespaces[SupportedNamespace.SOLANA]?.events ?? []),
+        ]),
+      ];
+
+      return {
+        chains: [...new Set(dataToSend.map((e) => e.chain))],
+        methods,
+        events,
+        accounts: dataToSend.map((e) => e.account),
+      };
+    },
+    [accounts.data, proposal, selectedAccounts],
+  );
+
   const buildSupportedNamespaces = useCallback(
     (proposal: ProposalTypes.Struct) => {
-      const { requiredNamespaces, optionalNamespaces } = proposal;
+      // NOTE: despite wallet connect proposal type, i've encountered non existence of optionalNamespaces
+      // here https://deltaone.xyz/#/app/v1/vault/Farm-SOL-USDC
+      const { requiredNamespaces = {}, optionalNamespaces = {} } = proposal;
 
       const supportedNamespaces: BuildApprovedNamespacesParams["supportedNamespaces"] =
         {};
@@ -338,6 +417,13 @@ export function useProposal(proposal: ProposalTypes.Struct) {
       }
       if ("xrpl" in requiredNamespaces || "xrpl" in optionalNamespaces) {
         supportedNamespaces[SupportedNamespace.XRPL] = buildXrpNamespace(
+          requiredNamespaces,
+          optionalNamespaces,
+        );
+      }
+
+      if ("solana" in requiredNamespaces || "solana" in optionalNamespaces) {
+        supportedNamespaces[SupportedNamespace.SOLANA] = buildSolanaNamespace(
           requiredNamespaces,
           optionalNamespaces,
         );

@@ -4,6 +4,7 @@ import react from "@vitejs/plugin-react";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 import inject from "@rollup/plugin-inject";
+import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -29,6 +30,7 @@ export default defineConfig({
         plugins: ["babel-plugin-styled-components"],
       },
     }),
+    nodePolyfills(),
     // react({
     //   include: /\.(jsx|tsx)$/,
     //   babel: {

@@ -68,9 +68,12 @@ const getAccountsFromAddresses = (addresses: string[], accounts: Account[]) => {
     const addrSplitted = addr.split(":");
     const chain = getCurrencyByChainId(`${addrSplitted[0]}:${addrSplitted[1]}`);
     let chainInLedgerLive = chain;
-
+    
     if (chain.startsWith("mvx")) {
       chainInLedgerLive = "elrond";
+    }
+    if (chain.startsWith("solana")) {
+      chainInLedgerLive = "solana";
     }
 
     if (chain.startsWith("xrpl")) {
