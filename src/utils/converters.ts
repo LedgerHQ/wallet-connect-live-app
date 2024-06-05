@@ -1,17 +1,6 @@
 import { BigNumber } from "bignumber.js";
 import eip55 from "eip55";
 import {
-  SolanaFMParser,
-  checkIfInstructionParser,
-  ParserType,
-} from "@solanafm/explorer-kit";
-import {
-  decodeInstruction,
-  decodeTransferInstruction,
-} from "@solana/spl-token";
-import { getProgramIdl } from "@solanafm/explorer-kit-idls";
-import bs58 from "bs58";
-import {
   ElrondTransaction,
   EthereumTransaction,
   SolanaTransaction as SolanaTransactionLive,
@@ -136,7 +125,6 @@ export function convertSolanaToLiveTX(
   let amount: BigNumber = new BigNumber(0);
   let recipient: string = "";
 
-  debugger;
   if (tx.instructions && tx.instructions.length > 0) {
     if (
       String(tx.instructions[0].programId) ===

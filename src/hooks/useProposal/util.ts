@@ -23,18 +23,18 @@ export function sortAlphabetic(array: AccountsInChain[]) {
 
 export function sortChains(chains: AccountsInChain[]) {
   const chainsRequired = sortAlphabetic(
-    chains.filter((chain) => chain.isRequired)
+    chains.filter((chain) => chain.isRequired),
   );
   const chainsAccount = sortAlphabetic(
-    chains.filter((chain) => chain.accounts.length > 0)
+    chains.filter((chain) => chain.accounts.length > 0),
   );
   const chainsWithoutAccount = sortAlphabetic(
-    chains.filter((chain) => chain.accounts.length === 0)
+    chains.filter((chain) => chain.accounts.length === 0),
   );
 
   const newOrder = [
     ...new Set(
-      chainsRequired.concat(chainsAccount).concat(chainsWithoutAccount)
+      chainsRequired.concat(chainsAccount).concat(chainsWithoutAccount),
     ),
   ];
 
@@ -46,13 +46,13 @@ export const getChains = (proposal: ProposalTypes.Struct) => {
     (namespace) => ({
       ...namespace,
       required: true,
-    })
+    }),
   );
   const optionalNamespaces = proposal.optionalNamespaces
     ? Object.values(proposal.optionalNamespaces).map((namespace) => ({
-      ...namespace,
-      required: false,
-    }))
+        ...namespace,
+        required: false,
+      }))
     : [];
 
   return [...requiredNamespaces, ...optionalNamespaces];
@@ -60,7 +60,7 @@ export const getChains = (proposal: ProposalTypes.Struct) => {
 
 export const formatAccountsByChain = (
   proposal: ProposalTypes.Struct,
-  accounts: Account[]
+  accounts: Account[],
 ) => {
   const families = getChains(proposal);
 
@@ -69,26 +69,28 @@ export const formatAccountsByChain = (
     .reduce((value, acc) => acc.concat(value), []);
 
   const chainsDeduplicated = [...Array.from(new Set(chains))];
-  console.log({chainsDeduplicated})
+  console.log({ chainsDeduplicated });
 
   const mappedAccountsByChains: AccountsInChain[] = chainsDeduplicated.map(
     (chain) => {
-      const formatedChain = getCurrencyByChainId(chain);
-      console.log({SUPPORTED_NETWORK, formatedChain, chain})
+      let formatedChain = getCurrencyByChainId(chain);
+      console.log({ SUPPORTED_NETWORK, formatedChain, chain });
 
+      const chainAccounts = accounts.filter((acc) => {
+        console.log({ acc, formatedChain });
+        return acc.currency === formatedChain;
+      });
+      
       return {
         chain: formatedChain,
         displayName: getDisplayName(formatedChain),
         isSupported: Boolean(SUPPORTED_NETWORK[formatedChain] !== undefined),
         isRequired: families.some(
-          (family) => family.required && family.chains?.includes(chain)
+          (family) => family.required && family.chains?.includes(chain),
         ),
-        accounts: accounts.filter((acc) => {
-          console.log({acc, formatedChain})
-          return (acc.currency === formatedChain)
-        }),
+        accounts: chainAccounts,
       };
-    }
+    },
   );
 
   return mappedAccountsByChains;

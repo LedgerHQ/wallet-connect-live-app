@@ -167,7 +167,6 @@ export function useProposal(proposal: ProposalTypes.Struct) {
     },
     [accounts.data, proposal, selectedAccounts],
   );
-
   const buildSolanaNamespace = useCallback(
     (
       requiredNamespaces: ProposalTypes.RequiredNamespaces,
@@ -182,6 +181,13 @@ export function useProposal(proposal: ProposalTypes.Struct) {
           a.isSupported &&
           Object.keys(SOLANA_CHAINS).includes(a.chain),
       );
+
+      const namespace =
+        requiredNamespaces[SupportedNamespace.SOLANA] ||
+        optionalNamespaces[SupportedNamespace.SOLANA];
+      
+      const isLegacy = namespace.chains?.[0] === "solana:4sGjMW1sUnHzSxGspuhpqLDx6wiyjNtZ";
+
       const dataToSend = accountsByChain.reduce<
         { account: string; chain: string }[]
       >(
@@ -189,16 +195,19 @@ export function useProposal(proposal: ProposalTypes.Struct) {
           accum.concat(
             elem.accounts
               .filter((acc) => selectedAccounts.includes(acc.id))
-              .map((a) => ({
-                account: `${getNamespace(a.currency)}:${a.address}`,
-                chain: getNamespace(a.currency),
-              })),
+              .map((a) => {
+                let currency = a.currency 
+                if (isLegacy) {
+                  currency = "solana (legacy)"
+                }
+                return {
+                account: `${getNamespace(currency)}:${a.address}`,
+                chain: getNamespace(currency),
+                }
+              } ),
           ),
         [],
       );
-      const namespace =
-        requiredNamespaces[SupportedNamespace.SOLANA] ||
-        optionalNamespaces[SupportedNamespace.SOLANA];
 
       console.log({namespace})
 
@@ -264,9 +273,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
 
   const approveSession = useCallback(async () => {
     try {
-      console.log("HERE");
       const supportedNs = buildSupportedNamespaces(proposal);
-      console.log({supportedNs})
       const approvedNs = buildApprovedNamespaces({
         proposal,
         supportedNamespaces: supportedNs,

@@ -359,7 +359,6 @@ export default function useWalletConnect() {
         case SOLANA_SIGNING_METHODS.SOLANA_SIGNTRANSACTION: {
           const liveTx = convertSolanaToLiveTX(request.params);
           console.log({ liveTx });
-          debugger;
           const pubkey: string = String(
             request.params.instructions[0].keys[0].pubkey,
           ); //.toBase58();
@@ -403,7 +402,6 @@ export default function useWalletConnect() {
           if (accountSign) {
             try {
               const message = request.params.message;
-              debugger;
               const signedMessage = await client.message.sign(
                 accountSign.id,
                 Buffer.from(message),
