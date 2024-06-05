@@ -355,63 +355,14 @@ export default function useWalletConnect() {
       id: number,
       chainId: string,
     ) => {
-      // const ledgerLiveCurrency = "elrond";
-      console.log({ request });
-      /*
-{
-    "request": {
-        "method": "solana_signTransaction",
-        "params": {
-            "feePayer": "AavRo1X6ZrArYAKqLP1UTJB7Hxij1CkkSW4zThvaetcc",
-            "recentBlockhash": "8zFFNRaMtKobJMRXvnf7FbyL9qFU75WL1EwgUDEkicuT",
-            "instructions": [
-                {
-                    "programId": "11111111111111111111111111111111",
-                    "data": [
-                        2,
-                        0,
-                        0,
-                        0,
-                        1,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0
-                    ],
-                    "keys": [
-                        {
-                            "isSigner": true,
-                            "isWritable": true,
-                            "pubkey": "AavRo1X6ZrArYAKqLP1UTJB7Hxij1CkkSW4zThvaetcc"
-                        },
-                        {
-                            "isSigner": false,
-                            "isWritable": true,
-                            "pubkey": "BZec6exEDU3XVjWem6V4zBQVTmGnx1EzGofLvTxjXuX5"
-                        }
-                    ]
-                }
-            ]
-        },
-        "expiryTimestamp": 1717441622
-    }
-}
-
-      */
       switch (request.method) {
         case SOLANA_SIGNING_METHODS.SOLANA_SIGNTRANSACTION: {
-          console.log("HERE");
-          debugger;
           const liveTx = convertSolanaToLiveTX(request.params);
           console.log({ liveTx });
           debugger;
           const pubkey: string = String(
             request.params.instructions[0].keys[0].pubkey,
           ); //.toBase58();
-          // request.params.feePayer,
           // TODO: check if issigner ?
           const accountTx = getAccountWithAddressAndChainId(
             accounts.data,
@@ -419,77 +370,57 @@ export default function useWalletConnect() {
             chainId,
           );
           if (accountTx) {
-            console.log({ accountTx });
-
+            try {
             const hash = await client.transaction.signAndBroadcast(
               accountTx.id,
               liveTx,
             );
+            void acceptRequest(web3wallet, topic, id, hash);
             console.log({ hash });
+            }catch(error) {
+              void rejectRequest(web3wallet, topic, id,  Errors.txDeclined);
+              console.error(error);
+            }
+          } else {
+              void rejectRequest(web3wallet, topic, id,  Errors.txDeclined);
           }
 
-          // const accountSign = getAccountWithAddressAndChainId(
-          //   accounts.data,
-          //   request.params.address,
-          //   ledgerLiveCurrency,
-          // );
-          // if (accountSign) {
-          //   try {
-          //     const message = request.params.message;
-          //     const signedMessage = await client.message.sign(
-          //       accountSign.id,
-          //       Buffer.from(message),
-          //     );
-          //     void acceptRequest(
-          //       web3wallet,
-          //       topic,
-          //       id,
-          //       formatMessage(signedMessage),
-          //     );
-          //   } catch (error) {
-          //     void rejectRequest(web3wallet, topic, id, Errors.userDecline);
-          //     console.error(error);
-          //   }
-          // } else {
-          //   void rejectRequest(web3wallet, topic, id, Errors.userDecline);
-          // }
           break;
         }
         case SOLANA_SIGNING_METHODS.SOLANA_SIGNMESSAGE: {
-          /*
-           * 
-          {
-    "request": {
+ /* "request": {
         "method": "solana_signMessage",
         "params": {
             "pubkey": "AavRo1X6ZrArYAKqLP1UTJB7Hxij1CkkSW4zThvaetcc",
             "message": "X3CUgCGzyn43DTAbUKnTMDzcGWMooJT2hPSZinjfN1QUgVNYYfeoJ5zg6i4NcLUGtnkHnZ1jG6j"
         },
-        "expiryTimestamp": 1717442587
-    }
-
-          */
-          // convertSolanaToLiveTX(request.params)
-          // const accountTX = getAccountWithAddressAndChainId(
-          //   accounts.data,
-          //   request.params.transaction.sender,
-          //   ledgerLiveCurrency,
-          // );
-          // if (accountTX) {
-          //   try {
-          //     const liveTx = convertMvxToLiveTX(request.params.transaction);
-          //     const hash = await client.transaction.signAndBroadcast(
-          //       accountTX.id,
-          //       liveTx,
-          //     );
-          //     void acceptRequest(web3wallet, topic, id, hash);
-          //   } catch (error) {
-          //     void rejectRequest(web3wallet, topic, id, Errors.txDeclined);
-          //     console.error(error);
-          //   }
-          // } else {
-          //   void rejectRequest(web3wallet, topic, id, Errors.txDeclined);
-          // }
+        "expiryTimestamp": 1717442587  */
+          const accountSign = getAccountWithAddressAndChainId(
+            accounts.data,
+            request.params.pubkey,
+            chainId,
+          );
+          if (accountSign) {
+            try {
+              const message = request.params.message;
+              debugger;
+              const signedMessage = await client.message.sign(
+                accountSign.id,
+                Buffer.from(message),
+              );
+              void acceptRequest(
+                web3wallet,
+                topic,
+                id,
+                formatMessage(signedMessage),
+              );
+            } catch (error) {
+              void rejectRequest(web3wallet, topic, id, Errors.userDecline);
+              console.error(error);
+            }
+          } else {
+            void rejectRequest(web3wallet, topic, id, Errors.userDecline);
+          }
           break;
         }
         default:
