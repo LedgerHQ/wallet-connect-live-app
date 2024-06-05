@@ -153,6 +153,8 @@ export default function SessionProposal({
     [accountsByChain],
   );
 
+  console.log(accountsByChain, noChainsSupported);
+
   const everyRequiredChainsSupported = useMemo(
     () => requiredChains.every((entry) => entry.isSupported),
     [requiredChains],
