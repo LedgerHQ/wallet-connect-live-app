@@ -1,43 +1,42 @@
 import { GenericRow } from "@/components/atoms/GenericRow";
-import { AccountsInChain } from "@/hooks/useProposal/util";
-import { Account } from "@ledgerhq/wallet-api-client";
+import { Account, Currency } from "@ledgerhq/wallet-api-client";
 import { RowType } from "@/components/atoms/types";
-import { getColor, getTicker, truncate } from "@/utils/helper.util";
-import { space } from "@ledgerhq/react-ui/styles/theme";
+import { truncate } from "@/utils/helper.util";
 import { CryptoIcon } from "@ledgerhq/react-ui";
 import { AccountBalance } from "@/components/atoms/AccountBalance";
+import { ListItem } from "@/components/atoms/containers/Elements";
 
-export function AccountRow(
-  account: Account,
-  index: number,
-  entry: AccountsInChain,
-  selectedAccounts: string[],
-  handleClick: (account: string) => void,
-) {
-  // TODO: how to get unit / or at least magnitude for the currency, defaulting to 18 for now.
+type Props = {
+  account: Account;
+  currency: Currency;
+  selectedAccounts: string[];
+  handleClick: (account: string) => void;
+};
+
+export function AccountRow({
+  account,
+  currency,
+  selectedAccounts,
+  handleClick,
+}: Props) {
   return (
-    <li
-      key={account.id}
-      style={{
-        marginBottom: index !== entry.accounts.length - 1 ? space[3] : 0,
-      }}
-    >
+    <ListItem>
       <GenericRow
         title={account.name}
         subtitle={truncate(account.address, 10)}
         isSelected={selectedAccounts.includes(account.id)}
-        rightElement={AccountBalance({ account })}
+        rightElement={AccountBalance({ account, currency })}
         onClick={() => handleClick(account.id)}
         RightIcon={
           <CryptoIcon
-            name={getTicker(entry.chain)}
+            name={currency.ticker}
             circleIcon
             size={20}
-            color={getColor(entry.chain)}
+            color={currency.color}
           />
         }
         rowType={RowType.Select}
       />
-    </li>
+    </ListItem>
   );
 }

@@ -60,8 +60,6 @@ export function formatUrl(url: string) {
   return url.split("//")[1] ?? url;
 }
 
-export const getNetwork = (chain: string) => SUPPORTED_NETWORK[chain];
-
 export const getTicker = (chain: string) => SUPPORTED_NETWORK[chain].ticker;
 export const getColor = (chain: string) => SUPPORTED_NETWORK[chain]?.color;
 export const getDisplayName = (chain: string) =>

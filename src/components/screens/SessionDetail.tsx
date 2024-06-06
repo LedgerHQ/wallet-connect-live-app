@@ -1,10 +1,8 @@
 import {
   getCurrencyByChainId,
   formatUrl,
-  getTicker,
   truncate,
   getDisplayName,
-  getColor,
 } from "@/utils/helper.util";
 import { Box, Button, CryptoIcon, Flex, Text } from "@ledgerhq/react-ui";
 import { ArrowLeftMedium } from "@ledgerhq/react-ui/assets/icons";
@@ -15,10 +13,10 @@ import { Account } from "@ledgerhq/wallet-api-client";
 import { GenericRow } from "@/components/atoms/GenericRow";
 import { RowType } from "@/components/atoms/types";
 import { InfoSessionProposal } from "@/components/screens/sessionProposal/InfoSessionProposal";
-import { space } from "@ledgerhq/react-ui/styles/theme";
 import {
   ButtonsContainer,
   List,
+  ListItem,
   Row,
 } from "@/components/atoms/containers/Elements";
 import { ResponsiveContainer } from "@/styles/styles";
@@ -29,7 +27,10 @@ import { useAtomValue } from "jotai";
 import { web3walletAtom } from "@/store/web3wallet.store";
 import { queryKey as sessionsQueryKey } from "@/hooks/useSessions";
 import useAccounts from "@/hooks/useAccounts";
-import { walletAPIClientAtom } from "@/store/wallet-api.store";
+import {
+  walletAPIClientAtom,
+  walletCurrenciesByIdAtom,
+} from "@/store/wallet-api.store";
 import { useQueryClient } from "@tanstack/react-query";
 import { SessionTypes } from "@walletconnect/types";
 import { AccountBalance } from "../atoms/AccountBalance";
@@ -91,6 +92,7 @@ export default function SessionDetail({ session }: Props) {
   const accounts = useAccounts(client);
   const web3wallet = useAtomValue(web3walletAtom);
   const analytics = useAnalytics();
+  const currenciesById = useAtomValue(walletCurrenciesByIdAtom);
 
   useEffect(() => {
     analytics.page("Wallet Connect Session Detail", {
@@ -251,30 +253,31 @@ export default function SessionDetail({ session }: Props) {
                         </Box>
 
                         <List>
-                          {accounts.map((account: Account, index: number) => (
-                            <li
-                              key={account.id}
-                              style={{
-                                marginBottom:
-                                  index !== accounts.length - 1 ? space[3] : 0,
-                              }}
-                            >
-                              <GenericRow
-                                title={account.name}
-                                subtitle={truncate(account.address, 10)}
-                                rightElement={AccountBalance({ account })}
-                                RightIcon={
-                                  <CryptoIcon
-                                    name={getTicker(chain)}
-                                    circleIcon
-                                    size={20}
-                                    color={getColor(chain)}
-                                  />
-                                }
-                                rowType={RowType.Default}
-                              />
-                            </li>
-                          ))}
+                          {accounts.map((account: Account) => {
+                            const currency = currenciesById[account.currency];
+
+                            return (
+                              <ListItem key={account.id}>
+                                <GenericRow
+                                  title={account.name}
+                                  subtitle={truncate(account.address, 10)}
+                                  rightElement={AccountBalance({
+                                    account,
+                                    currency,
+                                  })}
+                                  RightIcon={
+                                    <CryptoIcon
+                                      name={currency.ticker}
+                                      circleIcon
+                                      size={20}
+                                      color={currency.color}
+                                    />
+                                  }
+                                  rowType={RowType.Default}
+                                />
+                              </ListItem>
+                            );
+                          })}
                         </List>
                       </Box>
                     );

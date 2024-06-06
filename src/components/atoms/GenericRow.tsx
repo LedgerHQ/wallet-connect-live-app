@@ -14,10 +14,12 @@ type Props = {
   rowType: RowType;
 };
 
-const Row = styled(Flex)`
+const Row = styled(Flex)<{ rowType: RowType }>`
   border-radius: 12px;
   background-color: ${(props) => props.theme.colors.neutral.c20};
   padding: 12px;
+  cursor: ${(props) =>
+    props.rowType === RowType.Default ? "default" : "pointer"};
 `;
 
 export function GenericRow({
@@ -34,9 +36,7 @@ export function GenericRow({
     <Row
       justifyContent="space-between"
       onClick={rowType === RowType.Default ? undefined : onClick}
-      style={{
-        cursor: rowType === RowType.Default ? "default" : "pointer",
-      }}
+      rowType={rowType}
       alignItems="center"
     >
       <Flex
@@ -48,11 +48,7 @@ export function GenericRow({
           <Text variant="body" fontWeight="semiBold" color="neutral.c100">
             {title}
           </Text>
-          <Flex
-            flexDirection="row"
-            alignItems={"center"}
-            columnGap={2}
-          >
+          <Flex flexDirection="row" alignItems={"center"} columnGap={2}>
             {LeftIcon && <Box mr={2}>{LeftIcon}</Box>}
             <Text
               variant="small"
