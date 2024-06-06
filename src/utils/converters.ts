@@ -7,22 +7,9 @@ import {
   TransactionModel,
 } from "@ledgerhq/wallet-api-client";
 
-import type {
-  // Transaction as solanaTransaction,
-  Command,
-  TransferCommand,
-} from "@ledgerhq/coin-solana/types";
+import type { TransferCommand } from "@ledgerhq/coin-solana/types";
 
-// import type { SystemProgram } from "@solana/web3.js";
-
-import {
-  // PublicKey,
-  Transaction,
-  SystemProgram,
-  SystemInstruction,
-  TransactionInstruction,
-  // VersionedTransaction,
-} from "@solana/web3.js";
+import { Transaction, SystemProgram, SystemInstruction } from "@solana/web3.js";
 
 export type EthTransaction = {
   value: string;
@@ -81,42 +68,7 @@ export function convertMvxToLiveTX(tx: MvxTransaction): ElrondTransaction {
   };
 }
 
-// export type SolanaTransaction = {
-//   model: TransactionModel
-//   message: string;
-//   signature: string;
-//   publicKey: string;
-// };
-
 export type SolanaTransaction = Transaction;
-
-// type SolanaSignTransactionWithDeprecatedFields = {
-//   feePayer: string;
-//   instructions: [
-//     {
-//       programId: string;
-//       data?: string;
-//       keys: {
-//         isSigner: boolean;
-//         isWritable: boolean;
-//         pubkey: string;
-//       }[];
-//     },
-//   ];
-//   recentBlockhash: string;
-//   partialSignatures: {
-//     pubkey: string;
-//     signature: string;
-//   }[];
-//   signatures: {
-//     publicKey: string;
-//     signature: string;
-//   }[];
-// } & SolanaSignTransactionRequiredFields;
-
-// type SolanaSignTransactionRequiredFields = {
-//   transaction: string;
-// };
 
 export function convertSolanaToLiveTX(
   tx: SolanaTransaction,
@@ -130,67 +82,19 @@ export function convertSolanaToLiveTX(
       String(tx.instructions[0].programId) ===
       SystemProgram.programId.toString()
     ) {
-      /*
-{
-    "feePayer": "AavRo1X6ZrArYAKqLP1UTJB7Hxij1CkkSW4zThvaetcc",
-    "recentBlockhash": "Fxqugym9P4xfsPhjKcKMvyDMVCtd4ehpWJwNvTQx653c",
-    "instructions": [
-        {
-            "programId": "11111111111111111111111111111111",
-            "data": [
-                2,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            "keys": [
-                {
-                    "isSigner": true,
-                    "isWritable": true,
-                    "pubkey": "AavRo1X6ZrArYAKqLP1UTJB7Hxij1CkkSW4zThvaetcc"
-                },
-                {
-                    "isSigner": false,
-                    "isWritable": true,
-                    "pubkey": "6F7JxPshGc1JDLst62kg5hRk3s5CQSP1Z4YsmDaxkoVr"
-                }
-            ]
-        }
-    ]
-}
-      */
-
       const data = tx.instructions[0].data;
       const decodedTransfer = SystemInstruction.decodeTransfer({
         ...tx.instructions[0],
         data: Buffer.from(data),
-        // data: Uint8Array.from(data),
         programId: SystemProgram.programId,
       });
-      /* 
-    {
-     fromPubkey : "AavRo1X6ZrArYAKqLP1UTJB7Hxij1CkkSW4zThvaetcc"
-     lamports :  1n
-     toPubkey: "8fKj2eAc2cR4rf9xmVtF3tmiQYHXJW2qWyspyJ7in2go"
-    }
-      */
       debugger;
-      const decodedAmount = decodedTransfer.lamports.toString()
+      const decodedAmount = decodedTransfer.lamports.toString();
 
       let command: TransferCommand = {
         kind: "transfer",
-        amount: Number(decodedAmount), // bs58.decode(tx.instructions[0].data),
-        // sender: String(tx.instructions[0].keys[0].pubkey),
+        amount: Number(decodedAmount),
         sender: String(decodedTransfer.fromPubkey),
-        // recipient: String(tx.instructions[0].keys[1].pubkey),
         recipient: String(decodedTransfer.toPubkey),
       };
       amount = new BigNumber(decodedAmount);
@@ -208,7 +112,7 @@ export function convertSolanaToLiveTX(
       };
     } else {
       debugger;
-    throw new Error("Unsupported Solana instruction");
+      throw new Error("Unsupported Solana instruction");
     }
   } else {
     debugger;
@@ -223,7 +127,7 @@ export function convertSolanaToLiveTX(
   return {
     model,
     family: "solana",
-    amount: amount, // new BigNumber(0),
-    recipient: recipient, //String(tx.instructions[0].keys[1].pubkey), //.toBase58(), //tx.signatures[0].publicKey.toBase58(),
+    amount: amount,
+    recipient: recipient,
   };
 }
