@@ -14,10 +14,6 @@ import { WalletConnectContainer } from "../atoms/containers/Elements";
 import { ResponsiveContainer } from "@/styles/styles";
 import { useConnect } from "@/hooks/useConnect";
 import { InputMode } from "@/types/types";
-import useSessions from "@/hooks/useSessions";
-import usePendingProposals from "@/hooks/usePendingProposals";
-import { useAtomValue } from "jotai";
-import { web3walletAtom } from "@/store/web3wallet.store";
 
 const QRScannerContainer = styled.div`
   display: flex;
@@ -67,10 +63,6 @@ export function Connect({ mode }: Props) {
   const [errorValue, setErrorValue] = useState<string | undefined>(undefined);
   const [scanner, setScanner] = useState(mode === "scan");
   const analytics = useAnalytics();
-  const web3wallet = useAtomValue(web3walletAtom);
-  const pendingProposals = usePendingProposals(web3wallet);
-  const sessions = useSessions(web3wallet);
-  const showBackButton = pendingProposals.data.length || sessions.data.length;
 
   const { onConnect } = useConnect();
 
@@ -160,11 +152,9 @@ export function Connect({ mode }: Props) {
     <WalletConnectContainer>
       <ResponsiveContainer>
         <Flex mt={8} width="100%" alignItems="center">
-          {showBackButton ? (
-            <BackButton onClick={onGoBack}>
-              <ArrowLeftMedium size={24} color="neutral.c100" />
-            </BackButton>
-          ) : null}
+          <BackButton onClick={onGoBack} position={"absolute"}>
+            <ArrowLeftMedium size={24} color="neutral.c100" />
+          </BackButton>
 
           <Text
             display="flex"
@@ -173,7 +163,7 @@ export function Connect({ mode }: Props) {
             variant="h3"
             color="neutral.c100"
             // Add margin to center the text when the back button is present
-            mr={showBackButton ? 8 : undefined}
+            ml={8}
           >
             {t("connect.title")}
           </Text>

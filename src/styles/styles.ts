@@ -15,18 +15,11 @@ export const ResponsiveContainer = styled.div`
   justify-content: center;
   align-items: center;
   min-height: 100%;
+  width: calc(100% - 32px);
+  padding-left: 16px;
+  padding-right: 16px;
 
-  @media ${device.mobile} {
-    width: calc(100% - 32px);
-    padding-left: 16px;
-    padding-right: 16px;
-  }
-  @media ${device.tablet} {
-    width: 100%;
-    max-width: 465px;
-  }
   @media ${device.desktop} {
-    width: 100%;
-    max-width: 465px;
+    max-width: 865px;
   }
 `;

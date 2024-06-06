@@ -15,6 +15,9 @@ import { web3walletAtom } from "@/store/web3wallet.store";
 import useSessions, { queryKey as sessionsQueryKey } from "@/hooks/useSessions";
 import { useQueryClient } from "@tanstack/react-query";
 import usePendingProposals from "@/hooks/usePendingProposals";
+import SuggestedApps from "./SuggestedApps";
+import RecentlyUsedApps from "./RecentlyUsedApps";
+import {sortedRecentConnectionAppsAtom} from "@/store/recentConnectionAppsAtom";
 
 export default function Sessions() {
   const { t } = useTranslation();
@@ -28,6 +31,7 @@ export default function Sessions() {
   const isEmptyState = sessionsLength === 0;
   const hasProposals = pendingProposals.data.length > 0;
   const analytics = useAnalytics();
+  const lastConnectionApps = useAtomValue(sortedRecentConnectionAppsAtom);
 
   // TODO look at improving the analytics here maybe
   useEffect(() => {
@@ -113,7 +117,10 @@ export default function Sessions() {
     <Flex flexDirection="column" width="100%" height="100%" mt={8}>
       {hasProposals ? (
         <>
-          <Text variant="h3" mb={5} color="neutral.c100">
+          <Text variant="h3Inter" mb={5} color="neutral.c100">
+            {t("sessions.title")}
+          </Text>
+          <Text variant="extraSmall" color="neutral.c70">
             {t("sessions.proposals.title")}
           </Text>
 
@@ -139,44 +146,80 @@ export default function Sessions() {
         </>
       ) : null}
 
-      <Flex>
-        <Text variant="h3" mb={5} color="neutral.c100">
-          {t("sessions.title")}
-        </Text>
-        <Flex flex={1} />
-        <Button onClick={goToConnect} variant="main" size="small">
-          {t("sessions.goToConnect")}
-        </Button>
-      </Flex>
-
-      <List>
-        {sessions.data.map((session) => (
-          <Box key={session.topic} mt={3}>
-            <GenericRow
-              key={session.topic}
-              title={session.peer.metadata.name}
-              subtitle={formatUrl(session.peer.metadata.url)}
-              LeftIcon={
-                <ImageWithPlaceholder
-                  icon={session.peer.metadata.icons[0] ?? null}
+      {!isEmptyState && (
+        <>
+          <Text variant="extraSmall" color="neutral.c70">
+            {t("sessions.apps.title")}
+          </Text>
+          <List>
+            {sessions.data.map((session) => (
+              <Box key={session.topic} mt={3}>
+                <GenericRow
+                  key={session.topic}
+                  title={session.peer.metadata.name}
+                  subtitle={formatUrl(session.peer.metadata.url)}
+                  LeftIcon={
+                    <ImageWithPlaceholder
+                      icon={session.peer.metadata.icons[0] ?? null}
+                    />
+                  }
+                  rowType={RowType.Detail}
+                  onClick={() => goToDetailSession(session.topic)}
                 />
-              }
-              rowType={RowType.Detail}
-              onClick={() => goToDetailSession(session.topic)}
-            />
-          </Box>
-        ))}
-      </List>
+              </Box>
+            ))}
+          </List>
+        </>
+      )}
 
-      {!isEmptyState ? (
-        <ButtonsContainer my={6}>
-          <Button variant="shade" size="large" flex={1} onClick={openModal}>
+      {(!hasProposals && isEmptyState) ? (
+        <>
+          <Flex flexDirection={"column"} rowGap={8}>
+            <Text
+              justifyContent="center"
+              variant="h4Inter"
+              color="neutral.c100"
+              textAlign="center"
+            >
+              {t("connect.title")}
+            </Text>
+            <Text
+              display="flex"
+              justifyContent="center"
+              variant="extraSmall"
+              color="neutral.c70"
+              textAlign="center"
+            >
+              {t("sessions.apps.noAppsMessage")}
+            </Text>
+           
+          </Flex>
+        </>
+      ) : null}
+
+        <ButtonsContainer marginTop={2} columnGap={6}>
+          {!isEmptyState ? (
+          <Button variant="shade" size="medium" flex={1} onClick={openModal}>
             <Text variant="body" fontWeight="semiBold" color="neutral.c100">
               {t("sessions.disconnectAll")}
             </Text>
-          </Button>
+          </Button>) : null}
+
+          <Button variant="main" size="medium" flex={1} onClick={goToConnect}>
+            <Text variant="body" fontWeight="semiBold" color="neutral.c0">
+              {t("connect.cta")}
+            </Text>
+          </Button>      
         </ButtonsContainer>
-      ) : null}
+
+      {lastConnectionApps.length > 1 && (
+        <Flex flexDirection={"column"} marginTop={6}>
+          <RecentlyUsedApps />
+        </Flex>
+      )}
+      <Flex flexDirection={"column"} marginTop={6}>
+        <SuggestedApps />
+      </Flex>
 
       <WalletConnectPopin isOpen={isModalOpen} onClose={closeModal}>
         <Flex flexDirection="column" mx={6}>

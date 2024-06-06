@@ -14,7 +14,7 @@
     "invalidUri": "Invalid URI"
   },
   "connect": {
-    "title": "Connect",
+    "title": "Connect to an app to start",
     "cta": "Connect",
     "scanQRCode": "Scan QR code",
     "useWalletConnectUrl": "Or use a WalletConnect URL",
@@ -55,6 +55,14 @@
   },
   "sessions": {
     "title": "Sessions",
+    "apps": {
+      "title": "Connected apps",
+      "noAppsMessage": "Your connected apps will be listed here",
+      "dontKnow": "Don’t know any? Try one of these",
+      "lastConnection": "Last connections",
+      "tryNewApp": "Try new apps",
+      "clearHistory": "Clear history"
+    },
     "goToConnect": "Connect",
     "disconnectAll": "Disconnect All",
     "modal": {
