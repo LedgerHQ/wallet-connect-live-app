@@ -14,7 +14,7 @@
     "invalidUri" : "Geçersiz URI"
   },
   "connect" : {
-    "title" : "Bağlan",
+    "title" : "Başlamak için bir uygulamaya bağlanın",
     "cta" : "Bağlan",
     "scanQRCode" : "Karekodu okutun",
     "useWalletConnectUrl" : "Veya bir WalletConnect URL'si kullanın",
@@ -43,12 +43,26 @@
     },
     "error" : {
       "title" : "{{appName}}, henüz desteklemediğimiz zincirlere bağlanma isteğinde bulundu",
-      "desc" : "Şu anda Ethereum, Polygon, Binance Smart Chain, Arbitrum, Optimism, Avalanche C-Chain, Ethereum Goerli ve Optimism Goerli'yi destekliyoruz. Kademeli olarak yeni zincirler ekliyoruz."
+      "info" : "Şu anda desteklenenler: "
     },
-    "addAccount" : "Hesap ekle"
+    "missingRequired" : {
+      "title" : "{{appName}} uygulamasına bağlanmak için aşağıdaki zincirlerde hesaplarınız olması gerekiyor"
+    },
+    "addAccount" : "Hesap ekle",
+    "createAccount" : "Yeni bir hesap oluşturun",
+    "createAccountForChain" : "Yeni bir {{chain}} hesabı oluşturun",
+    "noRequiredChains" : "Bağlanmak için en az bir hesap seçin"
   },
   "sessions" : {
     "title" : "Oturumlar",
+    "apps" : {
+      "title" : "Bağlı uygulamalar",
+      "noAppsMessage" : "Bağlı uygulamalarınız burada listelenecektir",
+      "dontKnow" : "Bildiğiniz uygulama yok mu? Şunlardan birini deneyin",
+      "lastConnection" : "Son bağlantılar",
+      "tryNewApp" : "Yeni uygulamaları deneyin",
+      "clearHistory" : "Clear history"
+    },
     "goToConnect" : "Bağlan",
     "disconnectAll" : "Tümünün Bağlantısını Kes",
     "modal" : {
