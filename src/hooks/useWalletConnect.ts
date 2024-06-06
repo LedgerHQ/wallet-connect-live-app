@@ -9,15 +9,11 @@ import {
   EIP155_SIGNING_METHODS,
 } from "@/data/methods/EIP155Data.methods";
 import {
-  isBIP122Chain,
-  isEIP155Chain,
-  isMultiversXChain,
-} from "@/utils/helper.util";
-import {
   coreAtom,
   connectionStatusAtom,
   web3walletAtom,
 } from "@/store/web3wallet.store";
+import { isEIP155Chain, isMultiversXChain, isBIP122Chain, isRippleChain } from "@/utils/helper.util";
 import { useNavigate } from "@tanstack/react-router";
 import { useAtom, useAtomValue } from "jotai";
 import { Web3Wallet } from "@walletconnect/web3wallet/dist/types/client";
@@ -37,6 +33,7 @@ import {
   BIP122_REQUESTS,
   BIP122_SIGNING_METHODS,
 } from "@/data/methods/BIP122.methods";
+import { RIPPLE_REQUESTS, RIPPLE_SIGNING_METHODS } from "@/data/methods/Ripple.methods";
 
 enum Errors {
   userDecline = "User rejected",
@@ -287,6 +284,52 @@ export default function useWalletConnect() {
     [accounts.data, client, web3wallet],
   );
 
+
+  const handleXrpRequest = useCallback(
+    async (
+      request: RIPPLE_REQUESTS,
+      topic: string,
+      id: number,
+      _chainId: string,
+    ) => {
+      const ledgerLiveCurrency = "ripple";
+      switch (request.method) {
+        case RIPPLE_SIGNING_METHODS.RIPPLE_SIGN_TRANSACTION: {
+          const accountSign = getAccountWithAddressAndChainId(
+            accounts.data,
+            request.params.tx_json.Account,
+            ledgerLiveCurrency,
+          );
+
+          console.log(accountSign);/*
+          if (accountSign) {
+            try {
+              const message = request.params.message;
+              const signedMessage = await client.message.sign(
+                accountSign.id,
+                Buffer.from(message),
+              );
+              void acceptRequest(
+                web3wallet,
+                topic,
+                id,
+                formatMessage(signedMessage),
+              );
+            } catch (error) {
+              void rejectRequest(web3wallet, topic, id, Errors.userDecline);
+              console.error(error);
+            }
+          } else {
+            void rejectRequest(web3wallet, topic, id, Errors.userDecline);
+          }
+          */
+          break;
+        }
+        default:
+          return;
+      }}
+      , []);
+
   const handleMvxRequest = useCallback(
     async (
       request: MULTIVERSX_REQUESTS,
@@ -438,11 +481,13 @@ export default function useWalletConnect() {
         void handleMvxRequest(request, topic, id, chainId);
       } else if (isBIP122Chain(chainId, request)) {
         void handleBIP122Request(request, topic, id, chainId);
+      } else if(isRippleChain(chainId, request)) {
+        void handleXrpRequest(request, topic, id, chainId);
       } else {
         console.error("Not Supported Chain");
       }
     },
-    [handleBIP122Request, handleEIP155Request, handleMvxRequest],
+    [handleBIP122Request, handleEIP155Request, handleMvxRequest, handleXrpRequest],
   );
 
   const onSessionDeleted = useCallback(() => {
@@ -480,4 +525,4 @@ export default function useWalletConnect() {
     onSessionDeleted,
     onProposalExpire,
   ]);
-}
+  };

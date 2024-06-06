@@ -3,6 +3,7 @@ import eip55 from "eip55";
 import {
   ElrondTransaction,
   EthereumTransaction,
+  RippleTransaction,
 } from "@ledgerhq/wallet-api-client";
 
 export type EthTransaction = {
@@ -59,5 +60,25 @@ export function convertMvxToLiveTX(tx: MvxTransaction): ElrondTransaction {
     recipient: tx.receiver,
     gasLimit: tx.gasLimit,
     data: tx.data,
+  };
+}
+
+
+export type XrpTransaction = {
+  TransactionType: string;
+  Account: string;
+  Amount: any;
+  Destination: string;
+  Fee?: string
+};
+
+
+export function convertXrpToLiveTX(tx: XrpTransaction): RippleTransaction {
+  return {
+    family: "ripple",
+    fee: tx.Fee ? new BigNumber(tx.Fee) : new BigNumber(0),
+    tag: 0,
+    amount: tx.Amount ? new BigNumber(tx.Amount) : new BigNumber(0),
+    recipient: tx.Destination,
   };
 }

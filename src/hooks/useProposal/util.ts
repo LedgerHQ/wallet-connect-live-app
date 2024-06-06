@@ -72,8 +72,12 @@ export const formatAccountsByChain = (
 
   const mappedAccountsByChains: AccountsInChain[] = chainsDeduplicated.map(
     (chain) => {
-      const formatedChain = getCurrencyByChainId(chain);
+      let formatedChain = getCurrencyByChainId(chain);
 
+      if (formatedChain.startsWith("xrpl")) {
+        formatedChain = "ripple";
+      }
+      
       return {
         chain: formatedChain,
         displayName: getDisplayName(formatedChain),

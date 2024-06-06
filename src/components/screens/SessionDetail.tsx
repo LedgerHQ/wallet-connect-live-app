@@ -54,12 +54,12 @@ const CustomList = styled(Flex)`
 
 const getAccountsFromAddresses = (addresses: string[], accounts: Account[]) => {
   const accountsByChain = new Map<string, Account[]>();
-
+  
   addresses.forEach((addr) => {
     const addrSplitted = addr.split(":");
     const chain = getCurrencyByChainId(`${addrSplitted[0]}:${addrSplitted[1]}`);
     let chainInLedgerLive = chain;
-
+        
     if (chain.startsWith("mvx")) {
       chainInLedgerLive = "elrond";
     }

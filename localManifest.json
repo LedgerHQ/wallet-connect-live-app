@@ -28,6 +28,7 @@
     "arbitrum_sepolia",
     "optimism_sepolia",
     "base_sepolia",
+    "ripple",
     "ethereum_holesky"
   ],
   "content": {
