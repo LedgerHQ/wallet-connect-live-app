@@ -14,7 +14,6 @@ export const AccountBalance = ({ account }: { account: Account }) => {
   const currencyBalance = formatCurrencyUnit(unit, account.balance, {
     showCode: true,
   });
-  console.log({currencyBalance})
   return (
     <Flex flexDirection="column" mr={5}>
       <Text variant="small" fontWeight="medium" color="neutral.c70" mt={2}>

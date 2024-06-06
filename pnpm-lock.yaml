@@ -89,9 +89,6 @@ dependencies:
   react-transition-group:
     specifier: ^4.4.2
     version: 4.4.5(react-dom@18.2.0)(react@18.2.0)
-  rpc-websockets:
-    specifier: 7.9.0
-    version: 7.9.0
   styled-components:
     specifier: ^5.3.11
     version: 5.3.11(@babel/core@7.23.9)(react-dom@18.2.0)(react-is@18.2.0)(react@18.2.0)

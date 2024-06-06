@@ -209,8 +209,6 @@ export function useProposal(proposal: ProposalTypes.Struct) {
         [],
       );
 
-      console.log({namespace})
-
       const methods: string[] = namespace.methods;
 
       const events = [
@@ -235,15 +233,13 @@ export function useProposal(proposal: ProposalTypes.Struct) {
 
   const buildSupportedNamespaces = useCallback(
     (proposal: ProposalTypes.Struct) => {
-      const { requiredNamespaces = {}, optionalNamespaces = {} } = proposal;
-      // despite wallet connect proposal type, i've encountered non existence of optionalNamespaces
+      // NOTE: despite wallet connect proposal type, i've encountered non existence of optionalNamespaces
       // here https://deltaone.xyz/#/app/v1/vault/Farm-SOL-USDC
-      console.log({ proposal });
+      const { requiredNamespaces = {}, optionalNamespaces = {} } = proposal;
 
       const supportedNamespaces: BuildApprovedNamespacesParams["supportedNamespaces"] =
         {};
 
-      console.log({ requiredNamespaces, optionalNamespaces });
       if ("eip155" in requiredNamespaces || "eip155" in optionalNamespaces) {
         supportedNamespaces[SupportedNamespace.EIP155] = buildEip155Namespace(
           requiredNamespaces,
@@ -263,7 +259,6 @@ export function useProposal(proposal: ProposalTypes.Struct) {
           optionalNamespaces,
         );
       }
-      console.log({SupportedNamespace})
       return supportedNamespaces;
     },
     [buildEip155Namespace, buildMvxNamespace],

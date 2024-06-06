@@ -43,7 +43,6 @@
     "react-i18next": "^14.0.5",
     "react-qr-reader": "2.2.1",
     "react-transition-group": "^4.4.2",
-    "rpc-websockets": "7.9.0",
     "styled-components": "^5.3.11",
     "zustand": "^4.3.3"
   },

@@ -102,14 +102,11 @@ export default function SessionProposal({ proposal }: Props) {
     () => !accountsByChain.some((entry) => entry.isSupported),
     [accountsByChain],
   );
-  console.log({accountsByChain})
-  console.log("noChainsSupported", noChainsSupported);
 
   const everyRequiredChainsSupported = useMemo(
     () => requiredChains.every((entry) => entry.isSupported),
     [requiredChains],
   );
-  console.log({everyRequiredChainsSupported})
 
   const everyRequiredChainsSelected = useMemo(
     () =>
@@ -141,7 +138,6 @@ export default function SessionProposal({ proposal }: Props) {
     () => chainsWhereNoAccounts.length > 0,
     [chainsWhereNoAccounts],
   );
-  console.log({chainsWhereNoAccounts, accountsByChain, createAccountDisplayed})
 
   return (
     <Flex

@@ -358,10 +358,9 @@ export default function useWalletConnect() {
       switch (request.method) {
         case SOLANA_SIGNING_METHODS.SOLANA_SIGNTRANSACTION: {
           const liveTx = convertSolanaToLiveTX(request.params);
-          console.log({ liveTx });
           const pubkey: string = String(
             request.params.instructions[0].keys[0].pubkey,
-          ); //.toBase58();
+          );
           // TODO: check if issigner ?
           const accountTx = getAccountWithAddressAndChainId(
             accounts.data,
@@ -375,7 +374,6 @@ export default function useWalletConnect() {
               liveTx,
             );
             void acceptRequest(web3wallet, topic, id, hash);
-            console.log({ hash });
             }catch(error) {
               void rejectRequest(web3wallet, topic, id,  Errors.txDeclined);
               console.error(error);
@@ -387,13 +385,6 @@ export default function useWalletConnect() {
           break;
         }
         case SOLANA_SIGNING_METHODS.SOLANA_SIGNMESSAGE: {
- /* "request": {
-        "method": "solana_signMessage",
-        "params": {
-            "pubkey": "AavRo1X6ZrArYAKqLP1UTJB7Hxij1CkkSW4zThvaetcc",
-            "message": "X3CUgCGzyn43DTAbUKnTMDzcGWMooJT2hPSZinjfN1QUgVNYYfeoJ5zg6i4NcLUGtnkHnZ1jG6j"
-        },
-        "expiryTimestamp": 1717442587  */
           const accountSign = getAccountWithAddressAndChainId(
             accounts.data,
             request.params.pubkey,

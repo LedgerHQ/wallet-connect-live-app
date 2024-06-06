@@ -69,15 +69,12 @@ export const formatAccountsByChain = (
     .reduce((value, acc) => acc.concat(value), []);
 
   const chainsDeduplicated = [...Array.from(new Set(chains))];
-  console.log({ chainsDeduplicated });
 
   const mappedAccountsByChains: AccountsInChain[] = chainsDeduplicated.map(
     (chain) => {
       let formatedChain = getCurrencyByChainId(chain);
-      console.log({ SUPPORTED_NETWORK, formatedChain, chain });
 
       const chainAccounts = accounts.filter((acc) => {
-        console.log({ acc, formatedChain });
         return acc.currency === formatedChain;
       });
       
