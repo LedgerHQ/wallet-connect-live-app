@@ -1,7 +1,7 @@
 import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { SnackbarProvider } from 'notistack';
+import { SnackbarProvider } from "notistack";
 
 import { Flex, ProgressLoader, StyleProvider } from "@ledgerhq/react-ui";
 import GlobalStyle from "@/styles/globalStyle";
@@ -106,7 +106,7 @@ export const rootRoute = createRootRoute({
                       }}
                     >
                       <WalletConnectInit initialURI={uri} />
-                    <Outlet />
+                      <Outlet />
                     </SnackbarProvider>
                   </>
                 )}

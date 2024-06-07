@@ -1,18 +1,15 @@
-import { Flex, Icons } from "@ledgerhq/react-ui/index";
+import { Flex } from "@ledgerhq/react-ui/index";
 import { StatusDot } from "../atoms/statusDot/StatusDot";
 import { useAtomValue } from "jotai";
-import {
-  relayerConnectionStatusAtom,
-  web3walletAtom,
-} from "@/store/web3wallet.store";
+import { connectionStatusAtom, coreAtom } from "@/store/web3wallet.store";
 import { useTranslation } from "react-i18next";
 
 export default function RelayerStatus() {
   const { t } = useTranslation();
-  const web3wallet = useAtomValue(web3walletAtom);
-  const relayerStatus = useAtomValue(relayerConnectionStatusAtom);
+  const core = useAtomValue(coreAtom);
+  const relayerStatus = useAtomValue(connectionStatusAtom);
 
-  if (!web3wallet?.core?.relayer) {
+  if (!core?.relayer) {
     return;
   }
 
@@ -22,7 +19,7 @@ export default function RelayerStatus() {
         <StatusDot status="success">
           {t("connect.relayerStatus.connected")}
         </StatusDot>
-      ) : web3wallet.core.relayer.connecting ? (
+      ) : core.relayer.connecting ? (
         <StatusDot status="loading">
           {t("connect.relayerStatus.connecting")}
         </StatusDot>
@@ -33,7 +30,6 @@ export default function RelayerStatus() {
               {t("connect.relayerStatus.offline")}
             </StatusDot>
           </Flex>
-          <Icons.NetworkWarning size={"S"} color="error.c50" />
         </>
       )}
     </Flex>

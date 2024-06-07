@@ -26,9 +26,9 @@
     "@tanstack/react-query-devtools": "^5.20.2",
     "@tanstack/react-router": "^1.16.0",
     "@tanstack/router-devtools": "^1.16.0",
-    "@walletconnect/core": "^2.11.1",
-    "@walletconnect/utils": "^2.11.1",
-    "@walletconnect/web3wallet": "^1.10.1",
+    "@walletconnect/core": "^2.13.1",
+    "@walletconnect/utils": "^2.13.1",
+    "@walletconnect/web3wallet": "^1.12.1",
     "bignumber.js": "^9.0.2",
     "buffer": "^6.0.3",
     "eip55": "^2.1.0",
@@ -65,7 +65,7 @@
     "@typescript-eslint/parser": "^6.21.0",
     "@vitejs/plugin-react": "^4.2.1",
     "@vitest/coverage-v8": "^1.2.2",
-    "@walletconnect/types": "^2.11.1",
+    "@walletconnect/types": "^2.13.1",
     "babel-plugin-styled-components": "^2.1.4",
     "esbuild-plugin-polyfill-node": "^0.3.0",
     "eslint": "^8.56.0",
@@ -84,5 +84,6 @@
     "vite-tsconfig-paths": "^4.3.1",
     "vitest": "^1.2.2",
     "vitest-dom": "^0.1.1"
-  }
+  },
+  "packageManager": "pnpm@8.14.1+sha512.856c4ecd97c5d3f30354ebc373cd32fb37274295c489db2d0f613a1e60f010cadfbb15036d525f3a06dec1897e4219b3c4f6d3be8f2f62fb0a366bee6aaa7533"
 }
