@@ -8,10 +8,14 @@ import {
   EIP155_REQUESTS,
   EIP155_SIGNING_METHODS,
 } from "@/data/methods/EIP155Data.methods";
-import { web3walletAtom } from "@/store/web3wallet.store";
+import {
+  coreAtom,
+  connectionStatusAtom,
+  web3walletAtom,
+} from "@/store/web3wallet.store";
 import { isEIP155Chain, isMultiversXChain } from "@/utils/helper.util";
 import { useNavigate } from "@tanstack/react-router";
-import { useAtomValue } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { Web3Wallet } from "@walletconnect/web3wallet/dist/types/client";
 import useAccounts from "./useAccounts";
 import { walletAPIClientAtom } from "@/store/wallet-api.store";
@@ -76,7 +80,48 @@ const rejectRequest = (
   });
 };
 
+function useWalletConnectStatus() {
+  const core = useAtomValue(coreAtom);
+  const [connectionStatus, setConnectionStatus] = useAtom(connectionStatusAtom);
+
+  useEffect(() => {
+    if (core.relayer.connected && connectionStatus !== "connected") {
+      setConnectionStatus("connected");
+    }
+  }, [connectionStatus, core.relayer, setConnectionStatus]);
+
+  useEffect(() => {
+    console.log("setup relayer listener");
+    const onConnect = () => {
+      console.log("relayer_connect");
+      setConnectionStatus("connected");
+    };
+
+    const onDisconnect = () => {
+      console.log("relayer_disconnect");
+      setConnectionStatus("disconnected");
+
+      // TODO investigate if really necessary and when if this is the case
+      // core.relayer.restartTransport().catch(() => {
+      //   console.error("couldn't restart transport"); // TODO maybe use a toast
+      // });
+    };
+
+    core.relayer.on("relayer_connect", onConnect);
+    core.relayer.on("relayer_disconnect", onDisconnect);
+
+    return () => {
+      console.log("cleanup relayer listener");
+
+      core.relayer.off("relayer_connect", onConnect);
+      core.relayer.off("relayer_disconnect", onDisconnect);
+    };
+  }, [core.relayer, setConnectionStatus]);
+}
+
 export default function useWalletConnect() {
+  useWalletConnectStatus();
+
   const navigate = useNavigate();
   const web3wallet = useAtomValue(web3walletAtom);
 
