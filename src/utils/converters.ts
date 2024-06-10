@@ -120,7 +120,6 @@ export function convertSolanaToLiveTX(
   if (model === null) {
     throw new Error("Unsupported Solana transaction");
   }
-  debugger;
 
   return {
     model,
