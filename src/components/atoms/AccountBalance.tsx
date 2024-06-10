@@ -8,6 +8,7 @@ export const AccountBalance = ({ account }: { account: Account }) => {
   const network = getNetwork(account.currency);
   const unit = {
     code: network.ticker,
+    // NOTE: remove after merge of feat/btc 
     magnitude: network.decimals || 18,
     name: network.displayName,
   };

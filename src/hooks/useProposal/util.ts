@@ -72,7 +72,7 @@ export const formatAccountsByChain = (
 
   const mappedAccountsByChains: AccountsInChain[] = chainsDeduplicated.map(
     (chain) => {
-      let formatedChain = getCurrencyByChainId(chain);
+      const formatedChain = getCurrencyByChainId(chain);
 
       const chainAccounts = accounts.filter((acc) => {
         return acc.currency === formatedChain;

@@ -1,4 +1,4 @@
-import { MvxTransaction, SolanaTransaction } from "@/utils/converters";
+import { SolanaTransaction } from "@/utils/converters";
 
 /**
  * Methods
@@ -14,15 +14,6 @@ export const SOLANA_SIGNING_METHODS = {
  * Requests specs: https://docs.walletconnect.com/advanced/multichain/rpc-reference/solana-rpc
  */
 export type SOLANA_REQUESTS =
-  // | {
-  //     method: typeof SOLANA_SIGNING_METHODS.SOLANA_GETACCOUNTS;
-  //     params: {};
-  //   }
-  // | {
-  //     method: typeof SOLANA_SIGNING_METHODS.SOLANA_REQUESTACCOUNTS;
-  //     params: {};
-  //   }
-  // | 
   {
       method: typeof SOLANA_SIGNING_METHODS.SOLANA_SIGNTRANSACTION;
       params: SolanaTransaction;

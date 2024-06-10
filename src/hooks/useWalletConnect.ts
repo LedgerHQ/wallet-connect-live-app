@@ -358,7 +358,7 @@ export default function useWalletConnect() {
       switch (request.method) {
         case SOLANA_SIGNING_METHODS.SOLANA_SIGNTRANSACTION: {
           const liveTx = convertSolanaToLiveTX(request.params);
-          const pubkey: string = String(
+          const pubkey = String(
             request.params.instructions[0].keys[0].pubkey,
           );
           // TODO: check if issigner ?
@@ -439,7 +439,7 @@ export default function useWalletConnect() {
         console.error("Not Supported Chain");
       }
     },
-    [handleEIP155Request, handleMvxRequest],
+    [handleEIP155Request, handleMvxRequest, handleSolanaRequest],
   );
 
   const onSessionDeleted = useCallback(() => {

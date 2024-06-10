@@ -74,8 +74,8 @@ export function convertSolanaToLiveTX(
   tx: SolanaTransaction,
 ): SolanaTransactionLive {
   let model: TransactionModel | null = null;
-  let amount: BigNumber = new BigNumber(0);
-  let recipient: string = "";
+  let amount = new BigNumber(0);
+  let recipient = "";
 
   if (tx.instructions && tx.instructions.length === 1) {
     // NOTE: we should loop over instructions and create liveTx for each
@@ -89,10 +89,9 @@ export function convertSolanaToLiveTX(
         data: Buffer.from(data),
         programId: SystemProgram.programId,
       });
-      debugger;
       const decodedAmount = decodedTransfer.lamports.toString();
 
-      let command: TransferCommand = {
+      const command: TransferCommand = {
         kind: "transfer",
         amount: Number(decodedAmount),
         sender: String(decodedTransfer.fromPubkey),
@@ -112,12 +111,10 @@ export function convertSolanaToLiveTX(
         uiState: {},
       };
     } else {
-      debugger;
       throw new Error("Unsupported Solana instruction");
     }
   } else {
-    debugger;
-    throw new Error("Unsupported Solana non-instruction");
+    throw new Error("Unsupported Solana rpc transaction format");
   }
 
   if (model === null) {
