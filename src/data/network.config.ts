@@ -126,10 +126,12 @@ export const SOLANA_CHAINS: Record<string, Network> = {
     chainId: "1",
     namespace: "solana:4sGjMW1sUnHzSxGspuhpqLDx6wiyjNtZ", // work with APPs (legacy)
     ticker: "SOL",
-    displayName: "Solana (legacy)",
+    displayName: "Solana",
     color: "#1EF0A6",
     decimals: 9,
   },
+  // DISABLED UNTIL AVAILABLE IN LL
+  /*
   "solana testnet": {
     chainId: "4uhcVJyU9pJkvQyS88uRDiswHXSCkY3z",
     namespace: "solana:4uhcVJyU9pJkvQyS88uRDiswHXSCkY3z", // work with APPs (legacy)
@@ -146,6 +148,7 @@ export const SOLANA_CHAINS: Record<string, Network> = {
     color: "#1EF0A6",
     decimals: 9,
   }
+ */
 };
 
 
@@ -161,7 +164,7 @@ export const SUPPORTED_NETWORK: Record<string, Network> = {
   ...SOLANA_CHAINS,
 };
 
-export const SUPPORTED_NETWORK_NAMES: string[] = Object.values(SUPPORTED_NETWORK).map((network: Network) => network.displayName);
+export const SUPPORTED_NETWORK_NAMES: string[] = [...new Set(Object.values(SUPPORTED_NETWORK).map((network: Network) => network.displayName))];
 
 export enum SupportedNamespace {
   EIP155 = "eip155",

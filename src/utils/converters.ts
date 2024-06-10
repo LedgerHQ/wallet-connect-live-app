@@ -77,7 +77,8 @@ export function convertSolanaToLiveTX(
   let amount: BigNumber = new BigNumber(0);
   let recipient: string = "";
 
-  if (tx.instructions && tx.instructions.length > 0) {
+  if (tx.instructions && tx.instructions.length === 1) {
+    // NOTE: we should loop over instructions and create liveTx for each
     if (
       String(tx.instructions[0].programId) ===
       SystemProgram.programId.toString()
