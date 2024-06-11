@@ -86,10 +86,12 @@ export function convertSolanaToLiveTX(
     const msg = getBase64Encoder().encode(tx.transaction);
     const vtx = VersionedTransaction.deserialize(msg);
     // we get a set of compiled instructions, each with a programIdIndex
-    const programId = vtx.message.staticAccountKeys[vtx.message.compiledInstructions[0].programIdIndex].toString()
-    // ^ first programId, need to handle the rest of cimpiledInstructions also 
-    // debugger
-    console.log({vtx})
+    for (let i = 0; i < vtx.message.compiledInstructions.length; i++) {
+      const compiledInstruction = vtx.message.compiledInstructions[i];
+      const programId = vtx.message.staticAccountKeys[compiledInstruction.programIdIndex].toString()
+      console.log({programId})
+      // TODO: handle those programIds
+    }
   }
   else {
     if (tx.instructions.length > 1) {
