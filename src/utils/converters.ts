@@ -83,13 +83,13 @@ export function convertSolanaToLiveTX(
   if (!tx.instructions && tx.transaction) {
   // NOTE: this helper https://solana.stackexchange.com/questions/9775/how-to-deserialize-a-magic-links-versioned-transaction
   // @ts-ignore
-    const msg3 = getBase64Encoder().encode(tx.transaction as string);
-    const vtx = VersionedTransaction.deserialize(msg3);
-    // debugger
+    const msg = getBase64Encoder().encode(tx.transaction);
+    const vtx = VersionedTransaction.deserialize(msg);
     // we get a set of compiled instructions, each with a programIdIndex
     const programId = vtx.message.staticAccountKeys[vtx.message.compiledInstructions[0].programIdIndex].toString()
     // ^ first programId, need to handle the rest of cimpiledInstructions also 
     // debugger
+    console.log({vtx})
   }
   else {
     if (tx.instructions.length > 1) {
