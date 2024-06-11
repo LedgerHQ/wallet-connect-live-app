@@ -1,5 +1,6 @@
 import { BigNumber } from "bignumber.js";
 import eip55 from "eip55";
+import { getBase64Encoder } from '@solana/codecs-strings'; 
 import {
   ElrondTransaction,
   EthereumTransaction,
@@ -9,7 +10,7 @@ import {
 
 import type { TransferCommand } from "@ledgerhq/coin-solana/types";
 
-import { Transaction, SystemProgram, SystemInstruction } from "@solana/web3.js";
+import { Transaction, SystemProgram, SystemInstruction, VersionedMessage, VersionedTransaction, TransactionInstruction } from "@solana/web3.js";
 
 export type EthTransaction = {
   value: string;
@@ -69,16 +70,32 @@ export function convertMvxToLiveTX(tx: MvxTransaction): ElrondTransaction {
 }
 
 export type SolanaTransaction = Transaction;
+// NOTE: https://solana.com/docs/rpc/json-structures
 
 export function convertSolanaToLiveTX(
-  tx: SolanaTransaction,
+  tx: SolanaTransaction | { transaction: string; instructions: any[] },
 ): SolanaTransactionLive {
   let model: TransactionModel | null = null;
   let amount = new BigNumber(0);
   let recipient = "";
 
-  if (tx.instructions && tx.instructions.length === 1) {
+  // @ts-ignore
+  if (!tx.instructions && tx.transaction) {
+  // NOTE: this helper https://solana.stackexchange.com/questions/9775/how-to-deserialize-a-magic-links-versioned-transaction
+  // @ts-ignore
+    const msg3 = getBase64Encoder().encode(tx.transaction as string);
+    const vtx = VersionedTransaction.deserialize(msg3);
+    // debugger
+    // we get a set of compiled instructions, each with a programIdIndex
+    const programId = vtx.message.staticAccountKeys[vtx.message.compiledInstructions[0].programIdIndex].toString()
+    // ^ first programId, need to handle the rest of cimpiledInstructions also 
+    // debugger
+  }
+  else {
+    if (tx.instructions.length > 1) {
     // NOTE: we should loop over instructions and create liveTx for each
+      throw new Error("Not supporting multiple instructions yet");
+    }
     if (
       String(tx.instructions[0].programId) ===
       SystemProgram.programId.toString()
@@ -113,9 +130,11 @@ export function convertSolanaToLiveTX(
     } else {
       throw new Error("Unsupported Solana instruction");
     }
-  } else {
-    throw new Error("Unsupported Solana rpc transaction format");
   }
+  
+  // else {
+  //   throw new Error("Unsupported Solana rpc transaction format");
+  // }
 
   if (model === null) {
     throw new Error("Unsupported Solana transaction");

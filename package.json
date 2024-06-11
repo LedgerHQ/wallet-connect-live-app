@@ -23,6 +23,7 @@
     "@segment/analytics-next": "^1.64.0",
     "@segment/snippet": "^5.2.1",
     "@sentry/react": "^7.100.1",
+    "@solana/codecs-strings": "2.0.0-experimental.5e8ac8d",
     "@solana/web3.js": "1.77.3",
     "@tanstack/react-query": "^5.20.2",
     "@tanstack/react-query-devtools": "^5.20.2",

@@ -29,6 +29,9 @@ dependencies:
   '@sentry/react':
     specifier: ^7.100.1
     version: 7.100.1(react@18.2.0)
+  '@solana/codecs-strings':
+    specifier: 2.0.0-experimental.5e8ac8d
+    version: 2.0.0-experimental.5e8ac8d(fastestsmallesttextencoderdecoder@1.0.22)
   '@solana/web3.js':
     specifier: 1.77.3
     version: 1.77.3
@@ -2286,6 +2289,10 @@ packages:
       buffer: 6.0.3
     dev: false
 
+  /@solana/codecs-core@2.0.0-experimental.5e8ac8d:
+    resolution: {integrity: sha512-GrzBK2u957RsL42oh/04jMVpOj6hAnPpeF4gZT3/dL4zaYRnr6kDgW7bckiJm23ewzxUecIIbdb8/UPG6Nh18g==}
+    dev: false
+
   /@solana/codecs-core@2.0.0-preview.2:
     resolution: {integrity: sha512-gLhCJXieSCrAU7acUJjbXl+IbGnqovvxQLlimztPoGgfLQ1wFYu+XJswrEVQqknZYK1pgxpxH3rZ+OKFs0ndQg==}
     dependencies:
@@ -2300,11 +2307,27 @@ packages:
       '@solana/errors': 2.0.0-preview.2
     dev: false
 
+  /@solana/codecs-numbers@2.0.0-experimental.5e8ac8d:
+    resolution: {integrity: sha512-48xUa3JxmkAhBSwN/fbwbAvusPkPqeGUrYt0lECB6OMHqIYmjevEUJgscP0Aq7rsjtGOPzxIgjsqrtlWs775/Q==}
+    dependencies:
+      '@solana/codecs-core': 2.0.0-experimental.5e8ac8d
+    dev: false
+
   /@solana/codecs-numbers@2.0.0-preview.2:
     resolution: {integrity: sha512-aLZnDTf43z4qOnpTcDsUVy1Ci9im1Md8thWipSWbE+WM9ojZAx528oAql+Cv8M8N+6ALKwgVRhPZkto6E59ARw==}
     dependencies:
       '@solana/codecs-core': 2.0.0-preview.2
       '@solana/errors': 2.0.0-preview.2
+    dev: false
+
+  /@solana/codecs-strings@2.0.0-experimental.5e8ac8d(fastestsmallesttextencoderdecoder@1.0.22):
+    resolution: {integrity: sha512-SKXj2hv+GEJpPJWktcEfzkSxwmpkqC5VIw/nxgggKAVFBGSvayHZazHG85RCGQbm0x/jo8IXlR/85YSyjenSXQ==}
+    peerDependencies:
+      fastestsmallesttextencoderdecoder: ^1.0.22
+    dependencies:
+      '@solana/codecs-core': 2.0.0-experimental.5e8ac8d
+      '@solana/codecs-numbers': 2.0.0-experimental.5e8ac8d
+      fastestsmallesttextencoderdecoder: 1.0.22
     dev: false
 
   /@solana/codecs-strings@2.0.0-preview.2(fastestsmallesttextencoderdecoder@1.0.22):
