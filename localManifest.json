@@ -1,4 +1,5 @@
 {
+  "$schema": "https://live-app-catalog.ledger.com/schema.json",
   "id": "ledger-wallet-connect",
   "name": "WalletConnect local",
   "url": "http://localhost:3000/",
@@ -11,6 +12,10 @@
   "branch": "stable",
   "categories": ["bridge", "defi"],
   "currencies": [
+    "bitcoin",
+    "bitcoin_testnet",
+    "litecoin",
+    "dogecoin",
     "ethereum",
     "polygon",
     "bsc",
@@ -34,6 +39,7 @@
     }
   },
   "permissions": [
+    "currency.list",
     "account.list",
     "account.request",
     "message.sign",

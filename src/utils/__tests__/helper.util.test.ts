@@ -6,7 +6,6 @@ import {
   getCurrencyByChainId,
   getDisplayName,
   getNamespace,
-  getNetwork,
   getTicker,
   isEIP155Chain,
   truncate,
@@ -36,14 +35,6 @@ describe("Helper Util", () => {
     const polygon = getCurrencyByChainId("eip155:137");
 
     expect(polygon).toEqual("polygon");
-  });
-
-  it("getNetwork", () => {
-    const matic = getNetwork("polygon");
-    expect(matic.chainId).toEqual(SUPPORTED_NETWORK.polygon.chainId);
-
-    const arb = getNetwork("arbitrum");
-    expect(arb.chainId).toEqual(SUPPORTED_NETWORK.arbitrum.chainId);
   });
 
   it("getDisplayName", () => {

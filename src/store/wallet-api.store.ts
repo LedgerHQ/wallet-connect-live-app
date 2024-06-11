@@ -1,5 +1,6 @@
 import { atom } from "jotai";
 import {
+  Currency,
   WalletAPIClient,
   WindowMessageTransport,
 } from "@ledgerhq/wallet-api-client";
@@ -46,6 +47,19 @@ export const walletAPIClientAtom = atom((get) => {
   const transport = get(transportAtom);
 
   return new WalletAPIClient(transport);
+});
+
+export const walletCurrenciesAtom = atom((get) => {
+  const client = get(walletAPIClientAtom);
+  return client.currency.list();
+});
+
+export const walletCurrenciesByIdAtom = atom(async (get) => {
+  const currencies = await get(walletCurrenciesAtom);
+  return currencies.reduce<Record<string, Currency>>((acc, curr) => {
+    acc[curr.id] = curr;
+    return acc;
+  }, {});
 });
 
 export const walletInfosAtom = atom((get) => {

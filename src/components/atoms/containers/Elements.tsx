@@ -1,4 +1,5 @@
 import { Flex } from "@ledgerhq/react-ui";
+import { space } from "@ledgerhq/react-ui/styles/theme";
 import styled from "styled-components";
 
 const WalletConnectContainer = styled.div`
@@ -21,5 +22,10 @@ const ButtonsContainer = styled(Flex)`
 
 const Row = styled(Flex)``;
 const List = styled.ul``;
+const ListItem = styled.li`
+  &:not(:last-child) {
+    margin-bottom: ${space[3]}px;
+  }
+`;
 
-export { ButtonsContainer, Row, List, WalletConnectContainer };
+export { ButtonsContainer, Row, List, ListItem, WalletConnectContainer };

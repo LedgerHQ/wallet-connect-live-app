@@ -3,6 +3,7 @@ import { getErrorMessage, getNamespace } from "@/utils/helper.util";
 import { EIP155_SIGNING_METHODS } from "@/data/methods/EIP155Data.methods";
 import useAnalytics from "@/hooks/useAnalytics";
 import {
+  BIP122_CHAINS,
   EIP155_CHAINS,
   MULTIVERS_X_CHAINS,
   SupportedNamespace,
@@ -57,20 +58,20 @@ export function useProposal(proposal: ProposalTypes.Struct) {
   }, [navigate]);
 
   const buildEip155Namespace = useCallback(
-    (requiredNamespaces: ProposalTypes.RequiredNamespaces,
-      optionalNamespaces: ProposalTypes.OptionalNamespaces
+    (
+      requiredNamespaces: ProposalTypes.RequiredNamespaces,
+      optionalNamespaces: ProposalTypes.OptionalNamespaces,
     ) => {
       const accountsByChain = formatAccountsByChain(
         proposal,
         accounts.data,
-      ).filter(
-        (a) => {
-          return (a.accounts.length > 0 &&
-            a.isSupported &&
-            Object.keys(EIP155_CHAINS).includes(a.chain)
-          )
-        }
-      );
+      ).filter((a) => {
+        return (
+          a.accounts.length > 0 &&
+          a.isSupported &&
+          Object.keys(EIP155_CHAINS).includes(a.chain)
+        );
+      });
       const dataToSend = accountsByChain.reduce<
         { account: string; chain: string }[]
       >(
@@ -85,7 +86,9 @@ export function useProposal(proposal: ProposalTypes.Struct) {
           ),
         [],
       );
-      const namespace = requiredNamespaces[SupportedNamespace.EIP155] || optionalNamespaces[SupportedNamespace.EIP155];
+      const namespace =
+        requiredNamespaces[SupportedNamespace.EIP155] ||
+        optionalNamespaces[SupportedNamespace.EIP155];
 
       const methods: string[] = [
         ...new Set([
@@ -109,12 +112,15 @@ export function useProposal(proposal: ProposalTypes.Struct) {
         events,
         accounts: dataToSend.map((e) => e.account),
       };
-    }
-    , [accounts.data, proposal, selectedAccounts])
+    },
+    [accounts.data, proposal, selectedAccounts],
+  );
 
   const buildMvxNamespace = useCallback(
-    (requiredNamespaces: ProposalTypes.RequiredNamespaces,
-      optionalNamespaces: ProposalTypes.OptionalNamespaces) => {
+    (
+      requiredNamespaces: ProposalTypes.RequiredNamespaces,
+      optionalNamespaces: ProposalTypes.OptionalNamespaces,
+    ) => {
       const accountsByChain = formatAccountsByChain(
         proposal,
         accounts.data,
@@ -138,7 +144,9 @@ export function useProposal(proposal: ProposalTypes.Struct) {
           ),
         [],
       );
-      const namespace = requiredNamespaces[SupportedNamespace.MVX] || optionalNamespaces[SupportedNamespace.MVX];
+      const namespace =
+        requiredNamespaces[SupportedNamespace.MVX] ||
+        optionalNamespaces[SupportedNamespace.MVX];
 
       const methods: string[] = namespace.methods;
 
@@ -158,8 +166,63 @@ export function useProposal(proposal: ProposalTypes.Struct) {
         events,
         accounts: dataToSend.map((e) => e.account),
       };
-    }
-    , [accounts.data, proposal, selectedAccounts])
+    },
+    [accounts.data, proposal, selectedAccounts],
+  );
+
+  const buildBip122Namespace = useCallback(
+    (
+      requiredNamespaces: ProposalTypes.RequiredNamespaces,
+      optionalNamespaces: ProposalTypes.OptionalNamespaces,
+    ) => {
+      const accountsByChain = formatAccountsByChain(
+        proposal,
+        accounts.data,
+      ).filter(
+        (a) =>
+          a.accounts.length > 0 &&
+          a.isSupported &&
+          Object.keys(BIP122_CHAINS).includes(a.chain),
+      );
+      const dataToSend = accountsByChain.reduce<
+        { account: string; chain: string }[]
+      >(
+        (accum, elem) =>
+          accum.concat(
+            elem.accounts
+              .filter((acc) => selectedAccounts.includes(acc.id))
+              .map((a) => ({
+                account: `${getNamespace(a.currency)}:${a.address}`,
+                chain: getNamespace(a.currency),
+              })),
+          ),
+        [],
+      );
+      const namespace =
+        requiredNamespaces[SupportedNamespace.BIP122] ||
+        optionalNamespaces[SupportedNamespace.BIP122];
+
+      const methods: string[] = namespace.methods;
+
+      const events = [
+        ...new Set([
+          ...namespace.events,
+          "session_proposal",
+          "session_request",
+          "auth_request",
+          "session_delete",
+        ]),
+      ];
+
+      return {
+        chains: [...new Set(dataToSend.map((e) => e.chain))],
+        methods,
+        events,
+        accounts: dataToSend.map((e) => e.account),
+      };
+    },
+    [accounts.data, proposal, selectedAccounts],
+  );
 
   const buildSupportedNamespaces = useCallback(
     (proposal: ProposalTypes.Struct) => {
@@ -168,17 +231,27 @@ export function useProposal(proposal: ProposalTypes.Struct) {
       const supportedNamespaces: BuildApprovedNamespacesParams["supportedNamespaces"] =
         {};
 
+      if ("bip122" in requiredNamespaces || "bip122" in optionalNamespaces) {
+        supportedNamespaces[SupportedNamespace.BIP122] = buildBip122Namespace(
+          requiredNamespaces,
+          optionalNamespaces,
+        );
+      }
       if ("eip155" in requiredNamespaces || "eip155" in optionalNamespaces) {
-        supportedNamespaces[SupportedNamespace.EIP155] =
-          buildEip155Namespace(requiredNamespaces, optionalNamespaces);
+        supportedNamespaces[SupportedNamespace.EIP155] = buildEip155Namespace(
+          requiredNamespaces,
+          optionalNamespaces,
+        );
       }
       if ("mvx" in requiredNamespaces || "mvx" in optionalNamespaces) {
-        supportedNamespaces[SupportedNamespace.MVX] =
-          buildMvxNamespace(requiredNamespaces, optionalNamespaces);
+        supportedNamespaces[SupportedNamespace.MVX] = buildMvxNamespace(
+          requiredNamespaces,
+          optionalNamespaces,
+        );
       }
       return supportedNamespaces;
     },
-    [buildEip155Namespace, buildMvxNamespace],
+    [buildBip122Namespace, buildEip155Namespace, buildMvxNamespace],
   );
 
   const sessionsQueryFn = useSessionsQueryFn(web3wallet);
@@ -189,7 +262,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
       const approvedNs = buildApprovedNamespaces({
         proposal,
         supportedNamespaces: supportedNs,
-      })
+      });
       const session = await web3wallet.approveSession({
         id: proposal.id,
         namespaces: approvedNs,

@@ -18,6 +18,8 @@ import { AccountRow } from "./sessionProposal/AccountRow";
 import { ErrorMissingRequiredAccount } from "./sessionProposal/ErrorMissingRequiredAccount";
 import LogoHeader from "./sessionProposal/LogoHeader";
 import { ChainRow } from "./sessionProposal/ChainRow";
+import { walletCurrenciesByIdAtom } from "@/store/wallet-api.store";
+import { useAtomValue } from "jotai";
 
 const BackButton = styled(Flex)`
   cursor: pointer;
@@ -46,6 +48,7 @@ export default function SessionProposal({ proposal }: Props) {
   const analytics = useAnalytics();
   const dApp = proposal.proposer.metadata.name;
   const dAppUrl = proposal.proposer.metadata.url;
+  const currenciesById = useAtomValue(walletCurrenciesByIdAtom);
 
   useEffect(() => {
     analytics.page("Wallet Connect Session Request", {
@@ -139,6 +142,12 @@ export default function SessionProposal({ proposal }: Props) {
     [chainsWhereNoAccounts],
   );
 
+  const entries = useMemo(() => {
+    return sortChains(accountsByChain)
+      .filter((entry) => entry.isSupported)
+      .filter((entry) => entry.accounts.length > 0);
+  }, [accountsByChain]);
+
   return (
     <Flex
       flex={1}
@@ -218,43 +227,45 @@ export default function SessionProposal({ proposal }: Props) {
                 >
                   {formatUrl(dAppUrl)}
                 </Text>
-                  
-                  {requiredChains.length === 0 && (
-                    <Text
-                      mt={6}
-                      variant="small"
-                      textAlign="center"
-                      color={colors.neutral.c90}
-                      uppercase={false}>
+
+                {requiredChains.length === 0 && (
+                  <Text
+                    mt={6}
+                    variant="small"
+                    textAlign="center"
+                    color={colors.neutral.c90}
+                    uppercase={false}
+                  >
                     {t("sessionProposal.noRequiredChains")}
-                      </Text>
-                    )}
+                  </Text>
+                )}
               </Header>
               <ListChains>
-                {sortChains(accountsByChain)
-                  .filter((entry) => entry.isSupported)
-                  .filter((entry) => entry.accounts.length > 0)
-                  .map((entry) => {
-                    return (
-                      <Box key={entry.chain}>
-                        <ChainRow
-                          entry={entry}
-                          selectedAccounts={selectedAccounts}
-                        />
-                        <List>
-                          {entry.accounts.map((account, index: number) =>
-                            AccountRow(
-                              account,
-                              index,
-                              entry,
-                              selectedAccounts,
-                              handleClick,
-                            ),
-                          )}
-                        </List>
-                      </Box>
-                    );
-                  })}
+                {entries.map((entry) => {
+                  return (
+                    <Box key={entry.chain}>
+                      <ChainRow
+                        entry={entry}
+                        selectedAccounts={selectedAccounts}
+                      />
+                      <List>
+                        {entry.accounts.map((account) => {
+                          const currency = currenciesById[account.currency];
+
+                          return (
+                            <AccountRow
+                              key={account.id}
+                              account={account}
+                              currency={currency}
+                              selectedAccounts={selectedAccounts}
+                              handleClick={handleClick}
+                            />
+                          );
+                        })}
+                      </List>
+                    </Box>
+                  );
+                })}
                 {createAccountDisplayed && (
                   <AddAccountPlaceholder
                     chains={chainsWhereNoAccounts}
