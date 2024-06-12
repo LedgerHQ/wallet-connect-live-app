@@ -63,10 +63,13 @@ export function convertMvxToLiveTX(tx: MvxTransaction): ElrondTransaction {
   };
 }
 
-
+// Ressource : 
+// https://xpring-eng.github.io/xrp-api/XRPAPI-data-types-transaction_common_fields.html
 export type XrpTransaction = {
+  hash?: string;
   TransactionType: string;
   Account: string;
+  Flags: number;
   Amount: any;
   Destination: string;
   Fee?: string
@@ -74,11 +77,16 @@ export type XrpTransaction = {
 
 
 export function convertXrpToLiveTX(tx: XrpTransaction): RippleTransaction {
-  return {
-    family: "ripple",
-    fee: tx.Fee ? new BigNumber(tx.Fee) : new BigNumber(0),
-    tag: 0,
-    amount: tx.Amount ? new BigNumber(tx.Amount) : new BigNumber(0),
-    recipient: tx.Destination,
-  };
+
+  const rippleTransaction: RippleTransaction = {
+      family: "ripple",
+      tag: 0,
+      amount: tx.Amount ? new BigNumber(tx.Amount) : new BigNumber(0),
+      recipient: tx.Destination,
+    }; 
+
+    if(tx.Fee)
+      rippleTransaction["fee"] = new BigNumber(tx.Fee);
+
+  return rippleTransaction
 }

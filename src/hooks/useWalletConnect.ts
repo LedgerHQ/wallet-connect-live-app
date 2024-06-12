@@ -3,7 +3,7 @@ import { useCallback, useEffect } from "react";
 import { Web3WalletTypes } from "@walletconnect/web3wallet";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
 import { stripHexPrefix } from "@/utils/currencyFormatter/helpers";
-import { convertEthToLiveTX, convertMvxToLiveTX } from "@/utils/converters";
+import { convertEthToLiveTX, convertMvxToLiveTX, convertXrpToLiveTX } from "@/utils/converters";
 import {
   EIP155_REQUESTS,
   EIP155_SIGNING_METHODS,
@@ -293,36 +293,31 @@ export default function useWalletConnect() {
       _chainId: string,
     ) => {
       const ledgerLiveCurrency = "ripple";
+      
       switch (request.method) {
         case RIPPLE_SIGNING_METHODS.RIPPLE_SIGN_TRANSACTION: {
-          const accountSign = getAccountWithAddressAndChainId(
+          const accountTX = getAccountWithAddressAndChainId(
             accounts.data,
             request.params.tx_json.Account,
             ledgerLiveCurrency,
           );
 
-          console.log(accountSign);/*
-          if (accountSign) {
+          if (accountTX) {
             try {
-              const message = request.params.message;
-              const signedMessage = await client.message.sign(
-                accountSign.id,
-                Buffer.from(message),
+              debugger;
+              const liveTx = convertXrpToLiveTX(request.params.tx_json);
+              const hash = await client.transaction.signAndBroadcast(
+                accountTX.id,
+                liveTx,
               );
-              void acceptRequest(
-                web3wallet,
-                topic,
-                id,
-                formatMessage(signedMessage),
-              );
+              void acceptRequest(web3wallet, topic, id, hash);
             } catch (error) {
-              void rejectRequest(web3wallet, topic, id, Errors.userDecline);
+              void rejectRequest(web3wallet, topic, id, Errors.txDeclined);
               console.error(error);
             }
           } else {
-            void rejectRequest(web3wallet, topic, id, Errors.userDecline);
+            void rejectRequest(web3wallet, topic, id, Errors.txDeclined);
           }
-          */
           break;
         }
         default:

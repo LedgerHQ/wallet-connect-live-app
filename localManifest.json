@@ -2,7 +2,7 @@
   "$schema": "https://live-app-catalog.ledger.com/schema.json",
   "id": "ledger-wallet-connect",
   "name": "WalletConnect local",
-  "url": "http://localhost:3000/",
+  "url": "http://localhost:3001/",
   "params": {},
   "homepageUrl": "https://walletconnect.com/",
   "icon": "https://forum.zeroqode.com/uploads/default/original/2X/e/e363c6521db27335d44c1134d230b8992792dde4.png",

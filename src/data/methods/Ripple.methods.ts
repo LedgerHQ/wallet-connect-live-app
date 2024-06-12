@@ -1,4 +1,4 @@
-import { MvxTransaction, XrpTransaction } from "@/utils/converters";
+import { XrpTransaction } from "@/utils/converters";
 
 /**
  * Methods
