@@ -14,7 +14,7 @@
     "invalidUri" : "URI invalide"
   },
   "connect" : {
-    "title" : "Connexion",
+    "title" : "Connectez-vous à une application pour commencer",
     "cta" : "Connecter",
     "scanQRCode" : "Scannez un code QR",
     "useWalletConnectUrl" : "Ou utilisez une URL WalletConnect",
@@ -24,6 +24,11 @@
     "errorProtocol" : {
       "title" : "La dApp à laquelle vous essayez de vous connecter n’est pas à jour",
       "desc" : "WalletConnect v1 n’est plus pris en charge. Pour une connexion fluide et sécurisée, la dApp que vous utilisez doit être mise à niveau vers WalletConnect v2."
+    },
+    "relayerStatus" : {
+      "connected" : "Prêt à connecter",
+      "connecting" : "Connexion au serveur de WalletConnect",
+      "offline" : "Pas de connexion Internet"
     }
   },
   "sessionProposal" : {
@@ -33,8 +38,8 @@
     "close" : "Fermer",
     "notSupported" : "Blockchain non prise en charge :",
     "notSupported_plural" : "Blockchains non prises en charge :",
-    "info" : "Cette app pourra : ",
-    "info2" : "Cette app peut : ",
+    "info" : "Cette application pourra : ",
+    "info2" : "Cette application peut : ",
     "info3" : "Si vous connectez : ",
     "infoBullet" : {
       "0" : "Vérifier le solde et l’activité de votre compte",
@@ -43,12 +48,26 @@
     },
     "error" : {
       "title" : "{{appName}} a demandé à se connecter à des chaînes pas encore prises en charge",
-      "desc" : "Les chaînes que nous prenons actuellement en charge sont : Ethereum, Polygon, Binance Smart Chain, Arbitrum, Optimism, Avalanche C-Chain, Ethereum Goerli et Optimism Goerli. Nous en ajoutons de nouvelles progressivement."
+      "info" : "Nous prenons en charge : "
     },
-    "addAccount" : "Ajouter un compte"
+    "missingRequired" : {
+      "title" : "Vous devez avoir des comptes sur ces chaînes pour vous connecter à {{appName}}"
+    },
+    "addAccount" : "Ajouter un compte",
+    "createAccount" : "Créer un nouveau compte",
+    "createAccountForChain" : "Créer un nouveau compte {{chain}}",
+    "noRequiredChains" : "Sélectionnez au moins un compte à connecter"
   },
   "sessions" : {
     "title" : "Sessions",
+    "apps" : {
+      "title" : "Applications connectées",
+      "noAppsMessage" : "Vos applications connectées figureront ici",
+      "dontKnow" : "Applications intéressantes à découvrir",
+      "lastConnection" : "Dernières connexions",
+      "tryNewApp" : "Applications à découvrir",
+      "clearHistory" : "Effacer l’historique"
+    },
     "goToConnect" : "Connecter",
     "disconnectAll" : "Déconnecter tout",
     "modal" : {
