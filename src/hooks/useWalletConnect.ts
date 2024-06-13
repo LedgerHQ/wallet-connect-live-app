@@ -99,28 +99,18 @@ function useWalletConnectStatus() {
   }, [connectionStatus, core.relayer, setConnectionStatus]);
 
   useEffect(() => {
-    console.log("setup relayer listener");
     const onConnect = () => {
-      console.log("relayer_connect");
       setConnectionStatus("connected");
     };
 
     const onDisconnect = () => {
-      console.log("relayer_disconnect");
       setConnectionStatus("disconnected");
-
-      // TODO investigate if really necessary and when if this is the case
-      // core.relayer.restartTransport().catch(() => {
-      //   console.error("couldn't restart transport"); // TODO maybe use a toast
-      // });
     };
 
     core.relayer.on("relayer_connect", onConnect);
     core.relayer.on("relayer_disconnect", onDisconnect);
 
     return () => {
-      console.log("cleanup relayer listener");
-
       core.relayer.off("relayer_connect", onConnect);
       core.relayer.off("relayer_disconnect", onDisconnect);
     };

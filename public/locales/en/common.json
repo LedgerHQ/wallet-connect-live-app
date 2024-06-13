@@ -24,11 +24,6 @@
     "errorProtocol": {
       "title": "The Dapp you’re trying to connect to isn’t up to date",
       "desc": "WalletConnect V1 is no longer supported, and to ensure a smooth and secure connection, the Dapp you’re using must upgrade to WalletConnect V2."
-    },
-    "relayerStatus": {
-      "connected": "Ready to connect",
-      "connecting": "Connecting to wallet connect server",
-      "offline": "No internet connection"
     }
   },
   "sessionProposal": {

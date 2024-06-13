@@ -14,7 +14,6 @@ import { useNavigate } from "@tanstack/react-router";
 import { ResponsiveContainer } from "@/styles/styles";
 import { useConnect } from "@/hooks/useConnect";
 import { InputMode } from "@/types/types";
-import RelayerStatus from "./RelayerStatus";
 
 const QRScannerContainer = styled.div`
   display: flex;
@@ -203,7 +202,7 @@ export function Connect({ mode }: Props) {
             </QRScannerContainer>
           </Flex>
 
-          <Flex flexDirection="column" width="100%" mb={8}>
+          <Flex flexDirection="column" width="100%" mb={6}>
             <Text
               variant="paragraph"
               fontWeight="medium"
@@ -230,9 +229,8 @@ export function Connect({ mode }: Props) {
               }
               placeholder={t("connect.pasteUrl")}
             />
-            <RelayerStatus />
             <Button
-              mt={1}
+              mt={6}
               onClick={handleConnect}
               data-testid="connect-button"
               variant="main"
