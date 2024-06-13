@@ -304,7 +304,6 @@ export default function useWalletConnect() {
 
           if (accountTX) {
             try {
-              debugger;
               const liveTx = convertXrpToLiveTX(request.params.tx_json);
               const hash = await client.transaction.signAndBroadcast(
                 accountTX.id,
@@ -323,7 +322,8 @@ export default function useWalletConnect() {
         default:
           return;
       }}
-      , []);
+      , [accounts.data, client, web3wallet]);
+
 
   const handleMvxRequest = useCallback(
     async (

@@ -70,7 +70,7 @@ export type XrpTransaction = {
   TransactionType: string;
   Account: string;
   Flags: number;
-  Amount: any;
+  Amount: number | string;
   Destination: string;
   Fee?: string
 };
@@ -86,7 +86,7 @@ export function convertXrpToLiveTX(tx: XrpTransaction): RippleTransaction {
     }; 
 
     if(tx.Fee)
-      rippleTransaction["fee"] = new BigNumber(tx.Fee);
+      rippleTransaction.fee = new BigNumber(tx.Fee);
 
   return rippleTransaction
 }
