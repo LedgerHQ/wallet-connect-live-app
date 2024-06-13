@@ -1,11 +1,11 @@
 {
   "applicationDisabled" : {
     "title" : "Aktuell gibt es ein vorübergehendes Problem mit der WalletConnect v2-Integration.",
-    "desc" : "Wir sind intensiv damit beschäftigt, eine Lösung zu erarbeiten, um die Funktionalität so schnell wie möglich wiederherzustellen. Wir bitten Sie vielmals um Verständnis."
+    "desc" : "Wir sind intensiv damit beschäftigt, eine Lösung zu erarbeiten, um die Funktionalität so schnell wie möglich wiederherzustellen. Wir bitten vielmals um dein Verständnis."
   },
   "errorBoundary" : {
     "title" : "Ein Problem ist aufgetreten",
-    "desc" : "Wir wurden über diesen Fehler informiert. Bitte laden Sie die Seite versuchsweise neu."
+    "desc" : "Wir wurden über diesen Fehler informiert. Bitte lade die Seite versuchsweise neu."
   },
   "back" : "Zurück",
   "close" : "Schließen",
@@ -14,7 +14,7 @@
     "invalidUri" : "Ungültige URI"
   },
   "connect" : {
-    "title" : "Verbinden",
+    "title" : "Zum Starten mit einer App verbinden",
     "cta" : "Verbinden",
     "scanQRCode" : "QR-Code scannen",
     "useWalletConnectUrl" : "Sie können auch eine WalletConnect-URL verwenden.",
@@ -43,12 +43,26 @@
     },
     "error" : {
       "title" : "{{appName}} möchte sich mit Blockchains verbinden, die wir aktuell noch nicht unterstützen",
-      "desc" : "Derzeit unterstützen wir Ethereum, Polygon, Binance Smart Chain, Arbitrum, Optimism, Avalanche C-Chain, Ethereum Goerli und Optimism Goerli. Weitere werden schrittweise hinzugefügt."
+      "info" : "Wir unterstützen aktuell: "
     },
-    "addAccount" : "Konto hinzufügen"
+    "missingRequired" : {
+      "title" : "Zum Herstellen einer Verbindung mit {{appName}} brauchst du Konten für die folgenden Chains"
+    },
+    "addAccount" : "Konto hinzufügen",
+    "createAccount" : "Erstelle ein neues Konto",
+    "createAccountForChain" : "Neues {{chain}}-Konto erstellen",
+    "noRequiredChains" : "Wähle mindestens ein Konto zum Herstellen einer Verbindung aus"
   },
   "sessions" : {
     "title" : "Sitzungen",
+    "apps" : {
+      "title" : "Verbundene Apps",
+      "noAppsMessage" : "Hier werden deine verbundenen Apps aufgelistet",
+      "dontKnow" : "Du kennst keine? Probiere eine hiervon aus",
+      "lastConnection" : "Letzte Verbindungen",
+      "tryNewApp" : "Neue Apps ausprobieren",
+      "clearHistory" : "Verlauf löschen"
+    },
     "goToConnect" : "Verbinden",
     "disconnectAll" : "Alle trennen",
     "modal" : {
