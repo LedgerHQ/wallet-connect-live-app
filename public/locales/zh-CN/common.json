@@ -14,7 +14,7 @@
     "invalidUri" : "URI 无效"
   },
   "connect" : {
-    "title" : "连接",
+    "title" : "连接到应用程序即可开始",
     "cta" : "连接",
     "scanQRCode" : "扫描二维码",
     "useWalletConnectUrl" : "或使用 WalletConnect 网址",
@@ -24,6 +24,11 @@
     "errorProtocol" : {
       "title" : "您尝试连接的去中心化应用程序 (Dapp) 不是最新版本",
       "desc" : "系统不再支持 WalletConnect V1。为确保顺利、安全地连接，您使用的 Dapp 必须升级到 WalletConnect V2。"
+    },
+    "relayerStatus" : {
+      "connected" : "准备连接",
+      "connecting" : "连接到 WalletConnect 服务器",
+      "offline" : "没有互联网连接"
     }
   },
   "sessionProposal" : {
@@ -43,12 +48,26 @@
     },
     "error" : {
       "title" : "{{appName}} 请求连接的是我们暂不支持的链",
-      "desc" : "我们目前支持以太坊、Polygon、币安智能链 (BSC)、Arbitrum、Optimism、Avalanche C-Chain、Ethereum Goerli 和 Optimism Goerli。我们还在逐步添加新的链。"
+      "info" : "我们目前支持： "
     },
-    "addAccount" : "添加账户"
+    "missingRequired" : {
+      "title" : "您需要有以下链的账户才能连接到 {{appName}}"
+    },
+    "addAccount" : "添加账户",
+    "createAccount" : "创建新账户",
+    "createAccountForChain" : "创建新的 {{chain}} 账户",
+    "noRequiredChains" : "至少选择一个要连接的账户"
   },
   "sessions" : {
     "title" : "会话",
+    "apps" : {
+      "title" : "已连接的应用程序",
+      "noAppsMessage" : "您连接的应用程序将在此处列出",
+      "dontKnow" : "不知道是哪个？尝试其中一个",
+      "lastConnection" : "最近的连接",
+      "tryNewApp" : "尝试新的应用程序",
+      "clearHistory" : "清除历史记录"
+    },
     "goToConnect" : "连接",
     "disconnectAll" : "断开所有",
     "modal" : {
