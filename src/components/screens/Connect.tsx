@@ -7,10 +7,10 @@ import {
   QrCodeMedium,
 } from "@ledgerhq/react-ui/assets/icons";
 import { QRScanner } from "../QRScanner";
-import { WalletConnectContainer } from "../atoms/containers/Elements";
 import { useTranslation } from "react-i18next";
 import useAnalytics from "@/hooks/useAnalytics";
 import { useNavigate } from "@tanstack/react-router";
+import { WalletConnectContainer } from "../atoms/containers/Elements";
 import { ResponsiveContainer } from "@/styles/styles";
 import { useConnect } from "@/hooks/useConnect";
 import { InputMode } from "@/types/types";
@@ -201,7 +201,6 @@ export function Connect({ mode }: Props) {
               )}
             </QRScannerContainer>
           </Flex>
-
           <Flex flexDirection="column" width="100%" mb={6}>
             <Text
               variant="paragraph"
