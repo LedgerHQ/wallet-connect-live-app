@@ -14,7 +14,7 @@
     "invalidUri" : "유효하지 않은 URI"
   },
   "connect" : {
-    "title" : "연결",
+    "title" : "시작할 앱을 연결하세요",
     "cta" : "연결",
     "scanQRCode" : "QR 코드 스캔",
     "useWalletConnectUrl" : "또는 WalletConnect URL을 사용해보세요",
@@ -43,12 +43,26 @@
     },
     "error" : {
       "title" : "{{appName}}에서 아직 지원되지 않는 체인에 연결을 요청했습니다",
-      "desc" : "현재 이더리움, 폴리곤, 바이낸스 스마트 체인, 아비트럼, 옵티미즘, 아발란체 C-체인, 이더리움 골리, 옵티미즘 골리가 지원되며, 지원 대상을 점차 늘려가고 있습니다."
+      "info" : "당사는 현재 다음을 지원합니다: "
     },
-    "addAccount" : "계정 추가"
+    "missingRequired" : {
+      "title" : "{{appName}}에 연결하려면 다음 체인의 계정이 필요합니다."
+    },
+    "addAccount" : "계정 추가",
+    "createAccount" : "새로운 계정 생성",
+    "createAccountForChain" : "새로운 {{chain}} 계정 생성하기",
+    "noRequiredChains" : "연결할 계정을 하나 이상 선택하세요"
   },
   "sessions" : {
     "title" : "세션",
+    "apps" : {
+      "title" : "연결된 앱",
+      "noAppsMessage" : "연결된 앱 목록이 여기에 표시됩니다",
+      "dontKnow" : "연결하려는 앱이 없나요? 다음 중 하나를 시도해 보세요",
+      "lastConnection" : "최근 연결한 앱",
+      "tryNewApp" : "새로운 앱 사용해 보기",
+      "clearHistory" : "히스토리 삭제"
+    },
     "goToConnect" : "연결",
     "disconnectAll" : "모두 연결 해제하기",
     "modal" : {
