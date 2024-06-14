@@ -12,6 +12,8 @@ export const coreAtom = atom(() => {
   });
 });
 
+export const connectionStatusAtom = atom("disconnected");
+
 export const web3walletAtom = atom((get) => {
   const core = get(coreAtom);
 

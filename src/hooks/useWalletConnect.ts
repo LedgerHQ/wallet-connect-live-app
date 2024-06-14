@@ -8,14 +8,18 @@ import {
   EIP155_REQUESTS,
   EIP155_SIGNING_METHODS,
 } from "@/data/methods/EIP155Data.methods";
-import { web3walletAtom } from "@/store/web3wallet.store";
 import {
   isBIP122Chain,
   isEIP155Chain,
   isMultiversXChain,
 } from "@/utils/helper.util";
+import {
+  coreAtom,
+  connectionStatusAtom,
+  web3walletAtom,
+} from "@/store/web3wallet.store";
 import { useNavigate } from "@tanstack/react-router";
-import { useAtomValue } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { Web3Wallet } from "@walletconnect/web3wallet/dist/types/client";
 import useAccounts from "./useAccounts";
 import { walletAPIClientAtom } from "@/store/wallet-api.store";
@@ -84,7 +88,38 @@ const rejectRequest = (
   });
 };
 
+function useWalletConnectStatus() {
+  const core = useAtomValue(coreAtom);
+  const [connectionStatus, setConnectionStatus] = useAtom(connectionStatusAtom);
+
+  useEffect(() => {
+    if (core.relayer.connected && connectionStatus !== "connected") {
+      setConnectionStatus("connected");
+    }
+  }, [connectionStatus, core.relayer, setConnectionStatus]);
+
+  useEffect(() => {
+    const onConnect = () => {
+      setConnectionStatus("connected");
+    };
+
+    const onDisconnect = () => {
+      setConnectionStatus("disconnected");
+    };
+
+    core.relayer.on("relayer_connect", onConnect);
+    core.relayer.on("relayer_disconnect", onDisconnect);
+
+    return () => {
+      core.relayer.off("relayer_connect", onConnect);
+      core.relayer.off("relayer_disconnect", onDisconnect);
+    };
+  }, [core.relayer, setConnectionStatus]);
+}
+
 export default function useWalletConnect() {
+  useWalletConnectStatus();
+
   const navigate = useNavigate();
   const web3wallet = useAtomValue(web3walletAtom);
 
@@ -416,6 +451,9 @@ export default function useWalletConnect() {
 
   useEffect(() => {
     console.log("web3wallet setup listeners");
+    // TODO: handle session_request_expire
+    // web3wallet.on("session_request_expire", );
+
     // sign
     web3wallet.on("proposal_expire", onProposalExpire);
     web3wallet.on("session_proposal", onSessionProposal);

@@ -39,6 +39,9 @@ vi.mock("@walletconnect/core", () => {
             }, 200);
           }),
         },
+        relayer: {
+          on: vi.fn(),
+        }
       };
     }),
   };
