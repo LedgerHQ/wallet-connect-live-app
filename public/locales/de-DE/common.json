@@ -1,11 +1,11 @@
 {
   "applicationDisabled" : {
     "title" : "Aktuell gibt es ein vorübergehendes Problem mit der WalletConnect v2-Integration.",
-    "desc" : "Wir sind intensiv damit beschäftigt, eine Lösung zu erarbeiten, um die Funktionalität so schnell wie möglich wiederherzustellen. Wir bitten vielmals um dein Verständnis."
+    "desc" : "Wir sind intensiv damit beschäftigt, eine Lösung zu erarbeiten, um die Funktionalität so schnell wie möglich wiederherzustellen. Wir bitten Sie vielmals um Verständnis."
   },
   "errorBoundary" : {
     "title" : "Ein Problem ist aufgetreten",
-    "desc" : "Wir wurden über diesen Fehler informiert. Bitte lade die Seite versuchsweise neu."
+    "desc" : "Wir wurden über diesen Fehler informiert. Bitte laden Sie die Seite versuchsweise neu."
   },
   "back" : "Zurück",
   "close" : "Schließen",
