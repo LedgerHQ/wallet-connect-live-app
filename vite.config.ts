@@ -8,7 +8,7 @@ import inject from "@rollup/plugin-inject";
 // https://vitejs.dev/config/
 export default defineConfig({
   server: {
-    port: 3001,
+    port: 3000,
   },
   build: {
     sourcemap: true, // Source map generation must be turned on
