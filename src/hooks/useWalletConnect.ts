@@ -355,24 +355,36 @@ export default function useWalletConnect() {
       id: number,
       chainId: string,
     ) => {
+      console.log({request})
       switch (request.method) {
         case SOLANA_SIGNING_METHODS.SOLANA_SIGNTRANSACTION: {
-          const liveTx = convertSolanaToLiveTX(request.params);
-          const pubkey = String(
-            request.params.instructions[0].keys[0].pubkey,
-          );
+          debugger;
+          const liveTx = convertSolanaToLiveTX(request.params, accounts.data);
+          // Transactionrequest.params
+          // const pubkey = String(request.params.signatures[0].publicKey); // IF RAW
+          // const pubkey = String(
+          //   request.params.instructions[0].keys[0].pubkey,
+          // );
+          const pubkey = String(request.params.feePayer)
+          if (!pubkey) {
+            throw new Error("no pubkey")
+          }
           // TODO: check if issigner ?
           const accountTx = getAccountWithAddressAndChainId(
             accounts.data,
             pubkey,
             chainId,
           );
+              debugger;
           if (accountTx) {
             try {
+              debugger;
             const hash = await client.transaction.signAndBroadcast(
               accountTx.id,
               liveTx,
             );
+            console.log({hash})
+              debugger;
             void acceptRequest(web3wallet, topic, id, hash);
             }catch(error) {
               void rejectRequest(web3wallet, topic, id,  Errors.txDeclined);

@@ -15,7 +15,9 @@
     "test:e2e-ui": "playwright test --ui"
   },
   "dependencies": {
+    "@ledgerhq/coin-framework": "^0.13.0",
     "@ledgerhq/coin-solana": "0.7.0-nightly.10",
+    "@ledgerhq/cryptoassets": "^13.0.0",
     "@ledgerhq/hw-transport": "^6.30.4",
     "@ledgerhq/react-ui": "^0.14.15",
     "@ledgerhq/wallet-api-client": "^1.5.4",
@@ -24,6 +26,7 @@
     "@segment/snippet": "^5.2.1",
     "@sentry/react": "^7.100.1",
     "@solana/codecs-strings": "2.0.0-experimental.5e8ac8d",
+    "@solana/spl-token": "^0.4.6",
     "@solana/web3.js": "1.77.3",
     "@tanstack/react-query": "^5.20.2",
     "@tanstack/react-query-devtools": "^5.20.2",
@@ -33,6 +36,7 @@
     "@walletconnect/utils": "^2.11.1",
     "@walletconnect/web3wallet": "^1.10.1",
     "bignumber.js": "^9.0.2",
+    "bs58": "^5.0.0",
     "buffer": "^6.0.3",
     "eip55": "^2.1.0",
     "i18next": "^23.8.2",
@@ -45,6 +49,7 @@
     "react-qr-reader": "2.2.1",
     "react-transition-group": "^4.4.2",
     "styled-components": "^5.3.11",
+    "vite-plugin-node-polyfills": "^0.22.0",
     "zustand": "^4.3.3"
   },
   "devDependencies": {
