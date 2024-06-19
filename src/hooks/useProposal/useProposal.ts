@@ -6,6 +6,7 @@ import {
   BIP122_CHAINS,
   EIP155_CHAINS,
   MULTIVERS_X_CHAINS,
+  RIPPLE_CHAINS,
   SupportedNamespace,
 } from "@/data/network.config";
 import {
@@ -224,6 +225,56 @@ export function useProposal(proposal: ProposalTypes.Struct) {
     [accounts.data, proposal, selectedAccounts],
   );
 
+
+  const buildXrpNamespace = useCallback(
+    (requiredNamespaces: ProposalTypes.RequiredNamespaces,
+      optionalNamespaces: ProposalTypes.OptionalNamespaces) => {
+      const accountsByChain = formatAccountsByChain(
+        proposal,
+        accounts.data,
+      ).filter(
+        (a) =>
+          a.accounts.length > 0 &&
+          a.isSupported &&
+          Object.keys(RIPPLE_CHAINS).includes(a.chain),
+      );
+      const dataToSend = accountsByChain.reduce<
+        { account: string; chain: string }[]
+      >(
+        (accum, elem) =>
+          accum.concat(
+            elem.accounts
+              .filter((acc) => selectedAccounts.includes(acc.id))
+              .map((a) => ({
+                account: `${getNamespace(a.currency)}:${a.address}`,
+                chain: getNamespace(a.currency),
+              })),
+          ),
+        [],
+      );
+      const namespace = requiredNamespaces[SupportedNamespace.XRPL] || optionalNamespaces[SupportedNamespace.XRPL];
+
+      const methods: string[] = namespace.methods;
+
+      const events = [
+        ...new Set([
+          ...namespace.events,
+          "session_proposal",
+          "session_request",
+          "auth_request",
+          "session_delete",
+        ]),
+      ];
+
+      return {
+        chains: [...new Set(dataToSend.map((e) => e.chain))],
+        methods,
+        events,
+        accounts: dataToSend.map((e) => e.account),
+      };
+    }
+    , [accounts.data, proposal, selectedAccounts])
+
   const buildSupportedNamespaces = useCallback(
     (proposal: ProposalTypes.Struct) => {
       const { requiredNamespaces, optionalNamespaces } = proposal;
@@ -249,9 +300,13 @@ export function useProposal(proposal: ProposalTypes.Struct) {
           optionalNamespaces,
         );
       }
+      if ("xrpl" in requiredNamespaces || "xrpl" in optionalNamespaces) {
+        supportedNamespaces[SupportedNamespace.XRPL] =
+        buildXrpNamespace(requiredNamespaces, optionalNamespaces);
+      }
       return supportedNamespaces;
     },
-    [buildBip122Namespace, buildEip155Namespace, buildMvxNamespace],
+    [buildBip122Namespace, buildEip155Namespace, buildMvxNamespace, buildXrpNamespace],
   );
 
   const sessionsQueryFn = useSessionsQueryFn(web3wallet);

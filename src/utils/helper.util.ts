@@ -1,6 +1,7 @@
 import { BIP122_REQUESTS } from "@/data/methods/BIP122.methods";
 import { EIP155_REQUESTS } from "@/data/methods/EIP155Data.methods";
 import { MULTIVERSX_REQUESTS } from "@/data/methods/MultiversX.methods";
+import { RIPPLE_REQUESTS } from "@/data/methods/Ripple.methods";
 import { SUPPORTED_NETWORK } from "@/data/network.config";
 
 /**
@@ -51,6 +52,14 @@ export function isBIP122Chain(
   _request?: { method: string; params: any },
 ): _request is BIP122_REQUESTS {
   return chain.includes("bip122");
+}
+
+export function isRippleChain(
+  chain: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  _request?: { method: string; params: any }
+): _request is RIPPLE_REQUESTS {
+  return chain.includes("xrpl:0");
 }
 
 /**

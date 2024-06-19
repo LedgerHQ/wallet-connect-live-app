@@ -3,21 +3,17 @@ import { useCallback, useEffect } from "react";
 import { Web3WalletTypes } from "@walletconnect/web3wallet";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
 import { stripHexPrefix } from "@/utils/currencyFormatter/helpers";
-import { convertEthToLiveTX, convertMvxToLiveTX } from "@/utils/converters";
+import { convertEthToLiveTX, convertMvxToLiveTX, convertXrpToLiveTX } from "@/utils/converters";
 import {
   EIP155_REQUESTS,
   EIP155_SIGNING_METHODS,
 } from "@/data/methods/EIP155Data.methods";
 import {
-  isBIP122Chain,
-  isEIP155Chain,
-  isMultiversXChain,
-} from "@/utils/helper.util";
-import {
   coreAtom,
   connectionStatusAtom,
   web3walletAtom,
 } from "@/store/web3wallet.store";
+import { isEIP155Chain, isMultiversXChain, isBIP122Chain, isRippleChain } from "@/utils/helper.util";
 import { useNavigate } from "@tanstack/react-router";
 import { useAtom, useAtomValue } from "jotai";
 import { Web3Wallet } from "@walletconnect/web3wallet/dist/types/client";
@@ -37,6 +33,7 @@ import {
   BIP122_REQUESTS,
   BIP122_SIGNING_METHODS,
 } from "@/data/methods/BIP122.methods";
+import { RIPPLE_REQUESTS, RIPPLE_SIGNING_METHODS } from "@/data/methods/Ripple.methods";
 
 enum Errors {
   userDecline = "User rejected",
@@ -287,6 +284,47 @@ export default function useWalletConnect() {
     [accounts.data, client, web3wallet],
   );
 
+
+  const handleXrpRequest = useCallback(
+    async (
+      request: RIPPLE_REQUESTS,
+      topic: string,
+      id: number,
+      _chainId: string,
+    ) => {
+      const ledgerLiveCurrency = "ripple";
+      
+      switch (request.method) {
+        case RIPPLE_SIGNING_METHODS.RIPPLE_SIGN_TRANSACTION: {
+          const accountTX = getAccountWithAddressAndChainId(
+            accounts.data,
+            request.params.tx_json.Account,
+            ledgerLiveCurrency,
+          );
+
+          if (accountTX) {
+            try {
+              const liveTx = convertXrpToLiveTX(request.params.tx_json);
+              const hash = await client.transaction.signAndBroadcast(
+                accountTX.id,
+                liveTx,
+              );
+              void acceptRequest(web3wallet, topic, id, hash);
+            } catch (error) {
+              void rejectRequest(web3wallet, topic, id, Errors.txDeclined);
+              console.error(error);
+            }
+          } else {
+            void rejectRequest(web3wallet, topic, id, Errors.txDeclined);
+          }
+          break;
+        }
+        default:
+          return;
+      }}
+      , [accounts.data, client, web3wallet]);
+
+
   const handleMvxRequest = useCallback(
     async (
       request: MULTIVERSX_REQUESTS,
@@ -438,11 +476,13 @@ export default function useWalletConnect() {
         void handleMvxRequest(request, topic, id, chainId);
       } else if (isBIP122Chain(chainId, request)) {
         void handleBIP122Request(request, topic, id, chainId);
+      } else if(isRippleChain(chainId, request)) {
+        void handleXrpRequest(request, topic, id, chainId);
       } else {
         console.error("Not Supported Chain");
       }
     },
-    [handleBIP122Request, handleEIP155Request, handleMvxRequest],
+    [handleBIP122Request, handleEIP155Request, handleMvxRequest, handleXrpRequest],
   );
 
   const onSessionDeleted = useCallback(() => {
@@ -480,4 +520,4 @@ export default function useWalletConnect() {
     onSessionDeleted,
     onProposalExpire,
   ]);
-}
+  };
