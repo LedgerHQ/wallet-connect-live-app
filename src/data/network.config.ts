@@ -148,14 +148,14 @@ export const BIP122_CHAINS = {
 };
 
 export const RIPPLE_CHAINS: Record<string, Network> = {
-  "ripple": {
+  ripple: {
     chainId: "0",
     namespace: "xrpl:0",
     ticker: "XRP",
     displayName: "Ripple",
     color: "#23F7DD",
-  }
-}
+  },
+};
 
 export const EIP155_CHAINS = {
   ...EIP155_CHAINS_MAINNET,
@@ -167,7 +167,7 @@ export const SUPPORTED_NETWORK: Record<string, Network> = {
   ...EIP155_CHAINS,
   ...MULTIVERS_X_CHAINS,
   ...BIP122_CHAINS,
-  ...RIPPLE_CHAINS
+  ...RIPPLE_CHAINS,
 };
 
 export const SUPPORTED_NETWORK_NAMES: string[] = Object.values(
@@ -178,5 +178,5 @@ export enum SupportedNamespace {
   BIP122 = "bip122",
   EIP155 = "eip155",
   MVX = "mvx",
-  XRPL = "xrpl"
+  XRPL = "xrpl",
 }

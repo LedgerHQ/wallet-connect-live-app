@@ -64,6 +64,10 @@ const getAccountsFromAddresses = (addresses: string[], accounts: Account[]) => {
       chainInLedgerLive = "elrond";
     }
 
+    if (chain.startsWith("xrpl")) {
+      chainInLedgerLive = "ripple";
+    }
+
     const existingEntry = accountsByChain.get(chainInLedgerLive);
 
     const account = accounts.find(
