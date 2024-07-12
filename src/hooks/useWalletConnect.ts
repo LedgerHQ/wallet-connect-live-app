@@ -177,7 +177,7 @@ export default function useWalletConnect() {
           );
           if (accountSign) {
             try {
-              let strippedMessage: string = stripHexPrefix(
+              const strippedMessage: string = stripHexPrefix(
                 isPersonalSign ? request.params[0] : request.params[1],
               );
 
@@ -186,7 +186,7 @@ export default function useWalletConnect() {
                 message = Buffer.from(request.params[0])
               else 
                 message = Buffer.from(strippedMessage, "hex");
-              
+
               const signedMessage = await client.message.sign(
                 accountSign.id,
                 message,
