@@ -2,7 +2,7 @@ import { SignClientTypes } from "@walletconnect/types";
 import { useCallback, useEffect } from "react";
 import { Web3WalletTypes } from "@walletconnect/web3wallet";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
-import { stripHexPrefix } from "@/utils/currencyFormatter/helpers";
+import { isValidUTF8, stripHexPrefix } from "@/utils/currencyFormatter/helpers";
 import { convertEthToLiveTX, convertMvxToLiveTX, convertXrpToLiveTX } from "@/utils/converters";
 import {
   EIP155_REQUESTS,
@@ -177,13 +177,19 @@ export default function useWalletConnect() {
           );
           if (accountSign) {
             try {
-              const message = stripHexPrefix(
+              let strippedMessage: string = stripHexPrefix(
                 isPersonalSign ? request.params[0] : request.params[1],
               );
 
+              let message: Buffer;
+              if ((isPersonalSign && strippedMessage === request.params[0]) || !isValidUTF8(strippedMessage))
+                message = Buffer.from(request.params[0])
+              else 
+                message = Buffer.from(strippedMessage, "hex");
+              
               const signedMessage = await client.message.sign(
                 accountSign.id,
-                Buffer.from(message, "hex"),
+                message,
               );
               void acceptRequest(
                 web3wallet,

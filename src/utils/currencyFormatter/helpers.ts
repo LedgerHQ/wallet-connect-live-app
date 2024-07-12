@@ -33,9 +33,24 @@ export const isHexPrefixed = (str: string): boolean => {
 };
 
 // Copied from https://www.npmjs.com/package/ethereumjs-util
+// add /^[0-9a-fA-F]+$/.test(stripHexPrefix(str)); to check if the string is a valid hex string
 export const stripHexPrefix = (str: string): string => {
   if (typeof str !== "string")
     throw new Error(`[stripHexPrefix] input must be type 'string', received ${typeof str}`);
 
-  return isHexPrefixed(str) ? str.slice(2) : str;
+  return isHexPrefixed(str) && /^[0-9a-fA-F]+$/.test( str.slice(2)) ? str.slice(2) : str;
 };
+
+
+export function isValidUTF8(hexString: string) {
+  try {
+    const bytes = hexString.match(/.{1,2}/g)?.map(byte => parseInt(byte, 16));
+    if (!bytes) throw new Error('Invalid hex string');
+
+    const decoder = new TextDecoder('utf-8', { fatal: true });
+    decoder.decode(new Uint8Array(bytes)); 
+    return true;
+  } catch {
+    return false;
+  }
+}
