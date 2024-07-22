@@ -19,6 +19,7 @@
     "@ledgerhq/react-ui": "^0.14.15",
     "@ledgerhq/wallet-api-client": "^1.5.4",
     "@ledgerhq/wallet-api-simulator": "^1.1.9",
+    "@metamask/utils": "github:metamask/utils",
     "@segment/analytics-next": "^1.64.0",
     "@segment/snippet": "^5.2.1",
     "@sentry/react": "^7.100.1",

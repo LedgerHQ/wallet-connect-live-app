@@ -3,6 +3,7 @@ import { EIP155_REQUESTS } from "@/data/methods/EIP155Data.methods";
 import { MULTIVERSX_REQUESTS } from "@/data/methods/MultiversX.methods";
 import { RIPPLE_REQUESTS } from "@/data/methods/Ripple.methods";
 import { SUPPORTED_NETWORK } from "@/data/network.config";
+import { add0x, bytesToHex, remove0x } from '@metamask/utils';
 
 /**
  * Truncates string (in the middle) via given lenght value
@@ -87,3 +88,31 @@ export const getErrorMessage = (error: unknown) => {
   if (error instanceof Error) return error.message;
   return String(error);
 };
+
+const hexRe = /^[0-9A-Fa-f]+$/gu;
+export function normalizeMessageData(data: string) {
+  try {
+    const stripped = remove0x(data);
+    if (stripped !== data && isValidUTF8(stripped) && stripped.match(hexRe) ) {
+      return Buffer.from(stripped, 'hex')
+    }
+  } catch (e) {
+    // do nothing
+  }
+  return Buffer.from(data)
+
+}
+
+export function isValidUTF8(message: string) {
+  try {
+    const stripped = remove0x(message);
+    const bytes = stripped.match(/.{1,2}/g)?.map(byte => parseInt(byte, 16));
+    if (!bytes) throw new Error('Invalid hex string');
+
+    const decoder = new TextDecoder('utf-8', { fatal: true });
+    decoder.decode(new Uint8Array(bytes)); 
+    return true;
+  } catch {
+    return false;
+  }
+}

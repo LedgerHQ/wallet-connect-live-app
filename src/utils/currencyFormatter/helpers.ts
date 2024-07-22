@@ -40,17 +40,3 @@ export const stripHexPrefix = (str: string): string => {
 
   return isHexPrefixed(str) && /^[0-9a-fA-F]+$/.test( str.slice(2)) ? str.slice(2) : str;
 };
-
-
-export function isValidUTF8(hexString: string) {
-  try {
-    const bytes = hexString.match(/.{1,2}/g)?.map(byte => parseInt(byte, 16));
-    if (!bytes) throw new Error('Invalid hex string');
-
-    const decoder = new TextDecoder('utf-8', { fatal: true });
-    decoder.decode(new Uint8Array(bytes)); 
-    return true;
-  } catch {
-    return false;
-  }
-}

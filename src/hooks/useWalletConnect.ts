@@ -2,7 +2,7 @@ import { SignClientTypes } from "@walletconnect/types";
 import { useCallback, useEffect } from "react";
 import { Web3WalletTypes } from "@walletconnect/web3wallet";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
-import { isValidUTF8, stripHexPrefix } from "@/utils/currencyFormatter/helpers";
+import { stripHexPrefix } from "@/utils/currencyFormatter/helpers";
 import { convertEthToLiveTX, convertMvxToLiveTX, convertXrpToLiveTX } from "@/utils/converters";
 import {
   EIP155_REQUESTS,
@@ -13,7 +13,7 @@ import {
   connectionStatusAtom,
   web3walletAtom,
 } from "@/store/web3wallet.store";
-import { isEIP155Chain, isMultiversXChain, isBIP122Chain, isRippleChain } from "@/utils/helper.util";
+import { isEIP155Chain, isMultiversXChain, isBIP122Chain, isRippleChain, normalizeMessageData } from "@/utils/helper.util";
 import { useNavigate } from "@tanstack/react-router";
 import { useAtom, useAtomValue } from "jotai";
 import { Web3Wallet } from "@walletconnect/web3wallet/dist/types/client";
@@ -177,19 +177,12 @@ export default function useWalletConnect() {
           );
           if (accountSign) {
             try {
-              const strippedMessage: string = stripHexPrefix(
-                isPersonalSign ? request.params[0] : request.params[1],
-              );
-
-              let message: Buffer;
-              if ((isPersonalSign && strippedMessage === request.params[0]) || !isValidUTF8(strippedMessage))
-                message = Buffer.from(request.params[0])
-              else 
-                message = Buffer.from(strippedMessage, "hex");
+              const messageRequest = isPersonalSign ? request.params[0] : request.params[1]
+              const messageNormalized = normalizeMessageData(messageRequest);
 
               const signedMessage = await client.message.sign(
                 accountSign.id,
-                message,
+                messageNormalized,
               );
               void acceptRequest(
                 web3wallet,
@@ -216,11 +209,11 @@ export default function useWalletConnect() {
           );
           if (accountSignTyped) {
             try {
-              const message = stripHexPrefix(request.params[1]);
+              const messageNormalized = normalizeMessageData(request.params[1]);
 
               const signedMessage = await client.message.sign(
                 accountSignTyped.id,
-                Buffer.from(message),
+                messageNormalized,
               );
               void acceptRequest(
                 web3wallet,
