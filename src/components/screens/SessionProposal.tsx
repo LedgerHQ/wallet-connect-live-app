@@ -6,12 +6,7 @@ import { formatUrl } from "@/utils/helper.util";
 import { useProposal } from "@/hooks/useProposal/useProposal";
 import { ResponsiveContainer } from "@/styles/styles";
 import { Flex, Button, Box, Text } from "@ledgerhq/react-ui";
-import {
-  ArrowLeftMedium,
-  CircledCrossSolidMedium,
-  InfoAltFillMedium,
-  WarningSolidMedium,
-} from "@ledgerhq/react-ui/assets/icons";
+import { ArrowLeftMedium } from "@ledgerhq/react-ui/assets/icons";
 import { useTranslation } from "react-i18next";
 import { useCallback, useEffect, useMemo } from "react";
 import styled, { useTheme } from "styled-components";
@@ -25,6 +20,8 @@ import LogoHeader from "./sessionProposal/LogoHeader";
 import { ChainRow } from "./sessionProposal/ChainRow";
 import { walletCurrenciesByIdAtom } from "@/store/wallet-api.store";
 import { useAtomValue } from "jotai";
+import VerificationLabel from "../verification/VerificationLabel";
+import VerificationCard from "../verification/VerificationCard";
 
 const BackButton = styled(Flex)`
   cursor: pointer;
@@ -154,101 +151,6 @@ export default function SessionProposal({ proposal }: Props) {
       .filter((entry) => entry.accounts.length > 0);
   }, [accountsByChain]);
 
-  const labelVerified = useMemo(() => {
-    const sharedStyle = {
-      borderRadius: 2,
-      display: "flex",
-      alignItems: "center",
-      columnGap: 3,
-      marginTop: 5,
-      paddingY: 2,
-      paddingX: 4,
-    };
-    switch (getValidation()) {
-      case "VALID":
-        return null;
-      case "INVALID":
-        return (
-          <Box backgroundColor={colors.error.c90} {...sharedStyle}>
-            <WarningSolidMedium size={20} color={"red"} />
-            <Text color={"red"}>{"Domain mismatch"}</Text>
-          </Box>
-        );
-      case "SCAM":
-        return (
-          <Box backgroundColor={colors.error.c90} {...sharedStyle}>
-            <CircledCrossSolidMedium size={20} color={"red"} />
-            <Text color={"red"}>{"Security risk"}</Text>
-          </Box>
-        );
-      default:
-        return (
-          <Box backgroundColor={colors.warning.c90} {...sharedStyle}>
-            <InfoAltFillMedium size={20} color={"orange"} />
-            <Text color={"orange"}>{"Cannot verify"}</Text>
-          </Box>
-        );
-    }
-  }, []);
-
-  const infoValidation = useMemo(() => {
-    const sharedStyle = {
-      borderRadius: 2,
-      display: "flex",
-      alignItems: "center",
-      columnGap: 3,
-      paddingY: 4,
-      paddingX: 4,
-    };
-
-    switch (getValidation()) {
-      case "VALID":
-        return null;
-      case "INVALID":
-        return (
-          <Box backgroundColor={colors.error.c90} {...sharedStyle}>
-            <WarningSolidMedium size={30} color={"red"} />
-            <Box display={"flex"} flexDirection={"column"} rowGap={2}>
-              <Text fontWeight="bold" color={"red"}>
-                {t("sessionProposal.validation.invalid.title")}
-              </Text>
-              <Text color={"red"}>
-                {t("sessionProposal.validation.invalid.description")}
-              </Text>
-            </Box>
-          </Box>
-        );
-      case "SCAM":
-        return (
-          <Box backgroundColor={colors.error.c90} {...sharedStyle}>
-            <CircledCrossSolidMedium size={30} color={"red"} />
-            <Box display={"flex"} flexDirection={"column"} rowGap={2}>
-              <Text fontWeight="bold" color={"red"}>
-                {t("sessionProposal.validation.scam.title")}
-              </Text>
-              <Text color={"red"}>
-                {t("sessionProposal.validation.scam.description")}
-              </Text>
-            </Box>
-          </Box>
-        );
-      default:
-        return (
-          <Box backgroundColor={colors.warning.c90} {...sharedStyle}>
-            <InfoAltFillMedium size={30} color={"orange"} />
-            <Box display={"flex"} flexDirection={"column"} rowGap={2}>
-              <Text fontWeight="bold" color={"orange"}>
-                {t("sessionProposal.validation.unknown.title")}
-              </Text>
-              <Text color={"orange"}>
-                {t("sessionProposal.validation.unknown.description")}
-              </Text>
-            </Box>
-          </Box>
-        );
-    }
-  }, []);
-
   return (
     <Flex
       flex={1}
@@ -329,7 +231,7 @@ export default function SessionProposal({ proposal }: Props) {
                   {formatUrl(dAppUrl)}
                 </Text>
 
-                {labelVerified}
+                {<VerificationLabel verification={getValidation()} />}
 
                 {requiredChains.length === 0 && (
                   <Text
@@ -382,7 +284,8 @@ export default function SessionProposal({ proposal }: Props) {
             </Flex>
 
             <Flex flexDirection={"column"}>
-              {infoValidation}
+              {<VerificationCard verification={getValidation()} />}
+
               <Flex
                 style={{
                   backdropFilter: "blur(7px)",

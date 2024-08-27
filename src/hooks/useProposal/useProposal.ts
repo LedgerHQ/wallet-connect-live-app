@@ -25,9 +25,10 @@ import {
   useQueryFn as useSessionsQueryFn,
 } from "../useSessions";
 import { queryKey as pendingProposalsQueryKey } from "../usePendingProposals";
-import { ProposalTypes, Verify } from "@walletconnect/types";
+import { ProposalTypes } from "@walletconnect/types";
 import { enqueueSnackbar } from "notistack";
 import { sortedRecentConnectionAppsAtom } from "../../store/recentConnectionAppsAtom";
+import { ValidationStatus } from "@/types/types";
 
 export function useProposal(proposal: ProposalTypes.Struct) {
   const navigate = useNavigate();
@@ -322,13 +323,11 @@ export function useProposal(proposal: ProposalTypes.Struct) {
 
   const sessionsQueryFn = useSessionsQueryFn(web3wallet);
 
-  type Validation = "UNKNOWN" | "VALID" | "INVALID" | "SCAM";
-
-  const getValidation = useCallback((): Validation => {
+  const getValidation = useCallback((): ValidationStatus => {
     return (web3wallet.core.pairing
       .getPairings()
       .find((pairing) => pairing.topic === proposal.pairingTopic)?.peerMetadata
-      ?.verifyUrl || "UNKNOWN") as Validation;
+      ?.verifyUrl || "UNKNOWN") as ValidationStatus;
   }, []);
 
   const approveSession = useCallback(async () => {
