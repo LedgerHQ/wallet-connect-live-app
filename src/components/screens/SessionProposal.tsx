@@ -36,6 +36,7 @@ export default function SessionProposal({ proposal }: Props) {
   const { colors } = useTheme();
   const { t } = useTranslation();
   const {
+    getValidation,
     handleClick,
     handleClose,
     approveSession,
@@ -49,6 +50,8 @@ export default function SessionProposal({ proposal }: Props) {
   const dApp = proposal.proposer.metadata.name;
   const dAppUrl = proposal.proposer.metadata.url;
   const currenciesById = useAtomValue(walletCurrenciesByIdAtom);
+
+  console.log(getValidation());
 
   useEffect(() => {
     analytics.page("Wallet Connect Session Request", {
