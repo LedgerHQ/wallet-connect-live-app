@@ -148,17 +148,13 @@ export default function useWalletConnect() {
 
   const onSessionProposal = useCallback(
     (proposal: Web3WalletTypes.SessionProposal) => {
-      if (proposal.verifyContext.verified.isScam) {
-        console.log("This app is a scam");
-        // REJECT with ui
-        // make sur the proposal is not created or have to be deleted
-      }
-
       web3wallet.core.pairing.updateMetadata({
         topic: proposal.params.pairingTopic,
         metadata: {
           ...proposal.params.proposer.metadata,
-          verifyUrl: proposal.verifyContext.verified.validation,
+          verifyUrl: proposal.verifyContext.verified.isScam
+            ? "SCAM"
+            : proposal.verifyContext.verified.validation,
         },
       });
 

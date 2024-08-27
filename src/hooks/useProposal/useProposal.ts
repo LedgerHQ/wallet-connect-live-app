@@ -322,16 +322,14 @@ export function useProposal(proposal: ProposalTypes.Struct) {
 
   const sessionsQueryFn = useSessionsQueryFn(web3wallet);
 
-  const getValidation =
-    useCallback((): Verify.Context["verified"]["validation"] => {
-      return (
-        (web3wallet.core.pairing
-          .getPairings()
-          .find((pairing) => pairing.topic === proposal.pairingTopic)
-          ?.peerMetadata?.verifyUrl as "UNKNOWN" | "VALID" | "INVALID") ||
-        "UNKNOWN"
-      );
-    }, []);
+  type Validation = "UNKNOWN" | "VALID" | "INVALID" | "SCAM";
+
+  const getValidation = useCallback((): Validation => {
+    return (web3wallet.core.pairing
+      .getPairings()
+      .find((pairing) => pairing.topic === proposal.pairingTopic)?.peerMetadata
+      ?.verifyUrl || "UNKNOWN") as Validation;
+  }, []);
 
   const approveSession = useCallback(async () => {
     try {

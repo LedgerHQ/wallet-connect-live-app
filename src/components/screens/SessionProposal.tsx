@@ -6,7 +6,12 @@ import { formatUrl } from "@/utils/helper.util";
 import { useProposal } from "@/hooks/useProposal/useProposal";
 import { ResponsiveContainer } from "@/styles/styles";
 import { Flex, Button, Box, Text } from "@ledgerhq/react-ui";
-import { ArrowLeftMedium } from "@ledgerhq/react-ui/assets/icons";
+import {
+  ArrowLeftMedium,
+  CircledCrossSolidMedium,
+  InfoAltFillMedium,
+  WarningSolidMedium,
+} from "@ledgerhq/react-ui/assets/icons";
 import { useTranslation } from "react-i18next";
 import { useCallback, useEffect, useMemo } from "react";
 import styled, { useTheme } from "styled-components";
@@ -50,8 +55,6 @@ export default function SessionProposal({ proposal }: Props) {
   const dApp = proposal.proposer.metadata.name;
   const dAppUrl = proposal.proposer.metadata.url;
   const currenciesById = useAtomValue(walletCurrenciesByIdAtom);
-
-  console.log(getValidation());
 
   useEffect(() => {
     analytics.page("Wallet Connect Session Request", {
@@ -151,6 +154,101 @@ export default function SessionProposal({ proposal }: Props) {
       .filter((entry) => entry.accounts.length > 0);
   }, [accountsByChain]);
 
+  const labelVerified = useMemo(() => {
+    const sharedStyle = {
+      borderRadius: 2,
+      display: "flex",
+      alignItems: "center",
+      columnGap: 3,
+      marginTop: 5,
+      paddingY: 2,
+      paddingX: 4,
+    };
+    switch (getValidation()) {
+      case "VALID":
+        return null;
+      case "INVALID":
+        return (
+          <Box backgroundColor={colors.error.c90} {...sharedStyle}>
+            <WarningSolidMedium size={20} color={"red"} />
+            <Text color={"red"}>{"Domain mismatch"}</Text>
+          </Box>
+        );
+      case "SCAM":
+        return (
+          <Box backgroundColor={colors.error.c90} {...sharedStyle}>
+            <CircledCrossSolidMedium size={20} color={"red"} />
+            <Text color={"red"}>{"Security risk"}</Text>
+          </Box>
+        );
+      default:
+        return (
+          <Box backgroundColor={colors.warning.c90} {...sharedStyle}>
+            <InfoAltFillMedium size={20} color={"orange"} />
+            <Text color={"orange"}>{"Cannot verify"}</Text>
+          </Box>
+        );
+    }
+  }, []);
+
+  const infoValidation = useMemo(() => {
+    const sharedStyle = {
+      borderRadius: 2,
+      display: "flex",
+      alignItems: "center",
+      columnGap: 3,
+      paddingY: 4,
+      paddingX: 4,
+    };
+
+    switch (getValidation()) {
+      case "VALID":
+        return null;
+      case "INVALID":
+        return (
+          <Box backgroundColor={colors.error.c90} {...sharedStyle}>
+            <WarningSolidMedium size={30} color={"red"} />
+            <Box display={"flex"} flexDirection={"column"} rowGap={2}>
+              <Text fontWeight="bold" color={"red"}>
+                {t("sessionProposal.validation.invalid.title")}
+              </Text>
+              <Text color={"red"}>
+                {t("sessionProposal.validation.invalid.description")}
+              </Text>
+            </Box>
+          </Box>
+        );
+      case "SCAM":
+        return (
+          <Box backgroundColor={colors.error.c90} {...sharedStyle}>
+            <CircledCrossSolidMedium size={30} color={"red"} />
+            <Box display={"flex"} flexDirection={"column"} rowGap={2}>
+              <Text fontWeight="bold" color={"red"}>
+                {t("sessionProposal.validation.scam.title")}
+              </Text>
+              <Text color={"red"}>
+                {t("sessionProposal.validation.scam.description")}
+              </Text>
+            </Box>
+          </Box>
+        );
+      default:
+        return (
+          <Box backgroundColor={colors.warning.c90} {...sharedStyle}>
+            <InfoAltFillMedium size={30} color={"orange"} />
+            <Box display={"flex"} flexDirection={"column"} rowGap={2}>
+              <Text fontWeight="bold" color={"orange"}>
+                {t("sessionProposal.validation.unknown.title")}
+              </Text>
+              <Text color={"orange"}>
+                {t("sessionProposal.validation.unknown.description")}
+              </Text>
+            </Box>
+          </Box>
+        );
+    }
+  }, []);
+
   return (
     <Flex
       flex={1}
@@ -231,6 +329,8 @@ export default function SessionProposal({ proposal }: Props) {
                   {formatUrl(dAppUrl)}
                 </Text>
 
+                {labelVerified}
+
                 {requiredChains.length === 0 && (
                   <Text
                     mt={6}
@@ -281,39 +381,42 @@ export default function SessionProposal({ proposal }: Props) {
               </ListChains>
             </Flex>
 
-            <Flex
-              style={{
-                backdropFilter: "blur(7px)",
-                position: "sticky",
-                bottom: "0px",
-              }}
-            >
-              <ButtonsContainer>
-                <Button size="large" flex={0.3} mr={6} onClick={onReject}>
-                  <Text
-                    variant="body"
-                    fontWeight="semiBold"
-                    color="neutral.c100"
+            <Flex flexDirection={"column"}>
+              {infoValidation}
+              <Flex
+                style={{
+                  backdropFilter: "blur(7px)",
+                  position: "sticky",
+                  bottom: "0px",
+                }}
+              >
+                <ButtonsContainer>
+                  <Button size="large" flex={0.3} mr={6} onClick={onReject}>
+                    <Text
+                      variant="body"
+                      fontWeight="semiBold"
+                      color="neutral.c100"
+                    >
+                      {t("sessionProposal.reject")}
+                    </Text>
+                  </Button>
+                  <Button
+                    variant="main"
+                    size="large"
+                    flex={0.9}
+                    onClick={onApprove}
+                    disabled={disabled}
                   >
-                    {t("sessionProposal.reject")}
-                  </Text>
-                </Button>
-                <Button
-                  variant="main"
-                  size="large"
-                  flex={0.9}
-                  onClick={onApprove}
-                  disabled={disabled}
-                >
-                  <Text
-                    variant="body"
-                    fontWeight="semiBold"
-                    color={disabled ? "neutral.c50" : "neutral.c00"}
-                  >
-                    {t("sessionProposal.connect")}
-                  </Text>
-                </Button>
-              </ButtonsContainer>
+                    <Text
+                      variant="body"
+                      fontWeight="semiBold"
+                      color={disabled ? "neutral.c50" : "neutral.c00"}
+                    >
+                      {t("sessionProposal.connect")}
+                    </Text>
+                  </Button>
+                </ButtonsContainer>
+              </Flex>
             </Flex>
           </Flex>
         )}
