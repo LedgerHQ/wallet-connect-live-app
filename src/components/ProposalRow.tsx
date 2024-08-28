@@ -45,8 +45,8 @@ const ProposalRow = ({ proposal }: { proposal: ProposalTypes.Struct }) => {
             icon={proposal.proposer.metadata.icons[0] ?? null}
           />
         }
-        rightElement={
-          <VerificationLabel type="minimal" verification={verificationStatus} />
+        RightIcon={
+          <VerificationLabel type="icon" verification={verificationStatus} />
         }
         rowType={RowType.Detail}
         onClick={() => goToSessionProposal(proposal.id)}

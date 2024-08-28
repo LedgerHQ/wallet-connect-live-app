@@ -1,6 +1,8 @@
 import { ValidationStatus } from "@/types/types";
 import { Box, Text } from "@ledgerhq/react-ui";
 import {
+  CircledCheckMedium,
+  CircledCheckSolidMedium,
   CircledCrossSolidMedium,
   InfoAltFillMedium,
   WarningSolidMedium,
@@ -11,7 +13,7 @@ import { width } from "styled-system";
 
 type Props = {
   verification: ValidationStatus;
-  type?: "minimal" | "full";
+  type?: "icon" | "full";
   [key: string]: any;
 };
 
@@ -36,39 +38,45 @@ const VerificationLabel = ({
 
   switch (verification) {
     case "VALID":
-      return null;
+      return type === "full" ? (
+        <></>
+      ) : (
+        <CircledCheckSolidMedium size={12} color={"green"} />
+      );
     case "INVALID":
-      return (
+      return type === "full" ? (
         <Box backgroundColor={colors.error.c90} {...sharedStyle}>
           <WarningSolidMedium size={20} color={"red"} />
-          {type === "full" && (
-            <Text color={"red"}>
-              {t("sessionProposal.validation.invalid.label")}
-            </Text>
-          )}
+
+          <Text color={"red"}>
+            {t("sessionProposal.validation.invalid.label")}
+          </Text>
         </Box>
+      ) : (
+        <WarningSolidMedium size={12} color={"red"} />
       );
     case "SCAM":
-      return (
+      return type === "full" ? (
         <Box backgroundColor={colors.error.c90} {...sharedStyle}>
           <CircledCrossSolidMedium size={20} color={"red"} />
-          {type === "full" && (
-            <Text color={"red"}>
-              {t("sessionProposal.validation.scam.label")}
-            </Text>
-          )}
+          <Text color={"red"}>
+            {t("sessionProposal.validation.scam.label")}
+          </Text>
         </Box>
+      ) : (
+        <CircledCrossSolidMedium size={12} color={"red"} />
       );
     default:
-      return (
+      return type === "full" ? (
         <Box backgroundColor={colors.warning.c90} {...sharedStyle}>
           <InfoAltFillMedium size={20} color={"orange"} />
-          {type === "full" && (
-            <Text color={"orange"}>
-              {t("sessionProposal.validation.unknown.label")}
-            </Text>
-          )}
+
+          <Text color={"orange"}>
+            {t("sessionProposal.validation.unknown.label")}
+          </Text>
         </Box>
+      ) : (
+        <InfoAltFillMedium size={12} color={"orange"} />
       );
   }
 };
