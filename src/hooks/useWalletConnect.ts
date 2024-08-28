@@ -147,8 +147,8 @@ export default function useWalletConnect() {
   const pendingProposalsQueryFn = usePendingProposalsQueryFn(web3wallet);
 
   const onSessionProposal = useCallback(
-    (proposal: Web3WalletTypes.SessionProposal) => {
-      web3wallet.core.pairing.updateMetadata({
+    async (proposal: Web3WalletTypes.SessionProposal) => {
+      await web3wallet.core.pairing.updateMetadata({
         topic: proposal.params.pairingTopic,
         metadata: {
           ...proposal.params.proposer.metadata,
@@ -177,7 +177,7 @@ export default function useWalletConnect() {
           });
         });
     },
-    [navigate, pendingProposalsQueryFn, queryClient],
+    [navigate, pendingProposalsQueryFn, queryClient, web3wallet.core.pairing],
   );
 
   const handleEIP155Request = useCallback(
