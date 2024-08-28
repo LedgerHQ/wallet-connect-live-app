@@ -324,10 +324,12 @@ export function useProposal(proposal: ProposalTypes.Struct) {
   const sessionsQueryFn = useSessionsQueryFn(web3wallet);
 
   const getValidation = useCallback((): ValidationStatus => {
-    return (web3wallet.core.pairing
-      .getPairings()
-      .find((pairing) => pairing.topic === proposal.pairingTopic)?.peerMetadata
-      ?.verifyUrl || "UNKNOWN") as ValidationStatus;
+    return (proposal.proposer.metadata.verifyUrl ||
+      web3wallet.core.pairing
+        .getPairings()
+        .find((pairing) => pairing.topic === proposal.pairingTopic)
+        ?.peerMetadata?.verifyUrl ||
+      "UNKNOWN") as ValidationStatus;
   }, []);
 
   const approveSession = useCallback(async () => {

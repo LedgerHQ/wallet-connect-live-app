@@ -231,7 +231,12 @@ export default function SessionProposal({ proposal }: Props) {
                   {formatUrl(dAppUrl)}
                 </Text>
 
-                {<VerificationLabel verification={getValidation()} />}
+                {
+                  <VerificationLabel
+                    marginTop={5}
+                    verification={getValidation()}
+                  />
+                }
 
                 {requiredChains.length === 0 && (
                   <Text

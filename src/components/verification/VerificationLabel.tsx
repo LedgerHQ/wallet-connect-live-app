@@ -7,13 +7,19 @@ import {
 } from "@ledgerhq/react-ui/assets/icons";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "styled-components";
+import { width } from "styled-system";
 
 type Props = {
   verification: ValidationStatus;
   type?: "minimal" | "full";
+  [key: string]: any;
 };
 
-const VerificationLabel = ({ verification, type = "full" }: Props) => {
+const VerificationLabel = ({
+  verification,
+  type = "full",
+  ...style
+}: Props) => {
   const { colors } = useTheme();
   const { t } = useTranslation();
 
@@ -22,10 +28,10 @@ const VerificationLabel = ({ verification, type = "full" }: Props) => {
     display: "flex",
     alignItems: "center",
     columnGap: 3,
-    marginTop: 5,
     paddingY: 2,
     paddingX: 4,
-    width: "fit-content",
+    width: "max-content",
+    ...style,
   };
 
   switch (verification) {
@@ -45,10 +51,7 @@ const VerificationLabel = ({ verification, type = "full" }: Props) => {
     case "SCAM":
       return (
         <Box backgroundColor={colors.error.c90} {...sharedStyle}>
-          <CircledCrossSolidMedium
-            size={type === "full" ? 20 : 12}
-            color={"red"}
-          />
+          <CircledCrossSolidMedium size={20} color={"red"} />
           {type === "full" && (
             <Text color={"red"}>
               {t("sessionProposal.validation.scam.label")}
