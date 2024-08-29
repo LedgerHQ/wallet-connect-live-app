@@ -19,7 +19,6 @@ import SuggestedApps from "./SuggestedApps";
 import RecentlyUsedApps from "./RecentlyUsedApps";
 import { sortedRecentConnectionAppsAtom } from "@/store/recentConnectionAppsAtom";
 import ProposalRow from "../ProposalRow";
-import { ProposalTypes } from "@walletconnect/types";
 
 export default function Sessions() {
   const { t } = useTranslation();
@@ -113,7 +112,7 @@ export default function Sessions() {
 
           <List>
             {pendingProposals.data.map((proposal) => (
-              <ProposalRow proposal={proposal} />
+              <ProposalRow key={proposal.id} proposal={proposal} />
             ))}
           </List>
           <Flex mb={8} />

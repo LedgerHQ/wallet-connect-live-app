@@ -1,7 +1,6 @@
 import { ValidationStatus } from "@/types/types";
 import { Box, Text } from "@ledgerhq/react-ui";
 import {
-  CircledCheckMedium,
   CircledCheckSolidMedium,
   CircledCrossSolidMedium,
   InfoAltFillMedium,
@@ -9,12 +8,11 @@ import {
 } from "@ledgerhq/react-ui/assets/icons";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "styled-components";
-import { width } from "styled-system";
 
 type Props = {
   verification: ValidationStatus;
   type?: "icon" | "full";
-  [key: string]: any;
+  [key: string]: unknown;
 };
 
 const VerificationLabel = ({

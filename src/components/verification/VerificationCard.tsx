@@ -10,9 +10,10 @@ import { useTheme } from "styled-components";
 
 type Props = {
   verification: ValidationStatus;
+  [key: string]: unknown;
 };
 
-const VerificationCard = ({ verification }: Props) => {
+const VerificationCard = ({ verification, ...style }: Props) => {
   const { colors } = useTheme();
   const { t } = useTranslation();
 
@@ -23,6 +24,7 @@ const VerificationCard = ({ verification }: Props) => {
     columnGap: 3,
     paddingY: 4,
     paddingX: 4,
+    ...style,
   };
 
   switch (verification) {

@@ -15,7 +15,7 @@ const ProposalRow = ({ proposal }: { proposal: ProposalTypes.Struct }) => {
   const analytics = useAnalytics();
 
   const { getValidation } = useProposal(proposal);
-  const verificationStatus = useMemo(() => getValidation(), []);
+  const verificationStatus = useMemo(() => getValidation(), [getValidation]);
 
   console.log("verificationStatus", verificationStatus);
 

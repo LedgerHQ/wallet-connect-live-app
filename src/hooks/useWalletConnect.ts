@@ -147,16 +147,18 @@ export default function useWalletConnect() {
   const pendingProposalsQueryFn = usePendingProposalsQueryFn(web3wallet);
 
   const onSessionProposal = useCallback(
-    async (proposal: Web3WalletTypes.SessionProposal) => {
-      await web3wallet.core.pairing.updateMetadata({
-        topic: proposal.params.pairingTopic,
-        metadata: {
-          ...proposal.params.proposer.metadata,
-          verifyUrl: proposal.verifyContext.verified.isScam
-            ? "SCAM"
-            : proposal.verifyContext.verified.validation,
-        },
-      });
+    (proposal: Web3WalletTypes.SessionProposal) => {
+      async () => {
+        await web3wallet.core.pairing.updateMetadata({
+          topic: proposal.params.pairingTopic,
+          metadata: {
+            ...proposal.params.proposer.metadata,
+            verifyUrl: proposal.verifyContext.verified.isScam
+              ? "SCAM"
+              : proposal.verifyContext.verified.validation,
+          },
+        });
+      };
 
       void queryClient
         .invalidateQueries({

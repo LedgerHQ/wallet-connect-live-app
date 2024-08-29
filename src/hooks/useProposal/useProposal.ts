@@ -330,7 +330,11 @@ export function useProposal(proposal: ProposalTypes.Struct) {
         .find((pairing) => pairing.topic === proposal.pairingTopic)
         ?.peerMetadata?.verifyUrl ??
       "UNKNOWN") as ValidationStatus;
-  }, [proposal.pairingTopic]);
+  }, [
+    proposal.pairingTopic,
+    proposal.proposer.metadata.verifyUrl,
+    web3wallet.core.pairing,
+  ]);
 
   const approveSession = useCallback(async () => {
     try {
