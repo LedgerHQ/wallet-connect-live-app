@@ -1,4 +1,4 @@
-import { ValidationStatus } from "@/types/types";
+import { VerificationStatus } from "@/types/types";
 import { Box, Text } from "@ledgerhq/react-ui";
 import {
   CircledCrossSolidMedium,
@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next";
 import { useTheme } from "styled-components";
 
 type Props = {
-  verification: ValidationStatus;
+  verification: VerificationStatus;
   [key: string]: unknown;
 };
 

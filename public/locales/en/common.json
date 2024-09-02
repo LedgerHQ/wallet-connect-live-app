@@ -41,7 +41,7 @@
       "1": "Request approvals for transactions",
       "2": "You will be disconnected from {{dAppName}}"
     },
-    "validation": {
+    "verification": {
       "unknown": {
         "title": "Unknown domain",
         "label": "Cannot verify",

@@ -41,4 +41,4 @@ export type Proposal = {
   };
 };
 
-export type ValidationStatus = "UNKNOWN" | "VALID" | "INVALID" | "SCAM";
+export type VerificationStatus = "UNKNOWN" | "VALID" | "INVALID" | "SCAM";

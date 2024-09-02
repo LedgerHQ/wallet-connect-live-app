@@ -1,4 +1,4 @@
-import { ValidationStatus } from "@/types/types";
+import { VerificationStatus } from "@/types/types";
 import { Box, Text } from "@ledgerhq/react-ui";
 import {
   CircledCheckSolidMedium,
@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 import { useTheme } from "styled-components";
 
 type Props = {
-  verification: ValidationStatus;
+  verification: VerificationStatus;
   type?: "icon" | "full";
   [key: string]: unknown;
 };
@@ -47,7 +47,7 @@ const VerificationLabel = ({
           <WarningSolidMedium size={20} color={"red"} />
 
           <Text color={"red"}>
-            {t("sessionProposal.validation.invalid.label")}
+            {t("sessionProposal.verification.invalid.label")}
           </Text>
         </Box>
       ) : (
@@ -58,7 +58,7 @@ const VerificationLabel = ({
         <Box backgroundColor={colors.error.c90} {...sharedStyle}>
           <CircledCrossSolidMedium size={20} color={"red"} />
           <Text color={"red"}>
-            {t("sessionProposal.validation.scam.label")}
+            {t("sessionProposal.verification.scam.label")}
           </Text>
         </Box>
       ) : (
@@ -70,7 +70,7 @@ const VerificationLabel = ({
           <InfoAltFillMedium size={20} color={"orange"} />
 
           <Text color={"orange"}>
-            {t("sessionProposal.validation.unknown.label")}
+            {t("sessionProposal.verification.unknown.label")}
           </Text>
         </Box>
       ) : (

@@ -3,21 +3,18 @@ import { RowType } from "@/components/atoms/types";
 import { ImageWithPlaceholder } from "@/components/atoms/images/ImageWithPlaceholder";
 import { formatUrl } from "@/utils/helper.util";
 import { Box } from "@ledgerhq/react-ui";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { ProposalTypes } from "@walletconnect/types";
 import useAnalytics from "@/hooks/useAnalytics";
-import { useProposal } from "@/hooks/useProposal/useProposal";
 import VerificationLabel from "./verification/VerificationLabel";
+import useVerification from "@/hooks/useVerification";
 
 const ProposalRow = ({ proposal }: { proposal: ProposalTypes.Struct }) => {
   const navigate = useNavigate({ from: "/" });
   const analytics = useAnalytics();
 
-  const { getValidation } = useProposal(proposal);
-  const verificationStatus = useMemo(() => getValidation(), [getValidation]);
-
-  console.log("verificationStatus", verificationStatus);
+  const verificationStatus = useVerification(proposal);
 
   const goToSessionProposal = useCallback(
     (id: number) => {
@@ -35,7 +32,7 @@ const ProposalRow = ({ proposal }: { proposal: ProposalTypes.Struct }) => {
   );
 
   return (
-    <Box key={proposal.id} mt={3}>
+    <Box mt={3}>
       <GenericRow
         key={proposal.id}
         title={proposal.proposer.metadata.name}

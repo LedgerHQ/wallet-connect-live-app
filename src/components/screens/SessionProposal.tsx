@@ -22,6 +22,7 @@ import { walletCurrenciesByIdAtom } from "@/store/wallet-api.store";
 import { useAtomValue } from "jotai";
 import VerificationLabel from "../verification/VerificationLabel";
 import VerificationCard from "../verification/VerificationCard";
+import useVerification from "@/hooks/useVerification";
 
 const BackButton = styled(Flex)`
   cursor: pointer;
@@ -38,7 +39,6 @@ export default function SessionProposal({ proposal }: Props) {
   const { colors } = useTheme();
   const { t } = useTranslation();
   const {
-    getValidation,
     handleClick,
     handleClose,
     approveSession,
@@ -52,6 +52,8 @@ export default function SessionProposal({ proposal }: Props) {
   const dApp = proposal.proposer.metadata.name;
   const dAppUrl = proposal.proposer.metadata.url;
   const currenciesById = useAtomValue(walletCurrenciesByIdAtom);
+
+  const verificationStatus = useVerification(proposal);
 
   useEffect(() => {
     analytics.page("Wallet Connect Session Request", {
@@ -231,12 +233,10 @@ export default function SessionProposal({ proposal }: Props) {
                   {formatUrl(dAppUrl)}
                 </Text>
 
-                {
-                  <VerificationLabel
-                    marginTop={5}
-                    verification={getValidation()}
-                  />
-                }
+                <VerificationLabel
+                  marginTop={5}
+                  verification={verificationStatus}
+                />
 
                 {requiredChains.length === 0 && (
                   <Text
@@ -289,7 +289,7 @@ export default function SessionProposal({ proposal }: Props) {
             </Flex>
 
             <Flex flexDirection={"column"}>
-              {<VerificationCard verification={getValidation()} />}
+              <VerificationCard verification={verificationStatus} />
 
               <Flex
                 style={{

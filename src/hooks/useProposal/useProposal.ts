@@ -28,7 +28,6 @@ import { queryKey as pendingProposalsQueryKey } from "../usePendingProposals";
 import { ProposalTypes } from "@walletconnect/types";
 import { enqueueSnackbar } from "notistack";
 import { sortedRecentConnectionAppsAtom } from "../../store/recentConnectionAppsAtom";
-import { ValidationStatus } from "@/types/types";
 
 export function useProposal(proposal: ProposalTypes.Struct) {
   const navigate = useNavigate();
@@ -323,19 +322,6 @@ export function useProposal(proposal: ProposalTypes.Struct) {
 
   const sessionsQueryFn = useSessionsQueryFn(web3wallet);
 
-  const getValidation = useCallback((): ValidationStatus => {
-    return (proposal.proposer.metadata.verifyUrl ??
-      web3wallet.core.pairing
-        .getPairings()
-        .find((pairing) => pairing.topic === proposal.pairingTopic)
-        ?.peerMetadata?.verifyUrl ??
-      "UNKNOWN") as ValidationStatus;
-  }, [
-    proposal.pairingTopic,
-    proposal.proposer.metadata.verifyUrl,
-    web3wallet.core.pairing,
-  ]);
-
   const approveSession = useCallback(async () => {
     try {
       const supportedNs = buildSupportedNamespaces(proposal);
@@ -466,7 +452,6 @@ export function useProposal(proposal: ProposalTypes.Struct) {
 
   // No need for a memo as it's directly spread on usage
   return {
-    getValidation,
     approveSession,
     rejectSession,
     handleClose,
