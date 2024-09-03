@@ -34,7 +34,6 @@ const ProposalRow = ({ proposal }: { proposal: ProposalTypes.Struct }) => {
   return (
     <Box mt={3}>
       <GenericRow
-        key={proposal.id}
         title={proposal.proposer.metadata.name}
         subtitle={formatUrl(proposal.proposer.metadata.url)}
         LeftIcon={

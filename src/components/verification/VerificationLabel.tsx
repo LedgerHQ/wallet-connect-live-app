@@ -6,14 +6,14 @@ import {
   InfoAltFillMedium,
   WarningSolidMedium,
 } from "@ledgerhq/react-ui/assets/icons";
+import { BaseStyledProps } from "@ledgerhq/react-ui/components/styled";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "styled-components";
 
 type Props = {
   verification: VerificationStatus;
   type?: "icon" | "full";
-  [key: string]: unknown;
-};
+} & BaseStyledProps;
 
 const VerificationLabel = ({
   verification,

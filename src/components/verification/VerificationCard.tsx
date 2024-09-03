@@ -5,25 +5,24 @@ import {
   InfoAltFillMedium,
   WarningSolidMedium,
 } from "@ledgerhq/react-ui/assets/icons";
+import { BaseStyledProps } from "@ledgerhq/react-ui/components/styled";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "styled-components";
 
 type Props = {
   verification: VerificationStatus;
-  [key: string]: unknown;
-};
+} & BaseStyledProps;
 
 const VerificationCard = ({ verification, ...style }: Props) => {
   const { colors } = useTheme();
   const { t } = useTranslation();
 
-  const sharedStyle = {
+  const sharedStyle: BaseStyledProps = {
     borderRadius: 2,
     display: "flex",
     alignItems: "center",
     columnGap: 3,
-    paddingY: 4,
-    paddingX: 4,
+    padding: 4,
     ...style,
   };
 
@@ -36,10 +35,10 @@ const VerificationCard = ({ verification, ...style }: Props) => {
           <WarningSolidMedium size={30} color={"red"} />
           <Box display={"flex"} flexDirection={"column"} rowGap={2}>
             <Text fontWeight="bold" color={"red"}>
-              {t("sessionProposal.validation.invalid.title")}
+              {t("sessionProposal.verification.invalid.title")}
             </Text>
             <Text color={"red"}>
-              {t("sessionProposal.validation.invalid.description")}
+              {t("sessionProposal.verification.invalid.description")}
             </Text>
           </Box>
         </Box>
@@ -50,10 +49,10 @@ const VerificationCard = ({ verification, ...style }: Props) => {
           <CircledCrossSolidMedium size={30} color={"red"} />
           <Box display={"flex"} flexDirection={"column"} rowGap={2}>
             <Text fontWeight="bold" color={"red"}>
-              {t("sessionProposal.validation.scam.title")}
+              {t("sessionProposal.verification.scam.title")}
             </Text>
             <Text color={"red"}>
-              {t("sessionProposal.validation.scam.description")}
+              {t("sessionProposal.verification.scam.description")}
             </Text>
           </Box>
         </Box>
@@ -64,10 +63,10 @@ const VerificationCard = ({ verification, ...style }: Props) => {
           <InfoAltFillMedium size={30} color={"orange"} />
           <Box display={"flex"} flexDirection={"column"} rowGap={2}>
             <Text fontWeight="bold" color={"orange"}>
-              {t("sessionProposal.validation.unknown.title")}
+              {t("sessionProposal.verification.unknown.title")}
             </Text>
             <Text color={"orange"}>
-              {t("sessionProposal.validation.unknown.description")}
+              {t("sessionProposal.verification.unknown.description")}
             </Text>
           </Box>
         </Box>

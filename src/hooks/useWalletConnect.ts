@@ -146,6 +146,7 @@ export default function useWalletConnect() {
 
   const pendingProposalsQueryFn = usePendingProposalsQueryFn(web3wallet);
 
+  // TODO : check if WC provides any another way to get this data
   const onSessionProposal = useCallback(
     (proposal: Web3WalletTypes.SessionProposal) => {
       void web3wallet.core.pairing.updateMetadata({
