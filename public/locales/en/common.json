@@ -41,6 +41,23 @@
       "1": "Request approvals for transactions",
       "2": "You will be disconnected from {{dAppName}}"
     },
+    "verification": {
+      "unknown": {
+        "title": "Unknown domain",
+        "label": "Cannot verify",
+        "description": "This domain cannot be verified. Check the request carefully before approving."
+      },
+      "invalid": {
+        "title": "Domain mismatch",
+        "label": "Domain mismatch",
+        "description": "This website has a domain that does not match the sender of this request. approving may lead to loss of funds"
+      },
+      "scam": {
+        "title": "Known security risk",
+        "label": "Security risk",
+        "description": "This domain is flagged as unsafe by multiple security providers. Leave immediately to protect your assets."
+      }
+    },
     "error": {
       "title": "{{appName}} requested to connect to chains we don't support yet",
       "info": "We currently support: "

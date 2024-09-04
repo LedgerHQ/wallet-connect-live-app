@@ -27,7 +27,7 @@ import {
 import { queryKey as pendingProposalsQueryKey } from "../usePendingProposals";
 import { ProposalTypes } from "@walletconnect/types";
 import { enqueueSnackbar } from "notistack";
-import {sortedRecentConnectionAppsAtom} from "../../store/recentConnectionAppsAtom";
+import { sortedRecentConnectionAppsAtom } from "../../store/recentConnectionAppsAtom";
 
 export function useProposal(proposal: ProposalTypes.Struct) {
   const navigate = useNavigate();
@@ -36,7 +36,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
   const accounts = useAccounts(client);
   const web3wallet = useAtomValue(web3walletAtom);
   const analytics = useAnalytics();
-  const addAppToLastConnectionApps = useSetAtom(sortedRecentConnectionAppsAtom);;
+  const addAppToLastConnectionApps = useSetAtom(sortedRecentConnectionAppsAtom);
 
   const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
 
@@ -225,10 +225,11 @@ export function useProposal(proposal: ProposalTypes.Struct) {
     [accounts.data, proposal, selectedAccounts],
   );
 
-
   const buildXrpNamespace = useCallback(
-    (requiredNamespaces: ProposalTypes.RequiredNamespaces,
-      optionalNamespaces: ProposalTypes.OptionalNamespaces) => {
+    (
+      requiredNamespaces: ProposalTypes.RequiredNamespaces,
+      optionalNamespaces: ProposalTypes.OptionalNamespaces,
+    ) => {
       const accountsByChain = formatAccountsByChain(
         proposal,
         accounts.data,
@@ -252,7 +253,9 @@ export function useProposal(proposal: ProposalTypes.Struct) {
           ),
         [],
       );
-      const namespace = requiredNamespaces[SupportedNamespace.XRPL] || optionalNamespaces[SupportedNamespace.XRPL];
+      const namespace =
+        requiredNamespaces[SupportedNamespace.XRPL] ||
+        optionalNamespaces[SupportedNamespace.XRPL];
 
       const methods: string[] = namespace.methods;
 
@@ -272,8 +275,9 @@ export function useProposal(proposal: ProposalTypes.Struct) {
         events,
         accounts: dataToSend.map((e) => e.account),
       };
-    }
-    , [accounts.data, proposal, selectedAccounts])
+    },
+    [accounts.data, proposal, selectedAccounts],
+  );
 
   const buildSupportedNamespaces = useCallback(
     (proposal: ProposalTypes.Struct) => {
@@ -301,12 +305,19 @@ export function useProposal(proposal: ProposalTypes.Struct) {
         );
       }
       if ("xrpl" in requiredNamespaces || "xrpl" in optionalNamespaces) {
-        supportedNamespaces[SupportedNamespace.XRPL] =
-        buildXrpNamespace(requiredNamespaces, optionalNamespaces);
+        supportedNamespaces[SupportedNamespace.XRPL] = buildXrpNamespace(
+          requiredNamespaces,
+          optionalNamespaces,
+        );
       }
       return supportedNamespaces;
     },
-    [buildBip122Namespace, buildEip155Namespace, buildMvxNamespace, buildXrpNamespace],
+    [
+      buildBip122Namespace,
+      buildEip155Namespace,
+      buildMvxNamespace,
+      buildXrpNamespace,
+    ],
   );
 
   const sessionsQueryFn = useSessionsQueryFn(web3wallet);
@@ -331,7 +342,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
         queryKey: sessionsQueryKey,
         queryFn: sessionsQueryFn,
       });
-      addAppToLastConnectionApps(session.peer.metadata)
+      addAppToLastConnectionApps(session.peer.metadata);
       await navigate({
         to: "/detail/$topic",
         params: { topic: session.topic },
@@ -356,7 +367,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
     queryClient,
     sessionsQueryFn,
     web3wallet,
-    addAppToLastConnectionApps
+    addAppToLastConnectionApps,
   ]);
 
   const rejectSession = useCallback(async () => {

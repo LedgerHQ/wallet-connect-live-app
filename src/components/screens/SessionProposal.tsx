@@ -20,6 +20,9 @@ import LogoHeader from "./sessionProposal/LogoHeader";
 import { ChainRow } from "./sessionProposal/ChainRow";
 import { walletCurrenciesByIdAtom } from "@/store/wallet-api.store";
 import { useAtomValue } from "jotai";
+import VerificationLabel from "../verification/VerificationLabel";
+import VerificationCard from "../verification/VerificationCard";
+import useVerification from "@/hooks/useVerification";
 
 const BackButton = styled(Flex)`
   cursor: pointer;
@@ -49,6 +52,8 @@ export default function SessionProposal({ proposal }: Props) {
   const dApp = proposal.proposer.metadata.name;
   const dAppUrl = proposal.proposer.metadata.url;
   const currenciesById = useAtomValue(walletCurrenciesByIdAtom);
+
+  const verificationStatus = useVerification(proposal);
 
   useEffect(() => {
     analytics.page("Wallet Connect Session Request", {
@@ -228,6 +233,11 @@ export default function SessionProposal({ proposal }: Props) {
                   {formatUrl(dAppUrl)}
                 </Text>
 
+                <VerificationLabel
+                  marginTop={5}
+                  verification={verificationStatus}
+                />
+
                 {requiredChains.length === 0 && (
                   <Text
                     mt={6}
@@ -278,39 +288,43 @@ export default function SessionProposal({ proposal }: Props) {
               </ListChains>
             </Flex>
 
-            <Flex
-              style={{
-                backdropFilter: "blur(7px)",
-                position: "sticky",
-                bottom: "0px",
-              }}
-            >
-              <ButtonsContainer>
-                <Button size="large" flex={0.3} mr={6} onClick={onReject}>
-                  <Text
-                    variant="body"
-                    fontWeight="semiBold"
-                    color="neutral.c100"
+            <Flex flexDirection={"column"}>
+              <VerificationCard verification={verificationStatus} />
+
+              <Flex
+                style={{
+                  backdropFilter: "blur(7px)",
+                  position: "sticky",
+                  bottom: "0px",
+                }}
+              >
+                <ButtonsContainer>
+                  <Button size="large" flex={0.3} mr={6} onClick={onReject}>
+                    <Text
+                      variant="body"
+                      fontWeight="semiBold"
+                      color="neutral.c100"
+                    >
+                      {t("sessionProposal.reject")}
+                    </Text>
+                  </Button>
+                  <Button
+                    variant="main"
+                    size="large"
+                    flex={0.9}
+                    onClick={onApprove}
+                    disabled={disabled}
                   >
-                    {t("sessionProposal.reject")}
-                  </Text>
-                </Button>
-                <Button
-                  variant="main"
-                  size="large"
-                  flex={0.9}
-                  onClick={onApprove}
-                  disabled={disabled}
-                >
-                  <Text
-                    variant="body"
-                    fontWeight="semiBold"
-                    color={disabled ? "neutral.c50" : "neutral.c00"}
-                  >
-                    {t("sessionProposal.connect")}
-                  </Text>
-                </Button>
-              </ButtonsContainer>
+                    <Text
+                      variant="body"
+                      fontWeight="semiBold"
+                      color={disabled ? "neutral.c50" : "neutral.c00"}
+                    >
+                      {t("sessionProposal.connect")}
+                    </Text>
+                  </Button>
+                </ButtonsContainer>
+              </Flex>
             </Flex>
           </Flex>
         )}

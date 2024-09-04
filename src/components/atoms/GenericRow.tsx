@@ -39,30 +39,32 @@ export function GenericRow({
       rowType={rowType}
       alignItems="center"
     >
-      <Flex
-        flexDirection="row"
-        justifyContent="space-between"
-        alignItems="center"
-      >
-        <Flex flexDirection="column" rowGap={3}>
+      <Flex flexDirection="row" columnGap={3} flex={1}>
+        {LeftIcon && <Box mr={2}>{LeftIcon}</Box>}
+
+        <Flex
+          flexDirection="column"
+          alignItems={"start"}
+          justifyContent={"center"}
+          columnGap={2}
+        >
           <Text variant="body" fontWeight="semiBold" color="neutral.c100">
             {title}
           </Text>
-          <Flex flexDirection="row" alignItems={"center"} columnGap={2}>
-            {LeftIcon && <Box mr={2}>{LeftIcon}</Box>}
-            <Text
-              variant="small"
-              fontWeight="medium"
-              color="neutral.c70"
-              mt={2}
-            >
+          <Flex mt={2} flexDirection="row" alignItems={"center"} columnGap={2}>
+            <Text variant="small" fontWeight="medium" color="neutral.c70">
               {subtitle}
             </Text>
             {RightIcon}
           </Flex>
         </Flex>
       </Flex>
-      <Flex alignItems="center" data-testid="rightComp">
+
+      <Flex
+        alignItems="center"
+        data-testid="rightComp"
+        justifyContent="flex-end"
+      >
         {rightElement ?? null}
         {rowType === RowType.Select && onClick && (
           <Checkbox

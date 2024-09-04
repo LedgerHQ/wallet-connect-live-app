@@ -31,7 +31,7 @@ export function AccountRow({
           <CryptoIcon
             name={currency.ticker}
             circleIcon
-            size={20}
+            size={12}
             color={currency.color}
           />
         }

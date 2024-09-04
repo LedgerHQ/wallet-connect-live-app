@@ -17,7 +17,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import usePendingProposals from "@/hooks/usePendingProposals";
 import SuggestedApps from "./SuggestedApps";
 import RecentlyUsedApps from "./RecentlyUsedApps";
-import {sortedRecentConnectionAppsAtom} from "@/store/recentConnectionAppsAtom";
+import { sortedRecentConnectionAppsAtom } from "@/store/recentConnectionAppsAtom";
+import ProposalRow from "../ProposalRow";
 
 export default function Sessions() {
   const { t } = useTranslation();
@@ -55,21 +56,6 @@ export default function Sessions() {
       page: "Wallet Connect Sessions",
     });
   }, [analytics, navigate]);
-
-  const goToSessionProposal = useCallback(
-    (id: number) => {
-      void navigate({
-        to: "/proposal/$id",
-        params: { id: id.toString() },
-        search: (search) => search,
-      });
-      analytics.track("button_clicked", {
-        button: "Session Proposal",
-        page: "Wallet Connect Sessions",
-      });
-    },
-    [analytics, navigate],
-  );
 
   const goToDetailSession = useCallback(
     (topic: string) => {
@@ -126,20 +112,7 @@ export default function Sessions() {
 
           <List>
             {pendingProposals.data.map((proposal) => (
-              <Box key={proposal.id} mt={3}>
-                <GenericRow
-                  key={proposal.id}
-                  title={proposal.proposer.metadata.name}
-                  subtitle={formatUrl(proposal.proposer.metadata.url)}
-                  LeftIcon={
-                    <ImageWithPlaceholder
-                      icon={proposal.proposer.metadata.icons[0] ?? null}
-                    />
-                  }
-                  rowType={RowType.Detail}
-                  onClick={() => goToSessionProposal(proposal.id)}
-                />
-              </Box>
+              <ProposalRow key={proposal.id} proposal={proposal} />
             ))}
           </List>
           <Flex mb={8} />
@@ -172,7 +145,7 @@ export default function Sessions() {
         </>
       )}
 
-      {(!hasProposals && isEmptyState) ? (
+      {!hasProposals && isEmptyState ? (
         <>
           <Flex flexDirection={"column"} rowGap={8}>
             <Text
@@ -192,25 +165,25 @@ export default function Sessions() {
             >
               {t("sessions.apps.noAppsMessage")}
             </Text>
-           
           </Flex>
         </>
       ) : null}
 
-        <ButtonsContainer marginTop={2} columnGap={6}>
-          {!isEmptyState ? (
+      <ButtonsContainer marginTop={2} columnGap={6}>
+        {!isEmptyState ? (
           <Button variant="shade" size="medium" flex={1} onClick={openModal}>
             <Text variant="body" fontWeight="semiBold" color="neutral.c100">
               {t("sessions.disconnectAll")}
             </Text>
-          </Button>) : null}
+          </Button>
+        ) : null}
 
-          <Button variant="main" size="medium" flex={1} onClick={goToConnect}>
-            <Text variant="body" fontWeight="semiBold" color="neutral.c0">
-              {t("connect.cta")}
-            </Text>
-          </Button>      
-        </ButtonsContainer>
+        <Button variant="main" size="medium" flex={1} onClick={goToConnect}>
+          <Text variant="body" fontWeight="semiBold" color="neutral.c0">
+            {t("connect.cta")}
+          </Text>
+        </Button>
+      </ButtonsContainer>
 
       {lastConnectionApps.length > 1 && (
         <Flex flexDirection={"column"} marginTop={6}>

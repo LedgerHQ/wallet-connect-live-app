@@ -273,7 +273,7 @@ export default function SessionDetail({ session }: Props) {
                                     <CryptoIcon
                                       name={currency.ticker}
                                       circleIcon
-                                      size={20}
+                                      size={12}
                                       color={currency.color}
                                     />
                                   }
