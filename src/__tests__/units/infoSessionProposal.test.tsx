@@ -7,7 +7,7 @@ describe("InfoSessionProposal", () => {
     render(<InfoSessionProposal isInSessionDetails={true} />);
 
     expect(
-      await screen.findByText("sessionProposal.info2")
+      await screen.findByText("sessionProposal.info2"),
     ).toBeInTheDocument();
   });
 
@@ -20,7 +20,7 @@ describe("InfoSessionProposal", () => {
   it("renders two bullet points", async () => {
     render(<InfoSessionProposal />);
     const bulletPoints = await screen.findAllByText(
-      /sessionProposal.infoBullet./i
+      /sessionProposal.infoBullet./i,
     );
     expect(bulletPoints).toHaveLength(2);
   });

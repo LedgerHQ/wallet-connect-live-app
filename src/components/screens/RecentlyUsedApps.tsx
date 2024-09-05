@@ -1,9 +1,13 @@
-import {sortedRecentConnectionAppsAtom, recentConnectionAppsAtom, initialValue as recentConnectionAppsInitialValue} from "@/store/recentConnectionAppsAtom";
+import {
+  sortedRecentConnectionAppsAtom,
+  recentConnectionAppsAtom,
+  initialValue as recentConnectionAppsInitialValue,
+} from "@/store/recentConnectionAppsAtom";
 import AppCard from "../AppCard";
 import { Flex, Text } from "@ledgerhq/react-ui";
 import { t } from "i18next";
 import styled from "styled-components";
-import { useAtomValue,useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 
 const GridContainer = styled.div`
   width: 100%;
@@ -24,20 +28,27 @@ const StyledDiv = styled.div`
 
 export default function RecentlyUsedApps() {
   const lastConnectionApps = useAtomValue(sortedRecentConnectionAppsAtom);
-  const setLastConnectionApps = useSetAtom(recentConnectionAppsAtom)
-  
+  const setLastConnectionApps = useSetAtom(recentConnectionAppsAtom);
+
   return (
     <>
+      <Flex justifyContent={"space-between"}>
+        <Text variant="extraSmall" color="neutral.c70" marginBottom={6}>
+          {t("sessions.apps.lastConnection")}
+        </Text>
 
-    <Flex justifyContent={"space-between"}>
-      <Text variant="extraSmall" color="neutral.c70" marginBottom={6}>
-        {t("sessions.apps.lastConnection")}
-      </Text>
-
-      <Text style={{cursor: "pointer"}} variant="extraSmall" color="neutral.c70" marginBottom={6} onClick={() => { setLastConnectionApps(recentConnectionAppsInitialValue)}}>
-        {t("sessions.apps.clearHistory")}
-      </Text>
-    </Flex>
+        <Text
+          style={{ cursor: "pointer" }}
+          variant="extraSmall"
+          color="neutral.c70"
+          marginBottom={6}
+          onClick={() => {
+            setLastConnectionApps(recentConnectionAppsInitialValue);
+          }}
+        >
+          {t("sessions.apps.clearHistory")}
+        </Text>
+      </Flex>
 
       <GridContainer>
         {lastConnectionApps.map((app) => (

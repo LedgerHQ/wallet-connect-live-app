@@ -31,9 +31,9 @@ const appList = [
     id: "kiln",
     name: "Kiln",
     category: "stake",
-    "icon": "https://cdn.live.ledger.com/icons/platform/kiln.png",
+    icon: "https://cdn.live.ledger.com/icons/platform/kiln.png",
     url: "https://stake.kiln.fi/dedicated/stake",
-  },  
+  },
   {
     id: "paraswap",
     name: "ParaSwap",

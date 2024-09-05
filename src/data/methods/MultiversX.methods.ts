@@ -14,22 +14,21 @@ export const MULTIVERSX_SIGNING_METHODS = {
  */
 export type MULTIVERSX_REQUESTS =
   | {
-    method: typeof MULTIVERSX_SIGNING_METHODS.MULTIVERSX_SIGN_MESSAGE;
-    params: {
-      message: string;
-      address: string;
-    };
-  }
+      method: typeof MULTIVERSX_SIGNING_METHODS.MULTIVERSX_SIGN_MESSAGE;
+      params: {
+        message: string;
+        address: string;
+      };
+    }
   | {
-    method: typeof MULTIVERSX_SIGNING_METHODS.MULTIVERSX_SIGN_TRANSACTION;
-    params: {
-      transaction: MvxTransaction;
-    };
-  }
+      method: typeof MULTIVERSX_SIGNING_METHODS.MULTIVERSX_SIGN_TRANSACTION;
+      params: {
+        transaction: MvxTransaction;
+      };
+    }
   | {
-    method: typeof MULTIVERSX_SIGNING_METHODS.MULTIVERSX_SIGN_TRANSACTIONS;
-    params: {
-      transactions: MvxTransaction[];
+      method: typeof MULTIVERSX_SIGNING_METHODS.MULTIVERSX_SIGN_TRANSACTIONS;
+      params: {
+        transactions: MvxTransaction[];
+      };
     };
-  };
-

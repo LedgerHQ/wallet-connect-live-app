@@ -21,7 +21,7 @@ describe.skip("Network Support tests", () => {
       },
       {
         timeout: 3000,
-      }
+      },
     );
 
     await userApp.click(screen.getByRole("button", { name: /connect.cta/i }));
@@ -30,17 +30,17 @@ describe.skip("Network Support tests", () => {
     // proposalRouter();
 
     const { user: userProposal } = render(
-      <SessionProposal proposal={proposal} />
+      <SessionProposal proposal={proposal} />,
     );
 
     expect(
-      screen.getByText(/sessionProposal.error.title/i)
+      screen.getByText(/sessionProposal.error.title/i),
     ).toBeInTheDocument();
 
     expect(screen.getByText(/sessionProposal.error.desc/i)).toBeInTheDocument();
 
     await userProposal.click(
-      screen.getByRole("button", { name: /sessionProposal.close/i })
+      screen.getByRole("button", { name: /sessionProposal.close/i }),
     );
 
     cleanup();

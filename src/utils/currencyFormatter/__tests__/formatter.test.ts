@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from "vitest";
 import BigNumber from "bignumber.js";
 import formatCurrencyUnit from "..";
 import { toLocaleString } from "../formatCurrency";
@@ -12,14 +12,20 @@ function getNumberWithMagnitude(str: string | number = "123456789") {
   };
 }
 
-function getNumberWithLocale(str: string | number = "123456789", locale?: string) {
+function getNumberWithLocale(
+  str: string | number = "123456789",
+  locale?: string,
+) {
   const unit = { code: "BTC", magnitude: 1, name: "bitcoin" };
   const bigN = new BigNumber(str);
 
   return formatCurrencyUnit(unit, bigN, { locale });
 }
 
-function getNumberWithCode(showCode = false, str: string | number = "123456789") {
+function getNumberWithCode(
+  showCode = false,
+  str: string | number = "123456789",
+) {
   const unit = { code: "BTC", magnitude: 3, name: "bitcoin" };
   const bigN = new BigNumber(str);
 
@@ -76,8 +82,12 @@ describe("Ledger Live Desktop imported tests", () => {
     expect(toLocaleString(new BigNumber(123.01))).toBe("123.01");
     expect(toLocaleString(new BigNumber(123.012))).toBe("123.012");
     expect(toLocaleString(new BigNumber(1123))).toBe("1,123");
-    expect(toLocaleString(new BigNumber("9999999999999999"))).toBe("9,999,999,999,999,999");
-    expect(toLocaleString(new BigNumber("9999999999999.99"))).toBe("9,999,999,999,999.99");
+    expect(toLocaleString(new BigNumber("9999999999999999"))).toBe(
+      "9,999,999,999,999,999",
+    );
+    expect(toLocaleString(new BigNumber("9999999999999.99"))).toBe(
+      "9,999,999,999,999.99",
+    );
   });
   it("toLocaleString to default maxDecimalPlaces to 3", () => {
     expect(toLocaleString(new BigNumber(4.44444))).toBe("4.444");
@@ -208,9 +218,13 @@ describe("Ledger Live Desktop imported tests", () => {
       }),
     ).toBe("9.7");
     expect(
-      toLocaleString(new BigNumber("4.4444444444444444444411111111111111"), "en", {
-        maxDecimalPlaces: 20,
-      }),
+      toLocaleString(
+        new BigNumber("4.4444444444444444444411111111111111"),
+        "en",
+        {
+          maxDecimalPlaces: 20,
+        },
+      ),
     ).toBe("4.44444444444444444444");
   });
 });

@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from "vitest";
 import BigNumber from "bignumber.js";
 import { defaultFormatOptions } from "../constants";
 import { formatCurrencyUnitFragment, toLocaleString } from "../formatCurrency";
@@ -49,11 +49,17 @@ describe("getNumberWithOptions tests", () => {
 describe("formatCurrencyUnitFragment tests", () => {
   const unit = { code: "BTC", magnitude: 0, name: "bitcoin" };
   it("should validate big number input", () => {
-    const consoleWarnMock = vi.spyOn(console, "warn").mockImplementation(() => { return }); // mock console.warn to clean warnings while running this test
+    const consoleWarnMock = vi.spyOn(console, "warn").mockImplementation(() => {
+      return;
+    }); // mock console.warn to clean warnings while running this test
 
-    expect(formatCurrencyUnitFragment(unit, new BigNumber("not a number"))).toEqual([]);
+    expect(
+      formatCurrencyUnitFragment(unit, new BigNumber("not a number")),
+    ).toEqual([]);
 
-    expect(formatCurrencyUnitFragment(unit, new BigNumber(Infinity))).toEqual([]);
+    expect(formatCurrencyUnitFragment(unit, new BigNumber(Infinity))).toEqual(
+      [],
+    );
     expect(formatCurrencyUnitFragment(unit, 42 as never)).toEqual([]); // passing a literal value. TS enforces it to be a BigNumber, so as never was used
 
     consoleWarnMock.mockRestore(); // restore console.warn
@@ -81,23 +87,27 @@ describe("formatCurrencyUnitFragment tests", () => {
   });
 
   it("should support negative floats", () => {
-    expect(formatCurrencyUnitFragment(unit, new BigNumber(-12.345678))).toEqual([
-      { kind: "sign", value: "-" },
-      {
-        kind: "value",
-        value: "12",
-      },
-    ]);
+    expect(formatCurrencyUnitFragment(unit, new BigNumber(-12.345678))).toEqual(
+      [
+        { kind: "sign", value: "-" },
+        {
+          kind: "value",
+          value: "12",
+        },
+      ],
+    );
   });
 
   it("should always show sign", () => {
-    expect(formatCurrencyUnitFragment(unit, new BigNumber(-12.345678))).toEqual([
-      { kind: "sign", value: "-" },
-      {
-        kind: "value",
-        value: "12",
-      },
-    ]);
+    expect(formatCurrencyUnitFragment(unit, new BigNumber(-12.345678))).toEqual(
+      [
+        { kind: "sign", value: "-" },
+        {
+          kind: "value",
+          value: "12",
+        },
+      ],
+    );
 
     expect(
       formatCurrencyUnitFragment(unit, new BigNumber(12.345678), {

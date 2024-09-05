@@ -32,7 +32,12 @@ export const ErrorNotification = React.forwardRef<
   const { id, errorType, message, ...other } = props;
 
   return (
-    <SnackbarContent ref={ref} role="alert" {...other} onClick={() => closeSnackbar(id)}>
+    <SnackbarContent
+      ref={ref}
+      role="alert"
+      {...other}
+      onClick={() => closeSnackbar(id)}
+    >
       <Notification
         badge={warningBadge}
         hasBackground={true}

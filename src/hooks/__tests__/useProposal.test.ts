@@ -44,7 +44,7 @@ describe("getChains", () => {
 
   it("should return an array with multiple chains", () => {
     const proposal = JSON.parse(
-      JSON.stringify(sessionProposalNotSupported)
+      JSON.stringify(sessionProposalNotSupported),
     ) as Proposal;
 
     const result = getChains(proposal);

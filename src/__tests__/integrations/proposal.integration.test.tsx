@@ -34,11 +34,11 @@ vi.doMock("@tanstack/react-router", () => {
 });
 
 const mockRejectSession = vi.fn(() =>
-  Promise.resolve(() => console.log("REJECT DONE"))
+  Promise.resolve(() => console.log("REJECT DONE")),
 );
 
 const mockAcceptSession = vi.fn(() =>
-  Promise.resolve(() => console.log("ACCEPT DONE"))
+  Promise.resolve(() => console.log("ACCEPT DONE")),
 );
 
 // TODO maybe remove as we already have a mock in the setup
@@ -77,7 +77,7 @@ describe.skip("Proposal Flow tests", () => {
       },
       {
         timeout: 3000,
-      }
+      },
     );
 
     await user.click(screen.getByRole("button", { name: /connect.cta/i }));
@@ -90,12 +90,12 @@ describe.skip("Proposal Flow tests", () => {
         expect(
           screen.getByRole("button", {
             name: /sessionProposal.connect/i,
-          })
+          }),
         ).toBeInTheDocument();
       },
       {
         timeout: 3000,
-      }
+      },
     );
 
     await waitFor(
@@ -103,12 +103,12 @@ describe.skip("Proposal Flow tests", () => {
         expect(
           screen.getByRole("button", {
             name: /sessionProposal.reject/i,
-          })
+          }),
         ).toBeInTheDocument();
       },
       {
         timeout: 3000,
-      }
+      },
     );
   });
 
@@ -116,7 +116,7 @@ describe.skip("Proposal Flow tests", () => {
     await userEvent.click(
       screen.getByRole("button", {
         name: /sessionProposal.reject/i,
-      })
+      }),
     );
 
     cleanup();
@@ -126,12 +126,12 @@ describe.skip("Proposal Flow tests", () => {
     await waitFor(
       () => {
         expect(
-          screen.getByRole("button", { name: /connect.cta/i })
+          screen.getByRole("button", { name: /connect.cta/i }),
         ).toBeInTheDocument();
       },
       {
         timeout: 3000,
-      }
+      },
     );
   });
 
@@ -141,13 +141,13 @@ describe.skip("Proposal Flow tests", () => {
     cleanup();
 
     const { user: userProposal } = render(
-      <SessionProposal proposal={proposal} />
+      <SessionProposal proposal={proposal} />,
     );
 
     await userProposal.click(
       screen.getByRole("button", {
         name: /sessionProposal.connect/i,
-      })
+      }),
     );
 
     cleanup();
@@ -155,13 +155,13 @@ describe.skip("Proposal Flow tests", () => {
 
     expect(screen.getByText(/sessions\.detail\.title/i)).toBeInTheDocument();
     expect(
-      screen.getByText(/sessions\.detail\.connected/i)
+      screen.getByText(/sessions\.detail\.connected/i),
     ).toBeInTheDocument();
     expect(screen.getByText(/sessions\.detail\.expires/i)).toBeInTheDocument();
     expect(
       screen.getByRole("button", {
         name: /sessions.detail.disconnect/i,
-      })
+      }),
     ).toBeInTheDocument();
   });
 });

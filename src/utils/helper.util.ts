@@ -56,8 +56,8 @@ export function isBIP122Chain(
 
 export function isRippleChain(
   chain: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  _request?: { method: string; params: any }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  _request?: { method: string; params: any },
 ): _request is RIPPLE_REQUESTS {
   return chain.includes("xrpl:0");
 }
