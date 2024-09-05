@@ -28,11 +28,18 @@ type ErrorNotificationProps = CustomContentProps & {
 export const ErrorNotification = React.forwardRef<
   HTMLDivElement,
   ErrorNotificationProps
->((props, ref) => {
-  const { id, errorType, message, ...other } = props;
+>((myProps, ref) => {
+  // Using myProps here as using props triggers an eslint false positive
+  // https://github.com/jsx-eslint/eslint-plugin-react/issues/3796
+  const { id, errorType, message, ...other } = myProps;
 
   return (
-    <SnackbarContent ref={ref} role="alert" {...other} onClick={() => closeSnackbar(id)}>
+    <SnackbarContent
+      ref={ref}
+      role="alert"
+      {...other}
+      onClick={() => closeSnackbar(id)}
+    >
       <Notification
         badge={warningBadge}
         hasBackground={true}

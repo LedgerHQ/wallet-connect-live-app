@@ -20,7 +20,6 @@ export function ErrorFallback() {
 
   useEffect(() => {
     analytics.page("WalletConnect ErrorBoundary Page");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

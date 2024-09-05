@@ -20,13 +20,15 @@ export const getFormattedCurrency = (
 
   return supportsToLocaleString
     ? (10000.2).toLocaleString(locale)
-    : toLocaleStringsMock[locale] ?? toLocaleStringsMock.en;
+    : (toLocaleStringsMock[locale] ?? toLocaleStringsMock.en);
 };
 
 // Copied from https://www.npmjs.com/package/ethereumjs-util
 export const isHexPrefixed = (str: string): boolean => {
   if (typeof str !== "string") {
-    throw new Error(`[isHexPrefixed] input must be type 'string', received type ${typeof str}`);
+    throw new Error(
+      `[isHexPrefixed] input must be type 'string', received type ${typeof str}`,
+    );
   }
 
   return str.startsWith("0x");
@@ -35,7 +37,9 @@ export const isHexPrefixed = (str: string): boolean => {
 // Copied from https://www.npmjs.com/package/ethereumjs-util
 export const stripHexPrefix = (str: string): string => {
   if (typeof str !== "string")
-    throw new Error(`[stripHexPrefix] input must be type 'string', received ${typeof str}`);
+    throw new Error(
+      `[stripHexPrefix] input must be type 'string', received ${typeof str}`,
+    );
 
   return isHexPrefixed(str) ? str.slice(2) : str;
 };

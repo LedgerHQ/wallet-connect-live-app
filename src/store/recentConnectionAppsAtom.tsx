@@ -1,6 +1,6 @@
-import { atomWithStorage } from 'jotai/utils';
-import { atom } from 'jotai';
-import { SignClientTypes } from '@walletconnect/types';
+import { atomWithStorage } from "jotai/utils";
+import { atom } from "jotai";
+import { SignClientTypes } from "@walletconnect/types";
 
 type MetadataWithDate = SignClientTypes.Metadata & {
   date: Date;
@@ -8,13 +8,13 @@ type MetadataWithDate = SignClientTypes.Metadata & {
 
 type StoredValueType = Record<string, MetadataWithDate>;
 
-export const initialValue = {}
+export const initialValue = {};
 
 export const recentConnectionAppsAtom = atomWithStorage<StoredValueType>(
   "connectionApps",
   initialValue,
   undefined,
-  { getOnInit: true }
+  { getOnInit: true },
 );
 
 export const sortedRecentConnectionAppsAtom = atom(

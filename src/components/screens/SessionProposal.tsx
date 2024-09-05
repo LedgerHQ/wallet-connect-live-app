@@ -5,10 +5,10 @@ import { InfoSessionProposal } from "@/components/screens/sessionProposal/InfoSe
 import { formatUrl } from "@/utils/helper.util";
 import { useProposal } from "@/hooks/useProposal/useProposal";
 import { ResponsiveContainer } from "@/styles/styles";
-import { Flex, Button, Box, Text } from "@ledgerhq/react-ui";
+import { Flex, Button, Box, Text, InfiniteLoader } from "@ledgerhq/react-ui";
 import { ArrowLeftMedium } from "@ledgerhq/react-ui/assets/icons";
 import { useTranslation } from "react-i18next";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import styled, { useTheme } from "styled-components";
 import useAnalytics from "@/hooks/useAnalytics";
 import { tryDecodeURI } from "@/utils/image";
@@ -52,6 +52,7 @@ export default function SessionProposal({ proposal }: Props) {
   const dApp = proposal.proposer.metadata.name;
   const dAppUrl = proposal.proposer.metadata.url;
   const currenciesById = useAtomValue(walletCurrenciesByIdAtom);
+  const [approving, setApproving] = useState(false);
 
   const verificationStatus = useVerification(proposal);
 
@@ -60,7 +61,6 @@ export default function SessionProposal({ proposal }: Props) {
       dapp: dApp,
       url: dAppUrl,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onGoBack = useCallback(() => {
@@ -78,6 +78,7 @@ export default function SessionProposal({ proposal }: Props) {
       dapp: dApp,
       url: dAppUrl,
     });
+    setApproving(true);
     void approveSession();
   }, [analytics, approveSession, dApp, dAppUrl]);
 
@@ -125,8 +126,10 @@ export default function SessionProposal({ proposal }: Props) {
   );
 
   const disabled = useMemo(
-    () => !(everyRequiredChainsSelected && selectedAccounts.length > 0),
-    [everyRequiredChainsSelected, selectedAccounts],
+    () =>
+      approving ||
+      !(everyRequiredChainsSelected && selectedAccounts.length > 0),
+    [approving, everyRequiredChainsSelected, selectedAccounts.length],
   );
 
   const iconProposer = useMemo(
@@ -288,33 +291,37 @@ export default function SessionProposal({ proposal }: Props) {
               </ListChains>
             </Flex>
 
-            <Flex flexDirection={"column"}>
+            <Flex flexDirection={"column"} paddingY={4}>
               <VerificationCard verification={verificationStatus} />
+            </Flex>
 
-              <Flex
-                style={{
-                  backdropFilter: "blur(7px)",
-                  position: "sticky",
-                  bottom: "0px",
-                }}
-              >
-                <ButtonsContainer>
-                  <Button size="large" flex={0.3} mr={6} onClick={onReject}>
-                    <Text
-                      variant="body"
-                      fontWeight="semiBold"
-                      color="neutral.c100"
-                    >
-                      {t("sessionProposal.reject")}
-                    </Text>
-                  </Button>
-                  <Button
-                    variant="main"
-                    size="large"
-                    flex={0.9}
-                    onClick={onApprove}
-                    disabled={disabled}
+            <Flex
+              style={{
+                backdropFilter: "blur(7px)",
+                position: "sticky",
+                bottom: "0px",
+              }}
+            >
+              <ButtonsContainer>
+                <Button size="large" flex={0.3} mr={6} onClick={onReject}>
+                  <Text
+                    variant="body"
+                    fontWeight="semiBold"
+                    color="neutral.c100"
                   >
+                    {t("sessionProposal.reject")}
+                  </Text>
+                </Button>
+                <Button
+                  variant="main"
+                  size="large"
+                  flex={0.9}
+                  onClick={onApprove}
+                  disabled={disabled}
+                >
+                  {approving ? (
+                    <InfiniteLoader size={20} />
+                  ) : (
                     <Text
                       variant="body"
                       fontWeight="semiBold"
@@ -322,9 +329,9 @@ export default function SessionProposal({ proposal }: Props) {
                     >
                       {t("sessionProposal.connect")}
                     </Text>
-                  </Button>
-                </ButtonsContainer>
-              </Flex>
+                  )}
+                </Button>
+              </ButtonsContainer>
             </Flex>
           </Flex>
         )}

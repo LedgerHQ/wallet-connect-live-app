@@ -16,6 +16,7 @@ import {
   coreAtom,
   connectionStatusAtom,
   web3walletAtom,
+  walletConnectLoading,
 } from "@/store/web3wallet.store";
 import {
   isEIP155Chain,
@@ -24,7 +25,7 @@ import {
   isRippleChain,
 } from "@/utils/helper.util";
 import { useNavigate } from "@tanstack/react-router";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { Web3Wallet } from "@walletconnect/web3wallet/dist/types/client";
 import useAccounts from "./useAccounts";
 import { walletAPIClientAtom } from "@/store/wallet-api.store";
@@ -53,11 +54,10 @@ enum Errors {
   msgDecline = "Message signed declined",
 }
 
+const hexReg = /^ *(0x)?([a-fA-F0-9]+) *$/;
 const formatMessage = (buffer: Buffer) => {
   const message = stripHexPrefix(
-    buffer.toString().match(/^ *(0x)?([a-fA-F0-9]+) *$/)
-      ? buffer.toString()
-      : buffer.toString("hex"),
+    hexReg.exec(buffer.toString()) ? buffer.toString() : buffer.toString("hex"),
   );
   return "0x" + message;
 };
@@ -129,7 +129,7 @@ function useWalletConnectStatus() {
 export default function useWalletConnect() {
   useWalletConnectStatus();
 
-  const navigate = useNavigate();
+  const navigate = useNavigate({ from: "/" });
   const web3wallet = useAtomValue(web3walletAtom);
 
   const queryClient = useQueryClient();
@@ -482,8 +482,10 @@ export default function useWalletConnect() {
     [accounts.data, client, web3wallet],
   );
 
+  const setLoading = useSetAtom(walletConnectLoading);
   const onSessionRequest = useCallback(
     (requestEvent: SignClientTypes.EventArguments["session_request"]) => {
+      setLoading(false);
       const {
         topic,
         params: { request, chainId },
@@ -509,6 +511,7 @@ export default function useWalletConnect() {
       handleEIP155Request,
       handleMvxRequest,
       handleXrpRequest,
+      setLoading,
     ],
   );
 

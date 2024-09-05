@@ -39,6 +39,8 @@ type RootSearch = {
   theme: ThemeNames;
   lang: string;
   uri?: string;
+  requestId?: string;
+  sessionTopic?: string;
   mode?: InputMode;
 };
 
@@ -59,6 +61,18 @@ export const rootRoute = createRootRoute({
     const uri =
       search.uri && typeof search.uri === "string" ? search.uri : undefined;
 
+    const requestId =
+      search.requestId &&
+      (typeof search.requestId === "string" ||
+        typeof search.requestId === "number")
+        ? search.requestId
+        : undefined;
+
+    const sessionTopic =
+      search.sessionTopic && typeof search.sessionTopic === "string"
+        ? search.sessionTopic
+        : undefined;
+
     const mode =
       search.mode === "scan" || search.mode === "text"
         ? search.mode
@@ -68,11 +82,13 @@ export const rootRoute = createRootRoute({
       theme,
       lang,
       uri,
+      requestId: requestId?.toString(),
+      sessionTopic,
       mode,
     };
   },
   component: function Root() {
-    const { lang, theme, uri } = rootRoute.useSearch();
+    const { lang, theme, uri, requestId, sessionTopic } = rootRoute.useSearch();
 
     useEffect(() => {
       void i18n.changeLanguage(lang);
@@ -99,16 +115,18 @@ export const rootRoute = createRootRoute({
                 {isApplicationDisabled ? (
                   <ApplicationDisabled />
                 ) : (
-                  <>
-                    <SnackbarProvider
-                      Components={{
-                        errorNotification: ErrorNotification,
-                      }}
-                    >
-                      <WalletConnectInit initialURI={uri} />
-                      <Outlet />
-                    </SnackbarProvider>
-                  </>
+                  <SnackbarProvider
+                    Components={{
+                      errorNotification: ErrorNotification,
+                    }}
+                  >
+                    <WalletConnectInit
+                      initialURI={uri}
+                      initialRequestId={requestId}
+                      initialSessionTopic={sessionTopic}
+                    />
+                    <Outlet />
+                  </SnackbarProvider>
                 )}
               </ErrorBoundary>
             </Suspense>

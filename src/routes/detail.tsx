@@ -16,11 +16,13 @@ export const detailRoute = createRoute({
     const sessions = useSessions(web3wallet);
     const session = useMemo(
       () => sessions.data.find((elem) => elem.topic === params.topic),
-      [params.topic, sessions.data]
+      [params.topic, sessions.data],
     );
 
     if (!session) {
-      return <Navigate to="/" search={(search) => search} />;
+      return (
+        <Navigate from="/detail/$topic" to="/" search={(search) => search} />
+      );
     }
 
     return <SessionDetail session={session} />;

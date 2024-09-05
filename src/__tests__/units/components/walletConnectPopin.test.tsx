@@ -10,7 +10,7 @@ describe("WalletConnectPopin", () => {
     const { container } = render(
       <WalletConnectPopin isOpen={true} onClose={mockOnClose}>
         <div>Content goes here</div>
-      </WalletConnectPopin>
+      </WalletConnectPopin>,
     );
 
     // Assert that the component is in the document when isOpen is true
@@ -21,7 +21,7 @@ describe("WalletConnectPopin", () => {
     render(
       <WalletConnectPopin isOpen={false} onClose={mockOnClose}>
         <div data-testid="content">Content goes here</div>
-      </WalletConnectPopin>
+      </WalletConnectPopin>,
     );
 
     // Assert that the component is not in the document when isOpen is false
@@ -32,7 +32,7 @@ describe("WalletConnectPopin", () => {
     const { user } = render(
       <WalletConnectPopin isOpen={true} onClose={mockOnClose}>
         <div>Content goes here</div>
-      </WalletConnectPopin>
+      </WalletConnectPopin>,
     );
 
     const closeButton = screen.getByTestId("close-button");

@@ -65,7 +65,7 @@ const AllProviders = ({ children, theme = "dark" }: PropsTheme) => {
 
 const customRender = (
   ui: ReactElement,
-  options?: Omit<RenderOptions, "wrapper">
+  options?: Omit<RenderOptions, "wrapper">,
 ) => render(ui, { wrapper: AllProviders, ...options });
 
 /**
@@ -76,7 +76,7 @@ const customRender = (
  */
 const setupUserEventWithRender = (
   ui: ReactElement,
-  options?: Omit<RenderOptions, "wrapper">
+  options?: Omit<RenderOptions, "wrapper">,
 ) => ({
   user: userEvent.setup(),
   ...customRender(ui, options),
@@ -136,9 +136,11 @@ function createTestRouter(component: () => JSX.Element) {
 // export function renderComponent(component: typeof _router) {
 export async function renderComponent(component: () => JSX.Element) {
   const router = createTestRouter(component);
+  // @ts-expect-error: router error because of the declaration in main.tsx
   render(<RouterProvider router={router} />);
   await act(async () => {
     return router.navigate({
+      from: "/",
       to: "/",
       search: (search) => search,
     });

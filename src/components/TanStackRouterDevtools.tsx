@@ -8,5 +8,5 @@ export const TanStackRouterDevtools = import.meta.env.PROD
         default: res.TanStackRouterDevtools,
         // For Embedded Mode
         // default: res.TanStackRouterDevtoolsPanel
-      }))
+      })),
     );

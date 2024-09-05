@@ -39,14 +39,12 @@ export default function Sessions() {
     analytics.page("Wallet Connect Sessions", {
       isEmptyState,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     analytics.track("equipment_connected", {
       sessionsConnected: sessionsLength,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionsLength]);
 
   const goToConnect = useCallback(() => {

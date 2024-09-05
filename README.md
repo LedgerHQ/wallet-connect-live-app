@@ -8,16 +8,16 @@ and is intended to be integrated within ledger products, enabling users to seaml
 ## Supported Currencies
 
 | Currency          | Supported ? | Sepolia Supported? | Holesky Supported? |
-| ----------------- | ----------- | ----------------- | --- |
-| Bitcoin           | ❌          | -                 | -   |
-| Ethereum          | ✅          | ✅                | ✅   |
-| Polygon           | ✅          | ❌                |   |
-| Arbitrum          | ✅          | ✅                |   |
-| Optimism          | ✅          | ✅                |   |
-| Avalanche C-Chain | ✅          | -                 |   |
-| Base              | ✅          | ✅                |   |
-| Cosmos            | ⏳          | -                 |   |
-| Multivers-X       | ✅          | -                 |   |
+| ----------------- | ----------- | ------------------ | ------------------ |
+| Bitcoin           | ❌          | -                  | -                  |
+| Ethereum          | ✅          | ✅                 | ✅                 |
+| Polygon           | ✅          | ❌                 |                    |
+| Arbitrum          | ✅          | ✅                 |                    |
+| Optimism          | ✅          | ✅                 |                    |
+| Avalanche C-Chain | ✅          | -                  |                    |
+| Base              | ✅          | ✅                 |                    |
+| Cosmos            | ⏳          | -                  |                    |
+| Multivers-X       | ✅          | -                  |                    |
 
 ## Hosting
 

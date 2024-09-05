@@ -30,7 +30,7 @@ import { enqueueSnackbar } from "notistack";
 import { sortedRecentConnectionAppsAtom } from "../../store/recentConnectionAppsAtom";
 
 export function useProposal(proposal: ProposalTypes.Struct) {
-  const navigate = useNavigate();
+  const navigate = useNavigate({ from: "/proposal/$id" });
   const queryClient = useQueryClient();
   const client = useAtomValue(walletAPIClientAtom);
   const accounts = useAccounts(client);

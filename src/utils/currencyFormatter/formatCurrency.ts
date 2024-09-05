@@ -1,12 +1,25 @@
 import BigNumber from "bignumber.js";
-import { defaultFormatOptions, nonBreakableSpace, prefixFormat, suffixFormat } from "./constants";
+import {
+  defaultFormatOptions,
+  nonBreakableSpace,
+  prefixFormat,
+  suffixFormat,
+} from "./constants";
 import { getLocaleSeparators } from "./separators";
-import { FormatFragment, FormatFragmentTypes, SupportedOptions, Unit } from "./types";
+import {
+  FormatFragment,
+  FormatFragmentTypes,
+  SupportedOptions,
+  Unit,
+} from "./types";
 
 /**
  * Returns a BigNumber format data structure based on locale
  */
-const getLocaleFormat = (locale: string, useGrouping: boolean): BigNumber.Format => {
+const getLocaleFormat = (
+  locale: string,
+  useGrouping: boolean,
+): BigNumber.Format => {
   const { decimal, thousands } = getLocaleSeparators(locale);
   return {
     decimalSeparator: decimal,
@@ -37,14 +50,26 @@ export const toLocaleString = (
   locale = "en",
   options: Partial<SupportedOptions> = {},
 ): string => {
-  const { minDecimalPlaces = 0, maxDecimalPlaces = Math.max(minDecimalPlaces, 3) } = options;
+  const {
+    minDecimalPlaces = 0,
+    maxDecimalPlaces = Math.max(minDecimalPlaces, 3),
+  } = options;
 
-  const grouping = options?.useGrouping !== undefined ? options.useGrouping : true;
+  const grouping =
+    options?.useGrouping !== undefined ? options.useGrouping : true;
   const format = getLocaleFormat(locale, grouping);
-  const nWithMaxDecimalPlaces = getFormattedBigNumber(n, format, maxDecimalPlaces);
+  const nWithMaxDecimalPlaces = getFormattedBigNumber(
+    n,
+    format,
+    maxDecimalPlaces,
+  );
 
   if (maxDecimalPlaces !== minDecimalPlaces) {
-    const nWithMinDecimalPlaces = getFormattedBigNumber(n, format, minDecimalPlaces);
+    const nWithMinDecimalPlaces = getFormattedBigNumber(
+      n,
+      format,
+      minDecimalPlaces,
+    );
     let i = nWithMaxDecimalPlaces.length;
 
     // cleanup useless '0's from the right until the minDecimalPlaces
@@ -124,7 +149,12 @@ export function formatCurrencyUnitFragment(
       );
 
   const fragValueByKind = {
-    sign: alwaysShowSign || floatValue.isNegative() ? (floatValue.isNegative() ? "-" : "+") : null,
+    sign:
+      alwaysShowSign || floatValue.isNegative()
+        ? floatValue.isNegative()
+          ? "-"
+          : "+"
+        : null,
     code: showCode ? code : null,
     value: discreet
       ? "***"
@@ -164,7 +194,8 @@ export function formatCurrencyUnit(
   options?: Partial<typeof defaultFormatOptions>,
 ): string {
   const joinFragmentsSeparator =
-    options?.joinFragmentsSeparator ?? defaultFormatOptions.joinFragmentsSeparator;
+    options?.joinFragmentsSeparator ??
+    defaultFormatOptions.joinFragmentsSeparator;
   return formatCurrencyUnitFragment(unit, value, options)
     .map((f) => f.value)
     .join(joinFragmentsSeparator);

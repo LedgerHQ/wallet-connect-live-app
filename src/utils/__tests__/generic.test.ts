@@ -55,7 +55,7 @@ describe("getAccountWithAddressAndChainId", () => {
     const res = getAccountWithAddressAndChainId(
       [ACCOUNT_MOCK],
       ACCOUNT_MOCK.address,
-      chainId
+      chainId,
     );
 
     expect(res).toEqual(ACCOUNT_MOCK);
@@ -65,7 +65,7 @@ describe("getAccountWithAddressAndChainId", () => {
     const res2 = getAccountWithAddressAndChainId(
       [ACCOUNT_MOCK],
       ACCOUNT_MOCK.address,
-      chainId2
+      chainId2,
     );
     expect(res2).toBeUndefined();
   });

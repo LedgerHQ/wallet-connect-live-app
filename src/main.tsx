@@ -38,6 +38,6 @@ if (rootElement && !rootElement.innerHTML) {
       <Suspense>
         <RouterProvider router={router} />
       </Suspense>
-    </StrictMode>
+    </StrictMode>,
   );
 }

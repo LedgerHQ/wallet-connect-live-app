@@ -38,12 +38,14 @@ export default defineConfig({
     //   },
     // }),
     // Put the Sentry vite plugin after all other plugins
-    sentryVitePlugin({
-      org: "ledger",
-      project: "wallet-connect-live-app",
-      authToken: process.env.SENTRY_AUTH_TOKEN,
-      // env: process.env.NODE_ENV,
-    }),
+    process.env.SENTRY_AUTH_TOKEN
+      ? sentryVitePlugin({
+          org: "ledger",
+          project: "wallet-connect-live-app",
+          authToken: process.env.SENTRY_AUTH_TOKEN,
+          // env: process.env.NODE_ENV,
+        })
+      : undefined,
   ],
   test: {
     exclude: [...configDefaults.exclude, "tests_playwright/*"],

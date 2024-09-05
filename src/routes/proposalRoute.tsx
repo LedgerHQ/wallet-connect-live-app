@@ -23,11 +23,13 @@ export const proposalRoute = createRoute({
     // const proposal = sessionProposals.many;
     const proposal = useMemo(
       () => pendingProposals.data.find((elem) => elem.id === Number(params.id)),
-      [params.id, pendingProposals.data]
+      [params.id, pendingProposals.data],
     );
 
     if (!proposal) {
-      return <Navigate to="/" search={(search) => search} />;
+      return (
+        <Navigate from="/proposal/$id" to="/" search={(search) => search} />
+      );
     }
 
     return <SessionProposal proposal={proposal} />;

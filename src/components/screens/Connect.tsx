@@ -64,7 +64,7 @@ export function Connect({ mode }: Props) {
   const [scanner, setScanner] = useState(mode === "scan");
   const analytics = useAnalytics();
 
-  const { onConnect } = useConnect();
+  const { onConnect } = useConnect(navigate);
 
   const handleConnect = useCallback(() => {
     try {
@@ -76,7 +76,7 @@ export function Connect({ mode }: Props) {
         button: "WC-Connect",
         page: "Connect",
       });
-    } catch (error) {
+    } catch {
       setErrorValue(t("error.invalidUri"));
     }
   }, [inputValue, onConnect, analytics, t]);

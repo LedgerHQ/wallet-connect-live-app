@@ -31,7 +31,7 @@ describe("GenericRow", () => {
         rowType={RowType.Select}
         onClick={onClick}
         isSelected={true}
-      />
+      />,
     );
 
     const titleElement = screen.getByText("Title");
@@ -53,7 +53,7 @@ describe("GenericRow", () => {
         rowType={RowType.Select}
         onClick={onClick}
         isSelected={true}
-      />
+      />,
     );
     if (container.firstChild) fireEvent.click(container.firstChild);
 

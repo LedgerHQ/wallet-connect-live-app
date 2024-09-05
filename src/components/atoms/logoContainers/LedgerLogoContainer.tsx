@@ -8,9 +8,14 @@ type Props = {
   style?: React.CSSProperties;
   children: ReactNode;
 };
-function LogoContainer({width, height, children, ...props}: Props) {
+function LogoContainer({ width, height, children, ...props }: Props) {
   return (
-    <LiveAppLogoContainer {...props} width={width} height={height} data-test-id="logo">
+    <LiveAppLogoContainer
+      {...props}
+      width={width}
+      height={height}
+      data-test-id="logo"
+    >
       {children}
     </LiveAppLogoContainer>
   );
