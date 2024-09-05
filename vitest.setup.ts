@@ -16,8 +16,9 @@ vi.mock("@walletconnect/web3wallet", () => {
             },
           },
         },
-        on: vi.fn<Parameters<typeof window.addEventListener>>(
-          (eventName, callback) => window.addEventListener(eventName, callback)
+        on: vi.fn<typeof window.addEventListener<keyof WindowEventMap>>(
+          (eventName, callback, options) =>
+            window.addEventListener(eventName, callback, options),
         ),
       })),
     },
@@ -34,14 +35,14 @@ vi.mock("@walletconnect/core", () => {
               window.dispatchEvent(
                 new CustomEvent("session_proposal", {
                   detail: sessionProposal,
-                })
+                }),
               );
             }, 200);
           }),
         },
         relayer: {
           on: vi.fn(),
-        }
+        },
       };
     }),
   };

@@ -5,10 +5,10 @@ import { InfoSessionProposal } from "@/components/screens/sessionProposal/InfoSe
 import { formatUrl } from "@/utils/helper.util";
 import { useProposal } from "@/hooks/useProposal/useProposal";
 import { ResponsiveContainer } from "@/styles/styles";
-import { Flex, Button, Box, Text } from "@ledgerhq/react-ui";
+import { Flex, Button, Box, Text, InfiniteLoader } from "@ledgerhq/react-ui";
 import { ArrowLeftMedium } from "@ledgerhq/react-ui/assets/icons";
 import { useTranslation } from "react-i18next";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import styled, { useTheme } from "styled-components";
 import useAnalytics from "@/hooks/useAnalytics";
 import { tryDecodeURI } from "@/utils/image";
@@ -52,6 +52,7 @@ export default function SessionProposal({ proposal }: Props) {
   const dApp = proposal.proposer.metadata.name;
   const dAppUrl = proposal.proposer.metadata.url;
   const currenciesById = useAtomValue(walletCurrenciesByIdAtom);
+  const [approving, setApproving] = useState(false);
 
   const verificationStatus = useVerification(proposal);
 
@@ -78,6 +79,7 @@ export default function SessionProposal({ proposal }: Props) {
       dapp: dApp,
       url: dAppUrl,
     });
+    setApproving(true);
     void approveSession();
   }, [analytics, approveSession, dApp, dAppUrl]);
 
@@ -125,8 +127,10 @@ export default function SessionProposal({ proposal }: Props) {
   );
 
   const disabled = useMemo(
-    () => !(everyRequiredChainsSelected && selectedAccounts.length > 0),
-    [everyRequiredChainsSelected, selectedAccounts],
+    () =>
+      approving ||
+      !(everyRequiredChainsSelected && selectedAccounts.length > 0),
+    [approving, everyRequiredChainsSelected, selectedAccounts.length],
   );
 
   const iconProposer = useMemo(
@@ -315,13 +319,17 @@ export default function SessionProposal({ proposal }: Props) {
                     onClick={onApprove}
                     disabled={disabled}
                   >
-                    <Text
-                      variant="body"
-                      fontWeight="semiBold"
-                      color={disabled ? "neutral.c50" : "neutral.c00"}
-                    >
-                      {t("sessionProposal.connect")}
-                    </Text>
+                    {approving ? (
+                      <InfiniteLoader size={20} />
+                    ) : (
+                      <Text
+                        variant="body"
+                        fontWeight="semiBold"
+                        color={disabled ? "neutral.c50" : "neutral.c00"}
+                      >
+                        {t("sessionProposal.connect")}
+                      </Text>
+                    )}
                   </Button>
                 </ButtonsContainer>
               </Flex>

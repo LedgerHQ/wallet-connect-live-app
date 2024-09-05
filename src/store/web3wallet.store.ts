@@ -27,3 +27,5 @@ export const web3walletAtom = atom((get) => {
     },
   });
 });
+
+export const walletConnectLoading = atom(false);

@@ -4,9 +4,16 @@ import {
   truncate,
   getDisplayName,
 } from "@/utils/helper.util";
-import { Box, Button, CryptoIcon, Flex, Text } from "@ledgerhq/react-ui";
+import {
+  Box,
+  Button,
+  CryptoIcon,
+  Flex,
+  InfiniteLoader,
+  Text,
+} from "@ledgerhq/react-ui";
 import { ArrowLeftMedium } from "@ledgerhq/react-ui/assets/icons";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { Account } from "@ledgerhq/wallet-api-client";
@@ -97,6 +104,7 @@ export default function SessionDetail({ session }: Props) {
   const web3wallet = useAtomValue(web3walletAtom);
   const analytics = useAnalytics();
   const currenciesById = useAtomValue(walletCurrenciesByIdAtom);
+  const [disconnecting, setDisconnecting] = useState(false);
 
   useEffect(() => {
     analytics.page("Wallet Connect Session Detail", {
@@ -114,6 +122,7 @@ export default function SessionDetail({ session }: Props) {
   }, [navigate]);
 
   const handleDelete = useCallback(() => {
+    setDisconnecting(true);
     void web3wallet
       .disconnectSession({
         topic: session.topic,
@@ -300,10 +309,15 @@ export default function SessionDetail({ session }: Props) {
               size="large"
               flex={1}
               onClick={handleDelete}
+              disabled={disconnecting}
             >
-              <Text variant="body" fontWeight="semiBold" color="neutral.c100">
-                {t("sessions.detail.disconnect")}
-              </Text>
+              {disconnecting ? (
+                <InfiniteLoader size={20} />
+              ) : (
+                <Text variant="body" fontWeight="semiBold" color="neutral.c100">
+                  {t("sessions.detail.disconnect")}
+                </Text>
+              )}
             </Button>
           </ButtonsContainer>
         </Flex>
