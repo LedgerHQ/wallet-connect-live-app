@@ -48,7 +48,6 @@ export function WalletConnectInit({
         search: ({ requestId: _r, sessionTopic: _s, ...search }) => search,
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return loading ? (

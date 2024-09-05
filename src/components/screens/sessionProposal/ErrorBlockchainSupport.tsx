@@ -39,7 +39,6 @@ export function ErrorBlockchainSupport({ appName, chains }: Props) {
         isRequired: chain.isRequired,
       })),
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

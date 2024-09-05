@@ -20,7 +20,6 @@ export function ApplicationDisabled() {
 
   useEffect(() => {
     analytics.page("WalletConnect Has Been Disabled");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

@@ -45,7 +45,6 @@ export default function ProtocolNotSupported() {
 
   useEffect(() => {
     analytics.page("Wallet Connect Error Unsupported Protocol V1");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const goHome = useCallback(() => {

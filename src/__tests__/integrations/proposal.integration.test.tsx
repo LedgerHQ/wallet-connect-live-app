@@ -1,4 +1,3 @@
-/* eslint-disable testing-library/no-debugging-utils */
 import "@testing-library/react/dont-cleanup-after-each";
 import { cleanup, render, waitFor, screen } from "@/tests/test.utils";
 import { initialParamsHomePage } from "@/tests/mocks/initialParams.mock";

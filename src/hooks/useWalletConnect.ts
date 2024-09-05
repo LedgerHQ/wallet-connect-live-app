@@ -54,11 +54,10 @@ enum Errors {
   msgDecline = "Message signed declined",
 }
 
+const hexReg = /^ *(0x)?([a-fA-F0-9]+) *$/;
 const formatMessage = (buffer: Buffer) => {
   const message = stripHexPrefix(
-    buffer.toString().match(/^ *(0x)?([a-fA-F0-9]+) *$/)
-      ? buffer.toString()
-      : buffer.toString("hex"),
+    hexReg.exec(buffer.toString()) ? buffer.toString() : buffer.toString("hex"),
   );
   return "0x" + message;
 };

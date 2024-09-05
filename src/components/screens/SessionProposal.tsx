@@ -61,7 +61,6 @@ export default function SessionProposal({ proposal }: Props) {
       dapp: dApp,
       url: dAppUrl,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onGoBack = useCallback(() => {

@@ -76,7 +76,7 @@ export function Connect({ mode }: Props) {
         button: "WC-Connect",
         page: "Connect",
       });
-    } catch (error) {
+    } catch {
       setErrorValue(t("error.invalidUri"));
     }
   }, [inputValue, onConnect, analytics, t]);
