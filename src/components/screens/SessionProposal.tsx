@@ -291,47 +291,47 @@ export default function SessionProposal({ proposal }: Props) {
               </ListChains>
             </Flex>
 
-            <Flex flexDirection={"column"}>
+            <Flex flexDirection={"column"} paddingY={4}>
               <VerificationCard verification={verificationStatus} />
+            </Flex>
 
-              <Flex
-                style={{
-                  backdropFilter: "blur(7px)",
-                  position: "sticky",
-                  bottom: "0px",
-                }}
-              >
-                <ButtonsContainer>
-                  <Button size="large" flex={0.3} mr={6} onClick={onReject}>
+            <Flex
+              style={{
+                backdropFilter: "blur(7px)",
+                position: "sticky",
+                bottom: "0px",
+              }}
+            >
+              <ButtonsContainer>
+                <Button size="large" flex={0.3} mr={6} onClick={onReject}>
+                  <Text
+                    variant="body"
+                    fontWeight="semiBold"
+                    color="neutral.c100"
+                  >
+                    {t("sessionProposal.reject")}
+                  </Text>
+                </Button>
+                <Button
+                  variant="main"
+                  size="large"
+                  flex={0.9}
+                  onClick={onApprove}
+                  disabled={disabled}
+                >
+                  {approving ? (
+                    <InfiniteLoader size={20} />
+                  ) : (
                     <Text
                       variant="body"
                       fontWeight="semiBold"
-                      color="neutral.c100"
+                      color={disabled ? "neutral.c50" : "neutral.c00"}
                     >
-                      {t("sessionProposal.reject")}
+                      {t("sessionProposal.connect")}
                     </Text>
-                  </Button>
-                  <Button
-                    variant="main"
-                    size="large"
-                    flex={0.9}
-                    onClick={onApprove}
-                    disabled={disabled}
-                  >
-                    {approving ? (
-                      <InfiniteLoader size={20} />
-                    ) : (
-                      <Text
-                        variant="body"
-                        fontWeight="semiBold"
-                        color={disabled ? "neutral.c50" : "neutral.c00"}
-                      >
-                        {t("sessionProposal.connect")}
-                      </Text>
-                    )}
-                  </Button>
-                </ButtonsContainer>
-              </Flex>
+                  )}
+                </Button>
+              </ButtonsContainer>
             </Flex>
           </Flex>
         )}
