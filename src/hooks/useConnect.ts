@@ -1,12 +1,13 @@
 import { coreAtom } from "@/store/web3wallet.store";
 import { getErrorMessage } from "@/utils/helper.util";
-import { useNavigate } from "@tanstack/react-router";
+import { UseNavigateResult } from "@tanstack/react-router";
 import { useAtomValue } from "jotai";
 import { enqueueSnackbar } from "notistack";
 import { useCallback, useMemo } from "react";
 
-export function useConnect() {
-  const navigate = useNavigate();
+export function useConnect(
+  navigate: UseNavigateResult<"/"> | UseNavigateResult<"/connect">,
+) {
   const core = useAtomValue(coreAtom);
 
   const startProposal = useCallback(
@@ -38,7 +39,7 @@ export function useConnect() {
         throw error;
       }
     },
-    [core]
+    [core],
   );
 
   const onConnect = useCallback(
@@ -56,11 +57,12 @@ export function useConnect() {
       } catch (error: unknown) {
         enqueueSnackbar(getErrorMessage(error), {
           errorType: "Connection error",
-          variant: "errorNotification", anchorOrigin: {
-            vertical: 'top',
-            horizontal: 'right'
-          }
-        })
+          variant: "errorNotification",
+          anchorOrigin: {
+            vertical: "top",
+            horizontal: "right",
+          },
+        });
         console.error(error);
       } finally {
         await navigate({
@@ -69,13 +71,13 @@ export function useConnect() {
         });
       }
     },
-    [navigate, startProposal]
+    [navigate, startProposal],
   );
 
   return useMemo(
     () => ({
       onConnect,
     }),
-    [onConnect]
+    [onConnect],
   );
 }

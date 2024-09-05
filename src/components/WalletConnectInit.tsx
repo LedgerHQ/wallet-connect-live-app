@@ -19,9 +19,9 @@ export function WalletConnectInit({
 }: Props) {
   useWalletConnect();
 
-  const { onConnect } = useConnect();
-  const [loading, setLoading] = useAtom(walletConnectLoading);
   const navigate = useNavigate({ from: "/" });
+  const { onConnect } = useConnect(navigate);
+  const [loading, setLoading] = useAtom(walletConnectLoading);
 
   // Try connecting only once with the provided uri
   useEffect(() => {
