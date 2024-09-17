@@ -46,7 +46,6 @@ import {
   RIPPLE_REQUESTS,
   RIPPLE_SIGNING_METHODS,
 } from "@/data/methods/Ripple.methods";
-
 enum Errors {
   userDecline = "User rejected",
   txDeclined = "Transaction declined",
@@ -299,12 +298,31 @@ export default function useWalletConnect() {
           }
           break;
         }
+        case EIP155_SIGNING_METHODS.WALLET_SWITCH_ETHEREUM_CHAIN: {
+          console.log("request, switch wallet", request);
+          console.log("chainId", chainId);
+
+          return navigate({
+            to: "/update/$topic/$id/$chainId",
+            params: {
+              topic,
+              id: id.toString(),
+              chainId:
+                "eip155:" +
+                parseInt(
+                  stripHexPrefix(request.params[0].chainId),
+                  16,
+                ).toString(),
+            },
+            search: (search) => search,
+          });
+        }
         default:
           // TODO handle default case ?
           return;
       }
     },
-    [accounts.data, client, web3wallet],
+    [accounts.data, client.message, client.transaction, navigate, web3wallet],
   );
 
   const handleXrpRequest = useCallback(
@@ -490,9 +508,8 @@ export default function useWalletConnect() {
         id,
       } = requestEvent;
 
-      console.log("onSessionRequest: ", requestEvent);
-
       if (isEIP155Chain(chainId, request)) {
+        console.log("EIP155 Request", { request, topic, id, chainId });
         void handleEIP155Request(request, topic, id, chainId);
       } else if (isMultiversXChain(chainId, request)) {
         void handleMvxRequest(request, topic, id, chainId);
@@ -526,9 +543,6 @@ export default function useWalletConnect() {
     web3wallet.on("session_proposal", onSessionProposal);
     web3wallet.on("session_request", onSessionRequest);
     web3wallet.on("session_delete", onSessionDeleted);
-
-    // auth
-    // web3wallet.on("auth_request", onAuthRequest);
     return () => {
       console.log("web3wallet cleanup listeners");
       // sign
@@ -536,9 +550,7 @@ export default function useWalletConnect() {
       web3wallet.off("session_proposal", onSessionProposal);
       web3wallet.off("session_request", onSessionRequest);
       web3wallet.off("session_delete", onSessionDeleted);
-
-      // auth
-      // web3wallet.off("auth_request", onAuthRequest);
+      web3wallet.events.removeAllListeners();
     };
   }, [
     web3wallet,

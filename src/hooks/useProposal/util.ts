@@ -90,3 +90,17 @@ export const formatAccountsByChain = (
 
   return mappedAccountsByChains;
 };
+
+export const formatAccountsOneChain = (chain: string, accounts: Account[]) => {
+  const formattedChain = getCurrencyByChainId(chain);
+
+  return {
+    chain: formattedChain,
+    displayName: getDisplayName(formattedChain),
+    isSupported: Boolean(SUPPORTED_NETWORK[formattedChain] !== undefined),
+    isRequired: true,
+    accounts: accounts.filter((acc) => {
+      return acc.currency === formattedChain;
+    }),
+  };
+};
