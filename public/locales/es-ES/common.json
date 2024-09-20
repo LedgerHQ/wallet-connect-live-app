@@ -41,6 +41,23 @@
       "1" : "Solicitar aprobaciones de transacciones",
       "2" : "Se te desconectará de {{dAppName}}"
     },
+    "verification" : {
+      "unknown" : {
+        "title" : "Dominio desconocido",
+        "label" : "No se puede verificar",
+        "description" : "Este dominio no se puede verificar. Revisa la solicitud detenidamente antes de aprobarla."
+      },
+      "invalid" : {
+        "title" : "El dominio no coincide",
+        "label" : "El dominio no coincide",
+        "description" : "Este sitio web tiene un dominio que no coincide con el emisor de esta solicitud. Aprobar la transacción puede conllevar la pérdida de fondos."
+      },
+      "scam" : {
+        "title" : "Riesgo para la seguridad conocido",
+        "label" : "Riesgo para la seguridad",
+        "description" : "Este dominio fue señalado como no seguro por parte de diversos proveedores de seguridad. Abandónalo inmediatamente para proteger tus activos."
+      }
+    },
     "error" : {
       "title" : "{{appName}} ha solicitado conectarse a cadenas que aún no son compatibles",
       "info" : "Actualmente, ofrecemos compatibilidad con: "
