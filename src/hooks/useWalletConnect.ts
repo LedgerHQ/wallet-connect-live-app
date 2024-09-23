@@ -485,7 +485,6 @@ export default function useWalletConnect() {
   const setLoading = useSetAtom(walletConnectLoading);
   const onSessionRequest = useCallback(
     (requestEvent: SignClientTypes.EventArguments["session_request"]) => {
-      setLoading(false);
       const {
         topic,
         params: { request, chainId },
@@ -494,17 +493,21 @@ export default function useWalletConnect() {
 
       console.log("onSessionRequest: ", requestEvent);
 
-      if (isEIP155Chain(chainId, request)) {
-        void handleEIP155Request(request, topic, id, chainId);
-      } else if (isMultiversXChain(chainId, request)) {
-        void handleMvxRequest(request, topic, id, chainId);
-      } else if (isBIP122Chain(chainId, request)) {
-        void handleBIP122Request(request, topic, id, chainId);
-      } else if (isRippleChain(chainId, request)) {
-        void handleXrpRequest(request, topic, id, chainId);
-      } else {
-        console.error("Not Supported Chain");
-      }
+      void (async () => {
+        if (isEIP155Chain(chainId, request)) {
+          await handleEIP155Request(request, topic, id, chainId);
+        } else if (isMultiversXChain(chainId, request)) {
+          await handleMvxRequest(request, topic, id, chainId);
+        } else if (isBIP122Chain(chainId, request)) {
+          await handleBIP122Request(request, topic, id, chainId);
+        } else if (isRippleChain(chainId, request)) {
+          await handleXrpRequest(request, topic, id, chainId);
+        } else {
+          console.error("Not Supported Chain");
+        }
+      })().finally(() => {
+        setLoading(false);
+      });
     },
     [
       handleBIP122Request,

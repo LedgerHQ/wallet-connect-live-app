@@ -31,11 +31,26 @@ export function WalletConnectInit({
 
         setLoading(true);
 
-        void onConnect(uri).finally(() => {
-          setLoading(false);
-        });
+        // If we don't have a pathname in the URI
+        // It means that wallet connect is used by a native mobile app
+        // The deep-link for requests is not containing requestId and/or sessionTopic
+        // Like we usually see when connecting from the JS lib on the browser
+        if (uri.pathname) {
+          void onConnect(uri).finally(() => {
+            setLoading(false);
+          });
+        } else {
+          // Remove the invalid uri from the search params to avoid infinite loader if the user reload the current page
+          void navigate({
+            search: ({ uri: _, ...search }) => search,
+          });
+        }
       } catch (error) {
         setLoading(false);
+        // Remove the invalid uri from the search params to avoid infinite loader if the user reload the current page
+        void navigate({
+          search: ({ uri: _, ...search }) => search,
+        });
         // TODO maybe improve this error handling
         console.error("Invalid initialURI: ", error);
       }

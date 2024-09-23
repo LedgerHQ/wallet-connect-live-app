@@ -322,6 +322,18 @@ export function useProposal(proposal: ProposalTypes.Struct) {
 
   const sessionsQueryFn = useSessionsQueryFn(web3wallet);
 
+  const redirectToDapp = useCallback(() => {
+    if (
+      proposal.proposer.metadata.redirect?.native ||
+      proposal.proposer.metadata.redirect?.universal
+    ) {
+      window.open(
+        proposal.proposer.metadata.redirect.native ??
+          proposal.proposer.metadata.redirect.universal,
+      );
+    }
+  }, []);
+
   const approveSession = useCallback(async () => {
     try {
       const supportedNs = buildSupportedNamespaces(proposal);
@@ -343,10 +355,11 @@ export function useProposal(proposal: ProposalTypes.Struct) {
         queryFn: sessionsQueryFn,
       });
       addAppToLastConnectionApps(session.peer.metadata);
+      // Remove the uri from the search params to avoid trying to connect again if the user reload the current page
       await navigate({
         to: "/detail/$topic",
         params: { topic: session.topic },
-        search: (search) => search,
+        search: ({ uri: _, ...search }) => search,
       });
     } catch (error) {
       // TODO : display error toast
@@ -355,11 +368,14 @@ export function useProposal(proposal: ProposalTypes.Struct) {
       await queryClient.invalidateQueries({
         queryKey: pendingProposalsQueryKey,
       });
+      // Remove the uri from the search params to avoid trying to connect again if the user reload the current page
       await navigate({
         to: "/",
-        search: (search) => search,
+        search: ({ uri: _, ...search }) => search,
       });
     }
+
+    redirectToDapp();
   }, [
     buildSupportedNamespaces,
     navigate,
@@ -382,10 +398,13 @@ export function useProposal(proposal: ProposalTypes.Struct) {
     await queryClient.invalidateQueries({
       queryKey: pendingProposalsQueryKey,
     });
+    // Remove the uri from the search params to avoid trying to connect again if the user reload the current page
     await navigate({
       to: "/",
-      search: (search) => search,
+      search: ({ uri: _, ...search }) => search,
     });
+
+    redirectToDapp();
   }, [navigate, proposal, queryClient, web3wallet]);
 
   const handleClose = useCallback(() => {
