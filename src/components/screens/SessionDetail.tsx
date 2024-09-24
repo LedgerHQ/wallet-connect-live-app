@@ -111,6 +111,7 @@ export default function SessionDetail({ session }: Props) {
       dapp: session.peer.metadata.name,
       url: session.peer.metadata.url,
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const navigateToHome = useCallback(() => {

@@ -16,7 +16,8 @@ import {
   coreAtom,
   connectionStatusAtom,
   web3walletAtom,
-  walletConnectLoading,
+  loadingAtom,
+  showBackToBrowserModalAtom,
 } from "@/store/web3wallet.store";
 import {
   isEIP155Chain,
@@ -482,7 +483,25 @@ export default function useWalletConnect() {
     [accounts.data, client, web3wallet],
   );
 
-  const setLoading = useSetAtom(walletConnectLoading);
+  const setShowModal = useSetAtom(showBackToBrowserModalAtom);
+  const redirectToDapp = useCallback(
+    (topic: string) => {
+      const session = web3wallet.engine.signClient.session.get(topic);
+      if (session) {
+        const url =
+          session.peer.metadata.redirect?.native ??
+          session.peer.metadata.redirect?.universal;
+        if (url) {
+          window.open(url);
+        } else {
+          setShowModal(true);
+        }
+      }
+    },
+    [setShowModal, web3wallet.engine.signClient.session],
+  );
+
+  const setLoading = useSetAtom(loadingAtom);
   const onSessionRequest = useCallback(
     (requestEvent: SignClientTypes.EventArguments["session_request"]) => {
       const {
@@ -490,8 +509,6 @@ export default function useWalletConnect() {
         params: { request, chainId },
         id,
       } = requestEvent;
-
-      console.log("onSessionRequest: ", requestEvent);
 
       void (async () => {
         if (isEIP155Chain(chainId, request)) {
@@ -507,6 +524,7 @@ export default function useWalletConnect() {
         }
       })().finally(() => {
         setLoading(false);
+        redirectToDapp(topic);
       });
     },
     [
@@ -515,6 +533,7 @@ export default function useWalletConnect() {
       handleMvxRequest,
       handleXrpRequest,
       setLoading,
+      redirectToDapp,
     ],
   );
 

@@ -1,10 +1,32 @@
 import { useAtom } from "jotai";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Flex, InfiniteLoader } from "@ledgerhq/react-ui";
+import { Flex, InfiniteLoader, Text } from "@ledgerhq/react-ui";
 import { useConnect } from "@/hooks/useConnect";
 import useWalletConnect from "@/hooks/useWalletConnect";
-import { walletConnectLoading } from "@/store/web3wallet.store";
+import {
+  loadingAtom,
+  showBackToBrowserModalAtom,
+} from "@/store/web3wallet.store";
+import { BottomModal } from "./atoms/popin/BottomModal";
+
+function BackToBrowserModal({
+  show,
+  closeModal,
+}: {
+  show: boolean;
+  closeModal: () => void;
+}) {
+  return show ? (
+    <BottomModal isOpen={show} onClose={closeModal}>
+      <Flex flexDirection="column" mx={6}>
+        <Text textAlign={"center"} variant="h5" color="neutral.c100" mb={10}>
+          Go back to your browser to continue
+        </Text>
+      </Flex>
+    </BottomModal>
+  ) : null;
+}
 
 type Props = {
   initialURI?: string;
@@ -21,7 +43,8 @@ export function WalletConnectInit({
 
   const navigate = useNavigate({ from: "/" });
   const { onConnect } = useConnect(navigate);
-  const [loading, setLoading] = useAtom(walletConnectLoading);
+  const [showModal, setShowModal] = useAtom(showBackToBrowserModalAtom);
+  const [loading, setLoading] = useAtom(loadingAtom);
 
   // Try connecting only once with the provided uri
   useEffect(() => {
@@ -63,7 +86,12 @@ export function WalletConnectInit({
         search: ({ requestId: _r, sessionTopic: _s, ...search }) => search,
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const closeModal = useCallback(() => {
+    setShowModal(false);
+  }, [setShowModal]);
 
   return loading ? (
     <Flex
@@ -79,5 +107,7 @@ export function WalletConnectInit({
     >
       <InfiniteLoader />
     </Flex>
-  ) : null;
+  ) : (
+    <BackToBrowserModal show={showModal} closeModal={closeModal} />
+  );
 }
