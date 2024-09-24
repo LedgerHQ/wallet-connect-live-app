@@ -9,8 +9,6 @@ const useVerification = (
 ): VerificationStatus => {
   const web3wallet = useAtomValue(web3walletAtom);
 
-  proposal;
-
   return useMemo(
     () =>
       proposal.proposer.metadata.verifyUrl ??
