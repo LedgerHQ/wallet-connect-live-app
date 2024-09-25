@@ -1,4 +1,5 @@
 import { useAtom } from "jotai";
+import { useTranslation } from "react-i18next";
 import { useCallback, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Flex, InfiniteLoader, Text } from "@ledgerhq/react-ui";
@@ -17,11 +18,13 @@ function BackToBrowserModal({
   show: boolean;
   closeModal: () => void;
 }) {
+  const { t } = useTranslation();
+
   return show ? (
     <BottomModal isOpen={show} onClose={closeModal}>
       <Flex flexDirection="column" mx={6}>
         <Text textAlign={"center"} variant="h5" color="neutral.c100" mb={10}>
-          Go back to your browser to continue
+          {t("backToBrowserModal.message")}
         </Text>
       </Flex>
     </BottomModal>
