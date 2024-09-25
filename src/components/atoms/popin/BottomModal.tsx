@@ -24,7 +24,7 @@ const Wrapper = styled(Flex).attrs((p) => ({
 }))``;
 
 const Overlay = styled(Flex).attrs((p) => ({
-  justifyContent: "end",
+  justifyContent: "center",
   alignItems: "end",
   width: "100vw",
   height: "100vh",
