@@ -40,10 +40,6 @@ Behavior of the live app can be influenced by navigating to it with the followin
 - Shared 🖖 (All the useful functions shared throughout the app)
 - tests-tools 🧪 (All the tools needed to carry out the tests)
 
-## Store Management
-
-Use of [Zustand](https://github.com/pmndrs/zustand) and `persist` middleware to have a persistent store via the `localStorage`
-
 ## Support new Chain/Network
 
 1 - Update `localManifest.json` by adding new entry in currencies:

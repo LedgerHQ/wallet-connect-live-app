@@ -44,31 +44,33 @@ export function useConnect(
 
   const onConnect = useCallback(
     async (inputValue: URL) => {
-      try {
-        const uri = inputValue.toString();
-        if (uri.includes("@1")) {
+      const uri = inputValue.toString();
+      if (uri.includes("@1")) {
+        await navigate({
+          to: "/protocol-not-supported",
+          // Remove the invalid uri from the search params
+          // to avoid showing this page again if the user reload the current page
+          search: ({ uri: _, ...search }) => search,
+        });
+      } else {
+        try {
+          await startProposal(uri);
+        } catch (error: unknown) {
+          enqueueSnackbar(getErrorMessage(error), {
+            errorType: "Connection error",
+            variant: "errorNotification",
+            anchorOrigin: {
+              vertical: "top",
+              horizontal: "right",
+            },
+          });
+          console.error(error);
+        } finally {
           await navigate({
-            to: "/protocol-not-supported",
+            to: "/",
             search: (search) => search,
           });
-        } else {
-          await startProposal(uri);
         }
-      } catch (error: unknown) {
-        enqueueSnackbar(getErrorMessage(error), {
-          errorType: "Connection error",
-          variant: "errorNotification",
-          anchorOrigin: {
-            vertical: "top",
-            horizontal: "right",
-          },
-        });
-        console.error(error);
-      } finally {
-        await navigate({
-          to: "/",
-          search: (search) => search,
-        });
       }
     },
     [navigate, startProposal],

@@ -4,7 +4,7 @@ import eslint from "@eslint/js";
 import tsEslint from "typescript-eslint";
 import prettierConfig from "eslint-config-prettier";
 import react from "eslint-plugin-react";
-// import reactHooks from "eslint-plugin-react-hooks";
+import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import testingLibrary from "eslint-plugin-testing-library";
 
@@ -39,12 +39,13 @@ export default tsEslint.config(
   {
     files: ["**/*.{ts,tsx}"],
     plugins: {
-      // ["react-hooks"]: reactHooks,
-      ["react-refresh"]: reactRefresh,
+      // @ts-expect-error: react hooks not ready
+      "react-hooks": reactHooks,
+      "react-refresh": reactRefresh,
     },
+    // @ts-expect-error: react hooks not ready
     rules: {
-      // "react-hooks/rules-of-hooks": "error",
-      // "react-hooks/exhaustive-deps": "warn",
+      ...reactHooks.configs.recommended.rules,
       "@typescript-eslint/no-unused-vars": [
         "warn",
         {

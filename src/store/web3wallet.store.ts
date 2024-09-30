@@ -28,4 +28,6 @@ export const web3walletAtom = atom((get) => {
   });
 });
 
-export const walletConnectLoading = atom(false);
+export const loadingAtom = atom(false);
+
+export const showBackToBrowserModalAtom = atom(false);

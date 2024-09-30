@@ -16,7 +16,10 @@ import {
 import { formatAccountsByChain } from "@/hooks/useProposal/util";
 import { useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { web3walletAtom } from "@/store/web3wallet.store";
+import {
+  showBackToBrowserModalAtom,
+  web3walletAtom,
+} from "@/store/web3wallet.store";
 import { useAtomValue, useSetAtom } from "jotai";
 import useAccounts, { queryKey as accountsQueryKey } from "@/hooks/useAccounts";
 import { walletAPIClientAtom } from "@/store/wallet-api.store";
@@ -322,6 +325,18 @@ export function useProposal(proposal: ProposalTypes.Struct) {
 
   const sessionsQueryFn = useSessionsQueryFn(web3wallet);
 
+  const setShowModal = useSetAtom(showBackToBrowserModalAtom);
+  const url =
+    proposal.proposer.metadata.redirect?.native ??
+    proposal.proposer.metadata.redirect?.universal;
+  const redirectToDapp = useCallback(() => {
+    if (url) {
+      window.open(url);
+    } else {
+      setShowModal(true);
+    }
+  }, [setShowModal, url]);
+
   const approveSession = useCallback(async () => {
     try {
       const supportedNs = buildSupportedNamespaces(proposal);
@@ -343,10 +358,11 @@ export function useProposal(proposal: ProposalTypes.Struct) {
         queryFn: sessionsQueryFn,
       });
       addAppToLastConnectionApps(session.peer.metadata);
+      // Remove the uri from the search params to avoid trying to connect again if the user reload the current page
       await navigate({
         to: "/detail/$topic",
         params: { topic: session.topic },
-        search: (search) => search,
+        search: ({ uri: _, ...search }) => search,
       });
     } catch (error) {
       // TODO : display error toast
@@ -355,19 +371,23 @@ export function useProposal(proposal: ProposalTypes.Struct) {
       await queryClient.invalidateQueries({
         queryKey: pendingProposalsQueryKey,
       });
+      // Remove the uri from the search params to avoid trying to connect again if the user reload the current page
       await navigate({
         to: "/",
-        search: (search) => search,
+        search: ({ uri: _, ...search }) => search,
       });
     }
+
+    redirectToDapp();
   }, [
+    redirectToDapp,
     buildSupportedNamespaces,
-    navigate,
     proposal,
+    web3wallet,
     queryClient,
     sessionsQueryFn,
-    web3wallet,
     addAppToLastConnectionApps,
+    navigate,
   ]);
 
   const rejectSession = useCallback(async () => {
@@ -382,11 +402,14 @@ export function useProposal(proposal: ProposalTypes.Struct) {
     await queryClient.invalidateQueries({
       queryKey: pendingProposalsQueryKey,
     });
+    // Remove the uri from the search params to avoid trying to connect again if the user reload the current page
     await navigate({
       to: "/",
-      search: (search) => search,
+      search: ({ uri: _, ...search }) => search,
     });
-  }, [navigate, proposal, queryClient, web3wallet]);
+
+    redirectToDapp();
+  }, [navigate, proposal.id, queryClient, redirectToDapp, web3wallet]);
 
   const handleClose = useCallback(() => {
     void rejectSession();
