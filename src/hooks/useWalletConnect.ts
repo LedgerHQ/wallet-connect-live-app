@@ -1,17 +1,6 @@
 import { SignClientTypes } from "@walletconnect/types";
 import { useCallback, useEffect } from "react";
 import { Web3WalletTypes } from "@walletconnect/web3wallet";
-import { getAccountWithAddressAndChainId } from "@/utils/generic";
-import { stripHexPrefix } from "@/utils/currencyFormatter/helpers";
-import {
-  convertEthToLiveTX,
-  convertMvxToLiveTX,
-  convertXrpToLiveTX,
-} from "@/utils/converters";
-import {
-  EIP155_REQUESTS,
-  EIP155_SIGNING_METHODS,
-} from "@/data/methods/EIP155Data.methods";
 import {
   coreAtom,
   connectionStatusAtom,
@@ -27,7 +16,6 @@ import {
 } from "@/utils/helper.util";
 import { useNavigate } from "@tanstack/react-router";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { Web3Wallet } from "@walletconnect/web3wallet/dist/types/client";
 import useAccounts from "./useAccounts";
 import { walletAPIClientAtom } from "@/store/wallet-api.store";
 import { queryKey as sessionsQueryKey } from "./useSessions";
@@ -36,67 +24,13 @@ import {
   useQueryFn as usePendingProposalsQueryFn,
 } from "./usePendingProposals";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  MULTIVERSX_REQUESTS,
-  MULTIVERSX_SIGNING_METHODS,
-} from "@/data/methods/MultiversX.methods";
-import {
-  BIP122_REQUESTS,
-  BIP122_SIGNING_METHODS,
-} from "@/data/methods/BIP122.methods";
-import {
-  RIPPLE_REQUESTS,
-  RIPPLE_SIGNING_METHODS,
-} from "@/data/methods/Ripple.methods";
-
-enum Errors {
-  userDecline = "User rejected",
-  txDeclined = "Transaction declined",
-  msgDecline = "Message signed declined",
-}
-
-const hexReg = /^ *(0x)?([a-fA-F0-9]+) *$/;
-const formatMessage = (buffer: Buffer) => {
-  const message = stripHexPrefix(
-    hexReg.exec(buffer.toString()) ? buffer.toString() : buffer.toString("hex"),
-  );
-  return "0x" + message;
-};
-
-const acceptRequest = (
-  web3wallet: Web3Wallet,
-  topic: string,
-  id: number,
-  signedMessage: string,
-) => {
-  return web3wallet.respondSessionRequest({
-    topic,
-    response: {
-      id,
-      jsonrpc: "2.0",
-      result: signedMessage,
-    },
-  });
-};
-
-const rejectRequest = (
-  web3wallet: Web3Wallet,
-  topic: string,
-  id: number,
-  message: Errors,
-) => {
-  return web3wallet.respondSessionRequest({
-    topic,
-    response: {
-      id,
-      jsonrpc: "2.0",
-      error: {
-        code: 5000,
-        message,
-      },
-    },
-  });
-};
+import { handleEIP155Request } from "./requestHandlers/EIP155";
+import { handleMvxRequest } from "./requestHandlers/MultiversX";
+import { handleBIP122Request } from "./requestHandlers/BIP122";
+import { handleXrpRequest } from "./requestHandlers/Ripple";
+import { Errors, rejectRequest } from "./requestHandlers/utils";
+import { handleWalletRequest } from "./requestHandlers/Wallet";
+import { isWalletRequest } from "../utils/helper.util";
 
 function useWalletConnectStatus() {
   const core = useAtomValue(coreAtom);
@@ -182,307 +116,6 @@ export default function useWalletConnect() {
     [navigate, pendingProposalsQueryFn, queryClient, web3wallet.core.pairing],
   );
 
-  const handleEIP155Request = useCallback(
-    async (
-      request: EIP155_REQUESTS,
-      topic: string,
-      id: number,
-      chainId: string,
-    ) => {
-      switch (request.method) {
-        case EIP155_SIGNING_METHODS.ETH_SIGN:
-        case EIP155_SIGNING_METHODS.PERSONAL_SIGN: {
-          const isPersonalSign =
-            request.method === EIP155_SIGNING_METHODS.PERSONAL_SIGN;
-          const accountSign = getAccountWithAddressAndChainId(
-            accounts.data,
-            isPersonalSign ? request.params[1] : request.params[0],
-            chainId,
-          );
-          if (accountSign) {
-            try {
-              const message = stripHexPrefix(
-                isPersonalSign ? request.params[0] : request.params[1],
-              );
-
-              const signedMessage = await client.message.sign(
-                accountSign.id,
-                Buffer.from(message, "hex"),
-              );
-              void acceptRequest(
-                web3wallet,
-                topic,
-                id,
-                formatMessage(signedMessage),
-              );
-            } catch (error) {
-              void rejectRequest(web3wallet, topic, id, Errors.userDecline);
-              console.error(error);
-            }
-          } else {
-            void rejectRequest(web3wallet, topic, id, Errors.userDecline);
-          }
-          break;
-        }
-        case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA:
-        case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V3:
-        case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V4: {
-          const accountSignTyped = getAccountWithAddressAndChainId(
-            accounts.data,
-            request.params[0],
-            chainId,
-          );
-          if (accountSignTyped) {
-            try {
-              const message = stripHexPrefix(request.params[1]);
-
-              const signedMessage = await client.message.sign(
-                accountSignTyped.id,
-                Buffer.from(message),
-              );
-              void acceptRequest(
-                web3wallet,
-                topic,
-                id,
-                formatMessage(signedMessage),
-              );
-            } catch (error) {
-              void rejectRequest(web3wallet, topic, id, Errors.msgDecline);
-              console.error(error);
-            }
-          } else {
-            void rejectRequest(web3wallet, topic, id, Errors.msgDecline);
-          }
-          break;
-        }
-        case EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION: {
-          const ethTx = request.params[0];
-          const accountTX = getAccountWithAddressAndChainId(
-            accounts.data,
-            ethTx.from,
-            chainId,
-          );
-          if (accountTX) {
-            try {
-              const liveTx = convertEthToLiveTX(ethTx);
-              const hash = await client.transaction.signAndBroadcast(
-                accountTX.id,
-                liveTx,
-              );
-              void acceptRequest(web3wallet, topic, id, hash);
-            } catch (error) {
-              void rejectRequest(web3wallet, topic, id, Errors.txDeclined);
-              console.error(error);
-            }
-          } else {
-            void rejectRequest(web3wallet, topic, id, Errors.txDeclined);
-          }
-          break;
-        }
-        case EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION: {
-          const ethTx = request.params[0];
-          const accountTX = getAccountWithAddressAndChainId(
-            accounts.data,
-            ethTx.from,
-            chainId,
-          );
-          if (accountTX) {
-            try {
-              const liveTx = convertEthToLiveTX(ethTx);
-              const hash = await client.transaction.sign(accountTX.id, liveTx);
-              void acceptRequest(web3wallet, topic, id, hash.toString());
-            } catch (error) {
-              void rejectRequest(web3wallet, topic, id, Errors.txDeclined);
-              console.error(error);
-            }
-          } else {
-            void rejectRequest(web3wallet, topic, id, Errors.txDeclined);
-          }
-          break;
-        }
-        default:
-          // TODO handle default case ?
-          return;
-      }
-    },
-    [accounts.data, client, web3wallet],
-  );
-
-  const handleXrpRequest = useCallback(
-    async (
-      request: RIPPLE_REQUESTS,
-      topic: string,
-      id: number,
-      _chainId: string,
-    ) => {
-      const ledgerLiveCurrency = "ripple";
-      switch (request.method) {
-        case RIPPLE_SIGNING_METHODS.RIPPLE_SIGN_TRANSACTION: {
-          const accountTX = getAccountWithAddressAndChainId(
-            accounts.data,
-            request.params.tx_json.Account,
-            ledgerLiveCurrency,
-          );
-
-          if (accountTX) {
-            try {
-              const liveTx = convertXrpToLiveTX(request.params.tx_json);
-              const hash = await client.transaction.signAndBroadcast(
-                accountTX.id,
-                liveTx,
-              );
-              void acceptRequest(web3wallet, topic, id, hash);
-            } catch (error) {
-              void rejectRequest(web3wallet, topic, id, Errors.txDeclined);
-              console.error(error);
-            }
-          } else {
-            void rejectRequest(web3wallet, topic, id, Errors.txDeclined);
-          }
-          break;
-        }
-        default:
-          return;
-      }
-    },
-    [accounts.data, client, web3wallet],
-  );
-
-  const handleMvxRequest = useCallback(
-    async (
-      request: MULTIVERSX_REQUESTS,
-      topic: string,
-      id: number,
-      _chainId: string,
-    ) => {
-      const ledgerLiveCurrency = "elrond";
-      switch (request.method) {
-        case MULTIVERSX_SIGNING_METHODS.MULTIVERSX_SIGN_MESSAGE: {
-          const accountSign = getAccountWithAddressAndChainId(
-            accounts.data,
-            request.params.address,
-            ledgerLiveCurrency,
-          );
-          if (accountSign) {
-            try {
-              const message = request.params.message;
-              const signedMessage = await client.message.sign(
-                accountSign.id,
-                Buffer.from(message),
-              );
-              void acceptRequest(
-                web3wallet,
-                topic,
-                id,
-                formatMessage(signedMessage),
-              );
-            } catch (error) {
-              void rejectRequest(web3wallet, topic, id, Errors.userDecline);
-              console.error(error);
-            }
-          } else {
-            void rejectRequest(web3wallet, topic, id, Errors.userDecline);
-          }
-          break;
-        }
-        case MULTIVERSX_SIGNING_METHODS.MULTIVERSX_SIGN_TRANSACTION: {
-          const accountTX = getAccountWithAddressAndChainId(
-            accounts.data,
-            request.params.transaction.sender,
-            ledgerLiveCurrency,
-          );
-          if (accountTX) {
-            try {
-              const liveTx = convertMvxToLiveTX(request.params.transaction);
-              const hash = await client.transaction.signAndBroadcast(
-                accountTX.id,
-                liveTx,
-              );
-              void acceptRequest(web3wallet, topic, id, hash);
-            } catch (error) {
-              void rejectRequest(web3wallet, topic, id, Errors.txDeclined);
-              console.error(error);
-            }
-          } else {
-            void rejectRequest(web3wallet, topic, id, Errors.txDeclined);
-          }
-          break;
-        }
-        case MULTIVERSX_SIGNING_METHODS.MULTIVERSX_SIGN_TRANSACTIONS: {
-          for (const transaction of request.params.transactions) {
-            const accountTX = getAccountWithAddressAndChainId(
-              accounts.data,
-              transaction.sender,
-              ledgerLiveCurrency,
-            );
-            if (accountTX) {
-              try {
-                const liveTx = convertMvxToLiveTX(transaction);
-                const hash = await client.transaction.signAndBroadcast(
-                  accountTX.id,
-                  liveTx,
-                );
-                void acceptRequest(web3wallet, topic, id, hash);
-              } catch (error) {
-                void rejectRequest(web3wallet, topic, id, Errors.txDeclined);
-                console.error(error);
-              }
-            } else {
-              void rejectRequest(web3wallet, topic, id, Errors.txDeclined);
-            }
-          }
-          break;
-        }
-        default:
-          return;
-      }
-    },
-    [accounts.data, client, web3wallet],
-  );
-
-  const handleBIP122Request = useCallback(
-    async (
-      request: BIP122_REQUESTS,
-      topic: string,
-      id: number,
-      chainId: string,
-    ) => {
-      switch (request.method) {
-        case BIP122_SIGNING_METHODS.BIP122_SIGN_MESSAGE: {
-          const accountSign = getAccountWithAddressAndChainId(
-            accounts.data,
-            request.params.address,
-            chainId,
-          );
-          if (accountSign) {
-            try {
-              const message = request.params.message;
-              const signedMessage = await client.message.sign(
-                accountSign.id,
-                Buffer.from(message),
-              );
-              void acceptRequest(
-                web3wallet,
-                topic,
-                id,
-                formatMessage(signedMessage),
-              );
-            } catch (error) {
-              void rejectRequest(web3wallet, topic, id, Errors.userDecline);
-              console.error(error);
-            }
-          } else {
-            void rejectRequest(web3wallet, topic, id, Errors.userDecline);
-          }
-          break;
-        }
-        default:
-          return;
-      }
-    },
-    [accounts.data, client, web3wallet],
-  );
-
   const setShowModal = useSetAtom(showBackToBrowserModalAtom);
   const redirectToDapp = useCallback(
     (topic: string) => {
@@ -511,27 +144,82 @@ export default function useWalletConnect() {
       } = requestEvent;
 
       void (async () => {
-        if (isEIP155Chain(chainId, request)) {
-          await handleEIP155Request(request, topic, id, chainId);
-        } else if (isMultiversXChain(chainId, request)) {
-          await handleMvxRequest(request, topic, id, chainId);
-        } else if (isBIP122Chain(chainId, request)) {
-          await handleBIP122Request(request, topic, id, chainId);
-        } else if (isRippleChain(chainId, request)) {
-          await handleXrpRequest(request, topic, id, chainId);
-        } else {
-          console.error("Not Supported Chain");
+        try {
+          if (isWalletRequest(request)) {
+            await handleWalletRequest(
+              request,
+              topic,
+              id,
+              chainId,
+              accounts.data,
+              client,
+              web3wallet,
+              queryClient,
+            );
+          } else if (isEIP155Chain(chainId, request)) {
+            await handleEIP155Request(
+              request,
+              topic,
+              id,
+              chainId,
+              accounts.data,
+              client,
+              web3wallet,
+            );
+          } else if (isMultiversXChain(chainId, request)) {
+            await handleMvxRequest(
+              request,
+              topic,
+              id,
+              chainId,
+              accounts.data,
+              client,
+              web3wallet,
+            );
+          } else if (isBIP122Chain(chainId, request)) {
+            await handleBIP122Request(
+              request,
+              topic,
+              id,
+              chainId,
+              accounts.data,
+              client,
+              web3wallet,
+            );
+          } else if (isRippleChain(chainId, request)) {
+            await handleXrpRequest(
+              request,
+              topic,
+              id,
+              chainId,
+              accounts.data,
+              client,
+              web3wallet,
+            );
+          } else {
+            console.error("Not Supported Chain");
+            await rejectRequest(
+              web3wallet,
+              topic,
+              id,
+              Errors.unsupportedChains,
+              5100,
+            );
+          }
+        } catch {
+          await rejectRequest(web3wallet, topic, id, Errors.txDeclined);
         }
       })().finally(() => {
         setLoading(false);
         redirectToDapp(topic);
+        void queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
       });
     },
     [
-      handleBIP122Request,
-      handleEIP155Request,
-      handleMvxRequest,
-      handleXrpRequest,
+      accounts.data,
+      client,
+      web3wallet,
+      queryClient,
       setLoading,
       redirectToDapp,
     ],
