@@ -31,6 +31,10 @@ import { queryKey as pendingProposalsQueryKey } from "../usePendingProposals";
 import { ProposalTypes } from "@walletconnect/types";
 import { enqueueSnackbar } from "notistack";
 import { sortedRecentConnectionAppsAtom } from "../../store/recentConnectionAppsAtom";
+import { WALLET_METHODS } from "@/data/methods/Wallet.methods";
+import { MULTIVERSX_SIGNING_METHODS } from "@/data/methods/MultiversX.methods";
+import { BIP122_SIGNING_METHODS } from "@/data/methods/BIP122.methods";
+import { RIPPLE_SIGNING_METHODS } from "@/data/methods/Ripple.methods";
 
 export function useProposal(proposal: ProposalTypes.Struct) {
   const navigate = useNavigate({ from: "/proposal/$id" });
@@ -90,23 +94,26 @@ export function useProposal(proposal: ProposalTypes.Struct) {
           ),
         [],
       );
-      const namespace =
-        requiredNamespaces[SupportedNamespace.EIP155] ||
-        optionalNamespaces[SupportedNamespace.EIP155];
 
-      const methods: string[] = [
+      const supportedMethods: string[] = [
+        ...Object.values(WALLET_METHODS),
+        ...Object.values(EIP155_SIGNING_METHODS),
+      ];
+
+      const methods = [
         ...new Set([
-          ...namespace.methods,
-          ...Object.values(EIP155_SIGNING_METHODS),
+          ...(requiredNamespaces[SupportedNamespace.EIP155]?.methods.filter(
+            (method) => supportedMethods.includes(method),
+          ) ?? []),
+          ...(optionalNamespaces[SupportedNamespace.EIP155]?.methods.filter(
+            (method) => supportedMethods.includes(method),
+          ) ?? []),
         ]),
       ];
       const events = [
         ...new Set([
-          ...namespace.events,
-          "session_proposal",
-          "session_request",
-          "auth_request",
-          "session_delete",
+          ...(requiredNamespaces[SupportedNamespace.EIP155]?.events ?? []),
+          ...(optionalNamespaces[SupportedNamespace.EIP155]?.events ?? []),
         ]),
       ];
 
@@ -148,19 +155,27 @@ export function useProposal(proposal: ProposalTypes.Struct) {
           ),
         [],
       );
-      const namespace =
-        requiredNamespaces[SupportedNamespace.MVX] ||
-        optionalNamespaces[SupportedNamespace.MVX];
 
-      const methods: string[] = namespace.methods;
+      const supportedMethods: string[] = [
+        ...Object.values(WALLET_METHODS),
+        ...Object.values(MULTIVERSX_SIGNING_METHODS),
+      ];
+
+      const methods = [
+        ...new Set([
+          ...(requiredNamespaces[SupportedNamespace.MVX]?.methods.filter(
+            (method) => supportedMethods.includes(method),
+          ) ?? []),
+          ...(optionalNamespaces[SupportedNamespace.MVX]?.methods.filter(
+            (method) => supportedMethods.includes(method),
+          ) ?? []),
+        ]),
+      ];
 
       const events = [
         ...new Set([
-          ...namespace.events,
-          "session_proposal",
-          "session_request",
-          "auth_request",
-          "session_delete",
+          ...(requiredNamespaces[SupportedNamespace.MVX]?.events ?? []),
+          ...(optionalNamespaces[SupportedNamespace.MVX]?.events ?? []),
         ]),
       ];
 
@@ -202,19 +217,27 @@ export function useProposal(proposal: ProposalTypes.Struct) {
           ),
         [],
       );
-      const namespace =
-        requiredNamespaces[SupportedNamespace.BIP122] ||
-        optionalNamespaces[SupportedNamespace.BIP122];
 
-      const methods: string[] = namespace.methods;
+      const supportedMethods: string[] = [
+        ...Object.values(WALLET_METHODS),
+        ...Object.values(BIP122_SIGNING_METHODS),
+      ];
+
+      const methods = [
+        ...new Set([
+          ...(requiredNamespaces[SupportedNamespace.BIP122]?.methods.filter(
+            (method) => supportedMethods.includes(method),
+          ) ?? []),
+          ...(optionalNamespaces[SupportedNamespace.BIP122]?.methods.filter(
+            (method) => supportedMethods.includes(method),
+          ) ?? []),
+        ]),
+      ];
 
       const events = [
         ...new Set([
-          ...namespace.events,
-          "session_proposal",
-          "session_request",
-          "auth_request",
-          "session_delete",
+          ...(requiredNamespaces[SupportedNamespace.BIP122]?.events ?? []),
+          ...(optionalNamespaces[SupportedNamespace.BIP122]?.events ?? []),
         ]),
       ];
 
@@ -256,19 +279,27 @@ export function useProposal(proposal: ProposalTypes.Struct) {
           ),
         [],
       );
-      const namespace =
-        requiredNamespaces[SupportedNamespace.XRPL] ||
-        optionalNamespaces[SupportedNamespace.XRPL];
 
-      const methods: string[] = namespace.methods;
+      const supportedMethods: string[] = [
+        ...Object.values(WALLET_METHODS),
+        ...Object.values(RIPPLE_SIGNING_METHODS),
+      ];
+
+      const methods = [
+        ...new Set([
+          ...(requiredNamespaces[SupportedNamespace.XRPL]?.methods.filter(
+            (method) => supportedMethods.includes(method),
+          ) ?? []),
+          ...(optionalNamespaces[SupportedNamespace.XRPL]?.methods.filter(
+            (method) => supportedMethods.includes(method),
+          ) ?? []),
+        ]),
+      ];
 
       const events = [
         ...new Set([
-          ...namespace.events,
-          "session_proposal",
-          "session_request",
-          "auth_request",
-          "session_delete",
+          ...(requiredNamespaces[SupportedNamespace.XRPL]?.events ?? []),
+          ...(optionalNamespaces[SupportedNamespace.XRPL]?.events ?? []),
         ]),
       ];
 

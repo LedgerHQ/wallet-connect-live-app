@@ -155,7 +155,6 @@ All Live apps are defined with a manifest. Here is one that can be used for loca
     "account.list",
     "account.request",
     "message.sign",
-    "transaction.sign",
     "transaction.signAndBroadcast",
     "wallet.userId",
     "wallet.info"

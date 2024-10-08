@@ -5,6 +5,16 @@
 
 import { Network } from "./types";
 
+function getNetworkById(chains: Record<string, Network>) {
+  return Object.entries(chains).reduce<Record<Network["chainId"], string>>(
+    (acc, [key, network]) => {
+      acc[network.chainId] = key;
+      return acc;
+    },
+    {},
+  );
+}
+
 export const EIP155_CHAINS_MAINNET: Record<string, Network> = {
   ethereum: {
     chainId: 1,
@@ -108,6 +118,9 @@ export const MULTIVERS_X_CHAINS: Record<string, Network> = {
   },
 };
 
+export const MULTIVERS_X_NETWORK_BY_CHAIN_ID =
+  getNetworkById(MULTIVERS_X_CHAINS);
+
 export const BIP122_MAINNET_CHAINS: Record<string, Network> = {
   bitcoin: {
     chainId: "000000000019d6689c085ae165831e93",
@@ -147,6 +160,8 @@ export const BIP122_CHAINS = {
   ...BIP122_TEST_CHAINS,
 };
 
+export const BIP122_NETWORK_BY_CHAIN_ID = getNetworkById(BIP122_CHAINS);
+
 export const RIPPLE_CHAINS: Record<string, Network> = {
   ripple: {
     chainId: "0",
@@ -157,11 +172,15 @@ export const RIPPLE_CHAINS: Record<string, Network> = {
   },
 };
 
+export const RIPPLE_NETWORK_BY_CHAIN_ID = getNetworkById(RIPPLE_CHAINS);
+
 export const EIP155_CHAINS = {
   ...EIP155_CHAINS_MAINNET,
   ...EIP155_SEPOLIA_CHAINS,
   ...EIP155_HOLESKY_CHAINS,
 };
+
+export const EIP155_NETWORK_BY_CHAIN_ID = getNetworkById(EIP155_CHAINS);
 
 export const SUPPORTED_NETWORK: Record<string, Network> = {
   ...EIP155_CHAINS,

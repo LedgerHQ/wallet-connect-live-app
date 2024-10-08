@@ -14,6 +14,8 @@ export const EIP155_SIGNING_METHODS = {
   ETH_SIGN_TYPED_DATA_V3: "eth_signTypedData_v3",
   ETH_SIGN_TYPED_DATA_V4: "eth_signTypedData_v4",
   ETH_SEND_TRANSACTION: "eth_sendTransaction",
+  ETH_ACCOUNTS: "eth_accounts",
+  ETH_REQUEST_ACCOUNTS: "eth_requestAccounts",
 } as const;
 
 export type EIP155_REQUESTS =

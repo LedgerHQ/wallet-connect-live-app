@@ -2,6 +2,7 @@ import { BIP122_REQUESTS } from "@/data/methods/BIP122.methods";
 import { EIP155_REQUESTS } from "@/data/methods/EIP155Data.methods";
 import { MULTIVERSX_REQUESTS } from "@/data/methods/MultiversX.methods";
 import { RIPPLE_REQUESTS } from "@/data/methods/Ripple.methods";
+import { WALLET_REQUESTS } from "@/data/methods/Wallet.methods";
 import { SUPPORTED_NETWORK } from "@/data/network.config";
 
 /**
@@ -25,6 +26,16 @@ export function truncate(value: string, length: number) {
 }
 
 /**
+ * Check if it's a wallet request
+ */
+export function isWalletRequest(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  request: { method: string; params: any },
+): request is WALLET_REQUESTS {
+  return request.method.startsWith("wallet_");
+}
+
+/**
  * Check if chain is part of EIP155 standard
  */
 export function isEIP155Chain(
@@ -33,7 +44,7 @@ export function isEIP155Chain(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   _request?: { method: string; params: any },
 ): _request is EIP155_REQUESTS {
-  return chain.includes("eip155");
+  return chain.startsWith("eip155");
 }
 
 export function isMultiversXChain(
@@ -42,7 +53,7 @@ export function isMultiversXChain(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   _request?: { method: string; params: any },
 ): _request is MULTIVERSX_REQUESTS {
-  return chain.includes("mvx");
+  return chain.startsWith("mvx");
 }
 
 export function isBIP122Chain(
@@ -51,7 +62,7 @@ export function isBIP122Chain(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   _request?: { method: string; params: any },
 ): _request is BIP122_REQUESTS {
-  return chain.includes("bip122");
+  return chain.startsWith("bip122");
 }
 
 export function isRippleChain(
@@ -59,7 +70,7 @@ export function isRippleChain(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   _request?: { method: string; params: any },
 ): _request is RIPPLE_REQUESTS {
-  return chain.includes("xrpl:0");
+  return chain.startsWith("xrpl:0");
 }
 
 /**
