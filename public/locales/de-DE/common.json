@@ -41,6 +41,23 @@
       "1" : "Genehmigungen für Transaktionen anfordern",
       "2" : "Ihre Verbindung zu {{dAppName}} wird getrennt"
     },
+    "verification" : {
+      "unknown" : {
+        "title" : "Unbekannte Domain",
+        "label" : "Verifizieren nicht möglich",
+        "description" : "Diese Domain kann nicht verifiziert werden. Prüfe die Anfrage sorgfältig, bevor du sie genehmigst."
+      },
+      "invalid" : {
+        "title" : "Unstimmigkeit zwischen Domains",
+        "label" : "Unstimmigkeit zwischen Domains",
+        "description" : "Die Domain dieser Website passt nicht zum Absender dieser Anfrage. Eine Genehmigung kann zum Verlust von Vermögenswerten führen."
+      },
+      "scam" : {
+        "title" : "Bekanntes Sicherheitsrisiko",
+        "label" : "Sicherheitsrisiko",
+        "description" : "Diese Domain wird von mehreren Sicherheitsanbietern als unsicher eingestuft. Verlasse sie sofort, um dein Vermögen zu schützen."
+      }
+    },
     "error" : {
       "title" : "{{appName}} möchte sich mit Blockchains verbinden, die wir aktuell noch nicht unterstützen",
       "info" : "Wir unterstützen aktuell: "

@@ -41,6 +41,23 @@
       "1" : "Vous demander d’approuver des opérations",
       "2" : "Vous serez déconnecté(e) de {{dAppName}}"
     },
+    "verification" : {
+      "unknown" : {
+        "title" : "Domaine inconnu",
+        "label" : "Vérification impossible",
+        "description" : "Impossible de vérifier ce domaine. Vérifiez attentivement la demande avant de l’approuver."
+      },
+      "invalid" : {
+        "title" : "Domaine différent",
+        "label" : "Domaine différent",
+        "description" : "Le domaine de ce site Web ne correspond pas à l’émetteur de cette demande. Si vous l’approuvez, vous pourriez risquer de perdre des actifs."
+      },
+      "scam" : {
+        "title" : "Risque de sécurité connu",
+        "label" : "Risque de sécurité",
+        "description" : "Plusieurs prestataires de services de sécurité ont signalé ce domaine comme non sécurisé. Quittez-le immédiatement pour protéger vos actifs."
+      }
+    },
     "error" : {
       "title" : "{{appName}} a demandé à se connecter à des chaînes pas encore prises en charge",
       "info" : "Nous prenons en charge : "
