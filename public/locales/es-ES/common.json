@@ -104,5 +104,8 @@
       "desc" : "Empieza conectándote a una aplicación.",
       "goToConnect" : "Conectar"
     }
+  },
+  "backToBrowserModal" : {
+    "message" : "Vuelve al navegador para continuar"
   }
 }
