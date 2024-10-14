@@ -104,5 +104,8 @@
       "desc" : "连接一个应用程序即可开始。",
       "goToConnect" : "连接"
     }
+  },
+  "backToBrowserModal" : {
+    "message" : "返回浏览器以继续"
   }
 }
