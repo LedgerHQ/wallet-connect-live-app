@@ -104,5 +104,8 @@
       "desc" : "Bir uygulamaya bağlanarak başlayın.",
       "goToConnect" : "Bağlan"
     }
+  },
+  "backToBrowserModal" : {
+    "message" : "Devam etmek için tarayıcınıza geri dönün"
   }
 }

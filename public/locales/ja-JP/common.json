@@ -104,5 +104,8 @@
       "desc" : "アプリに接続して開始します。",
       "goToConnect" : "接続"
     }
+  },
+  "backToBrowserModal" : {
+    "message" : "ブラウザに戻って続行してください"
   }
 }
