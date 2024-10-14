@@ -41,6 +41,23 @@
       "1" : "İşlemler için onay isteyin",
       "2" : "{{dAppName}} ile bağlantınız kesilecektir"
     },
+    "verification" : {
+      "unknown" : {
+        "title" : "Bilinmeyen etki alanı",
+        "label" : "Doğrulanamıyor",
+        "description" : "Bu etki alanı doğrulanamıyor. Onaylamadan önce talebi dikkatli bir şekilde kontrol et."
+      },
+      "invalid" : {
+        "title" : "Etki alanı eşleşmiyor",
+        "label" : "Etki alanı eşleşmiyor",
+        "description" : "Bu web sitesinin, bu talebi gönderenle eşleşmeyen bir etki alanı var. Onaylamak fon kaybına neden olabilir"
+      },
+      "scam" : {
+        "title" : "Bilinen güvenlik riski",
+        "label" : "Güvenlik riski",
+        "description" : "Bu etki alanı, birçok güvenlik sağlayıcısı tarafından güvenli değil olarak işaretlendi. Varlıklarınızı korumak için siteden hemen çıkın."
+      }
+    },
     "error" : {
       "title" : "{{appName}}, henüz desteklemediğimiz zincirlere bağlanma isteğinde bulundu",
       "info" : "Şu anda desteklenenler: "
