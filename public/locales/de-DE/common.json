@@ -104,5 +104,8 @@
       "desc" : "Stellen Sie zunächst eine Verbindung mit einer App her.",
       "goToConnect" : "Verbinden"
     }
+  },
+  "backToBrowserModal" : {
+    "message" : "Gehe zurück zu deinem Browser, um fortzufahren"
   }
 }
