@@ -20,6 +20,12 @@ describe("SUPPORTED_NETWORK", () => {
     expect(polygon?.displayName).toBe("Polygon");
   });
 
+  it("contains Rootstock", () => {
+    const rootstock: Network | undefined = SUPPORTED_NETWORK.rsk;
+
+    expect(rootstock?.displayName).toBe("Rootstock");
+  });
+
   it("contains Optimism", () => {
     const optimism: Network | undefined = SUPPORTED_NETWORK.optimism;
 

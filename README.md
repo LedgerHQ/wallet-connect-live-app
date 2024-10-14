@@ -15,6 +15,7 @@ and is intended to be integrated within ledger products, enabling users to seaml
 | Arbitrum          | ✅          | ✅                 |                    |
 | Optimism          | ✅          | ✅                 |                    |
 | Avalanche C-Chain | ✅          | -                  |                    |
+| Rootstock         | ✅          | -                  |                    |
 | Base              | ✅          | ✅                 |                    |
 | Cosmos            | ⏳          | -                  |                    |
 | Multivers-X       | ✅          | -                  |                    |
