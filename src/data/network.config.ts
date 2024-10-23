@@ -37,6 +37,13 @@ export const EIP155_CHAINS_MAINNET: Record<string, Network> = {
     displayName: "Polygon",
     color: "#6d29de",
   },
+  rsk: {
+    chainId: 30,
+    namespace: "eip155:30",
+    ticker: "RBTC",
+    displayName: "Rootstock",
+    color: "#ff9100",
+  },
   optimism: {
     chainId: 10,
     namespace: "eip155:10",
