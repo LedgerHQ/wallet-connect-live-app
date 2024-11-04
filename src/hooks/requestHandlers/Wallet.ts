@@ -59,7 +59,6 @@ const addNewAccounts = async (
     account = await client.account.request({
       currencyIds: currencies,
     });
-    // TODO Maybe we should also select the requested account
   } catch (error) {
     if (error instanceof Error && error.message === "Canceled by user") {
       console.error("request account canceled by user");

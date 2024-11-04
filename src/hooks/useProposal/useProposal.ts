@@ -47,16 +47,14 @@ export function useProposal(proposal: ProposalTypes.Struct) {
 
   const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
 
-  const handleClick = useCallback(
-    (account: string) => {
-      if (selectedAccounts.includes(account)) {
-        setSelectedAccounts(selectedAccounts.filter((s) => s !== account));
-      } else {
-        setSelectedAccounts([...selectedAccounts, account]);
+  const handleClick = useCallback((account: string) => {
+    setSelectedAccounts((value) => {
+      if (value.includes(account)) {
+        return value.filter((s) => s !== account);
       }
-    },
-    [selectedAccounts],
-  );
+      return [...value, account];
+    });
+  }, []);
 
   const navigateToHome = useCallback(() => {
     return navigate({
@@ -471,10 +469,15 @@ export function useProposal(proposal: ProposalTypes.Struct) {
   const addNewAccount = useCallback(
     async (currency: string) => {
       try {
-        await client.account.request({
+        const account = await client.account.request({
           currencyIds: [currency],
         });
-        // TODO Maybe we should also select the requested account
+        setSelectedAccounts((value) => {
+          if (value.includes(account.id)) {
+            return value;
+          }
+          return [...value, account.id];
+        });
       } catch (error) {
         if (error instanceof Error && error.message === "Canceled by user") {
           console.error("request account canceled by user");
@@ -498,10 +501,15 @@ export function useProposal(proposal: ProposalTypes.Struct) {
   const addNewAccounts = useCallback(
     async (currencies: string[]) => {
       try {
-        await client.account.request({
+        const account = await client.account.request({
           currencyIds: currencies,
         });
-        // TODO Maybe we should also select the requested account
+        setSelectedAccounts((value) => {
+          if (value.includes(account.id)) {
+            return value;
+          }
+          return [...value, account.id];
+        });
       } catch (error) {
         if (error instanceof Error && error.message === "Canceled by user") {
           console.error("request account canceled by user");
