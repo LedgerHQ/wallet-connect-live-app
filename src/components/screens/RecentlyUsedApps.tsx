@@ -52,7 +52,7 @@ export default function RecentlyUsedApps() {
 
       <GridContainer>
         {lastConnectionApps.map((app) => (
-          <StyledDiv key={app.name}>
+          <StyledDiv key={app.url}>
             <AppCard
               name={app.name}
               category={app.url}

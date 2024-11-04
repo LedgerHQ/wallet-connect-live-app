@@ -12,6 +12,7 @@ import {
   InfiniteLoader,
   Text,
 } from "@ledgerhq/react-ui";
+import { enqueueSnackbar } from "notistack";
 import { ArrowLeftMedium } from "@ledgerhq/react-ui/assets/icons";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
@@ -40,6 +41,7 @@ import {
 } from "@/store/wallet-api.store";
 import { useQueryClient } from "@tanstack/react-query";
 import { SessionTypes } from "@walletconnect/types";
+import { getErrorMessage } from "@/utils/helper.util";
 import { AccountBalance } from "../atoms/AccountBalance";
 
 const DetailContainer = styled(Flex)`
@@ -136,14 +138,24 @@ export default function SessionDetail({ session }: Props) {
           button: "WC-Disconnect Session",
           page: "Wallet Connect Session Detail",
         });
-      })
-      .catch((error) => {
-        console.error(error);
-      })
-      .finally(() => {
         void queryClient
           .invalidateQueries({ queryKey: sessionsQueryKey })
           .then(() => navigateToHome());
+      })
+      .catch((error) => {
+        setDisconnecting(false);
+        enqueueSnackbar(getErrorMessage(error), {
+          errorType: "Disconnect session error",
+          variant: "errorNotification",
+          anchorOrigin: {
+            vertical: "top",
+            horizontal: "right",
+          },
+        });
+        console.error(error);
+        void queryClient.invalidateQueries({
+          queryKey: sessionsQueryKey,
+        });
       });
   }, [analytics, navigateToHome, queryClient, session, web3wallet]);
 

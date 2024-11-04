@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Input, Button, Text, Flex } from "@ledgerhq/react-ui";
+import { Input, Button, Text, Flex, InfiniteLoader } from "@ledgerhq/react-ui";
 import { useCallback, useState } from "react";
 import {
   ArrowLeftMedium,
@@ -63,6 +63,7 @@ export function Connect({ mode }: Props) {
   const [errorValue, setErrorValue] = useState<string | undefined>(undefined);
   const [scanner, setScanner] = useState(mode === "scan");
   const analytics = useAnalytics();
+  const [connecting, setConnecting] = useState(false);
 
   const { onConnect } = useConnect(navigate);
 
@@ -71,7 +72,10 @@ export function Connect({ mode }: Props) {
       const uri = new URL(inputValue);
       setInputValue("");
 
-      void onConnect(uri);
+      setConnecting(true);
+      void onConnect(uri).finally(() => {
+        setConnecting(false);
+      });
       analytics.track("button_clicked", {
         button: "WC-Connect",
         page: "Connect",
@@ -234,15 +238,19 @@ export function Connect({ mode }: Props) {
               data-testid="connect-button"
               variant="main"
               size="large"
-              disabled={!inputValue}
+              disabled={!inputValue || connecting}
             >
-              <Text
-                fontSize="body"
-                fontWeight="semiBold"
-                color={!inputValue ? "neutral.c50" : "neutral.c00"}
-              >
-                {t("connect.cta")}
-              </Text>
+              {connecting ? (
+                <InfiniteLoader size={20} />
+              ) : (
+                <Text
+                  fontSize="body"
+                  fontWeight="semiBold"
+                  color={!inputValue ? "neutral.c50" : "neutral.c00"}
+                >
+                  {t("connect.cta")}
+                </Text>
+              )}
             </Button>
           </Flex>
         </Flex>

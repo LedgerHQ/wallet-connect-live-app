@@ -395,21 +395,23 @@ export function useProposal(proposal: ProposalTypes.Struct) {
         params: { topic: session.topic },
         search: ({ uri: _, ...search }) => search,
       });
+
+      redirectToDapp();
     } catch (error) {
-      // TODO : display error toast
+      enqueueSnackbar(getErrorMessage(error), {
+        errorType: "Approve session error",
+        variant: "errorNotification",
+        anchorOrigin: {
+          vertical: "top",
+          horizontal: "right",
+        },
+      });
       console.error(error);
       await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
       await queryClient.invalidateQueries({
         queryKey: pendingProposalsQueryKey,
       });
-      // Remove the uri from the search params to avoid trying to connect again if the user reload the current page
-      await navigate({
-        to: "/",
-        search: ({ uri: _, ...search }) => search,
-      });
     }
-
-    redirectToDapp();
   }, [
     redirectToDapp,
     buildSupportedNamespaces,
@@ -422,24 +424,40 @@ export function useProposal(proposal: ProposalTypes.Struct) {
   ]);
 
   const rejectSession = useCallback(async () => {
-    await web3wallet.rejectSession({
-      id: proposal.id,
-      reason: {
-        code: 5000,
-        message: "USER_REJECTED_METHODS",
-      },
-    });
-    await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
-    await queryClient.invalidateQueries({
-      queryKey: pendingProposalsQueryKey,
-    });
-    // Remove the uri from the search params to avoid trying to connect again if the user reload the current page
-    await navigate({
-      to: "/",
-      search: ({ uri: _, ...search }) => search,
-    });
+    try {
+      await web3wallet.rejectSession({
+        id: proposal.id,
+        reason: {
+          code: 5000,
+          message: "USER_REJECTED_METHODS",
+        },
+      });
+      await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
+      await queryClient.invalidateQueries({
+        queryKey: pendingProposalsQueryKey,
+      });
+      // Remove the uri from the search params to avoid trying to connect again if the user reload the current page
+      await navigate({
+        to: "/",
+        search: ({ uri: _, ...search }) => search,
+      });
 
-    redirectToDapp();
+      redirectToDapp();
+    } catch (error) {
+      enqueueSnackbar(getErrorMessage(error), {
+        errorType: "Reject session error",
+        variant: "errorNotification",
+        anchorOrigin: {
+          vertical: "top",
+          horizontal: "right",
+        },
+      });
+      console.error(error);
+      await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
+      await queryClient.invalidateQueries({
+        queryKey: pendingProposalsQueryKey,
+      });
+    }
   }, [navigate, proposal.id, queryClient, redirectToDapp, web3wallet]);
 
   const handleClose = useCallback(() => {

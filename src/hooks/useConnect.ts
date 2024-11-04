@@ -66,9 +66,9 @@ export function useConnect(
           });
           console.error(error);
         } finally {
+          // Remove the uri from the search params to avoid trying to connect again if the user reload the current page
           await navigate({
-            to: "/",
-            search: (search) => search,
+            search: ({ uri: _, ...search }) => search,
           });
         }
       }
