@@ -1,6 +1,8 @@
 import { SignClientTypes } from "@walletconnect/types";
 import { useCallback, useEffect } from "react";
 import { Web3WalletTypes } from "@walletconnect/web3wallet";
+import { enqueueSnackbar } from "notistack";
+import { getErrorMessage } from "@/utils/helper.util";
 import {
   coreAtom,
   connectionStatusAtom,
@@ -206,7 +208,15 @@ export default function useWalletConnect() {
               5100,
             );
           }
-        } catch {
+        } catch (error) {
+          enqueueSnackbar(getErrorMessage(error), {
+            errorType: "Session request error",
+            variant: "errorNotification",
+            anchorOrigin: {
+              vertical: "top",
+              horizontal: "right",
+            },
+          });
           await rejectRequest(web3wallet, topic, id, Errors.txDeclined);
         }
       })().finally(() => {

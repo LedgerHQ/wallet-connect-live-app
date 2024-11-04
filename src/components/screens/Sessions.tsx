@@ -7,6 +7,8 @@ import { formatUrl } from "@/utils/helper.util";
 import { Flex, Button, Box, Text } from "@ledgerhq/react-ui";
 import { useTranslation } from "react-i18next";
 import { useCallback, useEffect } from "react";
+import { enqueueSnackbar } from "notistack";
+import { getErrorMessage } from "@/utils/helper.util";
 import useModal from "@/hooks/useModal";
 import useAnalytics from "@/hooks/useAnalytics";
 import { useNavigate } from "@tanstack/react-router";
@@ -85,6 +87,14 @@ export default function Sessions() {
       ),
     )
       .catch((err) => {
+        enqueueSnackbar(getErrorMessage(err), {
+          errorType: "Disconnect sessions error",
+          variant: "errorNotification",
+          anchorOrigin: {
+            vertical: "top",
+            horizontal: "right",
+          },
+        });
         console.error(err);
       })
       .finally(() => {

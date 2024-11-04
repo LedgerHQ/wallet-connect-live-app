@@ -6,9 +6,9 @@
   "params": {},
   "homepageUrl": "https://walletconnect.com/",
   "icon": "https://forum.zeroqode.com/uploads/default/original/2X/e/e363c6521db27335d44c1134d230b8992792dde4.png",
-  "platform": "all",
+  "platforms": ["desktop", "android", "ios"],
   "apiVersion": "^2.0.0",
-  "manifestVersion": "1",
+  "manifestVersion": "2",
   "branch": "stable",
   "categories": ["bridge", "defi"],
   "currencies": [
@@ -49,5 +49,5 @@
     "wallet.userId",
     "wallet.info"
   ],
-  "domains": ["http://*", "https://*"]
+  "domains": ["http://", "https://"]
 }

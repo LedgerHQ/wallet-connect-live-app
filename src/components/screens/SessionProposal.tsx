@@ -53,6 +53,7 @@ export default function SessionProposal({ proposal }: Props) {
   const dAppUrl = proposal.proposer.metadata.url;
   const currenciesById = useAtomValue(walletCurrenciesByIdAtom);
   const [approving, setApproving] = useState(false);
+  const [rejecting, setRejecting] = useState(false);
 
   const verificationStatus = useVerification(proposal);
 
@@ -80,7 +81,9 @@ export default function SessionProposal({ proposal }: Props) {
       url: dAppUrl,
     });
     setApproving(true);
-    void approveSession();
+    void approveSession().finally(() => {
+      setApproving(false);
+    });
   }, [analytics, approveSession, dApp, dAppUrl]);
 
   const onReject = useCallback(() => {
@@ -90,7 +93,10 @@ export default function SessionProposal({ proposal }: Props) {
       dapp: dApp,
       url: dAppUrl,
     });
-    void rejectSession();
+    setRejecting(true);
+    void rejectSession().finally(() => {
+      setRejecting(false);
+    });
   }, [analytics, dApp, dAppUrl, rejectSession]);
 
   const accountsByChain = useMemo(
@@ -304,14 +310,24 @@ export default function SessionProposal({ proposal }: Props) {
               }}
             >
               <ButtonsContainer>
-                <Button size="large" flex={0.3} mr={6} onClick={onReject}>
-                  <Text
-                    variant="body"
-                    fontWeight="semiBold"
-                    color="neutral.c100"
-                  >
-                    {t("sessionProposal.reject")}
-                  </Text>
+                <Button
+                  size="large"
+                  flex={0.3}
+                  mr={6}
+                  onClick={onReject}
+                  disabled={rejecting}
+                >
+                  {rejecting ? (
+                    <InfiniteLoader size={20} />
+                  ) : (
+                    <Text
+                      variant="body"
+                      fontWeight="semiBold"
+                      color="neutral.c100"
+                    >
+                      {t("sessionProposal.reject")}
+                    </Text>
+                  )}
                 </Button>
                 <Button
                   variant="main"

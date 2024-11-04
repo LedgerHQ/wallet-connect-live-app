@@ -142,7 +142,11 @@ export async function renderComponent(component: () => JSX.Element) {
     return router.navigate({
       from: "/",
       to: "/",
-      search: (search) => search,
+      search: (search) => ({
+        theme: "dark",
+        lang: "en",
+        ...search,
+      }),
     });
   });
   return router;
