@@ -302,13 +302,7 @@ export default function SessionProposal({ proposal }: Props) {
               <VerificationCard verification={verificationStatus} />
             </Flex>
 
-            <Flex
-              style={{
-                backdropFilter: "blur(7px)",
-                position: "sticky",
-                bottom: "0px",
-              }}
-            >
+            <BlurRow>
               <ButtonsContainer>
                 <Button
                   size="large"
@@ -349,7 +343,7 @@ export default function SessionProposal({ proposal }: Props) {
                   )}
                 </Button>
               </ButtonsContainer>
-            </Flex>
+            </BlurRow>
           </Flex>
         )}
       </ResponsiveContainer>
@@ -365,4 +359,16 @@ const Header = styled(Flex)`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+`;
+
+const BlurRow = styled(Flex)`
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1));
+    backdrop-filter: blur(10px);
+  }
+  position: sticky;
+  bottom: 0px;
 `;
