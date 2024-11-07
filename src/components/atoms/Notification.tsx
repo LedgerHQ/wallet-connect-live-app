@@ -1,4 +1,4 @@
-import { Notification, Icon, Alert, Box, Flex } from "@ledgerhq/react-ui";
+import { Notification, Icon, Alert, Box } from "@ledgerhq/react-ui";
 import { CustomContentProps, SnackbarContent, closeSnackbar } from "notistack";
 import React from "react";
 
