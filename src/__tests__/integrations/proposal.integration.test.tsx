@@ -41,7 +41,7 @@ const mockAcceptSession = vi.fn(() =>
 );
 
 // TODO maybe remove as we already have a mock in the setup
-vi.mock("@reown/walletKit", () => {
+vi.mock("@reown/walletkit", () => {
   return {
     WalletKit: {
       init: vi.fn(() => ({

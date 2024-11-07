@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import type { IWalletKit } from "@reown/walletKit";
+import type { IWalletKit } from "@reown/walletkit";
 
 export const queryKey = ["sessions"];
 

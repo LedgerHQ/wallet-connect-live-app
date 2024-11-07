@@ -1,5 +1,5 @@
 import { enqueueSnackbar } from "notistack";
-import type { IWalletKit } from "@reown/walletKit";
+import type { IWalletKit } from "@reown/walletkit";
 import type { QueryClient } from "@tanstack/react-query";
 import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import {

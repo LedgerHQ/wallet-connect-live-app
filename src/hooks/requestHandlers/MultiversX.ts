@@ -1,4 +1,4 @@
-import type { IWalletKit } from "@reown/walletKit";
+import type { IWalletKit } from "@reown/walletkit";
 import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import {
   type MULTIVERSX_REQUESTS,

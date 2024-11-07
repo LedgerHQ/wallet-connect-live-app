@@ -2,7 +2,7 @@ import "@testing-library/jest-dom/vitest";
 import { vi } from "vitest";
 import sessionProposal from "@/data/mocks/sessionProposal.example.json";
 
-vi.mock("@reown/walletKit", () => {
+vi.mock("@reown/walletkit", () => {
   return {
     WalletKit: {
       init: vi.fn(() => ({

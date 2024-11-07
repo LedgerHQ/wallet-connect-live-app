@@ -1,4 +1,4 @@
-import type { IWalletKit } from "@reown/walletKit";
+import type { IWalletKit } from "@reown/walletkit";
 import { stripHexPrefix } from "@/utils/currencyFormatter/helpers";
 
 export enum Errors {
