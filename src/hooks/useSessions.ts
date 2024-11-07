@@ -1,17 +1,17 @@
 import { useCallback } from "react";
-import { Web3Wallet } from "@walletconnect/web3wallet/dist/types/client";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import type { IWalletKit } from "@reown/walletKit";
 
 export const queryKey = ["sessions"];
 
-export function useQueryFn(web3wallet: Web3Wallet) {
+export function useQueryFn(walletKit: IWalletKit) {
   return useCallback(() => {
-    return web3wallet.engine.signClient.session.getAll();
-  }, [web3wallet]);
+    return walletKit.engine.signClient.session.getAll();
+  }, [walletKit]);
 }
 
-export default function useSessions(web3wallet: Web3Wallet) {
-  const queryFn = useQueryFn(web3wallet);
+export default function useSessions(walletKit: IWalletKit) {
+  const queryFn = useQueryFn(walletKit);
 
   return useSuspenseQuery({
     queryKey,

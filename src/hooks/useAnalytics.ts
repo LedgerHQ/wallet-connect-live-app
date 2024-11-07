@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo } from "react";
 import { AnalyticsBrowser } from "@segment/analytics-next";
-import { web3walletAtom } from "@/store/web3wallet.store";
+import { walletKitAtom } from "@/store/walletKit.store";
 import { atom, useAtomValue } from "jotai";
 import useSessions from "./useSessions";
 import { walletInfosAtom, walletUserIdAtom } from "@/store/wallet-api.store";
@@ -39,8 +39,8 @@ const analyticsAtom = atom((get) => {
 export default function useAnalytics() {
   const [analytics] = useAtomValue(analyticsAtom);
   const userId = useAtomValue(walletUserIdAtom);
-  const web3wallet = useAtomValue(web3walletAtom);
-  const sessions = useSessions(web3wallet);
+  const walletKit = useAtomValue(walletKitAtom);
+  const sessions = useSessions(walletKit);
   const sessionsConnected = sessions.data.length;
 
   const userProperties = useMemo(() => {

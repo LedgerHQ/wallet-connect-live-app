@@ -1,4 +1,4 @@
-import type { Web3Wallet } from "@walletconnect/web3wallet/dist/types/client";
+import type { IWalletKit } from "@reown/walletKit";
 import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import {
   type RIPPLE_REQUESTS,
@@ -6,7 +6,7 @@ import {
 } from "@/data/methods/Ripple.methods";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
 import { convertXrpToLiveTX } from "@/utils/converters";
-import { acceptRequest, Errors, rejectRequest } from "./utils";
+import { acceptRequest, Errors, isCanceledError, rejectRequest } from "./utils";
 
 export async function handleXrpRequest(
   request: RIPPLE_REQUESTS,
@@ -15,7 +15,7 @@ export async function handleXrpRequest(
   _chainId: string,
   accounts: Account[],
   client: WalletAPIClient,
-  web3wallet: Web3Wallet,
+  walletKit: IWalletKit,
 ) {
   const ledgerLiveCurrency = "ripple";
   switch (request.method) {
@@ -33,19 +33,22 @@ export async function handleXrpRequest(
             accountTX.id,
             liveTx,
           );
-          await acceptRequest(web3wallet, topic, id, hash);
+          await acceptRequest(walletKit, topic, id, hash);
         } catch (error) {
-          console.error(error);
-          await rejectRequest(web3wallet, topic, id, Errors.txDeclined);
+          if (isCanceledError(error)) {
+            await rejectRequest(walletKit, topic, id, Errors.txDeclined);
+          } else {
+            throw error;
+          }
         }
       } else {
-        await rejectRequest(web3wallet, topic, id, Errors.txDeclined);
+        await rejectRequest(walletKit, topic, id, Errors.txDeclined);
       }
       break;
     }
     default:
       await rejectRequest(
-        web3wallet,
+        walletKit,
         topic,
         id,
         Errors.unsupportedMethods,

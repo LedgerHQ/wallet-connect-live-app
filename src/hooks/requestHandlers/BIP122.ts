@@ -1,11 +1,17 @@
-import type { Web3Wallet } from "@walletconnect/web3wallet/dist/types/client";
+import type { IWalletKit } from "@reown/walletKit";
 import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import {
   type BIP122_REQUESTS,
   BIP122_SIGNING_METHODS,
 } from "@/data/methods/BIP122.methods";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
-import { acceptRequest, Errors, formatMessage, rejectRequest } from "./utils";
+import {
+  acceptRequest,
+  Errors,
+  formatMessage,
+  isCanceledError,
+  rejectRequest,
+} from "./utils";
 
 export async function handleBIP122Request(
   request: BIP122_REQUESTS,
@@ -14,7 +20,7 @@ export async function handleBIP122Request(
   chainId: string,
   accounts: Account[],
   client: WalletAPIClient,
-  web3wallet: Web3Wallet,
+  walletkit: IWalletKit,
 ) {
   switch (request.method) {
     case BIP122_SIGNING_METHODS.BIP122_SIGN_MESSAGE: {
@@ -31,23 +37,26 @@ export async function handleBIP122Request(
             Buffer.from(message),
           );
           await acceptRequest(
-            web3wallet,
+            walletkit,
             topic,
             id,
             formatMessage(signedMessage),
           );
         } catch (error) {
-          await rejectRequest(web3wallet, topic, id, Errors.userDecline);
-          console.error(error);
+          if (isCanceledError(error)) {
+            await rejectRequest(walletkit, topic, id, Errors.userDecline);
+          } else {
+            throw error;
+          }
         }
       } else {
-        await rejectRequest(web3wallet, topic, id, Errors.userDecline);
+        await rejectRequest(walletkit, topic, id, Errors.userDecline);
       }
       break;
     }
     default:
       await rejectRequest(
-        web3wallet,
+        walletkit,
         topic,
         id,
         Errors.unsupportedMethods,

@@ -1,6 +1,6 @@
 import { enqueueSnackbar } from "notistack";
+import type { IWalletKit } from "@reown/walletKit";
 import type { QueryClient } from "@tanstack/react-query";
-import type { Web3Wallet } from "@walletconnect/web3wallet/dist/types/client";
 import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import {
   WALLET_METHODS,
@@ -85,14 +85,14 @@ export async function handleWalletRequest(
   chainId: string,
   _accounts: Account[],
   client: WalletAPIClient,
-  web3wallet: Web3Wallet,
+  walletKit: IWalletKit,
   queryClient: QueryClient,
 ) {
   switch (request.method) {
     case WALLET_METHODS.WALLET_SWITCH_ETHEREUM_CHAIN: {
       const network = getNetwork(chainId, request.params[0].chainId);
       if (network) {
-        const session = web3wallet.engine.signClient.session.get(topic);
+        const session = walletKit.engine.signClient.session.get(topic);
         const namespace = chainId.split(":")[0];
         const newChain = getNamespace(network);
 
@@ -104,7 +104,7 @@ export async function handleWalletRequest(
           const account = await addNewAccounts(client, queryClient, [network]);
 
           if (account) {
-            await web3wallet.updateSession({
+            await walletKit.updateSession({
               topic,
               namespaces: {
                 ...session.namespaces,
@@ -121,7 +121,7 @@ export async function handleWalletRequest(
                 },
               },
             });
-            return web3wallet.respondSessionRequest({
+            return walletKit.respondSessionRequest({
               topic,
               response: {
                 id,
@@ -132,7 +132,7 @@ export async function handleWalletRequest(
           }
         }
       }
-      await rejectRequest(web3wallet, topic, id, Errors.txDeclined);
+      await rejectRequest(walletKit, topic, id, Errors.txDeclined);
       break;
     }
     case WALLET_METHODS.WALLET_ADD_ETHEREUM_CHAIN: {
@@ -140,10 +140,10 @@ export async function handleWalletRequest(
       if (network) {
         const account = await addNewAccounts(client, queryClient, [network]);
         if (account) {
-          const session = web3wallet.engine.signClient.session.get(topic);
+          const session = walletKit.engine.signClient.session.get(topic);
           const namespace = chainId.split(":")[0];
           const newChain = getNamespace(account.currency);
-          await web3wallet.updateSession({
+          await walletKit.updateSession({
             topic,
             namespaces: {
               ...session.namespaces,
@@ -160,7 +160,7 @@ export async function handleWalletRequest(
               },
             },
           });
-          return web3wallet.respondSessionRequest({
+          return walletKit.respondSessionRequest({
             topic,
             response: {
               id,
@@ -170,12 +170,12 @@ export async function handleWalletRequest(
           });
         }
       }
-      await rejectRequest(web3wallet, topic, id, Errors.txDeclined);
+      await rejectRequest(walletKit, topic, id, Errors.txDeclined);
       break;
     }
     default:
       await rejectRequest(
-        web3wallet,
+        walletKit,
         topic,
         id,
         Errors.unsupportedMethods,

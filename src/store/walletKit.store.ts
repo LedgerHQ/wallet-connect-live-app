@@ -1,6 +1,6 @@
 import { atom } from "jotai";
 import { Core } from "@walletconnect/core";
-import { Web3Wallet } from "@walletconnect/web3wallet";
+import { WalletKit } from "@reown/walletkit";
 
 const relayerURL = "wss://relay.walletconnect.com";
 
@@ -14,10 +14,10 @@ export const coreAtom = atom(() => {
 
 export const connectionStatusAtom = atom("disconnected");
 
-export const web3walletAtom = atom((get) => {
+export const walletKitAtom = atom((get) => {
   const core = get(coreAtom);
 
-  return Web3Wallet.init({
+  return WalletKit.init({
     core,
     metadata: {
       name: "Ledger Wallet",

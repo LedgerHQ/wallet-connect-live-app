@@ -1,4 +1,4 @@
-import type { Web3Wallet } from "@walletconnect/web3wallet/dist/types/client";
+import type { IWalletKit } from "@reown/walletKit";
 import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import {
   type MULTIVERSX_REQUESTS,
@@ -6,7 +6,13 @@ import {
 } from "@/data/methods/MultiversX.methods";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
 import { convertMvxToLiveTX } from "@/utils/converters";
-import { acceptRequest, Errors, formatMessage, rejectRequest } from "./utils";
+import {
+  acceptRequest,
+  Errors,
+  formatMessage,
+  isCanceledError,
+  rejectRequest,
+} from "./utils";
 
 export async function handleMvxRequest(
   request: MULTIVERSX_REQUESTS,
@@ -15,7 +21,7 @@ export async function handleMvxRequest(
   _chainId: string,
   accounts: Account[],
   client: WalletAPIClient,
-  web3wallet: Web3Wallet,
+  walletKit: IWalletKit,
 ) {
   const ledgerLiveCurrency = "elrond";
   switch (request.method) {
@@ -33,17 +39,20 @@ export async function handleMvxRequest(
             Buffer.from(message),
           );
           await acceptRequest(
-            web3wallet,
+            walletKit,
             topic,
             id,
             formatMessage(signedMessage),
           );
         } catch (error) {
-          await rejectRequest(web3wallet, topic, id, Errors.userDecline);
-          console.error(error);
+          if (isCanceledError(error)) {
+            await rejectRequest(walletKit, topic, id, Errors.userDecline);
+          } else {
+            throw error;
+          }
         }
       } else {
-        await rejectRequest(web3wallet, topic, id, Errors.userDecline);
+        await rejectRequest(walletKit, topic, id, Errors.userDecline);
       }
       break;
     }
@@ -60,13 +69,16 @@ export async function handleMvxRequest(
             accountTX.id,
             liveTx,
           );
-          await acceptRequest(web3wallet, topic, id, hash);
+          await acceptRequest(walletKit, topic, id, hash);
         } catch (error) {
-          await rejectRequest(web3wallet, topic, id, Errors.txDeclined);
-          console.error(error);
+          if (isCanceledError(error)) {
+            await rejectRequest(walletKit, topic, id, Errors.txDeclined);
+          } else {
+            throw error;
+          }
         }
       } else {
-        await rejectRequest(web3wallet, topic, id, Errors.txDeclined);
+        await rejectRequest(walletKit, topic, id, Errors.txDeclined);
       }
       break;
     }
@@ -84,20 +96,23 @@ export async function handleMvxRequest(
               accountTX.id,
               liveTx,
             );
-            await acceptRequest(web3wallet, topic, id, hash);
+            await acceptRequest(walletKit, topic, id, hash);
           } catch (error) {
-            await rejectRequest(web3wallet, topic, id, Errors.txDeclined);
-            console.error(error);
+            if (isCanceledError(error)) {
+              await rejectRequest(walletKit, topic, id, Errors.txDeclined);
+            } else {
+              throw error;
+            }
           }
         } else {
-          await rejectRequest(web3wallet, topic, id, Errors.txDeclined);
+          await rejectRequest(walletKit, topic, id, Errors.txDeclined);
         }
       }
       break;
     }
     default:
       await rejectRequest(
-        web3wallet,
+        walletKit,
         topic,
         id,
         Errors.unsupportedMethods,

@@ -41,9 +41,9 @@ const mockAcceptSession = vi.fn(() =>
 );
 
 // TODO maybe remove as we already have a mock in the setup
-vi.mock("@walletconnect/web3wallet", () => {
+vi.mock("@reown/walletKit", () => {
   return {
-    Web3Wallet: {
+    WalletKit: {
       init: vi.fn(() => ({
         getActiveSessions: vi.fn(() => []),
         on: vi.fn((eventName, callback) => {
