@@ -15,7 +15,10 @@ import { InputMode } from "@/types/types";
 import i18n from "@/i18n";
 import { TanStackRouterDevtools } from "@/components/TanStackRouterDevtools";
 import { WalletConnectInit } from "@/components/WalletConnectInit";
-import { ErrorNotification } from "@/components/atoms/Notification";
+import {
+  ConnectionNotification,
+  ErrorNotification,
+} from "@/components/atoms/Notification";
 
 // Create a client
 const twentyFourHoursInMs = 1000 * 60 * 60 * 24;
@@ -118,6 +121,7 @@ export const rootRoute = createRootRoute({
                   <SnackbarProvider
                     Components={{
                       errorNotification: ErrorNotification,
+                      connectionNotification: ConnectionNotification,
                     }}
                   >
                     <WalletConnectInit

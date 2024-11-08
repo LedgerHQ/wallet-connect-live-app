@@ -32,7 +32,7 @@ import { ImageWithPlaceholder } from "@/components/atoms/images/ImageWithPlaceho
 import useAnalytics from "@/hooks/useAnalytics";
 import { useNavigate } from "@tanstack/react-router";
 import { useAtomValue } from "jotai";
-import { web3walletAtom } from "@/store/web3wallet.store";
+import { walletKitAtom } from "@/store/walletKit.store";
 import { queryKey as sessionsQueryKey } from "@/hooks/useSessions";
 import useAccounts from "@/hooks/useAccounts";
 import {
@@ -103,7 +103,7 @@ export default function SessionDetail({ session }: Props) {
   const queryClient = useQueryClient();
   const client = useAtomValue(walletAPIClientAtom);
   const accounts = useAccounts(client);
-  const web3wallet = useAtomValue(web3walletAtom);
+  const walletKit = useAtomValue(walletKitAtom);
   const analytics = useAnalytics();
   const currenciesById = useAtomValue(walletCurrenciesByIdAtom);
   const [disconnecting, setDisconnecting] = useState(false);
@@ -125,7 +125,7 @@ export default function SessionDetail({ session }: Props) {
 
   const handleDelete = useCallback(() => {
     setDisconnecting(true);
-    void web3wallet
+    void walletKit
       .disconnectSession({
         topic: session.topic,
         reason: {
@@ -157,7 +157,7 @@ export default function SessionDetail({ session }: Props) {
           queryKey: sessionsQueryKey,
         });
       });
-  }, [analytics, navigateToHome, queryClient, session, web3wallet]);
+  }, [analytics, navigateToHome, queryClient, session, walletKit]);
 
   const onGoBack = useCallback(() => {
     void navigateToHome();

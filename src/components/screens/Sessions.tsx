@@ -13,7 +13,7 @@ import useModal from "@/hooks/useModal";
 import useAnalytics from "@/hooks/useAnalytics";
 import { useNavigate } from "@tanstack/react-router";
 import { useAtomValue } from "jotai";
-import { web3walletAtom } from "@/store/web3wallet.store";
+import { walletKitAtom } from "@/store/walletKit.store";
 import useSessions, { queryKey as sessionsQueryKey } from "@/hooks/useSessions";
 import { useQueryClient } from "@tanstack/react-query";
 import usePendingProposals from "@/hooks/usePendingProposals";
@@ -27,9 +27,9 @@ export default function Sessions() {
   const navigate = useNavigate({ from: "/" });
   const { openModal, closeModal, isModalOpen } = useModal();
   const queryClient = useQueryClient();
-  const web3wallet = useAtomValue(web3walletAtom);
-  const sessions = useSessions(web3wallet);
-  const pendingProposals = usePendingProposals(web3wallet);
+  const walletKit = useAtomValue(walletKitAtom);
+  const sessions = useSessions(walletKit);
+  const pendingProposals = usePendingProposals(walletKit);
   const sessionsLength = sessions.data.length;
   const isEmptyState = sessionsLength === 0;
   const hasProposals = pendingProposals.data.length > 0;
@@ -77,7 +77,7 @@ export default function Sessions() {
   const disconnect = useCallback(() => {
     void Promise.all(
       sessions.data.map((session) =>
-        web3wallet.disconnectSession({
+        walletKit.disconnectSession({
           topic: session.topic,
           reason: {
             code: 3,
@@ -107,7 +107,7 @@ export default function Sessions() {
           queryKey: sessionsQueryKey,
         });
       });
-  }, [analytics, closeModal, queryClient, sessions.data, web3wallet]);
+  }, [analytics, closeModal, queryClient, sessions.data, walletKit]);
 
   return (
     <Flex flexDirection="column" width="100%" height="100%" mt={8}>

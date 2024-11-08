@@ -1,4 +1,4 @@
-import { coreAtom } from "@/store/web3wallet.store";
+import { coreAtom } from "@/store/walletKit.store";
 import { getErrorMessage } from "@/utils/helper.util";
 import { UseNavigateResult } from "@tanstack/react-router";
 import { useAtomValue } from "jotai";

@@ -18,8 +18,8 @@ import { useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   showBackToBrowserModalAtom,
-  web3walletAtom,
-} from "@/store/web3wallet.store";
+  walletKitAtom,
+} from "@/store/walletKit.store";
 import { useAtomValue, useSetAtom } from "jotai";
 import useAccounts, { queryKey as accountsQueryKey } from "@/hooks/useAccounts";
 import { walletAPIClientAtom } from "@/store/wallet-api.store";
@@ -41,7 +41,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
   const queryClient = useQueryClient();
   const client = useAtomValue(walletAPIClientAtom);
   const accounts = useAccounts(client);
-  const web3wallet = useAtomValue(web3walletAtom);
+  const walletKit = useAtomValue(walletKitAtom);
   const analytics = useAnalytics();
   const addAppToLastConnectionApps = useSetAtom(sortedRecentConnectionAppsAtom);
 
@@ -352,7 +352,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
     ],
   );
 
-  const sessionsQueryFn = useSessionsQueryFn(web3wallet);
+  const sessionsQueryFn = useSessionsQueryFn(walletKit);
 
   const setShowModal = useSetAtom(showBackToBrowserModalAtom);
   const url =
@@ -373,7 +373,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
         proposal,
         supportedNamespaces: supportedNs,
       });
-      const session = await web3wallet.approveSession({
+      const session = await walletKit.approveSession({
         id: proposal.id,
         namespaces: approvedNs,
       });
@@ -414,7 +414,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
     redirectToDapp,
     buildSupportedNamespaces,
     proposal,
-    web3wallet,
+    walletKit,
     queryClient,
     sessionsQueryFn,
     addAppToLastConnectionApps,
@@ -423,7 +423,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
 
   const rejectSession = useCallback(async () => {
     try {
-      await web3wallet.rejectSession({
+      await walletKit.rejectSession({
         id: proposal.id,
         reason: {
           code: 5000,
@@ -456,7 +456,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
         queryKey: pendingProposalsQueryKey,
       });
     }
-  }, [navigate, proposal.id, queryClient, redirectToDapp, web3wallet]);
+  }, [navigate, proposal.id, queryClient, redirectToDapp, walletKit]);
 
   const handleClose = useCallback(() => {
     void rejectSession();

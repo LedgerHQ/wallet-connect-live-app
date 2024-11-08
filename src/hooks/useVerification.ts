@@ -1,4 +1,4 @@
-import { web3walletAtom } from "@/store/web3wallet.store";
+import { walletKitAtom } from "@/store/walletKit.store";
 import { VerificationStatus } from "@/types/types";
 import { ProposalTypes } from "@walletconnect/types";
 import { useAtomValue } from "jotai";
@@ -7,12 +7,12 @@ import { useMemo } from "react";
 const useVerification = (
   proposal: ProposalTypes.Struct,
 ): VerificationStatus => {
-  const web3wallet = useAtomValue(web3walletAtom);
+  const walletKit = useAtomValue(walletKitAtom);
 
   return useMemo(
     () =>
       proposal.proposer.metadata.verifyUrl ??
-      web3wallet.core.pairing
+      walletKit.core.pairing
         .getPairings()
         .find((pairing) => pairing.topic === proposal.pairingTopic)
         ?.peerMetadata?.verifyUrl ??
@@ -20,7 +20,7 @@ const useVerification = (
     [
       proposal.pairingTopic,
       proposal.proposer.metadata.verifyUrl,
-      web3wallet.core.pairing,
+      walletKit.core.pairing,
     ],
   ) as VerificationStatus;
 };

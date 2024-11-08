@@ -1,4 +1,4 @@
-import type { Web3Wallet } from "@walletconnect/web3wallet/dist/types/client";
+import type { IWalletKit } from "@reown/walletkit";
 import { stripHexPrefix } from "@/utils/currencyFormatter/helpers";
 
 export enum Errors {
@@ -18,12 +18,12 @@ export const formatMessage = (buffer: Buffer) => {
 };
 
 export const acceptRequest = (
-  web3wallet: Web3Wallet,
+  walletKit: IWalletKit,
   topic: string,
   id: number,
   signedMessage: string,
 ) => {
-  return web3wallet.respondSessionRequest({
+  return walletKit.respondSessionRequest({
     topic,
     response: {
       id,
@@ -34,13 +34,13 @@ export const acceptRequest = (
 };
 
 export const rejectRequest = (
-  web3wallet: Web3Wallet,
+  walletKit: IWalletKit,
   topic: string,
   id: number,
   message: Errors,
   code = 5000,
 ) => {
-  return web3wallet.respondSessionRequest({
+  return walletKit.respondSessionRequest({
     topic,
     response: {
       id,
@@ -51,4 +51,15 @@ export const rejectRequest = (
       },
     },
   });
+};
+
+const CANCELED_ERROR_MESSAGES = ["User cancelled", "Canceled by user"];
+const CANCELED_ERROR_NAMES = ["UserRefusedOnDevice"];
+
+export const isCanceledError = (error: unknown) => {
+  return (
+    error instanceof Error &&
+    (CANCELED_ERROR_MESSAGES.includes(error.message) ||
+      CANCELED_ERROR_NAMES.includes(error.name))
+  );
 };

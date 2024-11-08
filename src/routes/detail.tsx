@@ -3,7 +3,7 @@ import { rootRoute } from "@/routes/root";
 import SessionDetail from "@/components/screens/SessionDetail";
 import { useMemo } from "react";
 import { useAtomValue } from "jotai";
-import { web3walletAtom } from "@/store/web3wallet.store";
+import { walletKitAtom } from "@/store/walletKit.store";
 import useSessions from "@/hooks/useSessions";
 
 export const detailRoute = createRoute({
@@ -12,8 +12,8 @@ export const detailRoute = createRoute({
   component: function Detail() {
     const params = detailRoute.useParams();
 
-    const web3wallet = useAtomValue(web3walletAtom);
-    const sessions = useSessions(web3wallet);
+    const walletKit = useAtomValue(walletKitAtom);
+    const sessions = useSessions(walletKit);
     const session = useMemo(
       () => sessions.data.find((elem) => elem.topic === params.topic),
       [params.topic, sessions.data],

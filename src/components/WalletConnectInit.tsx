@@ -8,7 +8,7 @@ import useWalletConnect from "@/hooks/useWalletConnect";
 import {
   loadingAtom,
   showBackToBrowserModalAtom,
-} from "@/store/web3wallet.store";
+} from "@/store/walletKit.store";
 import { BottomModal } from "./atoms/popin/BottomModal";
 
 function BackToBrowserModal({

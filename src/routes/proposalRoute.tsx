@@ -3,7 +3,7 @@ import SessionProposal from "@/components/screens/SessionProposal";
 import { rootRoute } from "@/routes/root";
 import { useMemo } from "react";
 import { useAtomValue } from "jotai";
-import { web3walletAtom } from "@/store/web3wallet.store";
+import { walletKitAtom } from "@/store/walletKit.store";
 import usePendingProposals from "@/hooks/usePendingProposals";
 // import sessionProposals from "@/data/mocks/sessionProposals";
 
@@ -13,8 +13,8 @@ export const proposalRoute = createRoute({
   component: function Proposal() {
     const params = proposalRoute.useParams();
 
-    const web3wallet = useAtomValue(web3walletAtom);
-    const pendingProposals = usePendingProposals(web3wallet);
+    const walletKit = useAtomValue(walletKitAtom);
+    const pendingProposals = usePendingProposals(walletKit);
     // NOTE: keep for pair review to quickly go through main connection flows.
     // const proposal = sessionProposals.noSupport;
     // const proposal = sessionProposals.required;

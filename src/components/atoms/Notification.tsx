@@ -1,4 +1,4 @@
-import { Notification, Icon } from "@ledgerhq/react-ui";
+import { Notification, Icon, Alert, Box } from "@ledgerhq/react-ui";
 import { CustomContentProps, SnackbarContent, closeSnackbar } from "notistack";
 import React from "react";
 
@@ -8,6 +8,9 @@ declare module "notistack" {
   interface VariantOverrides {
     errorNotification: {
       errorType: string;
+    };
+    connectionNotification: {
+      connected: boolean;
     };
   }
 }
@@ -52,3 +55,34 @@ export const ErrorNotification = React.forwardRef<
 });
 
 ErrorNotification.displayName = "ErrorNotification";
+
+type ConnectionNotificationProps = CustomContentProps & {
+  connected: boolean;
+};
+
+export const ConnectionNotification = React.forwardRef<
+  HTMLDivElement,
+  ConnectionNotificationProps
+>((myProps, ref) => {
+  // Using myProps here as using props triggers an eslint false positive
+  // https://github.com/jsx-eslint/eslint-plugin-react/issues/3796
+  const { id, connected, message, ...other } = myProps;
+
+  return (
+    <SnackbarContent
+      ref={ref}
+      role="alert"
+      {...other}
+      onClick={() => closeSnackbar(id)}
+    >
+      <Box width="100%">
+        <Alert
+          type={connected ? "success" : "error"}
+          title={message?.toString()}
+        />
+      </Box>
+    </SnackbarContent>
+  );
+});
+
+ConnectionNotification.displayName = "ErrorNotification";

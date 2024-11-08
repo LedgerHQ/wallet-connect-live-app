@@ -1,15 +1,15 @@
 import { SignClientTypes } from "@walletconnect/types";
 import { useCallback, useEffect } from "react";
-import { Web3WalletTypes } from "@walletconnect/web3wallet";
+import { WalletKitTypes } from "@reown/walletkit";
 import { enqueueSnackbar } from "notistack";
 import { getErrorMessage } from "@/utils/helper.util";
 import {
   coreAtom,
   connectionStatusAtom,
-  web3walletAtom,
+  walletKitAtom,
   loadingAtom,
   showBackToBrowserModalAtom,
-} from "@/store/web3wallet.store";
+} from "@/store/walletKit.store";
 import {
   isEIP155Chain,
   isMultiversXChain,
@@ -41,16 +41,40 @@ function useWalletConnectStatus() {
   useEffect(() => {
     if (core.relayer.connected && connectionStatus !== "connected") {
       setConnectionStatus("connected");
+      enqueueSnackbar("Connected to WalletConnect", {
+        connected: true,
+        variant: "connectionNotification",
+        anchorOrigin: {
+          vertical: "top",
+          horizontal: "right",
+        },
+      });
     }
   }, [connectionStatus, core.relayer, setConnectionStatus]);
 
   useEffect(() => {
     const onConnect = () => {
       setConnectionStatus("connected");
+      enqueueSnackbar("Connected to WalletConnect", {
+        connected: true,
+        variant: "connectionNotification",
+        anchorOrigin: {
+          vertical: "top",
+          horizontal: "right",
+        },
+      });
     };
 
     const onDisconnect = () => {
       setConnectionStatus("disconnected");
+      enqueueSnackbar("Disconnected from WalletConnect", {
+        connected: false,
+        variant: "connectionNotification",
+        anchorOrigin: {
+          vertical: "top",
+          horizontal: "right",
+        },
+      });
     };
 
     core.relayer.on("relayer_connect", onConnect);
@@ -67,7 +91,7 @@ export default function useWalletConnect() {
   useWalletConnectStatus();
 
   const navigate = useNavigate({ from: "/" });
-  const web3wallet = useAtomValue(web3walletAtom);
+  const walletKit = useAtomValue(walletKitAtom);
 
   const queryClient = useQueryClient();
 
@@ -81,12 +105,12 @@ export default function useWalletConnect() {
     });
   }, [queryClient]);
 
-  const pendingProposalsQueryFn = usePendingProposalsQueryFn(web3wallet);
+  const pendingProposalsQueryFn = usePendingProposalsQueryFn(walletKit);
 
   // TODO : check if WC provides any another way to get this data
   const onSessionProposal = useCallback(
-    (proposal: Web3WalletTypes.SessionProposal) => {
-      void web3wallet.core.pairing.updateMetadata({
+    (proposal: WalletKitTypes.SessionProposal) => {
+      void walletKit.core.pairing.updateMetadata({
         topic: proposal.params.pairingTopic,
         metadata: {
           ...proposal.params.proposer.metadata,
@@ -115,13 +139,13 @@ export default function useWalletConnect() {
           });
         });
     },
-    [navigate, pendingProposalsQueryFn, queryClient, web3wallet.core.pairing],
+    [navigate, pendingProposalsQueryFn, queryClient, walletKit.core.pairing],
   );
 
   const setShowModal = useSetAtom(showBackToBrowserModalAtom);
   const redirectToDapp = useCallback(
     (topic: string) => {
-      const session = web3wallet.engine.signClient.session.get(topic);
+      const session = walletKit.engine.signClient.session.get(topic);
       if (session) {
         const url =
           session.peer.metadata.redirect?.native ??
@@ -133,7 +157,7 @@ export default function useWalletConnect() {
         }
       }
     },
-    [setShowModal, web3wallet.engine.signClient.session],
+    [setShowModal, walletKit.engine.signClient.session],
   );
 
   const setLoading = useSetAtom(loadingAtom);
@@ -155,7 +179,7 @@ export default function useWalletConnect() {
               chainId,
               accounts.data,
               client,
-              web3wallet,
+              walletKit,
               queryClient,
             );
           } else if (isEIP155Chain(chainId, request)) {
@@ -166,7 +190,7 @@ export default function useWalletConnect() {
               chainId,
               accounts.data,
               client,
-              web3wallet,
+              walletKit,
             );
           } else if (isMultiversXChain(chainId, request)) {
             await handleMvxRequest(
@@ -176,7 +200,7 @@ export default function useWalletConnect() {
               chainId,
               accounts.data,
               client,
-              web3wallet,
+              walletKit,
             );
           } else if (isBIP122Chain(chainId, request)) {
             await handleBIP122Request(
@@ -186,7 +210,7 @@ export default function useWalletConnect() {
               chainId,
               accounts.data,
               client,
-              web3wallet,
+              walletKit,
             );
           } else if (isRippleChain(chainId, request)) {
             await handleXrpRequest(
@@ -196,12 +220,12 @@ export default function useWalletConnect() {
               chainId,
               accounts.data,
               client,
-              web3wallet,
+              walletKit,
             );
           } else {
             console.error("Not Supported Chain");
             await rejectRequest(
-              web3wallet,
+              walletKit,
               topic,
               id,
               Errors.unsupportedChains,
@@ -217,7 +241,7 @@ export default function useWalletConnect() {
               horizontal: "right",
             },
           });
-          await rejectRequest(web3wallet, topic, id, Errors.txDeclined);
+          await rejectRequest(walletKit, topic, id, Errors.txDeclined);
         }
       })().finally(() => {
         setLoading(false);
@@ -225,14 +249,7 @@ export default function useWalletConnect() {
         void queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
       });
     },
-    [
-      accounts.data,
-      client,
-      web3wallet,
-      queryClient,
-      setLoading,
-      redirectToDapp,
-    ],
+    [accounts.data, client, walletKit, queryClient, setLoading, redirectToDapp],
   );
 
   const onSessionDeleted = useCallback(() => {
@@ -240,31 +257,31 @@ export default function useWalletConnect() {
   }, [queryClient]);
 
   useEffect(() => {
-    console.log("web3wallet setup listeners");
+    console.log("walletKit setup listeners");
     // TODO: handle session_request_expire
-    // web3wallet.on("session_request_expire", );
+    // walletKit.on("session_request_expire", );
 
     // sign
-    web3wallet.on("proposal_expire", onProposalExpire);
-    web3wallet.on("session_proposal", onSessionProposal);
-    web3wallet.on("session_request", onSessionRequest);
-    web3wallet.on("session_delete", onSessionDeleted);
+    walletKit.on("proposal_expire", onProposalExpire);
+    walletKit.on("session_proposal", onSessionProposal);
+    walletKit.on("session_request", onSessionRequest);
+    walletKit.on("session_delete", onSessionDeleted);
 
     // auth
-    // web3wallet.on("auth_request", onAuthRequest);
+    // walletKit.on("auth_request", onAuthRequest);
     return () => {
-      console.log("web3wallet cleanup listeners");
+      console.log("walletKit cleanup listeners");
       // sign
-      web3wallet.off("proposal_expire", onProposalExpire);
-      web3wallet.off("session_proposal", onSessionProposal);
-      web3wallet.off("session_request", onSessionRequest);
-      web3wallet.off("session_delete", onSessionDeleted);
+      walletKit.off("proposal_expire", onProposalExpire);
+      walletKit.off("session_proposal", onSessionProposal);
+      walletKit.off("session_request", onSessionRequest);
+      walletKit.off("session_delete", onSessionDeleted);
 
       // auth
-      // web3wallet.off("auth_request", onAuthRequest);
+      // walletKit.off("auth_request", onAuthRequest);
     };
   }, [
-    web3wallet,
+    walletKit,
     onSessionProposal,
     onSessionRequest,
     onSessionDeleted,
