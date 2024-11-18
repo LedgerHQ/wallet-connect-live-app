@@ -1,0 +1,111 @@
+{
+  "applicationDisabled" : {
+    "title" : "⁣⁢We are currently experiencing a temporary issue with WalletConnect v2 integration.⁭‍⁠⁬⁠‍؜⁠⁬‍⁡⁠؜⁭‌⁡⁪⁯⁡⁠⁡‍⁣⁤",
+    "desc" : "⁣⁢We are actively working to identify and implement a solution to restore the functionality as soon as possible. Thank you for your understanding.⁯⁠⁠⁮⁬⁫⁮⁪⁪⁪‌‍⁭⁫⁭⁠⁬⁭⁠‍⁯⁪⁣⁤"
+  },
+  "errorBoundary" : {
+    "title" : "⁣⁢Oops, something went wrong!⁡⁫؜⁭؜⁡‌⁮⁬‍؜⁯⁬⁠؜⁭⁪⁠⁯‍⁬⁬؜⁮⁫⁣⁤",
+    "desc" : "⁣⁢We have been notified of this error. Please try again by refreshing the page.‍⁮⁬‍⁡⁪⁡⁮⁡⁭⁬؜‌‍⁭‍⁯⁡‌⁮⁣⁤"
+  },
+  "back" : "⁣⁢Back⁯⁡⁭⁫⁠‍‍⁮⁮⁯⁡‌؜⁡⁡⁬⁭‍⁮⁫؜⁡؜‌⁣⁤",
+  "close" : "⁣⁢Close⁮⁠⁪⁫‌⁮⁭⁡⁭⁯⁪‌‍‍⁡⁭⁣⁤",
+  "error" : {
+    "noInput" : "⁣⁢No input value⁯⁬⁠⁪‌⁯⁡⁮⁫⁮⁫؜⁠‌‌⁬⁪⁪⁮⁬⁫⁯⁫؜⁣⁤",
+    "invalidUri" : "⁣⁢Invalid URI⁮‌⁭⁫⁯⁯⁠‍⁬؜‌⁫‍⁮‌⁪⁪⁪⁮‍؜⁪⁣⁤"
+  },
+  "connect" : {
+    "title" : "⁣⁢Connect to an app to start⁮⁡⁪⁮⁡⁮⁭⁭؜‍؜⁪؜⁯⁭⁮⁠؜⁮⁮⁫⁭⁣⁤",
+    "cta" : "⁣⁢Connect؜⁡⁮⁬؜⁮⁪⁯‍‌⁪⁬⁭⁠‌⁡⁭⁣⁤",
+    "scanQRCode" : "⁣⁢Scan QR code⁯⁠⁬⁯‌⁫⁪⁪⁫‍⁠⁬⁡⁠⁬⁬‌⁬⁭‌⁬⁭⁯⁣⁤",
+    "useWalletConnectUrl" : "⁣⁢Or use a WalletConnect URL⁠⁯⁭⁪⁭‍‍⁪⁬‍⁭؜⁫‌‍⁪⁭؜⁠⁫⁫⁡⁯⁣⁤",
+    "pasteUrl" : "⁣⁢Paste URL⁭⁭⁠⁬؜⁡⁠؜⁬‌⁮؜⁭⁪⁯⁭؜⁮‍⁮؜؜؜‌‍⁣⁤",
+    "switchToText" : "⁣⁢Switch to Text⁯⁫‌⁬⁭؜⁯‌⁫⁭⁯‌⁫‌⁬⁯⁭⁯⁡⁯⁬⁣⁤",
+    "switchToScanner" : "⁣⁢Switch to Scanner⁮⁮⁯⁯⁠‍⁭‌⁯؜⁬⁠⁯⁠⁬⁯⁡⁪⁫⁯⁡⁯⁯⁪⁣⁤",
+    "errorProtocol" : {
+      "title" : "⁣⁢The Dapp you’re trying to connect to isn’t up to date؜‍‍‍‍⁮⁬⁮⁮⁬⁪؜⁭⁪⁠⁪⁣⁤",
+      "desc" : "⁣⁢WalletConnect V1 is no longer supported, and to ensure a smooth and secure connection, the Dapp you’re using must upgrade to WalletConnect V2.‌⁡⁫⁮⁭⁫‌⁫؜‍‍⁪⁠⁯⁫⁬‍⁠⁭⁣⁤"
+    }
+  },
+  "sessionProposal" : {
+    "connectTo" : "⁣⁢Connect to {{name}}⁠؜⁬⁠⁡⁬⁬⁡⁬‌⁭⁡⁯؜⁭⁭⁯؜⁯⁭⁬⁫⁣⁤",
+    "connect" : "⁣⁢Connect⁫⁬؜⁠⁠⁫⁭⁯‌⁪؜⁪⁮⁭⁪‍⁠⁬⁫⁬⁣⁤",
+    "reject" : "⁣⁢Reject⁮⁬⁫⁠⁮⁫⁯⁠⁬⁡؜⁡⁮⁬⁠؜⁪⁯⁪⁪⁠⁮؜⁣⁤",
+    "close" : "⁣⁢Close⁯⁫⁬⁪⁠⁮؜⁫؜⁠؜⁫⁪⁭‍؜⁯‌⁬⁮⁬‍⁮⁣⁤",
+    "notSupported" : "⁣⁢This blockchain is not supported؜⁪⁫‌⁪‌⁭⁡⁭؜⁬⁭‍⁬⁬⁮⁡⁯⁪⁣⁤",
+    "notSupported_plural" : "⁣⁢These blockchains are not supported؜⁭⁮‍⁠‍⁭⁮⁠⁪⁪‍⁮⁡⁮⁮؜‍⁫⁪⁯⁭⁣⁤",
+    "info" : "⁣⁢This app will be able to:⁫⁬⁡‍؜⁡⁪‌⁮⁭⁡⁪⁭⁫‍⁫⁫⁭⁡⁮⁡⁮⁫؜⁪⁮⁬⁣⁤ ",
+    "info2" : "⁣⁢This app is able to:⁮⁠⁠⁭⁮⁫‍⁪⁡⁠⁠⁪‍‌⁪‍⁯⁠‌‌⁭‌⁡⁣⁤ ",
+    "info3" : "⁣⁢If you connect:⁡⁯⁬⁡⁬⁮⁠⁯⁠⁮⁮⁠⁮⁭⁯⁡⁡‌⁪⁭⁭⁫⁣⁤ ",
+    "infoBullet" : {
+      "0" : "⁣⁢Check your account balance and activity⁠⁮⁭‌⁯⁯⁫⁡؜⁬⁡⁠⁡⁮⁯‍⁭⁮؜؜⁣⁤",
+      "1" : "⁣⁢Request approvals for transactions‍⁡⁡⁪⁫⁯⁯⁭؜⁮⁫⁡⁯⁯⁪⁪⁡⁫⁪⁬⁬⁣⁤",
+      "2" : "⁣⁢You will be disconnected from {{dAppName}}⁭‌⁮⁠⁠⁫⁯⁭⁠‌⁪⁭؜‌⁫⁮⁪⁭⁣⁤"
+    },
+    "verification" : {
+      "unknown" : {
+        "title" : "⁣⁢Unknown domain‍⁬؜⁠⁫⁯⁫؜⁡⁪⁬‍⁮⁭؜⁮‍⁠⁪⁭⁣⁤",
+        "label" : "⁣⁢Cannot verify؜⁪⁪⁮⁯⁬⁫⁡⁡⁠⁭⁫⁮‍‍⁯⁡⁯⁬؜‍‌‍‍‍⁣⁤",
+        "description" : "⁣⁢This domain cannot be verified. Check the request carefully before approving.⁠‍⁠⁡‌⁠⁭‍⁠⁫‌‌⁭⁭⁫؜؜⁭⁠‍⁮⁭⁬⁡⁭⁣⁤"
+      },
+      "invalid" : {
+        "title" : "⁣⁢Domain mismatch⁯⁪⁭‍‌‌⁫؜⁪⁭؜⁪⁭⁮⁪⁬⁡⁡⁫⁪⁡⁪‌⁫⁣⁤",
+        "label" : "⁣⁢Domain mismatch‍⁠‍‍؜⁪⁮⁡⁡⁬‍⁬‌⁫‍⁮⁠‍⁯⁬⁠‌⁣⁤",
+        "description" : "⁣⁢This website has a domain that does not match the sender of this request. approving may lead to loss of funds⁡⁫؜؜⁡⁠⁯؜⁭⁭⁪؜⁪‌؜؜⁬؜⁯⁯؜⁭⁣⁤"
+      },
+      "scam" : {
+        "title" : "⁣⁢Known security risk⁫‌⁠⁠‌⁡⁫⁫⁯؜⁠⁮‌؜⁡؜⁡⁪⁬‌⁡‍⁮⁡⁯⁫⁣⁤",
+        "label" : "⁣⁢Security risk‌⁯‍⁬⁮⁯‌⁮⁡‌⁡⁬‌⁡⁫⁡؜⁡؜⁡⁣⁤",
+        "description" : "⁣⁢This domain is flagged as unsafe by multiple security providers. Leave immediately to protect your assets.⁡⁭‍⁮⁯⁡⁬‍⁯؜⁫‌⁫⁫؜⁡⁬⁯⁫⁬⁫⁬⁣⁤"
+      }
+    },
+    "error" : {
+      "title" : "⁣⁢{{appName}} requested to connect to chains we don't support yet⁠⁮‍⁭⁫⁮⁫⁬⁭⁭⁪⁭⁡⁡؜⁪⁠⁯‍⁯⁬⁫⁣⁤",
+      "info" : "⁣⁢We currently support:‍⁠⁫؜⁮‍⁡⁮⁫⁯؜؜‍⁫⁮‍‌⁯⁭⁯‌⁠⁣⁤ "
+    },
+    "missingRequired" : {
+      "title" : "⁣⁢You need accounts on the following chains to connect to {{appName}}؜؜‌⁮⁮؜⁪؜‍⁭⁯⁡⁮⁬⁮⁫‌؜⁬⁫⁠⁮⁯⁡⁣⁤"
+    },
+    "addAccount" : "⁣⁢Add account‌⁫⁫⁡‌‌⁠‍⁯؜⁭⁭⁭⁡⁮‌⁪⁮⁡⁬؜⁯⁣⁤",
+    "createAccount" : "⁣⁢Create a new account⁮⁮؜‌⁫⁪⁡‍⁡⁯⁫⁫⁮⁡⁡⁬⁯⁯⁠⁣⁤",
+    "createAccountForChain" : "⁣⁢Create a new {{chain}} account⁫‌‌⁪⁪‍⁬⁡⁪⁠⁭⁠‌⁯⁪؜‍⁭⁪⁪‌⁪⁭⁫⁮⁮⁣⁤",
+    "noRequiredChains" : "⁣⁢Select at least one account to connect⁮‍⁪⁡‍⁠؜؜⁠⁭⁫⁠؜‍⁠⁫⁫⁭⁯⁡⁠⁡⁬⁣⁤"
+  },
+  "sessions" : {
+    "title" : "⁣⁢Sessions⁡⁮⁪⁪⁠؜⁬؜⁠⁯‌‍⁠‌⁯⁬؜⁫⁮‍⁠⁫‌؜⁣⁤",
+    "apps" : {
+      "title" : "⁣⁢Connected apps؜⁪‌‍⁪⁮⁬⁡⁬⁯‍⁪⁡⁫⁬⁫⁭⁪⁫⁭‌⁡⁣⁤",
+      "noAppsMessage" : "⁣⁢Your connected apps will be listed here‍‍⁪⁠⁭⁬‌⁮⁪⁬⁡‌⁭⁮⁬⁫⁮⁠؜⁫⁡⁣⁤",
+      "dontKnow" : "⁣⁢Don’t know any? Try one of these⁭⁠⁠‍‌‌‌⁪⁡⁠؜⁪⁮⁫⁯⁡⁯⁪⁬⁣⁤",
+      "lastConnection" : "⁣⁢Last connections⁭⁭‍⁯؜⁭⁬⁯⁭⁬⁬⁠⁭‌؜⁫⁡⁯⁬⁡‍؜⁭‌⁣⁤",
+      "tryNewApp" : "⁣⁢Try new apps⁯⁠⁪؜⁬⁫⁡⁫⁠‍‍⁡⁫⁪⁫⁠‍⁯⁡‌⁫⁮⁬⁡⁣⁤",
+      "clearHistory" : "⁣⁢Clear history‌⁮⁯⁫⁯⁭⁬‌‍؜⁫⁠‌⁫⁯⁬‌⁯⁣⁤"
+    },
+    "goToConnect" : "⁣⁢Connect⁮⁠⁫⁠‌⁫⁫‍⁡⁯⁪‌⁫⁯⁫⁮⁬⁪⁠⁮‌⁡⁡⁣⁤",
+    "disconnectAll" : "⁣⁢Disconnect All⁯‍‌‌⁭⁠⁪‌⁠⁮⁯‌⁯‍⁯‍‌⁠⁮⁣⁤",
+    "modal" : {
+      "title" : "⁣⁢Do you really want to disconnect all your sessions?‌⁠⁡⁯⁠⁬⁫‌⁪⁫⁡⁭⁬؜؜⁬⁠⁯⁭⁫⁠⁬⁡⁭⁣⁤",
+      "desc" : "⁣⁢You will need to re-connect to be able to interact with all the apps you were connected to.⁬⁮⁮‍؜⁡⁬⁪⁠⁮؜⁡⁮⁬⁡⁯‍⁡⁯⁠⁡⁬⁣⁤",
+      "continue" : "⁣⁢Disconnect‌‌⁮⁡⁪⁪⁬⁬⁫؜‌⁭⁯⁭⁠⁭⁬‍؜؜⁣⁤",
+      "cancel" : "⁣⁢Cancel⁠⁠⁡⁡‍‌⁮⁡⁫؜⁬⁭⁠‍‌⁪⁠⁫⁯⁫؜⁭⁮⁣⁤"
+    },
+    "proposals" : {
+      "title" : "⁣⁢Proposals‌⁬⁡⁬⁭⁡⁡⁪⁡⁯⁫⁯⁯⁯‍⁪؜؜⁭⁯⁣⁤"
+    },
+    "detail" : {
+      "title" : "⁣⁢Session details⁪⁯⁮‍⁭⁬؜⁡⁯‌؜⁡‌⁪⁠⁠⁬⁫⁭⁬⁣⁤",
+      "account" : "⁣⁢Account⁭؜⁭⁬⁯⁮؜⁮⁡⁮⁠⁮⁭⁫⁡⁡⁪⁮⁮⁣⁤",
+      "accounts" : "⁣⁢Accounts⁫⁫‌⁪‌؜⁭⁡⁠⁡‌؜⁬⁭⁯⁭⁭‌‌⁯⁯‍⁡‍⁬⁣⁤",
+      "connected" : "⁣⁢Connected⁬⁪⁮؜⁡⁡⁮⁭⁮⁠‍⁬⁭⁪⁮⁮⁭⁫‌⁫⁣⁤",
+      "expires" : "⁣⁢Expires‍؜‌؜⁪⁮⁯⁪⁯⁬⁫⁠⁫⁮⁮⁬⁬⁪⁯⁮⁪⁡‌⁡⁪⁡⁭⁪⁣⁤",
+      "disconnect" : "⁣⁢Disconnect⁫‌⁬⁪⁬⁭‍⁫⁡⁭⁭⁯⁬⁭⁮⁡⁮‌⁮⁮⁭⁮⁡⁡⁭⁡⁠⁣⁤"
+    },
+    "emptyState" : {
+      "title" : "⁣⁢No active session, yet‌‌‍⁪⁫⁡⁪⁡⁯⁫⁮؜⁪؜⁯‍⁮⁮⁪⁠⁠⁣⁤",
+      "desc" : "⁣⁢Get started by connecting to an app.⁮؜⁬⁬؜؜⁠⁯⁪⁫⁬‌⁭‌⁮⁡⁡⁬⁪⁬‍⁣⁤",
+      "goToConnect" : "⁣⁢Connect⁯⁭‌⁪⁪⁠⁯⁯⁡⁭⁭⁮⁫⁡⁯⁮⁠⁯⁭‌⁪‍⁬⁠⁣⁤"
+    }
+  },
+  "backToBrowserModal" : {
+    "message" : "⁣⁢Go back to your browser to continue⁫⁠⁠‌⁡‍⁬⁬⁪⁪⁬؜⁡⁡⁠⁭؜⁬⁡⁬⁯⁠⁣⁤"
+  }
+}
