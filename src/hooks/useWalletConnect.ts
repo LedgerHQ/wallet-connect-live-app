@@ -9,6 +9,7 @@ import {
   walletKitAtom,
   loadingAtom,
   showBackToBrowserModalAtom,
+  verifyContextByTopicAtom,
 } from "@/store/walletKit.store";
 import {
   isEIP155Chain,
@@ -96,6 +97,7 @@ export default function useWalletConnect() {
   const queryClient = useQueryClient();
 
   const client = useAtomValue(walletAPIClientAtom);
+  const setVerifyContextByTopic = useSetAtom(verifyContextByTopicAtom);
 
   const accounts = useAccounts(client);
 
@@ -107,17 +109,11 @@ export default function useWalletConnect() {
 
   const pendingProposalsQueryFn = usePendingProposalsQueryFn(walletKit);
 
-  // TODO : check if WC provides any another way to get this data
   const onSessionProposal = useCallback(
     (proposal: WalletKitTypes.SessionProposal) => {
-      void walletKit.core.pairing.updateMetadata({
-        topic: proposal.params.pairingTopic,
-        metadata: {
-          ...proposal.params.proposer.metadata,
-          verifyUrl: proposal.verifyContext.verified.isScam
-            ? "SCAM"
-            : proposal.verifyContext.verified.validation,
-        },
+      setVerifyContextByTopic((verifyByTopic) => {
+        verifyByTopic[proposal.params.pairingTopic] = proposal.verifyContext;
+        return verifyByTopic;
       });
 
       void queryClient
@@ -139,7 +135,7 @@ export default function useWalletConnect() {
           });
         });
     },
-    [navigate, pendingProposalsQueryFn, queryClient, walletKit.core.pairing],
+    [navigate, pendingProposalsQueryFn, queryClient, setVerifyContextByTopic],
   );
 
   const setShowModal = useSetAtom(showBackToBrowserModalAtom);
@@ -167,7 +163,13 @@ export default function useWalletConnect() {
         topic,
         params: { request, chainId },
         id,
+        verifyContext,
       } = requestEvent;
+
+      setVerifyContextByTopic((verifyByTopic) => {
+        verifyByTopic[topic] = verifyContext;
+        return verifyByTopic;
+      });
 
       void (async () => {
         try {
@@ -249,7 +251,15 @@ export default function useWalletConnect() {
         void queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
       });
     },
-    [accounts.data, client, walletKit, queryClient, setLoading, redirectToDapp],
+    [
+      setVerifyContextByTopic,
+      accounts.data,
+      client,
+      walletKit,
+      queryClient,
+      setLoading,
+      redirectToDapp,
+    ],
   );
 
   const onSessionDeleted = useCallback(() => {
