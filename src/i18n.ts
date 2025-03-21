@@ -25,6 +25,7 @@ i18n
       ko: ["ko-KR", "en"],
       pt: ["pt-BR", "en"],
       ru: ["ru-RU", "en"],
+      th: ["th-TH", "en"],
       tr: ["tr-TR", "en"],
       zh: ["zh-CN", "en"],
       default: ["en"],
