@@ -67,12 +67,18 @@ export function GenericRow({
       >
         {rightElement ?? null}
         {rowType === RowType.Select && onClick && (
-          <Checkbox
-            isChecked={isSelected}
-            name={""}
-            onChange={onClick}
-            data-testid="checkbox"
-          />
+          <Box
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            <Checkbox
+              isChecked={isSelected}
+              name={""}
+              onChange={onClick}
+              data-testid="checkbox"
+            />
+          </Box>
         )}
         {rowType === RowType.Detail && (
           <ChevronRightMedium size={24} color="neutral.c70" />
