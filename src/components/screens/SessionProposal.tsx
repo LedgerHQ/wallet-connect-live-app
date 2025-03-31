@@ -305,6 +305,7 @@ export default function SessionProposal({ proposal }: Props) {
             <BlurRow>
               <ButtonsContainer>
                 <Button
+                  variant="neutral"
                   size="large"
                   flex={0.3}
                   mr={6}
