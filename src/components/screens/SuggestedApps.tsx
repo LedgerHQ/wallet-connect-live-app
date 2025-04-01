@@ -1,8 +1,8 @@
 import { device } from "@/styles/breakpoints";
-import AppCard from "../AppCard";
 import { Text } from "@ledgerhq/react-ui";
 import { t } from "i18next";
 import styled from "styled-components";
+import AppCard from "../AppCard";
 
 const appList = [
   {
@@ -84,7 +84,12 @@ const GridContainer = styled.div`
 export default function SuggestedApps() {
   return (
     <>
-      <Text variant="extraSmall" color="neutral.c70" marginBottom={6}>
+      <Text
+        fontSize={6}
+        variant="extraSmall"
+        color="neutral.c70"
+        marginBottom={6}
+      >
         {t("sessions.apps.dontKnow")}
       </Text>
 

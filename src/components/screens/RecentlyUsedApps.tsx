@@ -1,13 +1,13 @@
 import {
-  sortedRecentConnectionAppsAtom,
   recentConnectionAppsAtom,
   initialValue as recentConnectionAppsInitialValue,
+  sortedRecentConnectionAppsAtom,
 } from "@/store/recentConnectionAppsAtom";
-import AppCard from "../AppCard";
 import { Flex, Text } from "@ledgerhq/react-ui";
 import { t } from "i18next";
-import styled from "styled-components";
 import { useAtomValue, useSetAtom } from "jotai";
+import styled from "styled-components";
+import AppCard from "../AppCard";
 
 const GridContainer = styled.div`
   width: 100%;
@@ -33,11 +33,17 @@ export default function RecentlyUsedApps() {
   return (
     <>
       <Flex justifyContent={"space-between"}>
-        <Text variant="extraSmall" color="neutral.c70" marginBottom={6}>
+        <Text
+          fontSize={6}
+          variant="extraSmall"
+          color="neutral.c70"
+          marginBottom={6}
+        >
           {t("sessions.apps.lastConnection")}
         </Text>
 
         <Text
+          fontSize={6}
           style={{ cursor: "pointer" }}
           variant="extraSmall"
           color="neutral.c70"
