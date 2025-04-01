@@ -1,0 +1,26 @@
+diff --git a/lib/getDeviceId.js b/lib/getDeviceId.js
+index 1033f6624bb4b307690d30b2efd458dca51b171e..7cfdaea91839a516de9921e1fc83d097c0f579c8 100644
+--- a/lib/getDeviceId.js
++++ b/lib/getDeviceId.js
+@@ -5,7 +5,7 @@ var _require = require('./errors'),
+ 
+ function defaultDeviceIdChooser(filteredDevices, videoDevices, facingMode) {
+   if (filteredDevices.length > 0) {
+-    return filteredDevices[0].deviceId;
++    return filteredDevices[filteredDevices.length - 1].deviceId;
+   }
+   if (videoDevices.length == 1 || facingMode == 'user') {
+     return videoDevices[0].deviceId;
+diff --git a/src/getDeviceId.js b/src/getDeviceId.js
+index 4052b29b31fe4b8cf383a7976183deec0ec9c3a1..53cb9691941fcfe9489d7f91a2d309ab54d7acb4 100644
+--- a/src/getDeviceId.js
++++ b/src/getDeviceId.js
+@@ -2,7 +2,7 @@ const { NoVideoInputDevicesError } = require('./errors')
+ 
+ function defaultDeviceIdChooser(filteredDevices, videoDevices, facingMode) {
+   if(filteredDevices.length > 0){
+-    return filteredDevices[0].deviceId
++    return filteredDevices[filteredDevices.length - 1].deviceId;
+   }
+   if(videoDevices.length == 1 || facingMode == 'user'){
+     return videoDevices[0].deviceId
