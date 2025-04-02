@@ -194,9 +194,11 @@ export default function Sessions() {
         </Button>
       </ButtonsContainer>
 
-      <Flex flexDirection={"column"} marginTop={6}>
-        <RecentlyUsedApps />
-      </Flex>
+      {lastConnectionApps.length > 1 && (
+        <Flex flexDirection={"column"} marginTop={6}>
+          <RecentlyUsedApps />
+        </Flex>
+      )}
       <Flex flexDirection={"column"} marginTop={6}>
         <SuggestedApps />
       </Flex>
