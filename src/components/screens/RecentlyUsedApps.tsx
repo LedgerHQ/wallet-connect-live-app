@@ -33,19 +33,14 @@ export default function RecentlyUsedApps() {
   return (
     <>
       <Flex justifyContent={"space-between"}>
-        <Text
-          fontSize={6}
-          variant="extraSmall"
-          color="neutral.c70"
-          marginBottom={6}
-        >
+        <Text variant="large" color="neutral.c70" marginBottom={6}>
           {t("sessions.apps.lastConnection")}
         </Text>
 
         <Text
           fontSize={6}
           style={{ cursor: "pointer" }}
-          variant="extraSmall"
+          variant="large"
           color="neutral.c70"
           marginBottom={6}
           onClick={() => {

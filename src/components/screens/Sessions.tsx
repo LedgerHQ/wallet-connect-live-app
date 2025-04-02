@@ -166,10 +166,9 @@ export default function Sessions() {
               {t("connect.title")}
             </Text>
             <Text
-              fontSize={7}
               display="flex"
               justifyContent="center"
-              variant="extraSmall"
+              variant="large"
               color="neutral.c70"
               textAlign="center"
             >
@@ -195,11 +194,9 @@ export default function Sessions() {
         </Button>
       </ButtonsContainer>
 
-      {lastConnectionApps.length > 1 && (
-        <Flex flexDirection={"column"} marginTop={6}>
-          <RecentlyUsedApps />
-        </Flex>
-      )}
+      <Flex flexDirection={"column"} marginTop={6}>
+        <RecentlyUsedApps />
+      </Flex>
       <Flex flexDirection={"column"} marginTop={6}>
         <SuggestedApps />
       </Flex>
