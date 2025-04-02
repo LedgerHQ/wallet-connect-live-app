@@ -38,7 +38,6 @@ export default function RecentlyUsedApps() {
         </Text>
 
         <Text
-          fontSize={6}
           style={{ cursor: "pointer" }}
           variant="large"
           color="neutral.c70"
