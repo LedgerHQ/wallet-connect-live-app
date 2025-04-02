@@ -1,26 +1,25 @@
-import { List, ButtonsContainer } from "@/components/atoms/containers/Elements";
+import { ButtonsContainer, List } from "@/components/atoms/containers/Elements";
 import { GenericRow } from "@/components/atoms/GenericRow";
-import { RowType } from "@/components/atoms/types";
 import { ImageWithPlaceholder } from "@/components/atoms/images/ImageWithPlaceholder";
 import { WalletConnectPopin } from "@/components/atoms/popin/WalletConnectPopin";
-import { formatUrl } from "@/utils/helper.util";
-import { Flex, Button, Box, Text } from "@ledgerhq/react-ui";
-import { useTranslation } from "react-i18next";
-import { useCallback, useEffect } from "react";
-import { enqueueSnackbar } from "notistack";
-import { getErrorMessage } from "@/utils/helper.util";
-import useModal from "@/hooks/useModal";
+import { RowType } from "@/components/atoms/types";
 import useAnalytics from "@/hooks/useAnalytics";
+import useModal from "@/hooks/useModal";
+import usePendingProposals from "@/hooks/usePendingProposals";
+import useSessions, { queryKey as sessionsQueryKey } from "@/hooks/useSessions";
+import { sortedRecentConnectionAppsAtom } from "@/store/recentConnectionAppsAtom";
+import { walletKitAtom } from "@/store/walletKit.store";
+import { formatUrl, getErrorMessage } from "@/utils/helper.util";
+import { Box, Button, Flex, Text } from "@ledgerhq/react-ui";
+import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useAtomValue } from "jotai";
-import { walletKitAtom } from "@/store/walletKit.store";
-import useSessions, { queryKey as sessionsQueryKey } from "@/hooks/useSessions";
-import { useQueryClient } from "@tanstack/react-query";
-import usePendingProposals from "@/hooks/usePendingProposals";
-import SuggestedApps from "./SuggestedApps";
-import RecentlyUsedApps from "./RecentlyUsedApps";
-import { sortedRecentConnectionAppsAtom } from "@/store/recentConnectionAppsAtom";
+import { enqueueSnackbar } from "notistack";
+import { useCallback, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import ProposalRow from "../ProposalRow";
+import RecentlyUsedApps from "./RecentlyUsedApps";
+import SuggestedApps from "./SuggestedApps";
 
 export default function Sessions() {
   const { t } = useTranslation();
@@ -169,7 +168,7 @@ export default function Sessions() {
             <Text
               display="flex"
               justifyContent="center"
-              variant="extraSmall"
+              variant="large"
               color="neutral.c70"
               textAlign="center"
             >
