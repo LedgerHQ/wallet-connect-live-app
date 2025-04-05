@@ -4,7 +4,11 @@ import {
   type BIP122_REQUESTS,
   BIP122_SIGNING_METHODS,
 } from "@/data/methods/BIP122.methods";
-import { getAccountWithAddressAndChainId } from "@/utils/generic";
+import {
+  getAccountWithAddressAndChainId,
+  getAddressWithAccount,
+} from "@/utils/generic";
+import { convertBtcToLiveTX } from "@/utils/converters";
 import {
   acceptRequest,
   Errors,
@@ -26,7 +30,7 @@ export async function handleBIP122Request(
     case BIP122_SIGNING_METHODS.BIP122_SIGN_MESSAGE: {
       const accountSign = getAccountWithAddressAndChainId(
         accounts,
-        request.params.address,
+        getAddressWithAccount(request),
         chainId,
       );
       if (accountSign) {
@@ -51,6 +55,33 @@ export async function handleBIP122Request(
         }
       } else {
         await rejectRequest(walletkit, topic, id, Errors.userDecline);
+      }
+      break;
+    }
+    case BIP122_SIGNING_METHODS.BIP122_SEND_TRANSFERT: {
+      const btcTx = request.params;
+      const accountTX = getAccountWithAddressAndChainId(
+        accounts,
+        getAddressWithAccount(request),
+        chainId,
+      );
+      if (accountTX) {
+        try {
+          const liveTx = convertBtcToLiveTX(btcTx);
+          const hash = await client.transaction.signAndBroadcast(
+            accountTX.id,
+            liveTx,
+          );
+          await acceptRequest(walletkit, topic, id, hash);
+        } catch (error) {
+          if (isCanceledError(error)) {
+            await rejectRequest(walletkit, topic, id, Errors.txDeclined);
+          } else {
+            throw error;
+          }
+        }
+      } else {
+        await rejectRequest(walletkit, topic, id, Errors.txDeclined);
       }
       break;
     }
