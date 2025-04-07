@@ -4,10 +4,7 @@ import {
   type BIP122_REQUESTS,
   BIP122_SIGNING_METHODS,
 } from "@/data/methods/BIP122.methods";
-import {
-  getAccountWithAddressAndChainId,
-  getAddressWithAccount,
-} from "@/utils/generic";
+import { getAccountWithAddressAndChainId } from "@/utils/generic";
 import { convertBtcToLiveTX } from "@/utils/converters";
 import {
   acceptRequest,
@@ -30,7 +27,7 @@ export async function handleBIP122Request(
     case BIP122_SIGNING_METHODS.BIP122_SIGN_MESSAGE: {
       const accountSign = getAccountWithAddressAndChainId(
         accounts,
-        getAddressWithAccount(request),
+        request.params.address ?? request.params.account,
         chainId,
       );
       if (accountSign) {
@@ -62,7 +59,7 @@ export async function handleBIP122Request(
       const btcTx = request.params;
       const accountTX = getAccountWithAddressAndChainId(
         accounts,
-        getAddressWithAccount(request),
+        request.params.account,
         chainId,
       );
       if (accountTX) {

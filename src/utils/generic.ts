@@ -1,6 +1,5 @@
 import { Account } from "@ledgerhq/wallet-api-client";
 import { getCurrencyByChainId } from "./helper.util";
-import { getAddressFromAccount } from "@walletconnect/utils";
 
 export const getDefaultLanguage = (
   fallbackLang: string,
@@ -29,10 +28,3 @@ export const getAccountWithAddressAndChainId = (
       a.address.toLowerCase() === addr.toLowerCase() &&
       a.currency === getCurrencyByChainId(chainId),
   );
-
-export const getAddressWithAccount = (request: {
-  params: { account: string; address?: string };
-}): string =>
-  request.params?.address ??
-  getAddressFromAccount(request.params.account) ??
-  request.params.account;

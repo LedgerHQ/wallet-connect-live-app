@@ -15,7 +15,7 @@ export type BIP122_REQUESTS =
       params: {
         message: string;
         account: string;
-        address: string;
+        address?: string;
       };
     }
   | {
