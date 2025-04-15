@@ -2,6 +2,7 @@ import type { IWalletKit } from "@reown/walletkit";
 import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import {
   type BIP122_REQUESTS,
+  BIP122_RESPONSES,
   BIP122_SIGNING_METHODS,
 } from "@/data/methods/BIP122.methods";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
@@ -37,12 +38,12 @@ export async function handleBIP122Request(
             accountSign.id,
             Buffer.from(message),
           );
-          await acceptRequest(
-            walletkit,
-            topic,
-            id,
-            formatMessage(signedMessage),
-          );
+          const result: BIP122_RESPONSES[typeof request.method] = {
+            address: accountSign.address,
+            signature: formatMessage(signedMessage).replace("0x", ""),
+          };
+
+          await acceptRequest(walletkit, topic, id, result);
         } catch (error) {
           if (isCanceledError(error)) {
             await rejectRequest(walletkit, topic, id, Errors.userDecline);
@@ -69,7 +70,12 @@ export async function handleBIP122Request(
             accountTX.id,
             liveTx,
           );
-          await acceptRequest(walletkit, topic, id, hash);
+
+          const result: BIP122_RESPONSES[typeof request.method] = {
+            txid: hash,
+          };
+
+          await acceptRequest(walletkit, topic, id, result);
         } catch (error) {
           if (isCanceledError(error)) {
             await rejectRequest(walletkit, topic, id, Errors.txDeclined);

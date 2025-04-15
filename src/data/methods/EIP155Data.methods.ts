@@ -4,7 +4,7 @@
  */
 
 /**
- * Methods
+ * Methods specs : https://docs.reown.com/advanced/multichain/rpc-reference/ethereum-rpc
  */
 export const EIP155_SIGNING_METHODS = {
   PERSONAL_SIGN: "personal_sign",
@@ -44,3 +44,17 @@ export type EIP155_REQUESTS =
         },
       ];
     };
+
+/**
+ * Responses specs : https://docs.reown.com/advanced/multichain/rpc-reference/ethereum-rpc
+ */
+export type EIP155_RESPONSES = {
+  [EIP155_SIGNING_METHODS.ETH_SIGN]: string;
+  [EIP155_SIGNING_METHODS.ETH_SIGN]: string;
+  [EIP155_SIGNING_METHODS.PERSONAL_SIGN]: string;
+  [EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA]: string;
+  [EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V3]: string;
+  [EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V4]: string;
+  [EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION]: string;
+  [EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION]: string;
+};

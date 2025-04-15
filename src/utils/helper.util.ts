@@ -70,7 +70,8 @@ export function isRippleChain(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   _request?: { method: string; params: any },
 ): _request is RIPPLE_REQUESTS {
-  return chain.startsWith("xrpl:0");
+  // return chain.startsWith("xrpl:0");
+  return false;
 }
 
 /**

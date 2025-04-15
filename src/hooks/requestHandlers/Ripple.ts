@@ -2,6 +2,7 @@ import type { IWalletKit } from "@reown/walletkit";
 import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import {
   type RIPPLE_REQUESTS,
+  RIPPLE_RESPONSES,
   RIPPLE_SIGNING_METHODS,
 } from "@/data/methods/Ripple.methods";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
@@ -33,7 +34,14 @@ export async function handleXrpRequest(
             accountTX.id,
             liveTx,
           );
-          await acceptRequest(walletKit, topic, id, hash);
+
+          // FIXME: tx_json should be an object (see: https://docs.reown.com/advanced/multichain/rpc-reference/xrpl-rpc#example)
+          // TODO: After fixing, return the correct value to activate the requestHandler in isRippleChain (/src/utils/helper.util.ts)
+          const result: RIPPLE_RESPONSES[typeof request.method] = {
+            tx_json: { hash }, // Does not work
+          };
+
+          await acceptRequest(walletKit, topic, id, result);
         } catch (error) {
           if (isCanceledError(error)) {
             await rejectRequest(walletKit, topic, id, Errors.txDeclined);

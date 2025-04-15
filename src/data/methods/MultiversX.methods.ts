@@ -10,13 +10,14 @@ export const MULTIVERSX_SIGNING_METHODS = {
 } as const;
 
 /**
- * Requests specs: https://specs.walletconnect.com/2.0/blockchain-rpc/multiversx-rpc#parameters-2
+ * Requests 
  */
 export type MULTIVERSX_REQUESTS =
   | {
       method: typeof MULTIVERSX_SIGNING_METHODS.MULTIVERSX_SIGN_MESSAGE;
       params: {
         message: string;
+        account: string;
         address: string;
       };
     }
@@ -32,3 +33,18 @@ export type MULTIVERSX_REQUESTS =
         transactions: MvxTransaction[];
       };
     };
+
+/**
+ * Responses
+ */
+export type MULTIVERSX_RESPONSES = {
+  [MULTIVERSX_SIGNING_METHODS.MULTIVERSX_SIGN_MESSAGE]: {
+    signature: string;
+  };
+  [MULTIVERSX_SIGNING_METHODS.MULTIVERSX_SIGN_TRANSACTION]: {
+    signature: string;
+  };
+  [MULTIVERSX_SIGNING_METHODS.MULTIVERSX_SIGN_TRANSACTIONS]: {
+    signatures: { signature: string }[];
+  };
+};
