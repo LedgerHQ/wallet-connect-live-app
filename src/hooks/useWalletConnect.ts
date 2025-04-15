@@ -1,39 +1,42 @@
-import { SignClientTypes } from "@walletconnect/types";
-import { useCallback, useEffect } from "react";
-import { WalletKitTypes } from "@reown/walletkit";
-import { enqueueSnackbar } from "notistack";
-import { getErrorMessage } from "@/utils/helper.util";
+import { walletAPIClientAtom } from "@/store/wallet-api.store";
 import {
-  coreAtom,
   connectionStatusAtom,
-  walletKitAtom,
+  coreAtom,
   loadingAtom,
+  oneClickAuthPayloadAtom,
   showBackToBrowserModalAtom,
   verifyContextByTopicAtom,
+  walletKitAtom,
 } from "@/store/walletKit.store";
+import { getAccountWithAddressAndChainId } from "@/utils/generic";
 import {
+  getErrorMessage,
+  isBIP122Chain,
   isEIP155Chain,
   isMultiversXChain,
-  isBIP122Chain,
   isRippleChain,
 } from "@/utils/helper.util";
+import { WalletKitTypes } from "@reown/walletkit";
+import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
+import { AuthTypes, SignClientTypes } from "@walletconnect/types";
+import { buildAuthObject, populateAuthPayload } from "@walletconnect/utils";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { enqueueSnackbar } from "notistack";
+import { useCallback, useEffect } from "react";
+import { isWalletRequest } from "../utils/helper.util";
+import { handleBIP122Request } from "./requestHandlers/BIP122";
+import { handleEIP155Request } from "./requestHandlers/EIP155";
+import { handleMvxRequest } from "./requestHandlers/MultiversX";
+import { handleXrpRequest } from "./requestHandlers/Ripple";
+import { Errors, formatMessage, rejectRequest } from "./requestHandlers/utils";
+import { handleWalletRequest } from "./requestHandlers/Wallet";
 import useAccounts from "./useAccounts";
-import { walletAPIClientAtom } from "@/store/wallet-api.store";
-import { queryKey as sessionsQueryKey } from "./useSessions";
 import {
   queryKey as pendingProposalsQueryKey,
   useQueryFn as usePendingProposalsQueryFn,
 } from "./usePendingProposals";
-import { useQueryClient } from "@tanstack/react-query";
-import { handleEIP155Request } from "./requestHandlers/EIP155";
-import { handleMvxRequest } from "./requestHandlers/MultiversX";
-import { handleBIP122Request } from "./requestHandlers/BIP122";
-import { handleXrpRequest } from "./requestHandlers/Ripple";
-import { Errors, rejectRequest } from "./requestHandlers/utils";
-import { handleWalletRequest } from "./requestHandlers/Wallet";
-import { isWalletRequest } from "../utils/helper.util";
+import { queryKey as sessionsQueryKey } from "./useSessions";
 
 function useWalletConnectStatus() {
   const core = useAtomValue(coreAtom);
@@ -266,6 +269,87 @@ export default function useWalletConnect() {
     void queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
   }, [queryClient]);
 
+  const setOneClickAuthPayload = useSetAtom(oneClickAuthPayloadAtom);
+  const onSessionAuthenticate = useCallback(
+    (
+      payload: AuthTypes.BaseEventArgs<AuthTypes.SessionAuthenticateRequestParams>,
+    ) => {
+      setVerifyContextByTopic((verifyByTopic) => {
+        verifyByTopic[payload.topic] = payload.verifyContext!;
+        return verifyByTopic;
+      });
+
+      const fn = async () => {
+        setOneClickAuthPayload(payload);
+        await navigate({
+          to: "/oneclickauth",
+          search: (search) => search,
+        });
+
+        // const supportedChains = ["eip155:1", "eip155:2", "eip155:137"];
+
+        // const supportedMethods = [
+        //   "personal_sign",
+        //   "eth_sendTransaction",
+        //   "eth_signTypedData",
+        // ];
+
+        // const authPayload = populateAuthPayload({
+        //   authPayload: payload.params.authPayload,
+        //   chains: supportedChains,
+        //   methods: supportedMethods,
+        // });
+
+        // const addr = "0x90D5b3f3FaA3cd61fBd78bF1CE3DdB2100F4BFb2";
+
+        // const iss = `eip155:1:${addr}`;
+
+        // const message = walletKit.formatAuthMessage({
+        //   request: authPayload,
+        //   iss,
+        // });
+
+        // const accountSign = getAccountWithAddressAndChainId(
+        //   accounts.data,
+        //   addr,
+        //   "eip155:1",
+        // )!;
+
+        // const signedMessage = await client.message.sign(
+        //   accountSign.id,
+        //   Buffer.from(message, "utf-8"),
+        // );
+
+        // const auth = buildAuthObject(
+        //   authPayload,
+        //   {
+        //     t: "eip191",
+        //     s: formatMessage(signedMessage),
+        //   },
+        //   iss,
+        // );
+
+        // await walletKit.approveSessionAuthenticate({
+        //   id: payload.id,
+        //   auths: [auth],
+        // });
+      };
+
+      try {
+        void fn();
+      } catch (_) {
+        void walletKit.rejectSessionAuthenticate({
+          id: payload.id,
+          reason: {
+            code: 5000,
+            message: "USER_REJECTED_METHODS",
+          },
+        });
+      }
+    },
+    [accounts.data, client.message, setVerifyContextByTopic, walletKit],
+  );
+
   useEffect(() => {
     console.log("walletKit setup listeners");
     // TODO: handle session_request_expire
@@ -276,6 +360,7 @@ export default function useWalletConnect() {
     walletKit.on("session_proposal", onSessionProposal);
     walletKit.on("session_request", onSessionRequest);
     walletKit.on("session_delete", onSessionDeleted);
+    walletKit.on("session_authenticate", onSessionAuthenticate);
 
     // auth
     // walletKit.on("auth_request", onAuthRequest);
@@ -286,6 +371,7 @@ export default function useWalletConnect() {
       walletKit.off("session_proposal", onSessionProposal);
       walletKit.off("session_request", onSessionRequest);
       walletKit.off("session_delete", onSessionDeleted);
+      walletKit.on("session_authenticate", onSessionAuthenticate);
 
       // auth
       // walletKit.off("auth_request", onAuthRequest);
@@ -296,5 +382,6 @@ export default function useWalletConnect() {
     onSessionRequest,
     onSessionDeleted,
     onProposalExpire,
+    onSessionAuthenticate,
   ]);
 }

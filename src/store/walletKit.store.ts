@@ -1,6 +1,6 @@
 import { atom } from "jotai";
 import { Core } from "@walletconnect/core";
-import type { Verify } from "@walletconnect/types";
+import type { AuthTypes, Verify } from "@walletconnect/types";
 import { WalletKit } from "@reown/walletkit";
 
 const relayerURL = "wss://relay.walletconnect.com";
@@ -36,3 +36,6 @@ export const showBackToBrowserModalAtom = atom(false);
 export type VerifyContextByTopic = Record<string, Verify.Context>;
 
 export const verifyContextByTopicAtom = atom<VerifyContextByTopic>({});
+
+export const oneClickAuthPayloadAtom =
+  atom<AuthTypes.BaseEventArgs<AuthTypes.SessionAuthenticateRequestParams>>();

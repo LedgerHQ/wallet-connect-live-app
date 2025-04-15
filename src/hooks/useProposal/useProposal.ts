@@ -12,6 +12,8 @@ import {
 import {
   BuildApprovedNamespacesParams,
   buildApprovedNamespaces,
+  buildAuthObject,
+  populateAuthPayload,
 } from "@walletconnect/utils";
 import { formatAccountsByChain } from "@/hooks/useProposal/util";
 import { useNavigate } from "@tanstack/react-router";
@@ -28,15 +30,21 @@ import {
   useQueryFn as useSessionsQueryFn,
 } from "../useSessions";
 import { queryKey as pendingProposalsQueryKey } from "../usePendingProposals";
-import { ProposalTypes } from "@walletconnect/types";
+import { AuthTypes, ProposalTypes } from "@walletconnect/types";
 import { enqueueSnackbar } from "notistack";
 import { sortedRecentConnectionAppsAtom } from "../../store/recentConnectionAppsAtom";
 import { WALLET_METHODS } from "@/data/methods/Wallet.methods";
 import { MULTIVERSX_SIGNING_METHODS } from "@/data/methods/MultiversX.methods";
 import { BIP122_SIGNING_METHODS } from "@/data/methods/BIP122.methods";
 import { RIPPLE_SIGNING_METHODS } from "@/data/methods/Ripple.methods";
+import { getAccountWithAddressAndChainId } from "@/utils/generic";
+import { formatMessage } from "../requestHandlers/utils";
 
-export function useProposal(proposal: ProposalTypes.Struct) {
+type Props = ProposalTypes.Struct & {
+  oneClickAuthPayload?: AuthTypes.BaseEventArgs<AuthTypes.SessionAuthenticateRequestParams>;
+};
+
+export function useProposal(proposal: Props) {
   const navigate = useNavigate({ from: "/proposal/$id" });
   const queryClient = useQueryClient();
   const client = useAtomValue(walletAPIClientAtom);
@@ -62,6 +70,20 @@ export function useProposal(proposal: ProposalTypes.Struct) {
       search: (search) => search,
     });
   }, [navigate]);
+
+  const buildEip155AuthPayload = useCallback(() => {
+    const supportedMethods = Object.values(EIP155_SIGNING_METHODS);
+
+    const supportedChains = Object.values(EIP155_CHAINS).map(
+      (network) => network.namespace,
+    );
+
+    return {
+      chains: supportedChains,
+      methods: supportedMethods,
+      // accounts: dataToSend.map((e) => e.account), // TODO(Canestin) check if used
+    };
+  }, []);
 
   const buildEip155Namespace = useCallback(
     (
@@ -421,6 +443,116 @@ export function useProposal(proposal: ProposalTypes.Struct) {
     navigate,
   ]);
 
+  const approveSessionAuthenticate = useCallback(async () => {
+    try {
+      const {
+        chains,
+        methods,
+        accounts: accs,
+      } = buildEip155Namespace(
+        proposal.requiredNamespaces,
+        proposal.optionalNamespaces,
+      );
+
+      const payload = proposal?.oneClickAuthPayload;
+
+      if (!payload) {
+        throw new Error("No payload found");
+      }
+
+      const authPayload = populateAuthPayload({
+        authPayload: payload.params.authPayload,
+        chains,
+        methods,
+      });
+
+      const auths: AuthTypes.Cacao[] = [];
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      authPayload.chains.forEach(async (chain) => {
+        const address = "0x90D5b3f3FaA3cd61fBd78bF1CE3DdB2100F4BFb2";
+
+        const message = walletKit.formatAuthMessage({
+          request: authPayload,
+          iss: `${chain}:${address}`, // TODO(Canestin) get the good address
+          // iss: selectedAccounts[0],
+        });
+
+        const accountSign = getAccountWithAddressAndChainId(
+          accounts.data,
+          address,
+          "eip155:1",
+        )!;
+
+        const signature = await client.message.sign(
+          accountSign.id,
+          Buffer.from(message, "utf-8"),
+        );
+
+        const auth = buildAuthObject(
+          authPayload,
+          {
+            t: "eip191", // signature type
+            s: formatMessage(signature),
+          },
+          `${chain}:${address}`, // TODO(Canestin) get the good address
+          // selectedAccounts[0],
+        );
+        auths.push(auth);
+      });
+
+      const { session } = await walletKit.approveSessionAuthenticate({
+        id: payload.id,
+        auths,
+      });
+
+      await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
+      await queryClient.invalidateQueries({
+        queryKey: pendingProposalsQueryKey,
+      });
+      // Prefetching as we need the data in the next route to avoid redirecting to home
+      await queryClient.prefetchQuery({
+        queryKey: sessionsQueryKey,
+        queryFn: sessionsQueryFn,
+      });
+      addAppToLastConnectionApps(session!.peer.metadata);
+      // Remove the uri from the search params to avoid trying to connect again if the user reload the current page
+      await navigate({
+        to: "/detail/$topic",
+        params: { topic: session!.topic },
+        search: ({ uri: _, ...search }) => search,
+      });
+
+      redirectToDapp();
+    } catch (error) {
+      enqueueSnackbar(getErrorMessage(error), {
+        errorType: "Approve session error",
+        variant: "errorNotification",
+        anchorOrigin: {
+          vertical: "top",
+          horizontal: "right",
+        },
+      });
+      console.error(error);
+      await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
+      await queryClient.invalidateQueries({
+        queryKey: pendingProposalsQueryKey,
+      });
+    }
+  }, [
+    buildEip155Namespace,
+    proposal.requiredNamespaces,
+    proposal.optionalNamespaces,
+    proposal?.oneClickAuthPayload,
+    walletKit,
+    queryClient,
+    sessionsQueryFn,
+    addAppToLastConnectionApps,
+    navigate,
+    redirectToDapp,
+    accounts.data,
+    client.message,
+  ]);
+
   const rejectSession = useCallback(async () => {
     try {
       await walletKit.rejectSession({
@@ -533,6 +665,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
   // No need for a memo as it's directly spread on usage
   return {
     approveSession,
+    approveSessionAuthenticate,
     rejectSession,
     handleClose,
     handleClick,
