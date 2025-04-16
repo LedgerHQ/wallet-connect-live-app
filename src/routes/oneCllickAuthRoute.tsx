@@ -25,7 +25,7 @@ const convertPayloadToProposal = (
     proposer: payload.params.requester,
     requiredNamespaces: {
       eip155: {
-        chains: supportedChains,
+        chains: ["eip155:8453", "eip155:1"], // TODO(Canestin): replace with 'supportedChains' variable
         methods: supportedMethods,
         events: [],
       },

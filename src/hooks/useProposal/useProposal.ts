@@ -446,12 +446,12 @@ export function useProposal(proposal: Props) {
       const payload = proposal?.oneClickAuthPayload;
 
       if (!payload) {
-        throw new Error("No payload found");
+        throw new Error("No 1-click auth payload found");
       }
 
       const authPayload = populateAuthPayload({
         authPayload: payload.params.authPayload,
-        chains,
+        chains: ["eip155:8453", "eip155:1"], //  // TODO(Canestin): replace with 'chains' variable
         methods,
       });
 
@@ -489,10 +489,6 @@ export function useProposal(proposal: Props) {
       if (!session) return;
 
       await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
-      // await queryClient.invalidateQueries({
-      //   queryKey: pendingProposalsQueryKey,
-      // });
-      // Prefetching as we need the data in the next route to avoid redirecting to home
       await queryClient.prefetchQuery({
         queryKey: sessionsQueryKey,
         queryFn: sessionsQueryFn,
