@@ -7,6 +7,7 @@ import {
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
 import { convertSolanaToLiveTX } from "@/utils/converters";
 import { acceptRequest, Errors, formatMessage, rejectRequest } from "./utils";
+import { VersionedTransaction } from "@solana/web3.js";
 
 export async function handleSolanaRequest(
   request: SOLANA_REQUESTS,
@@ -21,14 +22,14 @@ export async function handleSolanaRequest(
   console.log({ request });
   switch (request.method) {
     case SOLANA_SIGNING_METHODS.SOLANA_SIGNTRANSACTION: {
-      debugger;
-      const liveTx = convertSolanaToLiveTX(request.params, accounts);
-      // Transactionrequest.params
-      // const pubkey = String(request.params.signatures[0].publicKey); // IF RAW
-      // const pubkey = String(
-      //   request.params.instructions[0].keys[0].pubkey,
-      // );
-      const pubkey = String(request.params.feePayer);
+      // debugger;
+      const tx = VersionedTransaction.deserialize(
+        Buffer.from(request.params.transaction, "base64"),
+      );
+      console.log(tx);
+      const [liveTx, feePayer] = convertSolanaToLiveTX(tx.message, accounts);
+
+      const pubkey = feePayer?.toString();
       if (!pubkey) {
         throw new Error("no pubkey");
       }
@@ -38,16 +39,16 @@ export async function handleSolanaRequest(
         pubkey,
         ledgerLiveCurrency,
       );
-      debugger;
+      // debugger;
       if (accountTx) {
         try {
-          debugger;
+          // debugger;
           const hash = await client.transaction.signAndBroadcast(
             accountTx.id,
             liveTx,
           );
           console.log({ hash });
-          debugger;
+          // debugger;
           await acceptRequest(walletKit, topic, id, hash);
         } catch (error) {
           await rejectRequest(walletKit, topic, id, Errors.txDeclined);

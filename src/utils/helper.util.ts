@@ -100,7 +100,7 @@ export const getNamespace = (chain: string) => {
 
 export const getCurrencyByChainId = (chainId: string) => {
   const elem = Object.entries(SUPPORTED_NETWORK).find(
-    ([, network]) => network.namespace === chainId.toLowerCase(),
+    ([, network]) => network.namespace.toLowerCase() === chainId.toLowerCase(),
   );
   if (elem?.[0] === "solana (legacy)") return "solana";
   return elem?.[0] ?? chainId;

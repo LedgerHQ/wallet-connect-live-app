@@ -28,6 +28,7 @@ import {
 } from "@solana/web3.js";
 import { encode } from "bs58";
 import { cryptocurrenciesById, getTokenById } from "@ledgerhq/cryptoassets";
+import { PublicKey } from "@solana/web3.js";
 
 export function encodeAccountIdWithTokenAccountAddress(
   accountId: string,
@@ -135,186 +136,527 @@ export type SolanaTransaction = Transaction;
 // NOTE: https://solana.com/docs/rpc/json-structures
 
 export function convertSolanaToLiveTX(
-  tx: Transaction,
+  tx: VersionedMessage,
   accounts: Account[],
-): SolanaTransactionLive {
+): [SolanaTransactionLive, PublicKey | undefined] {
   let model: TransactionModel | null = null;
   let amount = new BigNumber(0);
   let recipient = "";
-  debugger;
-  if (tx.instructions.length > 1) {
-    // NOTE: we should loop over instructions and create liveTx for each
-    throw new Error("Not supporting multiple instructions yet");
-  }
-  let programId = String(tx.instructions[0].programId);
-  if (programId === SystemProgram.programId.toString()) {
-    const data = tx.instructions[0].data;
-    const decodedTransfer = SystemInstruction.decodeTransfer({
-      ...tx.instructions[0],
-      data: Buffer.from(data),
-      programId: SystemProgram.programId,
+  let feePayer: PublicKey | undefined = undefined;
+  console.log(tx);
+  // debugger;
+
+  if (tx.version === "legacy") {
+    let instructionIndex = 0;
+    const supportedProgramIds = [
+      SystemProgram.programId.toString(),
+      token.TOKEN_PROGRAM_ID.toString(),
+      token.ASSOCIATED_TOKEN_PROGRAM_ID.toString(),
+    ];
+    while (
+      !!tx.compiledInstructions[instructionIndex] &&
+      !supportedProgramIds.includes(
+        tx.staticAccountKeys[
+          tx.compiledInstructions[instructionIndex].programIdIndex
+        ].toString(),
+      )
+    ) {
+      instructionIndex += 1;
+    }
+
+    if (!tx.compiledInstructions[instructionIndex]) {
+      // NOTE: we should loop over instructions and create liveTx for each
+      throw new Error("Didn't find a supported instruction");
+    }
+
+    const feePayerIdx = tx.compiledInstructions[
+      instructionIndex
+    ].accountKeyIndexes.find((idx) => {
+      return tx.isAccountSigner(idx);
     });
-    const decodedAmount = decodedTransfer.lamports.toString();
 
-    const command: TransferCommand = {
-      kind: "transfer",
-      amount: Number(decodedAmount),
-      sender: String(decodedTransfer.fromPubkey),
-      recipient: String(decodedTransfer.toPubkey),
-    };
-    amount = new BigNumber(decodedAmount);
-    recipient = String(decodedTransfer.toPubkey);
+    console.log("feePayerIdx: ", feePayerIdx);
 
-    model = {
-      commandDescriptor: {
-        command: command,
-        fee: 0,
-        warnings: {},
-        errors: {},
-      },
-      kind: "transfer",
-      uiState: {},
-    };
-  } else if (programId === token.TOKEN_PROGRAM_ID.toString()) {
-    const data = tx.instructions[0].data;
-    const decoded = token.decodeTransferCheckedInstruction({
-      ...tx.instructions[0],
-      data: Buffer.from(data),
-      programId: token.TOKEN_PROGRAM_ID,
-      // programId: SystemProgram.programId,
-    });
-    /*
+    if (feePayerIdx === undefined) {
+      throw new Error("Missing signer, used to infer wallet address");
+    }
 
-    export type TokenRecipientDescriptor = {
-  walletAddress: string;
-  tokenAccAddress: string;
-  shouldCreateAsAssociatedTokenAccount: boolean;
-};
-*/
-    if (!tx.feePayer) {
+    feePayer = tx.staticAccountKeys[feePayerIdx];
+
+    console.log("feePayer: ", feePayer);
+
+    if (!feePayer) {
       throw new Error("Missing fee payer, used to infer wallet address");
     }
 
-    const accAddress = String(tx.feePayer);
-    const tokenAccAddress = String(decoded.keys.destination.pubkey);
+    const programId =
+      tx.staticAccountKeys[
+        tx.compiledInstructions[instructionIndex].programIdIndex
+      ].toString();
+    console.log("programId: ", programId);
 
-    // amount = new BigNumber(decodedAmount);
-    // recipient = String(decodedTransfer.toPubkey);
+    switch (programId) {
+      case SystemProgram.programId.toString(): {
+        const data = tx.compiledInstructions[instructionIndex].data;
+        console.log("data: ", data);
+        const decodedTransfer = SystemInstruction.decodeTransfer({
+          data: Buffer.from(data),
+          programId: SystemProgram.programId,
+          keys: tx.compiledInstructions[instructionIndex].accountKeyIndexes.map(
+            (idx) => {
+              return {
+                pubkey: tx.staticAccountKeys[idx],
+                isSigner: tx.isAccountSigner(idx),
+                isWritable: tx.isAccountWritable(idx),
+              };
+            },
+          ),
+        });
+        const decodedAmount = decodedTransfer.lamports.toString();
+        console.log("decodedAmount: ", decodedAmount);
 
-    recipient = accAddress;
+        const command: TransferCommand = {
+          kind: "transfer",
+          amount: Number(decodedAmount),
+          sender: String(decodedTransfer.fromPubkey),
+          recipient: String(decodedTransfer.toPubkey),
+        };
+        console.log("command: ", command);
+        amount = new BigNumber(decodedAmount);
+        recipient = String(decodedTransfer.toPubkey);
 
-    const command: TokenTransferCommand = {
-      kind: "token.transfer",
-      amount: Number(decoded.data.amount),
-      ownerAddress: String(decoded.keys.owner.pubkey),
-      ownerAssociatedTokenAccountAddress: String(decoded.keys.source.pubkey),
-      recipientDescriptor: {
-        // walletAddress: String(decoded.keys.destination.pubkey),
-        walletAddress: accAddress,
-        tokenAccAddress: tokenAccAddress,
-        shouldCreateAsAssociatedTokenAccount: true,
-      },
-      mintAddress: String(decoded.keys.mint.pubkey),
-      mintDecimals: decoded.data.decimals,
-    };
-    // from LL: "sub account id is required for token transfer";
+        model = {
+          commandDescriptor: {
+            command: command,
+            fee: 0,
+            warnings: {},
+            errors: {},
+          },
+          kind: "transfer",
+          uiState: {},
+        };
+        break;
+      }
+      case token.TOKEN_PROGRAM_ID.toString(): {
+        const data = tx.compiledInstructions[instructionIndex].data;
+        const decoded = token.decodeTransferCheckedInstruction({
+          data: Buffer.from(data),
+          programId: token.TOKEN_PROGRAM_ID,
+          keys: tx.compiledInstructions[instructionIndex].accountKeyIndexes.map(
+            (idx) => {
+              return {
+                pubkey: tx.staticAccountKeys[idx],
+                isSigner: tx.isAccountSigner(idx),
+                isWritable: tx.isAccountWritable(idx),
+              };
+            },
+          ),
+        });
 
-    // const wSolSubAccId = encodeAccountIdWithTokenAccountAddress(
-    //   mainAccId,
-    //   testOnChainData.wSolSenderAssocTokenAccAddress,
-    // );
-    const mainAccId = encodeAccountId({
-      type: "js",
-      version: "2",
-      currencyId: "solana",
-      xpubOrAddress: accAddress, //testOnChainData.fundedSenderAddress,
-      derivationMode: "solanaMain",
-    });
-    const tokenAccountId = encodeAccountIdWithTokenAccountAddress(
-      mainAccId,
-      tokenAccAddress,
-    );
-    debugger;
+        // export type TokenRecipientDescriptor = {
+        //   walletAddress: string;
+        //   tokenAccAddress: string;
+        //   shouldCreateAsAssociatedTokenAccount: boolean;
+        // };
 
-    model = {
-      commandDescriptor: {
-        command: command,
-        fee: 0,
-        warnings: {},
-        errors: {},
-      },
-      kind: "token.transfer",
-      uiState: {
-        subAccountId: tokenAccountId, // TODO: create sub account before hand
-      },
-    };
-    debugger;
-  } else if (programId === token.ASSOCIATED_TOKEN_PROGRAM_ID.toString()) {
-    const data = tx.instructions[0].data;
-    const keys = tx.instructions[0].keys;
-    //     The data field for this instruction is usually empty or contains very little data, as the accounts themselves are enough to determine what the instruction is doing.
-    const fundingAccount = keys[0].pubkey;
-    const associatedTokenAccount = keys[1].pubkey;
-    const ownerAccount = keys[2].pubkey;
-    const mintAccount = keys[3].pubkey;
-    const systemProgramAccount = keys[4].pubkey;
-    const tokenProgramAccount = keys[5].pubkey;
+        const accAddress = feePayer.toString();
+        const tokenAccAddress = decoded.keys.destination.pubkey.toString();
 
-    debugger;
+        // amount = new BigNumber(decodedAmount);
+        // recipient = String(decodedTransfer.toPubkey);
 
-    const command: TokenCreateATACommand = {
-      kind: "token.createATA",
-      owner: ownerAccount.toString(),
-      mint: mintAccount.toString(),
-      associatedTokenAccountAddress: associatedTokenAccount.toString(),
-    };
-    const mainAccId = encodeAccountId({
-      type: "js",
-      version: "2",
-      currencyId: "solana",
-      xpubOrAddress: fundingAccount.toString(), //testOnChainData.fundedSenderAddress,
-      derivationMode: "solanaMain",
-    });
-    const tokenAccountId = encodeAccountIdWithTokenAccountAddress(
-      mainAccId,
-      associatedTokenAccount.toString(),
-    );
+        recipient = accAddress;
 
-    // const tokenId = toTokenId(assocTokenAcc.info.mint.toBase58());
-    const tokenId = toTokenId(mintAccount.toString());
-    // debugger;
-    // const tokenCurrency = getTokenById(tokenId);
-    debugger;
+        const command: TokenTransferCommand = {
+          kind: "token.transfer",
+          amount: Number(decoded.data.amount),
+          ownerAddress: String(decoded.keys.owner.pubkey),
+          ownerAssociatedTokenAccountAddress: String(
+            decoded.keys.source.pubkey,
+          ),
+          recipientDescriptor: {
+            // walletAddress: String(decoded.keys.destination.pubkey),
+            walletAddress: accAddress,
+            tokenAccAddress: tokenAccAddress,
+            shouldCreateAsAssociatedTokenAccount: true,
+          },
+          mintAddress: String(decoded.keys.mint.pubkey),
+          mintDecimals: decoded.data.decimals,
+        };
+        // from LL: "sub account id is required for token transfer";
 
-    model = {
-      commandDescriptor: {
-        command: command,
-        fee: 0,
-        warnings: {},
-        errors: {},
-      },
-      kind: "token.createATA",
-      uiState: {
-        tokenId,
-        // subAccountId: tokenAccountId, // TODO: create sub account before hand
-      },
-    };
+        // const wSolSubAccId = encodeAccountIdWithTokenAccountAddress(
+        //   mainAccId,
+        //   testOnChainData.wSolSenderAssocTokenAccAddress,
+        // );
+        const mainAccId = encodeAccountId({
+          type: "js",
+          version: "2",
+          currencyId: "solana",
+          xpubOrAddress: accAddress, //testOnChainData.fundedSenderAddress,
+          derivationMode: "solanaMain",
+        });
+        const tokenAccountId = encodeAccountIdWithTokenAccountAddress(
+          mainAccId,
+          tokenAccAddress,
+        );
+        debugger;
+
+        model = {
+          commandDescriptor: {
+            command: command,
+            fee: 0,
+            warnings: {},
+            errors: {},
+          },
+          kind: "token.transfer",
+          uiState: {
+            subAccountId: tokenAccountId, // TODO: create sub account before hand
+          },
+        };
+        debugger;
+        break;
+      }
+      case token.ASSOCIATED_TOKEN_PROGRAM_ID.toString(): {
+        const data = tx.compiledInstructions[instructionIndex].data;
+        const keys = tx.compiledInstructions[
+          instructionIndex
+        ].accountKeyIndexes.map((idx) => {
+          return {
+            pubkey: tx.staticAccountKeys[idx],
+            isSigner: tx.isAccountSigner(idx),
+            isWritable: tx.isAccountWritable(idx),
+          };
+        });
+        //     The data field for this instruction is usually empty or contains very little data, as the accounts themselves are enough to determine what the instruction is doing.
+        const fundingAccount = keys[0].pubkey;
+        const associatedTokenAccount = keys[1].pubkey;
+        const ownerAccount = keys[2].pubkey;
+        const mintAccount = keys[3].pubkey;
+        const systemProgramAccount = keys[4].pubkey;
+        const tokenProgramAccount = keys[5].pubkey;
+
+        debugger;
+
+        const command: TokenCreateATACommand = {
+          kind: "token.createATA",
+          owner: ownerAccount.toString(),
+          mint: mintAccount.toString(),
+          associatedTokenAccountAddress: associatedTokenAccount.toString(),
+        };
+        const mainAccId = encodeAccountId({
+          type: "js",
+          version: "2",
+          currencyId: "solana",
+          xpubOrAddress: fundingAccount.toString(), //testOnChainData.fundedSenderAddress,
+          derivationMode: "solanaMain",
+        });
+        const tokenAccountId = encodeAccountIdWithTokenAccountAddress(
+          mainAccId,
+          associatedTokenAccount.toString(),
+        );
+
+        // const tokenId = toTokenId(assocTokenAcc.info.mint.toBase58());
+        const tokenId = toTokenId(mintAccount.toString());
+        // debugger;
+        // const tokenCurrency = getTokenById(tokenId);
+        debugger;
+
+        model = {
+          commandDescriptor: {
+            command: command,
+            fee: 0,
+            warnings: {},
+            errors: {},
+          },
+          kind: "token.createATA",
+          uiState: {
+            tokenId,
+            // subAccountId: tokenAccountId, // TODO: create sub account before hand
+          },
+        };
+        break;
+      }
+      default:
+        throw new Error("Unsupported Solana instruction");
+    }
   } else {
-    throw new Error("Unsupported Solana instruction");
-  }
-  // else {
-  //   throw new Error("Unsupported Solana rpc transaction format");
-  // }
+    let instructionIndex = 0;
+    const supportedProgramIds = [
+      SystemProgram.programId.toString(),
+      token.TOKEN_PROGRAM_ID.toString(),
+      token.ASSOCIATED_TOKEN_PROGRAM_ID.toString(),
+    ];
+    while (
+      !!tx.compiledInstructions[instructionIndex] &&
+      !supportedProgramIds.includes(
+        tx.staticAccountKeys[
+          tx.compiledInstructions[instructionIndex].programIdIndex
+        ].toString(),
+      )
+    ) {
+      console.log(supportedProgramIds);
+      console.log(
+        tx.staticAccountKeys[
+          tx.compiledInstructions[instructionIndex].programIdIndex
+        ].toString(),
+      );
+      instructionIndex += 1;
+    }
 
-  debugger;
+    console.log(
+      "instructionIndex: ",
+      instructionIndex,
+      tx.compiledInstructions[instructionIndex],
+      [
+        SystemProgram.programId,
+        token.TOKEN_PROGRAM_ID,
+        token.ASSOCIATED_TOKEN_PROGRAM_ID,
+      ].includes(
+        tx.staticAccountKeys[
+          tx.compiledInstructions[instructionIndex]?.programIdIndex
+        ],
+      ),
+      tx.staticAccountKeys[
+        tx.compiledInstructions[instructionIndex]?.programIdIndex
+      ] === SystemProgram.programId,
+      tx.staticAccountKeys[
+        tx.compiledInstructions[instructionIndex]?.programIdIndex
+      ] === token.TOKEN_PROGRAM_ID,
+      tx.staticAccountKeys[
+        tx.compiledInstructions[instructionIndex]?.programIdIndex
+      ] === token.ASSOCIATED_TOKEN_PROGRAM_ID,
+    );
+
+    if (!tx.compiledInstructions[instructionIndex]) {
+      // NOTE: we should loop over instructions and create liveTx for each
+      throw new Error("Didn't find a supported instruction");
+    }
+    const programId =
+      tx.staticAccountKeys[
+        tx.compiledInstructions[instructionIndex].programIdIndex
+      ].toString();
+    console.log("programId: ", programId);
+
+    switch (programId) {
+      case SystemProgram.programId.toString(): {
+        const data = tx.compiledInstructions[instructionIndex].data;
+        console.log("data: ", data);
+        const decodedTransfer = SystemInstruction.decodeTransfer({
+          data: Buffer.from(data),
+          programId: SystemProgram.programId,
+          keys: tx.compiledInstructions[instructionIndex].accountKeyIndexes.map(
+            (idx) => {
+              return {
+                pubkey: tx.staticAccountKeys[idx],
+                isSigner: tx.isAccountSigner(idx),
+                isWritable: tx.isAccountWritable(idx),
+              };
+            },
+          ),
+        });
+        const decodedAmount = decodedTransfer.lamports.toString();
+        console.log("decodedAmount: ", decodedAmount);
+
+        const command: TransferCommand = {
+          kind: "transfer",
+          amount: Number(decodedAmount),
+          sender: String(decodedTransfer.fromPubkey),
+          recipient: String(decodedTransfer.toPubkey),
+        };
+        console.log("command: ", command);
+        amount = new BigNumber(decodedAmount);
+        recipient = String(decodedTransfer.toPubkey);
+
+        model = {
+          commandDescriptor: {
+            command: command,
+            fee: 0,
+            warnings: {},
+            errors: {},
+          },
+          kind: "transfer",
+          uiState: {},
+        };
+        break;
+      }
+      case token.TOKEN_PROGRAM_ID.toString(): {
+        const data = tx.compiledInstructions[instructionIndex].data;
+        const decoded = token.decodeTransferCheckedInstruction({
+          data: Buffer.from(data),
+          programId: token.TOKEN_PROGRAM_ID,
+          keys: tx.compiledInstructions[instructionIndex].accountKeyIndexes.map(
+            (idx) => {
+              return {
+                pubkey: tx.staticAccountKeys[idx],
+                isSigner: tx.isAccountSigner(idx),
+                isWritable: tx.isAccountWritable(idx),
+              };
+            },
+          ),
+        });
+
+        // export type TokenRecipientDescriptor = {
+        //   walletAddress: string;
+        //   tokenAccAddress: string;
+        //   shouldCreateAsAssociatedTokenAccount: boolean;
+        // };
+
+        const feePayerIdx = tx.compiledInstructions[
+          instructionIndex
+        ].accountKeyIndexes.find((idx) => {
+          return tx.isAccountSigner(idx);
+        });
+
+        if (!feePayerIdx) {
+          throw new Error("Missing signer, used to infer wallet address");
+        }
+
+        const feePayer = tx.staticAccountKeys[feePayerIdx];
+
+        if (!feePayer) {
+          throw new Error("Missing fee payer, used to infer wallet address");
+        }
+
+        const accAddress = feePayer.toString();
+        const tokenAccAddress = decoded.keys.destination.pubkey.toString();
+
+        // amount = new BigNumber(decodedAmount);
+        // recipient = String(decodedTransfer.toPubkey);
+
+        recipient = accAddress;
+
+        const command: TokenTransferCommand = {
+          kind: "token.transfer",
+          amount: Number(decoded.data.amount),
+          ownerAddress: String(decoded.keys.owner.pubkey),
+          ownerAssociatedTokenAccountAddress: String(
+            decoded.keys.source.pubkey,
+          ),
+          recipientDescriptor: {
+            // walletAddress: String(decoded.keys.destination.pubkey),
+            walletAddress: accAddress,
+            tokenAccAddress: tokenAccAddress,
+            shouldCreateAsAssociatedTokenAccount: true,
+          },
+          mintAddress: String(decoded.keys.mint.pubkey),
+          mintDecimals: decoded.data.decimals,
+        };
+        // from LL: "sub account id is required for token transfer";
+
+        // const wSolSubAccId = encodeAccountIdWithTokenAccountAddress(
+        //   mainAccId,
+        //   testOnChainData.wSolSenderAssocTokenAccAddress,
+        // );
+        const mainAccId = encodeAccountId({
+          type: "js",
+          version: "2",
+          currencyId: "solana",
+          xpubOrAddress: accAddress, //testOnChainData.fundedSenderAddress,
+          derivationMode: "solanaMain",
+        });
+        const tokenAccountId = encodeAccountIdWithTokenAccountAddress(
+          mainAccId,
+          tokenAccAddress,
+        );
+        debugger;
+
+        model = {
+          commandDescriptor: {
+            command: command,
+            fee: 0,
+            warnings: {},
+            errors: {},
+          },
+          kind: "token.transfer",
+          uiState: {
+            subAccountId: tokenAccountId, // TODO: create sub account before hand
+          },
+        };
+        debugger;
+        break;
+      }
+      case token.ASSOCIATED_TOKEN_PROGRAM_ID.toString(): {
+        const data = tx.compiledInstructions[instructionIndex].data;
+        const keys = tx.compiledInstructions[
+          instructionIndex
+        ].accountKeyIndexes.map((idx) => {
+          return {
+            pubkey: tx.staticAccountKeys[idx],
+            isSigner: tx.isAccountSigner(idx),
+            isWritable: tx.isAccountWritable(idx),
+          };
+        });
+        //     The data field for this instruction is usually empty or contains very little data, as the accounts themselves are enough to determine what the instruction is doing.
+        const fundingAccount = keys[0].pubkey;
+        const associatedTokenAccount = keys[1].pubkey;
+        const ownerAccount = keys[2].pubkey;
+        const mintAccount = keys[3].pubkey;
+        const systemProgramAccount = keys[4].pubkey;
+        const tokenProgramAccount = keys[5].pubkey;
+
+        debugger;
+
+        const command: TokenCreateATACommand = {
+          kind: "token.createATA",
+          owner: ownerAccount.toString(),
+          mint: mintAccount.toString(),
+          associatedTokenAccountAddress: associatedTokenAccount.toString(),
+        };
+        const mainAccId = encodeAccountId({
+          type: "js",
+          version: "2",
+          currencyId: "solana",
+          xpubOrAddress: fundingAccount.toString(), //testOnChainData.fundedSenderAddress,
+          derivationMode: "solanaMain",
+        });
+        const tokenAccountId = encodeAccountIdWithTokenAccountAddress(
+          mainAccId,
+          associatedTokenAccount.toString(),
+        );
+
+        // const tokenId = toTokenId(assocTokenAcc.info.mint.toBase58());
+        const tokenId = toTokenId(mintAccount.toString());
+        // debugger;
+        // const tokenCurrency = getTokenById(tokenId);
+        debugger;
+
+        model = {
+          commandDescriptor: {
+            command: command,
+            fee: 0,
+            warnings: {},
+            errors: {},
+          },
+          kind: "token.createATA",
+          uiState: {
+            tokenId,
+            // subAccountId: tokenAccountId, // TODO: create sub account before hand
+          },
+        };
+        break;
+      }
+      default:
+        throw new Error("Unsupported Solana instruction");
+    }
+  }
+
+  // debugger;
   if (model === null) {
     throw new Error("Unsupported Solana transaction");
   }
 
-  return {
-    model,
-    family: "solana",
-    amount: amount,
-    recipient: recipient,
-  };
+  console.log("command: ", model);
+  console.log("command: ", amount);
+  console.log("command: ", recipient);
+
+  return [
+    {
+      model,
+      family: "solana",
+      amount: amount,
+      recipient: recipient,
+    },
+    feePayer,
+  ];
 }

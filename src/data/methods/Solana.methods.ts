@@ -14,9 +14,11 @@ export const SOLANA_SIGNING_METHODS = {
  * Requests specs: https://docs.walletconnect.com/advanced/multichain/rpc-reference/solana-rpc
  */
 export type SOLANA_REQUESTS =
-  {
+  | {
       method: typeof SOLANA_SIGNING_METHODS.SOLANA_SIGNTRANSACTION;
-      params: SolanaTransaction;
+      params: {
+        transaction: string;
+      };
     }
   | {
       method: typeof SOLANA_SIGNING_METHODS.SOLANA_SIGNMESSAGE;

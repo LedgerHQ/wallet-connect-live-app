@@ -334,9 +334,9 @@ export function useProposal(proposal: ProposalTypes.Struct) {
       ];
 
       const isLegacy =
-        requiredNamespaces[SupportedNamespace.SOLANA].chains?.[0] ===
+        requiredNamespaces[SupportedNamespace.SOLANA]?.chains?.[0] ===
           "solana:4sGjMW1sUnHzSxGspuhpqLDx6wiyjNtZ" ||
-        optionalNamespaces[SupportedNamespace.SOLANA].chains?.[0] ===
+        optionalNamespaces[SupportedNamespace.SOLANA]?.chains?.[0] ===
           "solana:4sGjMW1sUnHzSxGspuhpqLDx6wiyjNtZ";
 
       const dataToSend = accountsByChain.reduce<
@@ -422,10 +422,28 @@ export function useProposal(proposal: ProposalTypes.Struct) {
         );
       }
 
+      console.log(
+        "out: ",
+        requiredNamespaces,
+        optionalNamespaces,
+        supportedNamespaces,
+      );
       if ("solana" in requiredNamespaces || "solana" in optionalNamespaces) {
+        console.log(
+          "in before: ",
+          requiredNamespaces,
+          optionalNamespaces,
+          supportedNamespaces,
+        );
         supportedNamespaces[SupportedNamespace.SOLANA] = buildSolanaNamespace(
           requiredNamespaces,
           optionalNamespaces,
+        );
+        console.log(
+          "in after: ",
+          requiredNamespaces,
+          optionalNamespaces,
+          supportedNamespaces,
         );
       }
       return supportedNamespaces;
