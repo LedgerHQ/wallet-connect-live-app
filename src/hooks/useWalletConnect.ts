@@ -318,7 +318,7 @@ export default function useWalletConnect() {
       walletKit.off("session_proposal", onSessionProposal);
       walletKit.off("session_request", onSessionRequest);
       walletKit.off("session_delete", onSessionDeleted);
-      walletKit.on("session_authenticate", onSessionAuthenticate);
+      walletKit.off("session_authenticate", onSessionAuthenticate);
 
       // auth
       // walletKit.off("auth_request", onAuthRequest);

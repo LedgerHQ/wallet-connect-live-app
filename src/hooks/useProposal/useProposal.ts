@@ -451,7 +451,7 @@ export function useProposal(proposal: Props) {
 
       const authPayload = populateAuthPayload({
         authPayload: payload.params.authPayload,
-        chains: ["eip155:8453", "eip155:1"], //  // TODO(Canestin): replace with 'chains' variable
+        chains,
         methods,
       });
 
@@ -486,7 +486,13 @@ export function useProposal(proposal: Props) {
         auths: [auth],
       });
 
-      if (!session) return;
+      if (!session) {
+        await navigate({
+          to: "/",
+          search: ({ uri: _, ...search }) => search,
+        });
+        return;
+      }
 
       await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
       await queryClient.prefetchQuery({

@@ -12,7 +12,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import styled, { useTheme } from "styled-components";
 import useAnalytics from "@/hooks/useAnalytics";
 import { tryDecodeURI } from "@/utils/image";
-import { formatAccountsByChain, sortChains } from "@/hooks/useProposal/util";
+import {
+  AccountsInChain,
+  formatAccountsByChain,
+  sortChains,
+} from "@/hooks/useProposal/util";
 import { ProposalTypes } from "@walletconnect/types";
 import { AccountRow } from "./sessionProposal/AccountRow";
 import { ErrorMissingRequiredAccount } from "./sessionProposal/ErrorMissingRequiredAccount";
@@ -188,13 +192,9 @@ export default function SessionProposal({ proposal }: Props) {
       .filter((entry) => entry.accounts.length > 0);
   }, [accountsByChain]);
 
-  // TODO: Fixe this to just display add account when completely no account
-  const atLeastOneRequiredChainsAccount = useMemo(
-    () =>
-      requiredChains.some((entry) =>
-        entry.accounts.some((account) => selectedAccounts.includes(account.id)),
-      ),
-    [requiredChains, selectedAccounts],
+  const atLeastOneRequiredChainHasAccount = useMemo(
+    () => requiredChains.some((entry) => entry.accounts.length > 0),
+    [requiredChains],
   );
 
   return (
@@ -218,59 +218,23 @@ export default function SessionProposal({ proposal }: Props) {
         (noChainsSupported ||
           !everyRequiredChainsSupported ||
           requiredChainsWhereNoAccounts.length > 0) ? (
-          <Flex flex={1} flexDirection="column" height="100%">
-            {noChainsSupported || !everyRequiredChainsSupported ? (
-              <ErrorBlockchainSupport appName={dApp} chains={accountsByChain} />
-            ) : (
-              <ErrorMissingRequiredAccount
+          <ErrorMissingAccount
+            appName={dApp}
+            addNewAccounts={addNewAccounts}
+            iconProposer={iconProposer}
+            chains={accountsByChain}
+            handleClose={handleClose}
+          />
+        ) : (
+          <>
+            {isOneClikAuth && !atLeastOneRequiredChainHasAccount ? (
+              <ErrorMissingAccount
                 appName={dApp}
                 addNewAccounts={addNewAccounts}
                 iconProposer={iconProposer}
                 chains={accountsByChain}
+                handleClose={handleClose}
               />
-            )}
-
-            <ButtonsContainer>
-              <Button
-                variant="main"
-                size="large"
-                flex={1}
-                onClick={handleClose}
-              >
-                <Text variant="body" fontWeight="semiBold" color="neutral.c00">
-                  {t("sessionProposal.close")}
-                </Text>
-              </Button>
-            </ButtonsContainer>
-          </Flex>
-        ) : (
-          <>
-            {isOneClikAuth && !atLeastOneRequiredChainsAccount ? (
-              <Flex flex={1} flexDirection="column" height="100%">
-                <ErrorMissingRequiredAccount
-                  appName={dApp}
-                  addNewAccounts={addNewAccounts}
-                  iconProposer={iconProposer}
-                  chains={accountsByChain}
-                />
-
-                <ButtonsContainer>
-                  <Button
-                    variant="main"
-                    size="large"
-                    flex={1}
-                    onClick={handleClose}
-                  >
-                    <Text
-                      variant="body"
-                      fontWeight="semiBold"
-                      color="neutral.c00"
-                    >
-                      {t("sessionProposal.close")}
-                    </Text>
-                  </Button>
-                </ButtonsContainer>
-              </Flex>
             ) : (
               <Flex
                 width="100%"
@@ -416,6 +380,35 @@ export default function SessionProposal({ proposal }: Props) {
     </Flex>
   );
 }
+
+type ErrorMissingAccountProps = {
+  appName: string;
+  addNewAccounts: (currencies: string[]) => Promise<void>;
+  iconProposer: string | null;
+  chains: AccountsInChain[];
+  handleClose: () => void;
+};
+const ErrorMissingAccount = (props: ErrorMissingAccountProps) => {
+  const { t } = useTranslation();
+  return (
+    <Flex flex={1} flexDirection="column" height="100%">
+      <ErrorMissingRequiredAccount {...props} />
+
+      <ButtonsContainer>
+        <Button
+          variant="main"
+          size="large"
+          flex={1}
+          onClick={props.handleClose}
+        >
+          <Text variant="body" fontWeight="semiBold" color="neutral.c00">
+            {t("sessionProposal.close")}
+          </Text>
+        </Button>
+      </ButtonsContainer>
+    </Flex>
+  );
+};
 
 const ListChains = styled(Flex)`
   flex-direction: column;

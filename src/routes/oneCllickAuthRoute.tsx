@@ -1,4 +1,4 @@
-import { createRoute } from "@tanstack/react-router";
+import { Navigate, createRoute } from "@tanstack/react-router";
 import SessionProposal from "@/components/screens/SessionProposal";
 import { rootRoute } from "@/routes/root";
 import { useAtomValue } from "jotai";
@@ -9,14 +9,18 @@ import { ProposalTypes } from "@walletconnect/types";
 import { OneClickAuthPayload } from "@/types/types";
 
 const convertPayloadToProposal = (
-  payload: OneClickAuthPayload,
-): ProposalTypes.Struct & {
-  oneClickAuthPayload?: OneClickAuthPayload;
-} => {
+  payload?: OneClickAuthPayload,
+):
+  | (ProposalTypes.Struct & {
+      oneClickAuthPayload?: OneClickAuthPayload;
+    })
+  | null => {
   const supportedMethods = Object.values(EIP155_SIGNING_METHODS);
   const supportedChains = Object.values(EIP155_CHAINS).map(
     (network) => network.namespace,
   );
+
+  if (!payload) return null;
 
   return {
     id: payload.id,
@@ -25,7 +29,7 @@ const convertPayloadToProposal = (
     proposer: payload.params.requester,
     requiredNamespaces: {
       eip155: {
-        chains: ["eip155:8453", "eip155:1"], // TODO(Canestin): replace with 'supportedChains' variable
+        chains: supportedChains,
         methods: supportedMethods,
         events: [],
       },
@@ -41,7 +45,13 @@ export const oneCllickAuthRoute = createRoute({
   path: "/oneclickauth",
   component: function Proposal() {
     const oneClickAuthPayload = useAtomValue(oneClickAuthPayloadAtom);
-    const proposal = convertPayloadToProposal(oneClickAuthPayload!);
+    const proposal = convertPayloadToProposal(oneClickAuthPayload);
+
+    if (!proposal) {
+      return (
+        <Navigate from="/oneclickauth" to="/" search={(search) => search} />
+      );
+    }
 
     return <SessionProposal proposal={proposal} />;
   },
