@@ -5,12 +5,13 @@ import { useAtomValue } from "jotai";
 import { oneClickAuthPayloadAtom } from "@/store/walletKit.store";
 import { EIP155_SIGNING_METHODS } from "@/data/methods/EIP155Data.methods";
 import { EIP155_CHAINS } from "@/data/network.config";
-import { AuthTypes, ProposalTypes } from "@walletconnect/types";
+import { ProposalTypes } from "@walletconnect/types";
+import { OneClickAuthPayload } from "@/types/types";
 
 const convertPayloadToProposal = (
-  payload: AuthTypes.BaseEventArgs<AuthTypes.SessionAuthenticateRequestParams>,
+  payload: OneClickAuthPayload,
 ): ProposalTypes.Struct & {
-  oneClickAuthPayload?: AuthTypes.BaseEventArgs<AuthTypes.SessionAuthenticateRequestParams>;
+  oneClickAuthPayload?: OneClickAuthPayload;
 } => {
   const supportedMethods = Object.values(EIP155_SIGNING_METHODS);
   const supportedChains = Object.values(EIP155_CHAINS).map(

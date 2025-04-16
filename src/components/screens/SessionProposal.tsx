@@ -8,12 +8,13 @@ import { ResponsiveContainer } from "@/styles/styles";
 import { tryDecodeURI } from "@/utils/image";
 import { Button, Flex, Text } from "@ledgerhq/react-ui";
 import { ArrowLeftMedium } from "@ledgerhq/react-ui/assets/icons";
-import { AuthTypes, ProposalTypes } from "@walletconnect/types";
+import { ProposalTypes } from "@walletconnect/types";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import AccountSelections from "./sessionProposal/AccountSelections";
 import { ErrorMissingRequiredAccount } from "./sessionProposal/ErrorMissingRequiredAccount";
+import { OneClickAuthPayload } from "@/types/types";
 
 const BackButton = styled(Flex)`
   cursor: pointer;
@@ -24,7 +25,7 @@ const BackButton = styled(Flex)`
 
 type Props = {
   proposal: ProposalTypes.Struct & {
-    oneClickAuthPayload?: AuthTypes.BaseEventArgs<AuthTypes.SessionAuthenticateRequestParams>;
+    oneClickAuthPayload?: OneClickAuthPayload;
   };
 };
 
@@ -44,6 +45,7 @@ export default function SessionProposal({ proposal }: Props) {
   const analytics = useAnalytics();
   const dApp = proposal.proposer.metadata.name;
   const dAppUrl = proposal.proposer.metadata.url;
+  const isOneClikAuth = !!proposal.oneClickAuthPayload;
   const [approving, setApproving] = useState(false);
   const [rejecting, setRejecting] = useState(false);
 
@@ -73,7 +75,7 @@ export default function SessionProposal({ proposal }: Props) {
       url: dAppUrl,
     });
     setApproving(true);
-    if (proposal.oneClickAuthPayload) {
+    if (isOneClikAuth) {
       void approveSessionAuthenticate().finally(() => {
         setApproving(false);
       });
@@ -88,7 +90,7 @@ export default function SessionProposal({ proposal }: Props) {
     approveSessionAuthenticate,
     dApp,
     dAppUrl,
-    proposal.oneClickAuthPayload,
+    isOneClikAuth,
   ]);
 
   const onReject = useCallback(() => {
@@ -185,9 +187,10 @@ export default function SessionProposal({ proposal }: Props) {
           </Flex>
         </BackButton>
 
-        {noChainsSupported ||
-        !everyRequiredChainsSupported ||
-        requiredChainsWhereNoAccounts.length > 0 ? (
+        {!isOneClikAuth &&
+        (noChainsSupported ||
+          !everyRequiredChainsSupported ||
+          requiredChainsWhereNoAccounts.length > 0) ? (
           <Flex flex={1} flexDirection="column" height="100%">
             {noChainsSupported || !everyRequiredChainsSupported ? (
               <ErrorBlockchainSupport appName={dApp} chains={accountsByChain} />
@@ -224,7 +227,7 @@ export default function SessionProposal({ proposal }: Props) {
             chainsWhereNoAccounts={chainsWhereNoAccounts}
             verificationStatus={verificationStatus}
             requiredChains={requiredChains}
-            disabled={disabled}
+            disabled={false}
             rejecting={rejecting}
             approving={approving}
             onApprove={onApprove}

@@ -8,7 +8,6 @@ import {
   verifyContextByTopicAtom,
   walletKitAtom,
 } from "@/store/walletKit.store";
-import { getAccountWithAddressAndChainId } from "@/utils/generic";
 import {
   getErrorMessage,
   isBIP122Chain,
@@ -19,8 +18,7 @@ import {
 import { WalletKitTypes } from "@reown/walletkit";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { AuthTypes, SignClientTypes } from "@walletconnect/types";
-import { buildAuthObject, populateAuthPayload } from "@walletconnect/utils";
+import { SignClientTypes } from "@walletconnect/types";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { enqueueSnackbar } from "notistack";
 import { useCallback, useEffect } from "react";
@@ -29,7 +27,7 @@ import { handleBIP122Request } from "./requestHandlers/BIP122";
 import { handleEIP155Request } from "./requestHandlers/EIP155";
 import { handleMvxRequest } from "./requestHandlers/MultiversX";
 import { handleXrpRequest } from "./requestHandlers/Ripple";
-import { Errors, formatMessage, rejectRequest } from "./requestHandlers/utils";
+import { Errors, rejectRequest } from "./requestHandlers/utils";
 import { handleWalletRequest } from "./requestHandlers/Wallet";
 import useAccounts from "./useAccounts";
 import {
@@ -37,6 +35,7 @@ import {
   useQueryFn as usePendingProposalsQueryFn,
 } from "./usePendingProposals";
 import { queryKey as sessionsQueryKey } from "./useSessions";
+import { OneClickAuthPayload } from "@/types/types";
 
 function useWalletConnectStatus() {
   const core = useAtomValue(coreAtom);
@@ -271,72 +270,20 @@ export default function useWalletConnect() {
 
   const setOneClickAuthPayload = useSetAtom(oneClickAuthPayloadAtom);
   const onSessionAuthenticate = useCallback(
-    (
-      payload: AuthTypes.BaseEventArgs<AuthTypes.SessionAuthenticateRequestParams>,
-    ) => {
+    (payload: OneClickAuthPayload) => {
       setVerifyContextByTopic((verifyByTopic) => {
         verifyByTopic[payload.topic] = payload.verifyContext!;
         return verifyByTopic;
       });
 
-      const fn = async () => {
-        setOneClickAuthPayload(payload);
-        await navigate({
-          to: "/oneclickauth",
-          search: (search) => search,
-        });
-
-        // const supportedChains = ["eip155:1", "eip155:2", "eip155:137"];
-
-        // const supportedMethods = [
-        //   "personal_sign",
-        //   "eth_sendTransaction",
-        //   "eth_signTypedData",
-        // ];
-
-        // const authPayload = populateAuthPayload({
-        //   authPayload: payload.params.authPayload,
-        //   chains: supportedChains,
-        //   methods: supportedMethods,
-        // });
-
-        // const addr = "0x90D5b3f3FaA3cd61fBd78bF1CE3DdB2100F4BFb2";
-
-        // const iss = `eip155:1:${addr}`;
-
-        // const message = walletKit.formatAuthMessage({
-        //   request: authPayload,
-        //   iss,
-        // });
-
-        // const accountSign = getAccountWithAddressAndChainId(
-        //   accounts.data,
-        //   addr,
-        //   "eip155:1",
-        // )!;
-
-        // const signedMessage = await client.message.sign(
-        //   accountSign.id,
-        //   Buffer.from(message, "utf-8"),
-        // );
-
-        // const auth = buildAuthObject(
-        //   authPayload,
-        //   {
-        //     t: "eip191",
-        //     s: formatMessage(signedMessage),
-        //   },
-        //   iss,
-        // );
-
-        // await walletKit.approveSessionAuthenticate({
-        //   id: payload.id,
-        //   auths: [auth],
-        // });
-      };
-
       try {
-        void fn();
+        void (async () => {
+          setOneClickAuthPayload(payload);
+          await navigate({
+            to: "/oneclickauth",
+            search: (search) => search,
+          });
+        })();
       } catch (_) {
         void walletKit.rejectSessionAuthenticate({
           id: payload.id,
@@ -347,7 +294,7 @@ export default function useWalletConnect() {
         });
       }
     },
-    [accounts.data, client.message, setVerifyContextByTopic, walletKit],
+    [navigate, setOneClickAuthPayload, setVerifyContextByTopic, walletKit],
   );
 
   useEffect(() => {
