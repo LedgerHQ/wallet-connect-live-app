@@ -3,7 +3,6 @@
  */
 export const BIP122_SIGNING_METHODS = {
   BIP122_SIGN_MESSAGE: "signMessage",
-  BIP122_SIGN_PSBT: "signPsbt",
   BIP122_SEND_TRANSFERT: "sendTransfer",
 } as const;
 
@@ -17,18 +16,6 @@ export type BIP122_REQUESTS =
         message: string;
         account: string;
         address?: string;
-      };
-    }
-  | {
-      method: typeof BIP122_SIGNING_METHODS.BIP122_SIGN_PSBT;
-      params: {
-        account: string;
-        psbt: string;
-        signInputs: {
-          address: string;
-          index: number;
-        }[];
-        broadcast?: boolean;
       };
     }
   | {
