@@ -1,6 +1,7 @@
 import type { IWalletKit } from "@reown/walletkit";
 import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import {
+  EIP155_RESPONSES,
   EIP155_SIGNING_METHODS,
   type EIP155_REQUESTS,
 } from "@/data/methods/EIP155Data.methods";
@@ -44,12 +45,11 @@ export async function handleEIP155Request(
             accountSign.id,
             Buffer.from(message, "hex"),
           );
-          await acceptRequest(
-            walletKit,
-            topic,
-            id,
-            formatMessage(signedMessage),
-          );
+
+          const result: EIP155_RESPONSES[typeof request.method] =
+            formatMessage(signedMessage);
+
+          await acceptRequest(walletKit, topic, id, result);
         } catch (error) {
           if (isCanceledError(error)) {
             await rejectRequest(walletKit, topic, id, Errors.userDecline);
@@ -77,12 +77,11 @@ export async function handleEIP155Request(
             accountSignTyped.id,
             Buffer.from(message),
           );
-          await acceptRequest(
-            walletKit,
-            topic,
-            id,
-            formatMessage(signedMessage),
-          );
+
+          const result: EIP155_RESPONSES[typeof request.method] =
+            formatMessage(signedMessage);
+
+          await acceptRequest(walletKit, topic, id, result);
         } catch (error) {
           if (isCanceledError(error)) {
             await rejectRequest(walletKit, topic, id, Errors.msgDecline);
@@ -110,7 +109,10 @@ export async function handleEIP155Request(
             accountTX.id,
             liveTx,
           );
-          await acceptRequest(walletKit, topic, id, hash);
+
+          const result: EIP155_RESPONSES[typeof request.method] = hash;
+
+          await acceptRequest(walletKit, topic, id, result);
         } catch (error) {
           if (isCanceledError(error)) {
             await rejectRequest(walletKit, topic, id, Errors.txDeclined);

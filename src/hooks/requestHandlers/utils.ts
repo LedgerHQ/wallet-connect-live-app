@@ -17,18 +17,28 @@ export const formatMessage = (buffer: Buffer) => {
   return "0x" + message;
 };
 
-export const acceptRequest = (
+/**
+ * Sends a successful response to a WalletKit session request.
+ *
+ * @template T - The shape of the result to send back
+ *
+ * @param walletKit - The instance of the WalletKit used to send the response
+ * @param topic - The session topic identifying the connection
+ * @param id - The request ID to respond to
+ * @param result - The result payload to return to the requester (should match with WC spec)
+ */
+export const acceptRequest = <T>(
   walletKit: IWalletKit,
   topic: string,
   id: number,
-  signedMessage: string,
+  result: T,
 ) => {
   return walletKit.respondSessionRequest({
     topic,
     response: {
       id,
       jsonrpc: "2.0",
-      result: signedMessage,
+      result,
     },
   });
 };

@@ -4,6 +4,7 @@ import {
   ElrondTransaction,
   EthereumTransaction,
   RippleTransaction,
+  BitcoinTransaction,
 } from "@ledgerhq/wallet-api-client";
 
 export type EthTransaction = {
@@ -86,4 +87,18 @@ export function convertXrpToLiveTX(tx: XrpTransaction): RippleTransaction {
   if (tx.Fee) rippleTransaction.fee = new BigNumber(tx.Fee);
 
   return rippleTransaction;
+}
+
+export type BtcTransaction = {
+  account: string;
+  recipientAddress: string;
+  amount: string;
+};
+
+export function convertBtcToLiveTX(btcTX: BtcTransaction): BitcoinTransaction {
+  return {
+    family: "bitcoin",
+    amount: btcTX.amount ? new BigNumber(btcTX.amount) : new BigNumber(0),
+    recipient: btcTX.recipientAddress,
+  };
 }

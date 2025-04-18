@@ -2,6 +2,7 @@ import type { IWalletKit } from "@reown/walletkit";
 import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import {
   type RIPPLE_REQUESTS,
+  RIPPLE_RESPONSES,
   RIPPLE_SIGNING_METHODS,
 } from "@/data/methods/Ripple.methods";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
@@ -33,7 +34,12 @@ export async function handleXrpRequest(
             accountTX.id,
             liveTx,
           );
-          await acceptRequest(walletKit, topic, id, hash);
+
+          const result: RIPPLE_RESPONSES[typeof request.method] = {
+            tx_json: { ...request.params.tx_json, hash },
+          };
+
+          await acceptRequest(walletKit, topic, id, result);
         } catch (error) {
           if (isCanceledError(error)) {
             await rejectRequest(walletKit, topic, id, Errors.txDeclined);
