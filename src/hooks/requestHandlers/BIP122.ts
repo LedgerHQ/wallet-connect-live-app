@@ -25,6 +25,7 @@ export async function handleBIP122Request(
   walletkit: IWalletKit,
 ) {
   switch (request.method) {
+    case BIP122_SIGNING_METHODS.BIP122_SIGN_MESSAGE_LEGACY:
     case BIP122_SIGNING_METHODS.BIP122_SIGN_MESSAGE: {
       const accountSign = getAccountWithAddressAndChainId(
         accounts,

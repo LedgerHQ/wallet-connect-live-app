@@ -2,6 +2,7 @@
  * Methods
  */
 export const BIP122_SIGNING_METHODS = {
+  BIP122_SIGN_MESSAGE_LEGACY: "bip122_signMessage",
   BIP122_SIGN_MESSAGE: "signMessage",
   BIP122_SEND_TRANSFERT: "sendTransfer",
 } as const;
@@ -11,7 +12,9 @@ export const BIP122_SIGNING_METHODS = {
  */
 export type BIP122_REQUESTS =
   | {
-      method: typeof BIP122_SIGNING_METHODS.BIP122_SIGN_MESSAGE;
+      method:
+        | typeof BIP122_SIGNING_METHODS.BIP122_SIGN_MESSAGE_LEGACY
+        | typeof BIP122_SIGNING_METHODS.BIP122_SIGN_MESSAGE;
       params: {
         message: string;
         account: string;
@@ -31,6 +34,11 @@ export type BIP122_REQUESTS =
  * Responses specs : https://docs.reown.com/advanced/multichain/rpc-reference/bitcoin-rpc
  */
 export type BIP122_RESPONSES = {
+  [BIP122_SIGNING_METHODS.BIP122_SIGN_MESSAGE_LEGACY]: {
+    address: string;
+    signature: string;
+    messageHash?: string;
+  };
   [BIP122_SIGNING_METHODS.BIP122_SIGN_MESSAGE]: {
     address: string;
     signature: string;
