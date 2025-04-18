@@ -1,6 +1,5 @@
 import { ButtonsContainer, List } from "@/components/atoms/containers/Elements";
 import { AddAccountPlaceholder } from "@/components/screens/sessionProposal/AddAccountPlaceholder";
-import { ErrorBlockchainSupport } from "@/components/screens/sessionProposal/ErrorBlockchainSupport";
 import { InfoSessionProposal } from "@/components/screens/sessionProposal/InfoSessionProposal";
 import { formatUrl } from "@/utils/helper.util";
 import { useProposal } from "@/hooks/useProposal/useProposal";
@@ -59,7 +58,7 @@ export default function SessionProposal({ proposal }: Props) {
   const analytics = useAnalytics();
   const dApp = proposal.proposer.metadata.name;
   const dAppUrl = proposal.proposer.metadata.url;
-  const isOneClikAuth = !!proposal.oneClickAuthPayload;
+  const isOneClickAuth = !!proposal.oneClickAuthPayload;
   const [approving, setApproving] = useState(false);
   const [rejecting, setRejecting] = useState(false);
   const currenciesById = useAtomValue(walletCurrenciesByIdAtom);
@@ -90,7 +89,7 @@ export default function SessionProposal({ proposal }: Props) {
       url: dAppUrl,
     });
     setApproving(true);
-    if (isOneClikAuth) {
+    if (isOneClickAuth) {
       void approveSessionAuthenticate().finally(() => {
         setApproving(false);
       });
@@ -105,7 +104,7 @@ export default function SessionProposal({ proposal }: Props) {
     approveSessionAuthenticate,
     dApp,
     dAppUrl,
-    isOneClikAuth,
+    isOneClickAuth,
   ]);
 
   const onReject = useCallback(() => {
@@ -157,14 +156,14 @@ export default function SessionProposal({ proposal }: Props) {
   const disabled = useMemo(
     () =>
       approving ||
-      (!isOneClikAuth &&
+      (!isOneClickAuth &&
         !(everyRequiredChainsSelected && selectedAccounts.length > 0)) ||
-      (isOneClikAuth && selectedAccounts.length < 1),
+      (isOneClickAuth && selectedAccounts.length < 1),
     [
       approving,
       everyRequiredChainsSelected,
       selectedAccounts.length,
-      isOneClikAuth,
+      isOneClickAuth,
     ],
   );
 
@@ -214,7 +213,7 @@ export default function SessionProposal({ proposal }: Props) {
           </Flex>
         </BackButton>
 
-        {!isOneClikAuth &&
+        {!isOneClickAuth &&
         (noChainsSupported ||
           !everyRequiredChainsSupported ||
           requiredChainsWhereNoAccounts.length > 0) ? (
@@ -227,7 +226,7 @@ export default function SessionProposal({ proposal }: Props) {
           />
         ) : (
           <>
-            {isOneClikAuth && !atLeastOneRequiredChainHasAccount ? (
+            {isOneClickAuth && !atLeastOneRequiredChainHasAccount ? (
               <ErrorMissingAccount
                 appName={dApp}
                 addNewAccounts={addNewAccounts}
