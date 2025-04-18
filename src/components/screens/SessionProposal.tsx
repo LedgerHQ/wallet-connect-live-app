@@ -1,6 +1,5 @@
 import { ButtonsContainer, List } from "@/components/atoms/containers/Elements";
 import { AddAccountPlaceholder } from "@/components/screens/sessionProposal/AddAccountPlaceholder";
-import { ErrorBlockchainSupport } from "@/components/screens/sessionProposal/ErrorBlockchainSupport";
 import { InfoSessionProposal } from "@/components/screens/sessionProposal/InfoSessionProposal";
 import { formatUrl } from "@/utils/helper.util";
 import { useProposal } from "@/hooks/useProposal/useProposal";
@@ -12,7 +11,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import styled, { useTheme } from "styled-components";
 import useAnalytics from "@/hooks/useAnalytics";
 import { tryDecodeURI } from "@/utils/image";
-import { formatAccountsByChain, sortChains } from "@/hooks/useProposal/util";
+import {
+  AccountsInChain,
+  formatAccountsByChain,
+  sortChains,
+} from "@/hooks/useProposal/util";
 import { ProposalTypes } from "@walletconnect/types";
 import { AccountRow } from "./sessionProposal/AccountRow";
 import { ErrorMissingRequiredAccount } from "./sessionProposal/ErrorMissingRequiredAccount";
@@ -23,6 +26,7 @@ import { useAtomValue } from "jotai";
 import VerificationLabel from "../verification/VerificationLabel";
 import VerificationCard from "../verification/VerificationCard";
 import useVerification from "@/hooks/useVerification";
+import { OneClickAuthPayload } from "@/types/types";
 
 const BackButton = styled(Flex)`
   cursor: pointer;
@@ -32,16 +36,19 @@ const BackButton = styled(Flex)`
 `;
 
 type Props = {
-  proposal: ProposalTypes.Struct;
+  proposal: ProposalTypes.Struct & {
+    oneClickAuthPayload?: OneClickAuthPayload;
+  };
 };
 
 export default function SessionProposal({ proposal }: Props) {
-  const { colors } = useTheme();
   const { t } = useTranslation();
+  const { colors } = useTheme();
   const {
     handleClick,
     handleClose,
     approveSession,
+    approveSessionAuthenticate,
     rejectSession,
     accounts,
     selectedAccounts,
@@ -51,9 +58,10 @@ export default function SessionProposal({ proposal }: Props) {
   const analytics = useAnalytics();
   const dApp = proposal.proposer.metadata.name;
   const dAppUrl = proposal.proposer.metadata.url;
-  const currenciesById = useAtomValue(walletCurrenciesByIdAtom);
+  const isOneClickAuth = !!proposal.oneClickAuthPayload;
   const [approving, setApproving] = useState(false);
   const [rejecting, setRejecting] = useState(false);
+  const currenciesById = useAtomValue(walletCurrenciesByIdAtom);
 
   const verificationStatus = useVerification(proposal);
 
@@ -81,10 +89,23 @@ export default function SessionProposal({ proposal }: Props) {
       url: dAppUrl,
     });
     setApproving(true);
-    void approveSession().finally(() => {
-      setApproving(false);
-    });
-  }, [analytics, approveSession, dApp, dAppUrl]);
+    if (isOneClickAuth) {
+      void approveSessionAuthenticate().finally(() => {
+        setApproving(false);
+      });
+    } else {
+      void approveSession().finally(() => {
+        setApproving(false);
+      });
+    }
+  }, [
+    analytics,
+    approveSession,
+    approveSessionAuthenticate,
+    dApp,
+    dAppUrl,
+    isOneClickAuth,
+  ]);
 
   const onReject = useCallback(() => {
     analytics.track("button_clicked", {
@@ -135,8 +156,15 @@ export default function SessionProposal({ proposal }: Props) {
   const disabled = useMemo(
     () =>
       approving ||
-      !(everyRequiredChainsSelected && selectedAccounts.length > 0),
-    [approving, everyRequiredChainsSelected, selectedAccounts.length],
+      (!isOneClickAuth &&
+        !(everyRequiredChainsSelected && selectedAccounts.length > 0)) ||
+      (isOneClickAuth && selectedAccounts.length < 1),
+    [
+      approving,
+      everyRequiredChainsSelected,
+      selectedAccounts.length,
+      isOneClickAuth,
+    ],
   );
 
   const iconProposer = useMemo(
@@ -163,6 +191,11 @@ export default function SessionProposal({ proposal }: Props) {
       .filter((entry) => entry.accounts.length > 0);
   }, [accountsByChain]);
 
+  const atLeastOneRequiredChainHasAccount = useMemo(
+    () => requiredChains.some((entry) => entry.accounts.length > 0),
+    [requiredChains],
+  );
+
   return (
     <Flex
       flex={1}
@@ -180,177 +213,201 @@ export default function SessionProposal({ proposal }: Props) {
           </Flex>
         </BackButton>
 
-        {noChainsSupported ||
-        !everyRequiredChainsSupported ||
-        requiredChainsWhereNoAccounts.length > 0 ? (
-          <Flex flex={1} flexDirection="column" height="100%">
-            {noChainsSupported || !everyRequiredChainsSupported ? (
-              <ErrorBlockchainSupport appName={dApp} chains={accountsByChain} />
-            ) : (
-              <ErrorMissingRequiredAccount
+        {!isOneClickAuth &&
+        (noChainsSupported ||
+          !everyRequiredChainsSupported ||
+          requiredChainsWhereNoAccounts.length > 0) ? (
+          <ErrorMissingAccount
+            appName={dApp}
+            addNewAccounts={addNewAccounts}
+            iconProposer={iconProposer}
+            chains={accountsByChain}
+            handleClose={handleClose}
+          />
+        ) : (
+          <>
+            {isOneClickAuth && !atLeastOneRequiredChainHasAccount ? (
+              <ErrorMissingAccount
                 appName={dApp}
                 addNewAccounts={addNewAccounts}
                 iconProposer={iconProposer}
                 chains={accountsByChain}
+                handleClose={handleClose}
               />
-            )}
-
-            <ButtonsContainer>
-              <Button
-                variant="main"
-                size="large"
+            ) : (
+              <Flex
+                width="100%"
+                height="300px"
                 flex={1}
-                onClick={handleClose}
+                justifyContent="space-between"
+                paddingBottom={12}
+                flexDirection="column"
               >
-                <Text variant="body" fontWeight="semiBold" color="neutral.c00">
-                  {t("sessionProposal.close")}
-                </Text>
-              </Button>
-            </ButtonsContainer>
-          </Flex>
-        ) : (
-          <Flex
-            width="100%"
-            height="300px"
-            flex={1}
-            justifyContent="space-between"
-            paddingBottom={12}
-            flexDirection="column"
-          >
-            <Flex flexDirection="column">
-              <Header mb={10}>
-                <LogoHeader iconProposer={iconProposer} error={false} />
-                <Text
-                  variant="h4"
-                  mt={3}
-                  mb={3}
-                  uppercase={false}
-                  textAlign="center"
-                  fontWeight="medium"
-                >
-                  {t("sessionProposal.connectTo", {
-                    name: dApp,
-                  })}
-                </Text>
+                <Flex flexDirection="column">
+                  <Header mb={10}>
+                    <LogoHeader iconProposer={iconProposer} error={false} />
+                    <Text
+                      variant="h4"
+                      mt={3}
+                      mb={3}
+                      uppercase={false}
+                      textAlign="center"
+                      fontWeight="medium"
+                    >
+                      {t("sessionProposal.connectTo", {
+                        name: dApp,
+                      })}
+                    </Text>
 
-                <Text
-                  variant="body"
-                  fontWeight="medium"
-                  textAlign="center"
-                  color={colors.neutral.c80}
-                  uppercase={false}
-                >
-                  {formatUrl(dAppUrl)}
-                </Text>
+                    <Text
+                      variant="body"
+                      fontWeight="medium"
+                      textAlign="center"
+                      color={colors.neutral.c80}
+                      uppercase={false}
+                    >
+                      {formatUrl(dAppUrl)}
+                    </Text>
 
-                <VerificationLabel
-                  marginTop={5}
-                  verification={verificationStatus}
-                />
+                    <VerificationLabel
+                      marginTop={5}
+                      verification={verificationStatus}
+                    />
 
-                {requiredChains.length === 0 && (
-                  <Text
-                    mt={6}
-                    variant="small"
-                    textAlign="center"
-                    color={colors.neutral.c90}
-                    uppercase={false}
-                  >
-                    {t("sessionProposal.noRequiredChains")}
-                  </Text>
-                )}
-              </Header>
-              <ListChains>
-                {entries.map((entry) => {
-                  return (
-                    <Box key={entry.chain}>
-                      <ChainRow
-                        entry={entry}
-                        selectedAccounts={selectedAccounts}
+                    {requiredChains.length === 0 && (
+                      <Text
+                        mt={6}
+                        variant="small"
+                        textAlign="center"
+                        color={colors.neutral.c90}
+                        uppercase={false}
+                      >
+                        {t("sessionProposal.noRequiredChains")}
+                      </Text>
+                    )}
+                  </Header>
+                  <ListChains>
+                    {entries.map((entry) => {
+                      return (
+                        <Box key={entry.chain}>
+                          <ChainRow
+                            entry={entry}
+                            selectedAccounts={selectedAccounts}
+                          />
+                          <List>
+                            {entry.accounts.map((account) => {
+                              const currency = currenciesById[account.currency];
+
+                              return (
+                                <AccountRow
+                                  key={account.id}
+                                  account={account}
+                                  currency={currency}
+                                  selectedAccounts={selectedAccounts}
+                                  handleClick={handleClick}
+                                />
+                              );
+                            })}
+                          </List>
+                        </Box>
+                      );
+                    })}
+                    {createAccountDisplayed && (
+                      <AddAccountPlaceholder
+                        chains={chainsWhereNoAccounts}
+                        addNewAccounts={addNewAccounts}
                       />
-                      <List>
-                        {entry.accounts.map((account) => {
-                          const currency = currenciesById[account.currency];
-
-                          return (
-                            <AccountRow
-                              key={account.id}
-                              account={account}
-                              currency={currency}
-                              selectedAccounts={selectedAccounts}
-                              handleClick={handleClick}
-                            />
-                          );
-                        })}
-                      </List>
+                    )}
+                    <Box mt={6}>
+                      <InfoSessionProposal />
                     </Box>
-                  );
-                })}
-                {createAccountDisplayed && (
-                  <AddAccountPlaceholder
-                    chains={chainsWhereNoAccounts}
-                    addNewAccounts={addNewAccounts}
-                  />
-                )}
-                <Box mt={6}>
-                  <InfoSessionProposal />
-                </Box>
-              </ListChains>
-            </Flex>
+                  </ListChains>
+                </Flex>
 
-            <Flex flexDirection={"column"} paddingY={4}>
-              <VerificationCard verification={verificationStatus} />
-            </Flex>
+                <Flex flexDirection={"column"} paddingY={4}>
+                  <VerificationCard verification={verificationStatus} />
+                </Flex>
 
-            <BlurRow>
-              <ButtonsContainer>
-                <Button
-                  variant="neutral"
-                  size="large"
-                  flex={0.3}
-                  mr={6}
-                  onClick={onReject}
-                  disabled={rejecting}
-                >
-                  {rejecting ? (
-                    <InfiniteLoader size={20} />
-                  ) : (
-                    <Text
-                      variant="body"
-                      fontWeight="semiBold"
-                      color="neutral.c100"
+                <BlurRow>
+                  <ButtonsContainer>
+                    <Button
+                      variant="neutral"
+                      size="large"
+                      flex={0.3}
+                      mr={6}
+                      onClick={onReject}
+                      disabled={rejecting}
                     >
-                      {t("sessionProposal.reject")}
-                    </Text>
-                  )}
-                </Button>
-                <Button
-                  variant="main"
-                  size="large"
-                  flex={0.9}
-                  onClick={onApprove}
-                  disabled={disabled}
-                >
-                  {approving ? (
-                    <InfiniteLoader size={20} />
-                  ) : (
-                    <Text
-                      variant="body"
-                      fontWeight="semiBold"
-                      color={disabled ? "neutral.c50" : "neutral.c00"}
+                      {rejecting ? (
+                        <InfiniteLoader size={20} />
+                      ) : (
+                        <Text
+                          variant="body"
+                          fontWeight="semiBold"
+                          color="neutral.c100"
+                        >
+                          {t("sessionProposal.reject")}
+                        </Text>
+                      )}
+                    </Button>
+                    <Button
+                      variant="main"
+                      size="large"
+                      flex={0.9}
+                      onClick={onApprove}
+                      disabled={disabled}
                     >
-                      {t("sessionProposal.connect")}
-                    </Text>
-                  )}
-                </Button>
-              </ButtonsContainer>
-            </BlurRow>
-          </Flex>
+                      {approving ? (
+                        <InfiniteLoader size={20} />
+                      ) : (
+                        <Text
+                          variant="body"
+                          fontWeight="semiBold"
+                          color={disabled ? "neutral.c50" : "neutral.c00"}
+                        >
+                          {t("sessionProposal.connect")}
+                        </Text>
+                      )}
+                    </Button>
+                  </ButtonsContainer>
+                </BlurRow>
+              </Flex>
+            )}
+          </>
         )}
       </ResponsiveContainer>
     </Flex>
   );
 }
+
+type ErrorMissingAccountProps = {
+  appName: string;
+  addNewAccounts: (currencies: string[]) => Promise<void>;
+  iconProposer: string | null;
+  chains: AccountsInChain[];
+  handleClose: () => void;
+};
+const ErrorMissingAccount = (props: ErrorMissingAccountProps) => {
+  const { t } = useTranslation();
+  return (
+    <Flex flex={1} flexDirection="column" height="100%">
+      <ErrorMissingRequiredAccount {...props} />
+
+      <ButtonsContainer>
+        <Button
+          variant="main"
+          size="large"
+          flex={1}
+          onClick={props.handleClose}
+        >
+          <Text variant="body" fontWeight="semiBold" color="neutral.c00">
+            {t("sessionProposal.close")}
+          </Text>
+        </Button>
+      </ButtonsContainer>
+    </Flex>
+  );
+};
 
 const ListChains = styled(Flex)`
   flex-direction: column;
