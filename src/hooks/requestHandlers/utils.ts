@@ -1,6 +1,5 @@
 import type { IWalletKit } from "@reown/walletkit";
 import { stripHexPrefix } from "@/utils/currencyFormatter/helpers";
-import { BIP122_RESPONSES } from "@/data/methods/BIP122.methods";
 
 export enum Errors {
   userDecline = "User rejected",

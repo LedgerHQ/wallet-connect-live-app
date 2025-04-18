@@ -35,10 +35,8 @@ export async function handleXrpRequest(
             liveTx,
           );
 
-          // FIXME: tx_json should be an object (see: https://docs.reown.com/advanced/multichain/rpc-reference/xrpl-rpc#example)
-          // TODO: After fixing, return the correct value to activate the requestHandler in isRippleChain (/src/utils/helper.util.ts)
           const result: RIPPLE_RESPONSES[typeof request.method] = {
-            tx_json: { hash }, // Does not work
+            tx_json: { ...request.params.tx_json, hash },
           };
 
           await acceptRequest(walletKit, topic, id, result);

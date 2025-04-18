@@ -24,6 +24,6 @@ export type RIPPLE_REQUESTS = {
  */
 export type RIPPLE_RESPONSES = {
   [RIPPLE_SIGNING_METHODS.RIPPLE_SIGN_TRANSACTION]: {
-    tx_json: Record<string, unknown>;
+    tx_json: XrpTransaction & { hash: string };
   };
 };
