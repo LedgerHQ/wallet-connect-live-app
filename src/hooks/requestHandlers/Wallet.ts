@@ -87,6 +87,7 @@ export async function handleWalletRequest(
   client: WalletAPIClient,
   walletKit: IWalletKit,
   queryClient: QueryClient,
+  setMainAccount: (acc: Account) => void,
 ) {
   switch (request.method) {
     case WALLET_METHODS.WALLET_SWITCH_ETHEREUM_CHAIN: {
@@ -121,6 +122,20 @@ export async function handleWalletRequest(
                 },
               },
             });
+            setMainAccount(account);
+            return walletKit.respondSessionRequest({
+              topic,
+              response: {
+                id,
+                jsonrpc: "2.0",
+                result: null,
+              },
+            });
+          }
+        } else {
+          const account = _accounts.find((acc) => acc.id.startsWith(newChain));
+          if (account) {
+            setMainAccount(account);
             return walletKit.respondSessionRequest({
               topic,
               response: {

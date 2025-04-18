@@ -23,6 +23,7 @@ export async function handleEIP155Request(
   accounts: Account[],
   client: WalletAPIClient,
   walletKit: IWalletKit,
+  setMainAccount: (acc: Account) => void,
 ) {
   switch (request.method) {
     case EIP155_SIGNING_METHODS.ETH_SIGN:
@@ -50,6 +51,8 @@ export async function handleEIP155Request(
             id,
             formatMessage(signedMessage),
           );
+
+          setMainAccount(accountSign);
         } catch (error) {
           if (isCanceledError(error)) {
             await rejectRequest(walletKit, topic, id, Errors.userDecline);
