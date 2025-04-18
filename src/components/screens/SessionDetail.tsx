@@ -3,6 +3,7 @@ import {
   formatUrl,
   truncate,
   getDisplayName,
+  getNamespace,
 } from "@/utils/helper.util";
 import {
   Box,
@@ -31,8 +32,12 @@ import { ResponsiveContainer } from "@/styles/styles";
 import { ImageWithPlaceholder } from "@/components/atoms/images/ImageWithPlaceholder";
 import useAnalytics from "@/hooks/useAnalytics";
 import { useNavigate } from "@tanstack/react-router";
-import { useAtomValue } from "jotai";
-import { walletKitAtom } from "@/store/walletKit.store";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import {
+  mainAccountAtom,
+  showBackToBrowserModalAtom,
+  walletKitAtom,
+} from "@/store/walletKit.store";
 import { queryKey as sessionsQueryKey } from "@/hooks/useSessions";
 import useAccounts from "@/hooks/useAccounts";
 import {
@@ -106,6 +111,8 @@ export default function SessionDetail({ session }: Props) {
   const walletKit = useAtomValue(walletKitAtom);
   const analytics = useAnalytics();
   const currenciesById = useAtomValue(walletCurrenciesByIdAtom);
+  const [mainAccount, setMainAccount] = useAtom(mainAccountAtom);
+  const setShowModal = useSetAtom(showBackToBrowserModalAtom);
   const [disconnecting, setDisconnecting] = useState(false);
 
   useEffect(() => {
@@ -159,6 +166,35 @@ export default function SessionDetail({ session }: Props) {
       });
   }, [analytics, navigateToHome, queryClient, session, walletKit]);
 
+  const handleSwitch = useCallback(
+    async (account: Account) => {
+      console.log("—————-B——————");
+      const chainId = getNamespace(account.currency);
+
+      void (await walletKit.emitSessionEvent({
+        topic: session.topic,
+        event: {
+          name: "chainChanged",
+          data: chainId.split(":")[1],
+        },
+        chainId,
+      }));
+
+      void (await walletKit.emitSessionEvent({
+        topic: session.topic,
+        event: {
+          name: "accountsChanged",
+          data: [account.address],
+        },
+        chainId,
+      }));
+
+      setShowModal(true);
+      setMainAccount(account);
+    },
+    [session.topic, setMainAccount, setShowModal, walletKit],
+  );
+
   const onGoBack = useCallback(() => {
     void navigateToHome();
     analytics.track("button_clicked", {
@@ -179,8 +215,15 @@ export default function SessionDetail({ session }: Props) {
 
   const sessionAccounts = useMemo(
     () => getAccountsFromAddresses(fullAddresses, accounts.data),
+
     [accounts.data, fullAddresses],
   );
+
+  useEffect(() => {
+    if (!mainAccount && sessionAccounts.length > 0) {
+      setMainAccount(sessionAccounts[0][1][0]);
+    }
+  }, [mainAccount, sessionAccounts, setMainAccount]);
 
   return (
     <Flex
@@ -284,6 +327,8 @@ export default function SessionDetail({ session }: Props) {
                             return (
                               <ListItem key={account.id}>
                                 <GenericRow
+                                  isSelected={mainAccount?.id === account.id}
+                                  onClick={() => void handleSwitch(account)}
                                   title={account.name}
                                   subtitle={truncate(account.address, 10)}
                                   rightElement={AccountBalance({
@@ -298,7 +343,7 @@ export default function SessionDetail({ session }: Props) {
                                       color={currency.color}
                                     />
                                   }
-                                  rowType={RowType.Default}
+                                  rowType={RowType.Switch}
                                 />
                               </ListItem>
                             );
