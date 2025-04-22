@@ -10,7 +10,6 @@ import {
   loadingAtom,
   showBackToBrowserModalAtom,
   verifyContextByTopicAtom,
-  mainAccountAtom,
 } from "@/store/walletKit.store";
 import {
   isEIP155Chain,
@@ -100,8 +99,6 @@ export default function useWalletConnect() {
   const client = useAtomValue(walletAPIClientAtom);
   const setVerifyContextByTopic = useSetAtom(verifyContextByTopicAtom);
 
-  const setMainAccount = useSetAtom(mainAccountAtom);
-
   const accounts = useAccounts(client);
 
   const onProposalExpire = useCallback(() => {
@@ -188,7 +185,6 @@ export default function useWalletConnect() {
               client,
               walletKit,
               queryClient,
-              setMainAccount,
             );
           } else if (isEIP155Chain(chainId, request)) {
             await handleEIP155Request(
@@ -199,7 +195,6 @@ export default function useWalletConnect() {
               accounts.data,
               client,
               walletKit,
-              setMainAccount,
             );
           } else if (isMultiversXChain(chainId, request)) {
             await handleMvxRequest(
@@ -264,7 +259,6 @@ export default function useWalletConnect() {
       client,
       walletKit,
       queryClient,
-      setMainAccount,
       setLoading,
       redirectToDapp,
     ],

@@ -1,7 +1,8 @@
-import { useCallback, useState } from "react";
-import { getErrorMessage, getNamespace } from "@/utils/helper.util";
+import { BIP122_SIGNING_METHODS } from "@/data/methods/BIP122.methods";
 import { EIP155_SIGNING_METHODS } from "@/data/methods/EIP155Data.methods";
-import useAnalytics from "@/hooks/useAnalytics";
+import { MULTIVERSX_SIGNING_METHODS } from "@/data/methods/MultiversX.methods";
+import { RIPPLE_SIGNING_METHODS } from "@/data/methods/Ripple.methods";
+import { WALLET_METHODS } from "@/data/methods/Wallet.methods";
 import {
   BIP122_CHAINS,
   EIP155_CHAINS,
@@ -9,41 +10,72 @@ import {
   RIPPLE_CHAINS,
   SupportedNamespace,
 } from "@/data/network.config";
-import {
-  BuildApprovedNamespacesParams,
-  buildApprovedNamespaces,
-} from "@walletconnect/utils";
+import useAccounts from "@/hooks/useAccounts";
+import useAnalytics from "@/hooks/useAnalytics";
 import { formatAccountsByChain } from "@/hooks/useProposal/util";
-import { useNavigate } from "@tanstack/react-router";
-import { useQueryClient } from "@tanstack/react-query";
+import { walletAPIClientAtom } from "@/store/wallet-api.store";
 import {
   showBackToBrowserModalAtom,
   walletKitAtom,
 } from "@/store/walletKit.store";
+import {
+  getCurrencyByChainId,
+  getErrorMessage,
+  getNamespace,
+} from "@/utils/helper.util";
+import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
+import { ProposalTypes, SessionTypes } from "@walletconnect/types";
+import { BuildApprovedNamespacesParams } from "@walletconnect/utils";
 import { useAtomValue, useSetAtom } from "jotai";
-import useAccounts, { queryKey as accountsQueryKey } from "@/hooks/useAccounts";
-import { walletAPIClientAtom } from "@/store/wallet-api.store";
+import { enqueueSnackbar } from "notistack";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { queryKey as pendingProposalsQueryKey } from "./usePendingProposals";
 import {
   queryKey as sessionsQueryKey,
   useQueryFn as useSessionsQueryFn,
-} from "../useSessions";
-import { queryKey as pendingProposalsQueryKey } from "../usePendingProposals";
-import { ProposalTypes } from "@walletconnect/types";
-import { enqueueSnackbar } from "notistack";
-import { sortedRecentConnectionAppsAtom } from "../../store/recentConnectionAppsAtom";
-import { WALLET_METHODS } from "@/data/methods/Wallet.methods";
-import { MULTIVERSX_SIGNING_METHODS } from "@/data/methods/MultiversX.methods";
-import { BIP122_SIGNING_METHODS } from "@/data/methods/BIP122.methods";
-import { RIPPLE_SIGNING_METHODS } from "@/data/methods/Ripple.methods";
+} from "./useSessions";
+import { Account } from "@ledgerhq/wallet-api-client";
+import { use } from "i18next";
 
-export function useProposal(proposal: ProposalTypes.Struct) {
-  const navigate = useNavigate({ from: "/proposal/$id" });
+export function useSessionDetails(session: SessionTypes.Struct) {
+  const navigate = useNavigate({ from: "/detail/$topic" });
   const queryClient = useQueryClient();
   const client = useAtomValue(walletAPIClientAtom);
   const accounts = useAccounts(client);
   const walletKit = useAtomValue(walletKitAtom);
   const analytics = useAnalytics();
-  const addAppToLastConnectionApps = useSetAtom(sortedRecentConnectionAppsAtom);
+  const [mainAccount, setMainAccount] = useState<Account>();
+  const [editingSession, setEditingSession] = useState(false);
+  const setShowModal = useSetAtom(showBackToBrowserModalAtom);
+  const [updating, setUpdating] = useState(false);
+  const [disconnecting, setDisconnecting] = useState(false);
+
+  const fullAddresses = useMemo(
+    () =>
+      Object.entries(session.namespaces).reduce(
+        (acc, elem) => acc.concat(elem[1].accounts),
+        [] as string[],
+      ),
+    [session],
+  );
+
+  const sessionAccounts = useMemo(
+    () => getAccountsFromAddresses(fullAddresses, accounts.data),
+
+    [accounts.data, fullAddresses],
+  );
+
+  useEffect(() => {
+    if (sessionAccounts.length > 0) {
+      setMainAccount(sessionAccounts[0][1][0]);
+      setSelectedAccounts(
+        sessionAccounts.flatMap(([, accounts]) =>
+          accounts.map((account) => account.id),
+        ),
+      );
+    }
+  }, [sessionAccounts, setMainAccount]);
 
   const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
 
@@ -69,7 +101,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
       optionalNamespaces: ProposalTypes.OptionalNamespaces,
     ) => {
       const accountsByChain = formatAccountsByChain(
-        proposal,
+        session,
         accounts.data,
       ).filter((a) => {
         return (
@@ -122,7 +154,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
         accounts: dataToSend.map((e) => e.account),
       };
     },
-    [accounts.data, proposal, selectedAccounts],
+    [accounts.data, session, selectedAccounts],
   );
 
   const buildMvxNamespace = useCallback(
@@ -131,7 +163,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
       optionalNamespaces: ProposalTypes.OptionalNamespaces,
     ) => {
       const accountsByChain = formatAccountsByChain(
-        proposal,
+        session,
         accounts.data,
       ).filter(
         (a) =>
@@ -184,7 +216,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
         accounts: dataToSend.map((e) => e.account),
       };
     },
-    [accounts.data, proposal, selectedAccounts],
+    [accounts.data, session, selectedAccounts],
   );
 
   const buildBip122Namespace = useCallback(
@@ -193,7 +225,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
       optionalNamespaces: ProposalTypes.OptionalNamespaces,
     ) => {
       const accountsByChain = formatAccountsByChain(
-        proposal,
+        session,
         accounts.data,
       ).filter(
         (a) =>
@@ -246,7 +278,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
         accounts: dataToSend.map((e) => e.account),
       };
     },
-    [accounts.data, proposal, selectedAccounts],
+    [accounts.data, session, selectedAccounts],
   );
 
   const buildXrpNamespace = useCallback(
@@ -255,7 +287,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
       optionalNamespaces: ProposalTypes.OptionalNamespaces,
     ) => {
       const accountsByChain = formatAccountsByChain(
-        proposal,
+        session,
         accounts.data,
       ).filter(
         (a) =>
@@ -308,12 +340,12 @@ export function useProposal(proposal: ProposalTypes.Struct) {
         accounts: dataToSend.map((e) => e.account),
       };
     },
-    [accounts.data, proposal, selectedAccounts],
+    [accounts.data, session, selectedAccounts],
   );
 
   const buildSupportedNamespaces = useCallback(
-    (proposal: ProposalTypes.Struct) => {
-      const { requiredNamespaces, optionalNamespaces } = proposal;
+    (session: SessionTypes.Struct) => {
+      const { requiredNamespaces, optionalNamespaces } = session;
 
       const supportedNamespaces: BuildApprovedNamespacesParams["supportedNamespaces"] =
         {};
@@ -354,32 +386,63 @@ export function useProposal(proposal: ProposalTypes.Struct) {
 
   const sessionsQueryFn = useSessionsQueryFn(walletKit);
 
-  const setShowModal = useSetAtom(showBackToBrowserModalAtom);
-  const url =
-    proposal.proposer.metadata.redirect?.native ??
-    proposal.proposer.metadata.redirect?.universal;
-  const redirectToDapp = useCallback(() => {
-    if (url) {
-      window.open(url);
-    } else {
-      setShowModal(true);
-    }
-  }, [setShowModal, url]);
-
-  const approveSession = useCallback(async () => {
-    try {
-      const supportedNs = buildSupportedNamespaces(proposal);
-      const approvedNs = buildApprovedNamespaces({
-        proposal,
-        supportedNamespaces: supportedNs,
+  const handleDelete = useCallback(() => {
+    setDisconnecting(true);
+    void walletKit
+      .disconnectSession({
+        topic: session.topic,
+        reason: {
+          code: 3,
+          message: "Disconnect Session",
+        },
+      })
+      .then(() => {
+        analytics.track("button_clicked", {
+          button: "WC-Disconnect Session",
+          page: "Wallet Connect Session Detail",
+        });
+        void queryClient
+          .invalidateQueries({ queryKey: sessionsQueryKey })
+          .then(() => navigateToHome());
+      })
+      .catch((error) => {
+        setDisconnecting(false);
+        enqueueSnackbar(getErrorMessage(error), {
+          errorType: "Disconnect session error",
+          variant: "errorNotification",
+          anchorOrigin: {
+            vertical: "top",
+            horizontal: "right",
+          },
+        });
+        console.error(error);
+        void queryClient.invalidateQueries({
+          queryKey: sessionsQueryKey,
+        });
       });
-      const session = await walletKit.approveSession({
-        id: proposal.id,
-        namespaces: approvedNs,
-        sessionProperties: {
-          supportedNs: JSON.stringify(supportedNs),
+  }, [analytics, navigateToHome, queryClient, session, walletKit]);
+
+  const confirmEdition = useCallback(async () => {
+    if (selectedAccounts.length === 0) {
+      enqueueSnackbar("Please select at least one account", {
+        errorType: "Edit session error",
+        variant: "errorNotification",
+        anchorOrigin: {
+          vertical: "top",
+          horizontal: "right",
         },
       });
+      return;
+    }
+    setUpdating(true);
+    try {
+      const namespaces = buildSupportedNamespaces(session);
+
+      await walletKit.updateSession({
+        topic: session.topic,
+        namespaces,
+      });
+
       await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
       await queryClient.invalidateQueries({
         queryKey: pendingProposalsQueryKey,
@@ -389,15 +452,8 @@ export function useProposal(proposal: ProposalTypes.Struct) {
         queryKey: sessionsQueryKey,
         queryFn: sessionsQueryFn,
       });
-      addAppToLastConnectionApps(session.peer.metadata);
-      // Remove the uri from the search params to avoid trying to connect again if the user reload the current page
-      await navigate({
-        to: "/detail/$topic",
-        params: { topic: session.topic },
-        search: ({ uri: _, ...search }) => search,
-      });
 
-      redirectToDapp();
+      // Remove the uri from the search params to avoid trying to connect again if the user reload the current page
     } catch (error) {
       enqueueSnackbar(getErrorMessage(error), {
         errorType: "Approve session error",
@@ -412,137 +468,151 @@ export function useProposal(proposal: ProposalTypes.Struct) {
       await queryClient.invalidateQueries({
         queryKey: pendingProposalsQueryKey,
       });
+    } finally {
+      setUpdating(false);
+      setEditingSession(false);
     }
   }, [
-    redirectToDapp,
+    selectedAccounts.length,
     buildSupportedNamespaces,
-    proposal,
+    session,
     walletKit,
     queryClient,
     sessionsQueryFn,
-    addAppToLastConnectionApps,
-    navigate,
   ]);
 
-  const rejectSession = useCallback(async () => {
-    try {
-      await walletKit.rejectSession({
-        id: proposal.id,
-        reason: {
-          code: 5000,
-          message: "USER_REJECTED_METHODS",
+  useEffect(() => {
+    console.log("session", session);
+    console.log("selectedAccount", selectedAccounts);
+  }, [session, selectedAccounts]);
+
+  const handleSwitch = useCallback(
+    async (account: Account) => {
+      if (mainAccount?.id === account.id) return;
+
+      const chainId = getNamespace(account.currency);
+      const [namespace, chainValue] = chainId.split(":");
+
+      if (session.namespaces[namespace].events.includes("chainChanged")) {
+        await walletKit.emitSessionEvent({
+          topic: session.topic,
+          event: {
+            name: "chainChanged",
+            data: chainValue,
+          },
+          chainId,
+        });
+      }
+
+      if (
+        session.namespaces[namespace].events.includes("bip122_addressesChanged")
+      ) {
+        await walletKit.emitSessionEvent({
+          topic: session.topic,
+          event: {
+            name: "bip122_addressesChanged",
+            data: chainValue,
+          },
+          chainId,
+        });
+      }
+
+      if (session.namespaces[namespace].events.includes("accountsChanged")) {
+        await walletKit.emitSessionEvent({
+          topic: session.topic,
+          event: {
+            name: "accountsChanged",
+            data: [account.address],
+          },
+          chainId,
+        });
+      }
+
+      const caipAccount = `${chainId}:${account.address}`;
+      const existingNamespace = session.namespaces[namespace];
+      delete session.namespaces[namespace];
+
+      await walletKit.updateSession({
+        topic: session.topic,
+        namespaces: {
+          [namespace]: {
+            ...existingNamespace,
+            accounts: [
+              caipAccount,
+              ...existingNamespace.accounts.filter((a) => a !== caipAccount),
+            ],
+            chains: [
+              chainId,
+              ...(existingNamespace.chains?.filter((c) => c !== chainId) ?? []),
+            ],
+          },
+          ...session.namespaces,
         },
       });
-      await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
-      await queryClient.invalidateQueries({
-        queryKey: pendingProposalsQueryKey,
-      });
-      // Remove the uri from the search params to avoid trying to connect again if the user reload the current page
-      await navigate({
-        to: "/",
-        search: ({ uri: _, ...search }) => search,
-      });
 
-      redirectToDapp();
-    } catch (error) {
-      enqueueSnackbar(getErrorMessage(error), {
-        errorType: "Reject session error",
-        variant: "errorNotification",
-        anchorOrigin: {
-          vertical: "top",
-          horizontal: "right",
-        },
-      });
-      console.error(error);
-      await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
-      await queryClient.invalidateQueries({
-        queryKey: pendingProposalsQueryKey,
-      });
-    }
-  }, [navigate, proposal.id, queryClient, redirectToDapp, walletKit]);
+      setMainAccount(account);
+      setShowModal(true);
+    },
+    [
+      mainAccount?.id,
+      session.namespaces,
+      session.topic,
+      setMainAccount,
+      setShowModal,
+      walletKit,
+    ],
+  );
 
-  const handleClose = useCallback(() => {
-    void rejectSession();
-    analytics.track("button_clicked", {
-      button: "Close",
-      page: "Wallet Connect Error Unsupported Blockchains",
+  function getAccountsFromAddresses(addresses: string[], accounts: Account[]) {
+    const accountsByChain = new Map<string, Account[]>();
+
+    addresses.forEach((addr) => {
+      const addrSplitted = addr.split(":");
+      const chain = getCurrencyByChainId(
+        `${addrSplitted[0]}:${addrSplitted[1]}`,
+      );
+      let chainInLedgerLive = chain;
+
+      if (chain.startsWith("mvx")) {
+        chainInLedgerLive = "elrond";
+      }
+
+      if (chain.startsWith("xrpl")) {
+        chainInLedgerLive = "ripple";
+      }
+
+      const existingEntry = accountsByChain.get(chainInLedgerLive);
+
+      const account = accounts.find(
+        (a) =>
+          a.address === addrSplitted[2] && chainInLedgerLive === a.currency,
+      );
+
+      if (account) {
+        accountsByChain.set(
+          chain,
+          existingEntry ? [...existingEntry, account] : [account],
+        );
+      }
     });
-  }, [analytics, rejectSession]);
+    return Array.from(accountsByChain);
+  }
 
-  const addNewAccount = useCallback(
-    async (currency: string) => {
-      try {
-        const account = await client.account.request({
-          currencyIds: [currency],
-        });
-        setSelectedAccounts((value) => {
-          if (value.includes(account.id)) {
-            return value;
-          }
-          return [...value, account.id];
-        });
-      } catch (error) {
-        if (error instanceof Error && error.message === "Canceled by user") {
-          console.error("request account canceled by user");
-          return;
-        }
-        enqueueSnackbar(getErrorMessage(error), {
-          errorType: "Error adding accounts",
-          variant: "errorNotification",
-          anchorOrigin: {
-            vertical: "top",
-            horizontal: "right",
-          },
-        });
-      }
-      // refetch accounts
-      await queryClient.invalidateQueries({ queryKey: accountsQueryKey });
-    },
-    [client, queryClient],
-  );
-
-  const addNewAccounts = useCallback(
-    async (currencies: string[]) => {
-      try {
-        const account = await client.account.request({
-          currencyIds: currencies,
-        });
-        setSelectedAccounts((value) => {
-          if (value.includes(account.id)) {
-            return value;
-          }
-          return [...value, account.id];
-        });
-      } catch (error) {
-        if (error instanceof Error && error.message === "Canceled by user") {
-          console.error("request account canceled by user");
-          return;
-        }
-        enqueueSnackbar(getErrorMessage(error), {
-          errorType: "Error adding accounts",
-          variant: "errorNotification",
-          anchorOrigin: {
-            vertical: "top",
-            horizontal: "right",
-          },
-        });
-      }
-      // refetch accounts
-      await queryClient.invalidateQueries({ queryKey: accountsQueryKey });
-    },
-    [client, queryClient],
-  );
-
-  // No need for a memo as it's directly spread on usage
   return {
-    approveSession,
-    rejectSession,
-    handleClose,
+    confirmEdition,
     handleClick,
     accounts: accounts.data,
     selectedAccounts,
-    addNewAccount,
-    addNewAccounts,
     navigateToHome,
+    sessionAccounts,
+    editingSession,
+    setEditingSession,
+    mainAccount,
+    setMainAccount,
+    handleSwitch,
+    updating,
+    setUpdating,
+    disconnecting,
+    handleDelete,
   };
 }

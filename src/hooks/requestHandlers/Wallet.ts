@@ -87,7 +87,6 @@ export async function handleWalletRequest(
   client: WalletAPIClient,
   walletKit: IWalletKit,
   queryClient: QueryClient,
-  setMainAccount: (acc: Account) => void,
 ) {
   switch (request.method) {
     case WALLET_METHODS.WALLET_SWITCH_ETHEREUM_CHAIN: {
@@ -96,6 +95,8 @@ export async function handleWalletRequest(
         const session = walletKit.engine.signClient.session.get(topic);
         const namespace = chainId.split(":")[0];
         const newChain = getNamespace(network);
+
+        console.log("request de chez request", request);
 
         const accountPresent = session.namespaces[namespace]?.accounts.some(
           (account) => account.startsWith(newChain),
@@ -122,7 +123,7 @@ export async function handleWalletRequest(
                 },
               },
             });
-            setMainAccount(account);
+            // setMainAccount(account);
             return walletKit.respondSessionRequest({
               topic,
               response: {
@@ -135,7 +136,7 @@ export async function handleWalletRequest(
         } else {
           const account = _accounts.find((acc) => acc.id.startsWith(newChain));
           if (account) {
-            setMainAccount(account);
+            // setMainAccount(account);
             return walletKit.respondSessionRequest({
               topic,
               response: {

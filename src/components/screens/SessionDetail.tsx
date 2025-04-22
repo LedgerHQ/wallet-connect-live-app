@@ -1,10 +1,4 @@
-import {
-  getCurrencyByChainId,
-  formatUrl,
-  truncate,
-  getDisplayName,
-  getNamespace,
-} from "@/utils/helper.util";
+import { formatUrl, truncate, getDisplayName } from "@/utils/helper.util";
 import {
   Box,
   Button,
@@ -13,9 +7,8 @@ import {
   InfiniteLoader,
   Text,
 } from "@ledgerhq/react-ui";
-import { enqueueSnackbar } from "notistack";
 import { ArrowLeftMedium } from "@ledgerhq/react-ui/assets/icons";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { Account } from "@ledgerhq/wallet-api-client";
@@ -32,22 +25,18 @@ import { ResponsiveContainer } from "@/styles/styles";
 import { ImageWithPlaceholder } from "@/components/atoms/images/ImageWithPlaceholder";
 import useAnalytics from "@/hooks/useAnalytics";
 import { useNavigate } from "@tanstack/react-router";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import {
-  mainAccountAtom,
-  showBackToBrowserModalAtom,
-  walletKitAtom,
-} from "@/store/walletKit.store";
-import { queryKey as sessionsQueryKey } from "@/hooks/useSessions";
+import { useAtomValue } from "jotai";
 import useAccounts from "@/hooks/useAccounts";
 import {
   walletAPIClientAtom,
   walletCurrenciesByIdAtom,
 } from "@/store/wallet-api.store";
-import { useQueryClient } from "@tanstack/react-query";
 import { SessionTypes } from "@walletconnect/types";
-import { getErrorMessage } from "@/utils/helper.util";
 import { AccountBalance } from "../atoms/AccountBalance";
+import { formatAccountsByChain } from "@/hooks/useProposal/util";
+import { AccountRow } from "./sessionProposal/AccountRow";
+import { ChainRow } from "./sessionProposal/ChainRow";
+import { useSessionDetails } from "@/hooks/useSessionDetails";
 
 const DetailContainer = styled(Flex)`
   border-radius: 12px;
@@ -66,54 +55,30 @@ const CustomList = styled(Flex)`
   flex-direction: column;
 `;
 
-const getAccountsFromAddresses = (addresses: string[], accounts: Account[]) => {
-  const accountsByChain = new Map<string, Account[]>();
-
-  addresses.forEach((addr) => {
-    const addrSplitted = addr.split(":");
-    const chain = getCurrencyByChainId(`${addrSplitted[0]}:${addrSplitted[1]}`);
-    let chainInLedgerLive = chain;
-
-    if (chain.startsWith("mvx")) {
-      chainInLedgerLive = "elrond";
-    }
-
-    if (chain.startsWith("xrpl")) {
-      chainInLedgerLive = "ripple";
-    }
-
-    const existingEntry = accountsByChain.get(chainInLedgerLive);
-
-    const account = accounts.find(
-      (a) => a.address === addrSplitted[2] && chainInLedgerLive === a.currency,
-    );
-
-    if (account) {
-      accountsByChain.set(
-        chain,
-        existingEntry ? [...existingEntry, account] : [account],
-      );
-    }
-  });
-  return Array.from(accountsByChain);
-};
-
 type Props = {
   session: SessionTypes.Struct;
 };
 
 export default function SessionDetail({ session }: Props) {
   const { t } = useTranslation();
+  const {
+    handleClick,
+    confirmEdition,
+    selectedAccounts,
+    sessionAccounts,
+    editingSession,
+    setEditingSession,
+    mainAccount,
+    handleSwitch,
+    updating,
+    handleDelete,
+    disconnecting,
+  } = useSessionDetails(session);
   const navigate = useNavigate({ from: "/detail/$topic" });
-  const queryClient = useQueryClient();
   const client = useAtomValue(walletAPIClientAtom);
   const accounts = useAccounts(client);
-  const walletKit = useAtomValue(walletKitAtom);
   const analytics = useAnalytics();
   const currenciesById = useAtomValue(walletCurrenciesByIdAtom);
-  const [mainAccount, setMainAccount] = useAtom(mainAccountAtom);
-  const setShowModal = useSetAtom(showBackToBrowserModalAtom);
-  const [disconnecting, setDisconnecting] = useState(false);
 
   useEffect(() => {
     analytics.page("Wallet Connect Session Detail", {
@@ -130,71 +95,6 @@ export default function SessionDetail({ session }: Props) {
     });
   }, [navigate]);
 
-  const handleDelete = useCallback(() => {
-    setDisconnecting(true);
-    void walletKit
-      .disconnectSession({
-        topic: session.topic,
-        reason: {
-          code: 3,
-          message: "Disconnect Session",
-        },
-      })
-      .then(() => {
-        analytics.track("button_clicked", {
-          button: "WC-Disconnect Session",
-          page: "Wallet Connect Session Detail",
-        });
-        void queryClient
-          .invalidateQueries({ queryKey: sessionsQueryKey })
-          .then(() => navigateToHome());
-      })
-      .catch((error) => {
-        setDisconnecting(false);
-        enqueueSnackbar(getErrorMessage(error), {
-          errorType: "Disconnect session error",
-          variant: "errorNotification",
-          anchorOrigin: {
-            vertical: "top",
-            horizontal: "right",
-          },
-        });
-        console.error(error);
-        void queryClient.invalidateQueries({
-          queryKey: sessionsQueryKey,
-        });
-      });
-  }, [analytics, navigateToHome, queryClient, session, walletKit]);
-
-  const handleSwitch = useCallback(
-    async (account: Account) => {
-      console.log("—————-B——————");
-      const chainId = getNamespace(account.currency);
-
-      void (await walletKit.emitSessionEvent({
-        topic: session.topic,
-        event: {
-          name: "chainChanged",
-          data: chainId.split(":")[1],
-        },
-        chainId,
-      }));
-
-      void (await walletKit.emitSessionEvent({
-        topic: session.topic,
-        event: {
-          name: "accountsChanged",
-          data: [account.address],
-        },
-        chainId,
-      }));
-
-      setShowModal(true);
-      setMainAccount(account);
-    },
-    [session.topic, setMainAccount, setShowModal, walletKit],
-  );
-
   const onGoBack = useCallback(() => {
     void navigateToHome();
     analytics.track("button_clicked", {
@@ -204,26 +104,17 @@ export default function SessionDetail({ session }: Props) {
   }, [analytics, navigateToHome]);
 
   const metadata = session.peer.metadata;
-  const fullAddresses = useMemo(
-    () =>
-      Object.entries(session.namespaces).reduce(
-        (acc, elem) => acc.concat(elem[1].accounts),
-        [] as string[],
-      ),
-    [session],
+
+  const accountsByChain = useMemo(
+    () => formatAccountsByChain(session, accounts.data),
+    [session, accounts],
   );
 
-  const sessionAccounts = useMemo(
-    () => getAccountsFromAddresses(fullAddresses, accounts.data),
-
-    [accounts.data, fullAddresses],
-  );
-
-  useEffect(() => {
-    if (!mainAccount && sessionAccounts.length > 0) {
-      setMainAccount(sessionAccounts[0][1][0]);
-    }
-  }, [mainAccount, sessionAccounts, setMainAccount]);
+  const entries = useMemo(() => {
+    return accountsByChain
+      .filter((entry) => entry.isSupported)
+      .filter((entry) => entry.accounts.length > 0);
+  }, [accountsByChain]);
 
   return (
     <Flex
@@ -305,11 +196,66 @@ export default function SessionDetail({ session }: Props) {
               </Row>
             </DetailContainer>
 
-            {sessionAccounts.length > 0 ? (
+            {editingSession &&
+              entries.map((entry) => {
+                return (
+                  <Box key={entry.chain} mb={8}>
+                    <ChainRow
+                      entry={entry}
+                      selectedAccounts={selectedAccounts}
+                    />
+                    <List>
+                      {entry.accounts.map((account) => {
+                        const currency = currenciesById[account.currency];
+
+                        return (
+                          <AccountRow
+                            key={account.id}
+                            account={account}
+                            currency={currency}
+                            selectedAccounts={selectedAccounts}
+                            handleClick={handleClick}
+                          />
+                        );
+                      })}
+                    </List>
+                  </Box>
+                );
+              })}
+
+            {!editingSession && sessionAccounts.length > 0 && (
               <>
-                <Text variant="h4" mt={8} mb={6} color="neutral.c100">
-                  {t("sessions.detail.accounts")}
-                </Text>
+                <Flex
+                  flexDirection="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  mt={4}
+                >
+                  <Text variant="h4" color="neutral.c100">
+                    {t("sessions.detail.accounts")}
+                  </Text>
+                  {!editingSession && (
+                    <Flex>
+                      <ButtonsContainer>
+                        <Button
+                          variant="shade"
+                          size="medium"
+                          flex={1}
+                          onClick={() => setEditingSession(true)}
+                        >
+                          <Text
+                            variant="small"
+                            fontWeight="semiBold"
+                            color="neutral.c100"
+                          >
+                            Edit session
+                          </Text>
+                        </Button>
+                      </ButtonsContainer>
+                    </Flex>
+                  )}
+                </Flex>
+
                 <CustomList>
                   {sessionAccounts.map(([chain, accounts]) => {
                     return (
@@ -358,27 +304,87 @@ export default function SessionDetail({ session }: Props) {
                   </Box>
                 </CustomList>
               </>
-            ) : null}
+            )}
           </Flex>
-          <ButtonsContainer mt={5}>
-            <Button
-              variant="shade"
-              size="large"
-              flex={1}
-              onClick={handleDelete}
-              disabled={disconnecting}
-            >
-              {disconnecting ? (
-                <InfiniteLoader size={20} />
-              ) : (
-                <Text variant="body" fontWeight="semiBold" color="neutral.c100">
-                  {t("sessions.detail.disconnect")}
-                </Text>
-              )}
-            </Button>
-          </ButtonsContainer>
+
+          {!editingSession && (
+            <ButtonsContainer mt={5}>
+              <Button
+                variant="shade"
+                size="large"
+                flex={1}
+                onClick={handleDelete}
+                disabled={disconnecting}
+              >
+                {disconnecting ? (
+                  <InfiniteLoader size={20} />
+                ) : (
+                  <Text
+                    variant="body"
+                    fontWeight="semiBold"
+                    color="neutral.c100"
+                  >
+                    {t("sessions.detail.disconnect")}
+                  </Text>
+                )}
+              </Button>
+            </ButtonsContainer>
+          )}
+
+          {editingSession && (
+            <BlurRow>
+              <ButtonsContainer>
+                <Button
+                  variant="neutral"
+                  size="large"
+                  flex={0.3}
+                  mr={6}
+                  onClick={() => setEditingSession(false)}
+                >
+                  <Text
+                    variant="body"
+                    fontWeight="semiBold"
+                    color="neutral.c100"
+                  >
+                    {t("sessions.modal.cancel")}
+                  </Text>
+                </Button>
+                <Button
+                  variant="main"
+                  size="large"
+                  flex={0.9}
+                  onClick={() => void confirmEdition()}
+                >
+                  {updating ? (
+                    <InfiniteLoader size={20} />
+                  ) : (
+                    <Text
+                      variant="body"
+                      fontWeight="semiBold"
+                      color={"neutral.c00"}
+                    >
+                      Confirm
+                    </Text>
+                  )}
+                </Button>
+              </ButtonsContainer>
+            </BlurRow>
+          )}
         </Flex>
       </ResponsiveContainer>
     </Flex>
   );
 }
+
+const BlurRow = styled(Flex)`
+  width: 100%;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1));
+    backdrop-filter: blur(10px);
+  }
+  position: sticky;
+  bottom: 0px;
+`;
