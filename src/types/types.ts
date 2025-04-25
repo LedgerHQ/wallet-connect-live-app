@@ -1,5 +1,3 @@
-import { AuthTypes } from "@walletconnect/types";
-
 export type NetworkConfig = {
   chainId: number;
   currency: string;
@@ -44,6 +42,3 @@ export type Proposal = {
 };
 
 export type VerificationStatus = "UNKNOWN" | "VALID" | "INVALID" | "SCAM";
-
-export type OneClickAuthPayload =
-  AuthTypes.BaseEventArgs<AuthTypes.SessionAuthenticateRequestParams>;
