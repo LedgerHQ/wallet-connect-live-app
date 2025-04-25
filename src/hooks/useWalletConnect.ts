@@ -1,41 +1,39 @@
-import { walletAPIClientAtom } from "@/store/wallet-api.store";
+import { SignClientTypes } from "@walletconnect/types";
+import { useCallback, useEffect } from "react";
+import { WalletKitTypes } from "@reown/walletkit";
+import { enqueueSnackbar } from "notistack";
+import { getErrorMessage } from "@/utils/helper.util";
 import {
-  connectionStatusAtom,
   coreAtom,
+  connectionStatusAtom,
+  walletKitAtom,
   loadingAtom,
-  oneClickAuthPayloadAtom,
   showBackToBrowserModalAtom,
   verifyContextByTopicAtom,
-  walletKitAtom,
 } from "@/store/walletKit.store";
 import {
-  getErrorMessage,
-  isBIP122Chain,
   isEIP155Chain,
   isMultiversXChain,
+  isBIP122Chain,
   isRippleChain,
 } from "@/utils/helper.util";
-import { WalletKitTypes } from "@reown/walletkit";
-import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { SignClientTypes } from "@walletconnect/types";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { enqueueSnackbar } from "notistack";
-import { useCallback, useEffect } from "react";
-import { isWalletRequest } from "../utils/helper.util";
-import { handleBIP122Request } from "./requestHandlers/BIP122";
-import { handleEIP155Request } from "./requestHandlers/EIP155";
-import { handleMvxRequest } from "./requestHandlers/MultiversX";
-import { handleXrpRequest } from "./requestHandlers/Ripple";
-import { Errors, rejectRequest } from "./requestHandlers/utils";
-import { handleWalletRequest } from "./requestHandlers/Wallet";
 import useAccounts from "./useAccounts";
+import { walletAPIClientAtom } from "@/store/wallet-api.store";
+import { queryKey as sessionsQueryKey } from "./useSessions";
 import {
   queryKey as pendingProposalsQueryKey,
   useQueryFn as usePendingProposalsQueryFn,
 } from "./usePendingProposals";
-import { queryKey as sessionsQueryKey } from "./useSessions";
-import { OneClickAuthPayload } from "@/types/types";
+import { useQueryClient } from "@tanstack/react-query";
+import { handleEIP155Request } from "./requestHandlers/EIP155";
+import { handleMvxRequest } from "./requestHandlers/MultiversX";
+import { handleBIP122Request } from "./requestHandlers/BIP122";
+import { handleXrpRequest } from "./requestHandlers/Ripple";
+import { Errors, rejectRequest } from "./requestHandlers/utils";
+import { handleWalletRequest } from "./requestHandlers/Wallet";
+import { isWalletRequest } from "../utils/helper.util";
 
 function useWalletConnectStatus() {
   const core = useAtomValue(coreAtom);
@@ -268,35 +266,6 @@ export default function useWalletConnect() {
     void queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
   }, [queryClient]);
 
-  const setOneClickAuthPayload = useSetAtom(oneClickAuthPayloadAtom);
-  const onSessionAuthenticate = useCallback(
-    (payload: OneClickAuthPayload) => {
-      setVerifyContextByTopic((verifyByTopic) => {
-        verifyByTopic[payload.topic] = payload.verifyContext!;
-        return verifyByTopic;
-      });
-
-      try {
-        void (async () => {
-          setOneClickAuthPayload(payload);
-          await navigate({
-            to: "/oneclickauth",
-            search: (search) => search,
-          });
-        })();
-      } catch (_) {
-        void walletKit.rejectSessionAuthenticate({
-          id: payload.id,
-          reason: {
-            code: 5000,
-            message: "USER_REJECTED_METHODS",
-          },
-        });
-      }
-    },
-    [navigate, setOneClickAuthPayload, setVerifyContextByTopic, walletKit],
-  );
-
   useEffect(() => {
     console.log("walletKit setup listeners");
     // TODO: handle session_request_expire
@@ -307,7 +276,6 @@ export default function useWalletConnect() {
     walletKit.on("session_proposal", onSessionProposal);
     walletKit.on("session_request", onSessionRequest);
     walletKit.on("session_delete", onSessionDeleted);
-    walletKit.on("session_authenticate", onSessionAuthenticate);
 
     // auth
     // walletKit.on("auth_request", onAuthRequest);
@@ -318,7 +286,6 @@ export default function useWalletConnect() {
       walletKit.off("session_proposal", onSessionProposal);
       walletKit.off("session_request", onSessionRequest);
       walletKit.off("session_delete", onSessionDeleted);
-      walletKit.off("session_authenticate", onSessionAuthenticate);
 
       // auth
       // walletKit.off("auth_request", onAuthRequest);
@@ -329,6 +296,5 @@ export default function useWalletConnect() {
     onSessionRequest,
     onSessionDeleted,
     onProposalExpire,
-    onSessionAuthenticate,
   ]);
 }
