@@ -1,4 +1,4 @@
-import { Flex, Text, Checkbox, Box, Switch } from "@ledgerhq/react-ui";
+import { Flex, Text, Checkbox, Box } from "@ledgerhq/react-ui";
 import { ChevronRightMedium } from "@ledgerhq/react-ui/assets/icons";
 import styled from "styled-components";
 import { RowType } from "./types";
