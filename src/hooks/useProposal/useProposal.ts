@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { getErrorMessage, getNamespace } from "@/utils/helper.util";
+import { getAccountWithAddress } from "@/utils/generic";
 import { EIP155_SIGNING_METHODS } from "@/data/methods/EIP155Data.methods";
 import useAnalytics from "@/hooks/useAnalytics";
 import {
@@ -12,6 +13,8 @@ import {
 import {
   BuildApprovedNamespacesParams,
   buildApprovedNamespaces,
+  buildAuthObject,
+  populateAuthPayload,
 } from "@walletconnect/utils";
 import { formatAccountsByChain } from "@/hooks/useProposal/util";
 import { useNavigate } from "@tanstack/react-router";
@@ -29,12 +32,14 @@ import {
 } from "../useSessions";
 import { queryKey as pendingProposalsQueryKey } from "../usePendingProposals";
 import { ProposalTypes } from "@walletconnect/types";
+import { OneClickAuthPayload } from "@/types/types";
 import { enqueueSnackbar } from "notistack";
 import { sortedRecentConnectionAppsAtom } from "../../store/recentConnectionAppsAtom";
 import { WALLET_METHODS } from "@/data/methods/Wallet.methods";
 import { MULTIVERSX_SIGNING_METHODS } from "@/data/methods/MultiversX.methods";
 import { BIP122_SIGNING_METHODS } from "@/data/methods/BIP122.methods";
 import { RIPPLE_SIGNING_METHODS } from "@/data/methods/Ripple.methods";
+import { formatMessage } from "../requestHandlers/utils";
 
 export function useProposal(
   proposal: ProposalTypes.Struct,
@@ -685,6 +690,7 @@ export function useProposal(
   // No need for a memo as it's directly spread on usage
   return {
     approveSession,
+    approveSessionAuthenticate,
     rejectSession,
     rejectSessionAuthenticate,
     handleClose,

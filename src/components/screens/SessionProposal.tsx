@@ -24,7 +24,6 @@ import VerificationLabel from "../verification/VerificationLabel";
 import VerificationCard from "../verification/VerificationCard";
 import useVerification from "@/hooks/useVerification";
 import { OneClickAuthPayload } from "@/types/types";
-import { ErrorBlockchainSupport } from "./sessionProposal/ErrorBlockchainSupport";
 
 const BackButton = styled(Flex)`
   cursor: pointer;
@@ -44,11 +43,11 @@ export default function SessionProposal({
 }: Props) {
   const { t } = useTranslation();
   const { colors } = useTheme();
-  const { t } = useTranslation();
   const {
     handleClick,
     handleClose,
     approveSession,
+    approveSessionAuthenticate,
     rejectSession,
     rejectSessionAuthenticate,
     accounts,
@@ -57,9 +56,10 @@ export default function SessionProposal({
     navigateToHome,
   } = useProposal(proposal, oneClickAuthPayload);
   const analytics = useAnalytics();
+  const isOneClickAuth = !!oneClickAuthPayload;
   const dApp = proposal.proposer.metadata.name;
   const dAppUrl = proposal.proposer.metadata.url;
-  const isOneClickAuth = !!oneClickAuthPayload;
+  const currenciesById = useAtomValue(walletCurrenciesByIdAtom);
   const [approving, setApproving] = useState(false);
   const [rejecting, setRejecting] = useState(false);
 
@@ -89,10 +89,23 @@ export default function SessionProposal({
       url: dAppUrl,
     });
     setApproving(true);
-    void approveSession().finally(() => {
-      setApproving(false);
-    });
-  }, [analytics, approveSession, dApp, dAppUrl]);
+    if (isOneClickAuth) {
+      void approveSessionAuthenticate().finally(() => {
+        setApproving(false);
+      });
+    } else {
+      void approveSession().finally(() => {
+        setApproving(false);
+      });
+    }
+  }, [
+    analytics,
+    approveSession,
+    approveSessionAuthenticate,
+    dApp,
+    dAppUrl,
+    isOneClickAuth,
+  ]);
 
   const onReject = useCallback(() => {
     analytics.track("button_clicked", {
