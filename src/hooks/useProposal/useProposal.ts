@@ -36,8 +36,13 @@ import { MULTIVERSX_SIGNING_METHODS } from "@/data/methods/MultiversX.methods";
 import { BIP122_SIGNING_METHODS } from "@/data/methods/BIP122.methods";
 import { RIPPLE_SIGNING_METHODS } from "@/data/methods/Ripple.methods";
 
-export function useProposal(proposal: ProposalTypes.Struct) {
-  const navigate = useNavigate({ from: "/proposal/$id" });
+export function useProposal(
+  proposal: ProposalTypes.Struct,
+  oneClickAuthPayload?: OneClickAuthPayload,
+) {
+  const navigate = useNavigate({
+    from: oneClickAuthPayload ? "/oneclickauth" : "/proposal/$id",
+  });
   const queryClient = useQueryClient();
   const client = useAtomValue(walletAPIClientAtom);
   const accounts = useAccounts(client);
@@ -421,6 +426,112 @@ export function useProposal(proposal: ProposalTypes.Struct) {
     navigate,
   ]);
 
+  const approveSessionAuthenticate = useCallback(async () => {
+    try {
+      const {
+        chains,
+        methods,
+        accounts: accs,
+      } = buildEip155Namespace(
+        proposal.requiredNamespaces,
+        proposal.optionalNamespaces,
+      );
+
+      const payload = oneClickAuthPayload;
+
+      if (!payload) {
+        throw new Error("No 1-click auth payload found");
+      }
+
+      const authPayload = populateAuthPayload({
+        authPayload: payload.params.authPayload,
+        chains,
+        methods,
+      });
+
+      const firstAccount = accs[0];
+
+      const message = walletKit.formatAuthMessage({
+        request: authPayload,
+        iss: firstAccount,
+      });
+
+      const accountSign = getAccountWithAddress(
+        accounts.data,
+        firstAccount.split(":").at(-1)!,
+      )!;
+
+      const signature = await client.message.sign(
+        accountSign.id,
+        Buffer.from(message, "utf-8"),
+      );
+
+      const auth = buildAuthObject(
+        authPayload,
+        {
+          t: "eip191", // signature type
+          s: formatMessage(signature),
+        },
+        firstAccount,
+      );
+
+      const { session } = await walletKit.approveSessionAuthenticate({
+        id: payload.id,
+        auths: [auth],
+      });
+
+      if (!session) {
+        await navigate({
+          to: "/",
+          search: ({ uri: _, ...search }) => search,
+        });
+        return;
+      }
+
+      await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
+      await queryClient.prefetchQuery({
+        queryKey: sessionsQueryKey,
+        queryFn: sessionsQueryFn,
+      });
+      addAppToLastConnectionApps(session.peer.metadata);
+      // Remove the uri from the search params to avoid trying to connect again if the user reload the current page
+      await navigate({
+        to: "/detail/$topic",
+        params: { topic: session.topic },
+        search: ({ uri: _, ...search }) => search,
+      });
+
+      redirectToDapp();
+    } catch (error) {
+      enqueueSnackbar(getErrorMessage(error), {
+        errorType: "Approve session error",
+        variant: "errorNotification",
+        anchorOrigin: {
+          vertical: "top",
+          horizontal: "right",
+        },
+      });
+      console.error(error);
+      await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
+      await queryClient.invalidateQueries({
+        queryKey: pendingProposalsQueryKey,
+      });
+    }
+  }, [
+    buildEip155Namespace,
+    proposal.requiredNamespaces,
+    proposal.optionalNamespaces,
+    oneClickAuthPayload,
+    walletKit,
+    queryClient,
+    sessionsQueryFn,
+    addAppToLastConnectionApps,
+    navigate,
+    redirectToDapp,
+    accounts.data,
+    client.message,
+  ]);
+
   const rejectSession = useCallback(async () => {
     try {
       await walletKit.rejectSession({
@@ -457,6 +568,47 @@ export function useProposal(proposal: ProposalTypes.Struct) {
       });
     }
   }, [navigate, proposal.id, queryClient, redirectToDapp, walletKit]);
+
+  const rejectSessionAuthenticate = useCallback(async () => {
+    if (!oneClickAuthPayload) {
+      throw new Error("No 1-click auth payload found");
+    }
+
+    try {
+      await walletKit.rejectSessionAuthenticate({
+        id: oneClickAuthPayload.id,
+        reason: {
+          code: 5000,
+          message: "USER_REJECTED_METHODS",
+        },
+      });
+
+      await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
+      await queryClient.invalidateQueries({
+        queryKey: pendingProposalsQueryKey,
+      });
+      await navigate({
+        to: "/",
+        search: ({ uri: _, ...search }) => search,
+      });
+
+      redirectToDapp();
+    } catch (error) {
+      enqueueSnackbar(getErrorMessage(error), {
+        errorType: "Reject session authenticate error",
+        variant: "errorNotification",
+        anchorOrigin: {
+          vertical: "top",
+          horizontal: "right",
+        },
+      });
+      console.error(error);
+      await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
+      await queryClient.invalidateQueries({
+        queryKey: pendingProposalsQueryKey,
+      });
+    }
+  }, [navigate, oneClickAuthPayload, queryClient, redirectToDapp, walletKit]);
 
   const handleClose = useCallback(() => {
     void rejectSession();
@@ -534,6 +686,7 @@ export function useProposal(proposal: ProposalTypes.Struct) {
   return {
     approveSession,
     rejectSession,
+    rejectSessionAuthenticate,
     handleClose,
     handleClick,
     accounts: accounts.data,

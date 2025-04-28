@@ -23,6 +23,8 @@ import { useAtomValue } from "jotai";
 import VerificationLabel from "../verification/VerificationLabel";
 import VerificationCard from "../verification/VerificationCard";
 import useVerification from "@/hooks/useVerification";
+import { OneClickAuthPayload } from "@/types/types";
+import { ErrorBlockchainSupport } from "./sessionProposal/ErrorBlockchainSupport";
 
 const BackButton = styled(Flex)`
   cursor: pointer;
@@ -33,9 +35,14 @@ const BackButton = styled(Flex)`
 
 type Props = {
   proposal: ProposalTypes.Struct;
+  oneClickAuthPayload?: OneClickAuthPayload;
 };
 
-export default function SessionProposal({ proposal }: Props) {
+export default function SessionProposal({
+  proposal,
+  oneClickAuthPayload,
+}: Props) {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const { t } = useTranslation();
   const {
@@ -43,15 +50,16 @@ export default function SessionProposal({ proposal }: Props) {
     handleClose,
     approveSession,
     rejectSession,
+    rejectSessionAuthenticate,
     accounts,
     selectedAccounts,
     addNewAccounts,
     navigateToHome,
-  } = useProposal(proposal);
+  } = useProposal(proposal, oneClickAuthPayload);
   const analytics = useAnalytics();
   const dApp = proposal.proposer.metadata.name;
   const dAppUrl = proposal.proposer.metadata.url;
-  const currenciesById = useAtomValue(walletCurrenciesByIdAtom);
+  const isOneClickAuth = !!oneClickAuthPayload;
   const [approving, setApproving] = useState(false);
   const [rejecting, setRejecting] = useState(false);
 
@@ -94,10 +102,23 @@ export default function SessionProposal({ proposal }: Props) {
       url: dAppUrl,
     });
     setRejecting(true);
-    void rejectSession().finally(() => {
-      setRejecting(false);
-    });
-  }, [analytics, dApp, dAppUrl, rejectSession]);
+    if (isOneClickAuth) {
+      void rejectSessionAuthenticate().finally(() => {
+        setRejecting(false);
+      });
+    } else {
+      void rejectSession().finally(() => {
+        setRejecting(false);
+      });
+    }
+  }, [
+    analytics,
+    dApp,
+    dAppUrl,
+    isOneClickAuth,
+    rejectSession,
+    rejectSessionAuthenticate,
+  ]);
 
   const accountsByChain = useMemo(
     () => formatAccountsByChain(proposal, accounts),

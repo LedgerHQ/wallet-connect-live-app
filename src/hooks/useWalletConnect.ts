@@ -266,6 +266,23 @@ export default function useWalletConnect() {
     void queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
   }, [queryClient]);
 
+  const setOneClickAuthPayload = useSetAtom(oneClickAuthPayloadAtom);
+  const onSessionAuthenticate = useCallback(
+    (payload: OneClickAuthPayload) => {
+      setVerifyContextByTopic((verifyByTopic) => {
+        verifyByTopic[payload.topic] = payload.verifyContext!;
+        return verifyByTopic;
+      });
+
+      setOneClickAuthPayload(payload);
+      void navigate({
+        to: "/oneclickauth",
+        search: (search) => search,
+      });
+    },
+    [navigate, setOneClickAuthPayload, setVerifyContextByTopic],
+  );
+
   useEffect(() => {
     console.log("walletKit setup listeners");
     // TODO: handle session_request_expire
