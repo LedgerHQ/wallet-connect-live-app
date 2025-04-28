@@ -25,7 +25,35 @@ export async function handleBIP122Request(
   walletkit: IWalletKit,
 ) {
   switch (request.method) {
-    case BIP122_SIGNING_METHODS.BIP122_SIGN_MESSAGE_LEGACY:
+    case BIP122_SIGNING_METHODS.BIP122_SIGN_MESSAGE_LEGACY: {
+      const accountSign = getAccountWithAddressAndChainId(
+        accounts,
+        request.params.address,
+        chainId,
+      );
+      if (accountSign) {
+        try {
+          const message = request.params.message;
+          const signedMessage = await client.message.sign(
+            accountSign.id,
+            Buffer.from(message),
+          );
+          const result: BIP122_RESPONSES[typeof request.method] =
+            formatMessage(signedMessage);
+
+          await acceptRequest(walletkit, topic, id, result);
+        } catch (error) {
+          if (isCanceledError(error)) {
+            await rejectRequest(walletkit, topic, id, Errors.userDecline);
+          } else {
+            throw error;
+          }
+        }
+      } else {
+        await rejectRequest(walletkit, topic, id, Errors.userDecline);
+      }
+      break;
+    }
     case BIP122_SIGNING_METHODS.BIP122_SIGN_MESSAGE: {
       const accountSign = getAccountWithAddressAndChainId(
         accounts,
