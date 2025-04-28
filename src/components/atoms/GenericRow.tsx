@@ -1,6 +1,7 @@
 import { Flex, Text, Checkbox, Box } from "@ledgerhq/react-ui";
 import { ChevronRightMedium } from "@ledgerhq/react-ui/assets/icons";
 import styled from "styled-components";
+import { useTranslation } from "react-i18next";
 import { RowType } from "./types";
 
 type Props = {
@@ -25,7 +26,7 @@ const TextInfo = styled(Text)<{ isSelected: boolean }>`
 const Row = styled(Flex)<{ rowType: RowType; isSelected: boolean }>`
   border-radius: 12px;
   background-color: ${(props) =>
-    props.rowType === RowType.Switch && props.isSelected
+    props.rowType === RowType.Toggle && props.isSelected
       ? props.theme.colors.success.c10
       : props.theme.colors.neutral.c20};
   padding: 12px;
@@ -33,7 +34,7 @@ const Row = styled(Flex)<{ rowType: RowType; isSelected: boolean }>`
     props.rowType === RowType.Default ? "default" : "pointer"};
   &:hover {
     background-color: ${(props) =>
-      props.rowType === RowType.Switch &&
+      props.rowType === RowType.Toggle &&
       !props.isSelected &&
       props.theme.colors.neutral.c30};
   }
@@ -49,6 +50,8 @@ export function GenericRow({
   onClick,
   rowType,
 }: Readonly<Props>) {
+  const { t } = useTranslation();
+
   return (
     <Row
       justifyContent="space-between"
@@ -78,9 +81,9 @@ export function GenericRow({
         </Flex>
       </Flex>
 
-      {rowType === RowType.Switch && isSelected && (
+      {rowType === RowType.Toggle && isSelected && (
         <TextInfo mr={5} isSelected={isSelected}>
-          Main account
+          {t("sessions.detail.mainAccount")}
         </TextInfo>
       )}
 

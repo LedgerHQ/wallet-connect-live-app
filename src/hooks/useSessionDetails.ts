@@ -32,7 +32,6 @@ export function useSessionDetails(session: SessionTypes.Struct) {
   const walletKit = useAtomValue(walletKitAtom);
   const analytics = useAnalytics();
   const [mainAccount, setMainAccount] = useState<Account>();
-  const [editingSession, setEditingSession] = useState(false);
   const setShowModal = useSetAtom(showBackToBrowserModalAtom);
   const [updating, setUpdating] = useState(false);
   const [disconnecting, setDisconnecting] = useState(false);
@@ -201,7 +200,12 @@ export function useSessionDetails(session: SessionTypes.Struct) {
       });
     } finally {
       setUpdating(false);
-      setEditingSession(false);
+      void navigate({
+        from: "/detail/$topic/edit",
+        to: "/detail/$topic",
+        params: { topic: session.topic },
+        search: ({ uri: _, ...search }) => search,
+      });
     }
   }, [
     selectedAccounts.length,
@@ -211,6 +215,7 @@ export function useSessionDetails(session: SessionTypes.Struct) {
     walletKit,
     queryClient,
     sessionsQueryFn,
+    navigate,
   ]);
 
   const handleSwitch = useCallback(
@@ -334,8 +339,6 @@ export function useSessionDetails(session: SessionTypes.Struct) {
     selectedAccounts,
     navigateToHome,
     sessionAccounts,
-    editingSession,
-    setEditingSession,
     mainAccount,
     setMainAccount,
     handleSwitch,
