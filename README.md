@@ -211,4 +211,3 @@ You can follow [this procress](https://docs.google.com/document/d/179QyFKLyTYlwJ
 
 - WalletConnect [Github](https://github.com/walletconnect/walletconnect-monorepo/)
 - WalletConnect [Doc](https://docs.walletconnect.com/2.0)
-- WalletConnect Testing [DApp](https://appkit-lab.reown.com/library/wagmi-siwe/)
