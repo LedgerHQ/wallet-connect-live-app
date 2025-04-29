@@ -69,7 +69,7 @@ export default function SessionDetail({ session }: Props) {
     return navigate({
       to: "/detail/$topic/edit",
       params: { topic: session.topic },
-      search: ({ uri: _, ...search }) => search,
+      search: (search) => search,
     });
   }, [navigate, session.topic]);
 
