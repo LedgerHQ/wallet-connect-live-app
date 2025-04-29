@@ -10,6 +10,7 @@ import {
   loadingAtom,
   showBackToBrowserModalAtom,
   verifyContextByTopicAtom,
+  oneClickAuthPayloadAtom,
 } from "@/store/walletKit.store";
 import {
   isEIP155Chain,
@@ -34,6 +35,7 @@ import { handleXrpRequest } from "./requestHandlers/Ripple";
 import { Errors, rejectRequest } from "./requestHandlers/utils";
 import { handleWalletRequest } from "./requestHandlers/Wallet";
 import { isWalletRequest } from "../utils/helper.util";
+import { OneClickAuthPayload } from "@/types/types";
 
 function useWalletConnectStatus() {
   const core = useAtomValue(coreAtom);
@@ -266,6 +268,23 @@ export default function useWalletConnect() {
     void queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
   }, [queryClient]);
 
+  const setOneClickAuthPayload = useSetAtom(oneClickAuthPayloadAtom);
+  const onSessionAuthenticate = useCallback(
+    (payload: OneClickAuthPayload) => {
+      setVerifyContextByTopic((verifyByTopic) => {
+        verifyByTopic[payload.topic] = payload.verifyContext!;
+        return verifyByTopic;
+      });
+
+      setOneClickAuthPayload(payload);
+      void navigate({
+        to: "/oneclickauth",
+        search: (search) => search,
+      });
+    },
+    [navigate, setOneClickAuthPayload, setVerifyContextByTopic],
+  );
+
   useEffect(() => {
     console.log("walletKit setup listeners");
     // TODO: handle session_request_expire
@@ -276,6 +295,7 @@ export default function useWalletConnect() {
     walletKit.on("session_proposal", onSessionProposal);
     walletKit.on("session_request", onSessionRequest);
     walletKit.on("session_delete", onSessionDeleted);
+    walletKit.on("session_authenticate", onSessionAuthenticate);
 
     // auth
     // walletKit.on("auth_request", onAuthRequest);
@@ -286,6 +306,7 @@ export default function useWalletConnect() {
       walletKit.off("session_proposal", onSessionProposal);
       walletKit.off("session_request", onSessionRequest);
       walletKit.off("session_delete", onSessionDeleted);
+      walletKit.off("session_authenticate", onSessionAuthenticate);
 
       // auth
       // walletKit.off("auth_request", onAuthRequest);
@@ -296,5 +317,6 @@ export default function useWalletConnect() {
     onSessionRequest,
     onSessionDeleted,
     onProposalExpire,
+    onSessionAuthenticate,
   ]);
 }

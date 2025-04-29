@@ -5,12 +5,14 @@ import { detailRoute } from "@/routes/detail";
 import { proposalRoute } from "@/routes/proposalRoute";
 import { protocolNotSupportedRoute } from "@/routes/protocolNotSupportedRoute";
 import { connectRoute } from "@/routes/connect";
+import { oneClickAuthRoute } from "@/routes/oneClickAuthRoute";
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
   connectRoute,
   detailRoute,
   proposalRoute,
+  oneClickAuthRoute,
   protocolNotSupportedRoute,
 ]);
 
