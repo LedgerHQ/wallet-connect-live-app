@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { getErrorMessage } from "@/utils/helper.util";
+import { getAccountWithAddressAndChainId } from "@/utils/generic";
 import useAnalytics from "@/hooks/useAnalytics";
-import { getAccountWithAddress } from "@/utils/generic";
 import {
   buildApprovedNamespaces,
   buildAuthObject,
@@ -154,16 +154,22 @@ export function useProposal(
       });
 
       const firstAccount = accs[0];
+      const [namespace, chainId, addr] = firstAccount.split(":");
 
       const message = walletKit.formatAuthMessage({
         request: authPayload,
         iss: firstAccount,
       });
 
-      const accountSign = getAccountWithAddress(
+      const accountSign = getAccountWithAddressAndChainId(
         accounts.data,
-        firstAccount.split(":").at(-1)!,
-      )!;
+        addr,
+        `${namespace}:${chainId}`,
+      );
+
+      if (!accountSign) {
+        throw new Error("Account not found");
+      }
 
       const signature = await client.message.sign(
         accountSign.id,
