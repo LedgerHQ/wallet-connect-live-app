@@ -130,18 +130,6 @@ export async function handleWalletRequest(
               },
             });
           }
-        } else {
-          const account = _accounts.find((acc) => acc.id.startsWith(newChain));
-          if (account) {
-            return walletKit.respondSessionRequest({
-              topic,
-              response: {
-                id,
-                jsonrpc: "2.0",
-                result: null,
-              },
-            });
-          }
         }
       }
       await rejectRequest(walletKit, topic, id, Errors.txDeclined);
