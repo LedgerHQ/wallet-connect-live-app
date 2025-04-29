@@ -36,7 +36,7 @@ const convertPayloadToFakeProposal = (
   };
 };
 
-export const oneCllickAuthRoute = createRoute({
+export const oneClickAuthRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/oneclickauth",
   component: function Proposal() {
