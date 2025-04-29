@@ -76,9 +76,6 @@ export function useProposal(proposal: ProposalTypes.Struct) {
       const session = await walletKit.approveSession({
         id: proposal.id,
         namespaces: approvedNs,
-        sessionProperties: {
-          supportedNs: JSON.stringify(supportedNs),
-        },
       });
       await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
       await queryClient.invalidateQueries({

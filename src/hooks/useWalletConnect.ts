@@ -166,8 +166,6 @@ export default function useWalletConnect() {
         verifyContext,
       } = requestEvent;
 
-      console.log("RequestEvent de chez onSessionRequest", requestEvent);
-
       setVerifyContextByTopic((verifyByTopic) => {
         verifyByTopic[topic] = verifyContext;
         return verifyByTopic;

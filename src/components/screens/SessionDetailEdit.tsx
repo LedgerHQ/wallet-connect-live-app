@@ -55,9 +55,9 @@ export default function DetailEdit({ session }: Props) {
   );
 
   const entries = useMemo(() => {
-    return accountsByChain
-      .filter((entry) => entry.isSupported)
-      .filter((entry) => entry.accounts.length > 0);
+    return accountsByChain.filter(
+      (entry) => entry.isSupported && entry.accounts.length > 0,
+    );
   }, [accountsByChain]);
 
   return (

@@ -96,8 +96,6 @@ export async function handleWalletRequest(
         const namespace = chainId.split(":")[0];
         const newChain = getNamespace(network);
 
-        console.log("request de chez request", request);
-
         const accountPresent = session.namespaces[namespace]?.accounts.some(
           (account) => account.startsWith(newChain),
         );
@@ -123,7 +121,6 @@ export async function handleWalletRequest(
                 },
               },
             });
-            // setMainAccount(account);
             return walletKit.respondSessionRequest({
               topic,
               response: {
@@ -136,7 +133,6 @@ export async function handleWalletRequest(
         } else {
           const account = _accounts.find((acc) => acc.id.startsWith(newChain));
           if (account) {
-            // setMainAccount(account);
             return walletKit.respondSessionRequest({
               topic,
               response: {

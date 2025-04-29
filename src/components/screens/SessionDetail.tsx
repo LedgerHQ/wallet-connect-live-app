@@ -101,7 +101,7 @@ export default function SessionDetail({ session }: Props) {
           <Flex flexDirection="column" width="100%">
             <DetailHeader session={session} onGoBack={onGoBack} />
 
-            {sessionAccounts.length > 0 && (
+            {sessionAccounts.length > 0 ? (
               <>
                 <Flex
                   flexDirection="row"
@@ -181,7 +181,7 @@ export default function SessionDetail({ session }: Props) {
                   </Box>
                 </CustomList>
               </>
-            )}
+            ) : null}
           </Flex>
 
           <ButtonsContainer mt={5}>
