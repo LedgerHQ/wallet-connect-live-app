@@ -316,6 +316,7 @@ export function useSupportedNamespaces(
   );
 
   return {
+    buildEip155Namespace,
     buildSupportedNamespaces,
   };
 }
