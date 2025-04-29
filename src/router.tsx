@@ -6,6 +6,7 @@ import { detailEditRoute } from "@/routes/detailEditRoute";
 import { proposalRoute } from "@/routes/proposalRoute";
 import { protocolNotSupportedRoute } from "@/routes/protocolNotSupportedRoute";
 import { connectRoute } from "@/routes/connect";
+import { oneClickAuthRoute } from "@/routes/oneClickAuthRoute";
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
@@ -13,6 +14,7 @@ const routeTree = rootRoute.addChildren([
   detailRoute,
   detailEditRoute,
   proposalRoute,
+  oneClickAuthRoute,
   protocolNotSupportedRoute,
 ]);
 

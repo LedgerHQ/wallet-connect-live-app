@@ -23,6 +23,7 @@ import { useAtomValue } from "jotai";
 import VerificationLabel from "../verification/VerificationLabel";
 import VerificationCard from "../verification/VerificationCard";
 import useVerification from "@/hooks/useVerification";
+import { OneClickAuthPayload } from "@/types/types";
 
 const BackButton = styled(Flex)`
   cursor: pointer;
@@ -33,22 +34,29 @@ const BackButton = styled(Flex)`
 
 type Props = {
   proposal: ProposalTypes.Struct;
+  oneClickAuthPayload?: OneClickAuthPayload;
 };
 
-export default function SessionProposal({ proposal }: Props) {
-  const { colors } = useTheme();
+export default function SessionProposal({
+  proposal,
+  oneClickAuthPayload,
+}: Props) {
   const { t } = useTranslation();
+  const { colors } = useTheme();
   const {
     handleClick,
     handleClose,
     approveSession,
+    approveSessionAuthenticate,
     rejectSession,
+    rejectSessionAuthenticate,
     accounts,
     selectedAccounts,
     addNewAccounts,
     navigateToHome,
-  } = useProposal(proposal);
+  } = useProposal(proposal, oneClickAuthPayload);
   const analytics = useAnalytics();
+  const isOneClickAuth = !!oneClickAuthPayload;
   const dApp = proposal.proposer.metadata.name;
   const dAppUrl = proposal.proposer.metadata.url;
   const currenciesById = useAtomValue(walletCurrenciesByIdAtom);
@@ -81,10 +89,23 @@ export default function SessionProposal({ proposal }: Props) {
       url: dAppUrl,
     });
     setApproving(true);
-    void approveSession().finally(() => {
-      setApproving(false);
-    });
-  }, [analytics, approveSession, dApp, dAppUrl]);
+    if (isOneClickAuth) {
+      void approveSessionAuthenticate().finally(() => {
+        setApproving(false);
+      });
+    } else {
+      void approveSession().finally(() => {
+        setApproving(false);
+      });
+    }
+  }, [
+    analytics,
+    approveSession,
+    approveSessionAuthenticate,
+    dApp,
+    dAppUrl,
+    isOneClickAuth,
+  ]);
 
   const onReject = useCallback(() => {
     analytics.track("button_clicked", {
@@ -94,10 +115,23 @@ export default function SessionProposal({ proposal }: Props) {
       url: dAppUrl,
     });
     setRejecting(true);
-    void rejectSession().finally(() => {
-      setRejecting(false);
-    });
-  }, [analytics, dApp, dAppUrl, rejectSession]);
+    if (isOneClickAuth) {
+      void rejectSessionAuthenticate().finally(() => {
+        setRejecting(false);
+      });
+    } else {
+      void rejectSession().finally(() => {
+        setRejecting(false);
+      });
+    }
+  }, [
+    analytics,
+    dApp,
+    dAppUrl,
+    isOneClickAuth,
+    rejectSession,
+    rejectSessionAuthenticate,
+  ]);
 
   const accountsByChain = useMemo(
     () => formatAccountsByChain(proposal, accounts),
