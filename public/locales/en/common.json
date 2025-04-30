@@ -95,6 +95,9 @@
       "title": "Session details",
       "account": "Account",
       "accounts": "Accounts",
+      "mainAccount": "Main account",
+      "editSession": "Edit session",
+      "confirm": "Confirm",
       "connected": "Connected",
       "expires": "Expires",
       "disconnect": "Disconnect"

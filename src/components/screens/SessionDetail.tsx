@@ -1,9 +1,4 @@
-import {
-  getCurrencyByChainId,
-  formatUrl,
-  truncate,
-  getDisplayName,
-} from "@/utils/helper.util";
+import { truncate, getDisplayName } from "@/utils/helper.util";
 import {
   Box,
   Button,
@@ -12,9 +7,7 @@ import {
   InfiniteLoader,
   Text,
 } from "@ledgerhq/react-ui";
-import { enqueueSnackbar } from "notistack";
-import { ArrowLeftMedium } from "@ledgerhq/react-ui/assets/icons";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { Account } from "@ledgerhq/wallet-api-client";
@@ -25,73 +18,20 @@ import {
   ButtonsContainer,
   List,
   ListItem,
-  Row,
 } from "@/components/atoms/containers/Elements";
 import { ResponsiveContainer } from "@/styles/styles";
-import { ImageWithPlaceholder } from "@/components/atoms/images/ImageWithPlaceholder";
 import useAnalytics from "@/hooks/useAnalytics";
 import { useNavigate } from "@tanstack/react-router";
 import { useAtomValue } from "jotai";
-import { walletKitAtom } from "@/store/walletKit.store";
-import { queryKey as sessionsQueryKey } from "@/hooks/useSessions";
-import useAccounts from "@/hooks/useAccounts";
-import {
-  walletAPIClientAtom,
-  walletCurrenciesByIdAtom,
-} from "@/store/wallet-api.store";
-import { useQueryClient } from "@tanstack/react-query";
+import { walletCurrenciesByIdAtom } from "@/store/wallet-api.store";
 import { SessionTypes } from "@walletconnect/types";
-import { getErrorMessage } from "@/utils/helper.util";
 import { AccountBalance } from "../atoms/AccountBalance";
-
-const DetailContainer = styled(Flex)`
-  border-radius: 12px;
-  background-color: ${(props) => props.theme.colors.neutral.c20};
-  padding: 12px;
-  flex-direction: column;
-`;
-const BackButton = styled(Flex)`
-  cursor: pointer;
-  &:hover {
-    opacity: 0.7;
-  }
-`;
+import { useSessionDetails } from "@/hooks/useSessionDetails";
+import DetailHeader from "../atoms/DetailHeader";
 
 const CustomList = styled(Flex)`
   flex-direction: column;
 `;
-
-const getAccountsFromAddresses = (addresses: string[], accounts: Account[]) => {
-  const accountsByChain = new Map<string, Account[]>();
-
-  addresses.forEach((addr) => {
-    const addrSplitted = addr.split(":");
-    const chain = getCurrencyByChainId(`${addrSplitted[0]}:${addrSplitted[1]}`);
-    let chainInLedgerLive = chain;
-
-    if (chain.startsWith("mvx")) {
-      chainInLedgerLive = "elrond";
-    }
-
-    if (chain.startsWith("xrpl")) {
-      chainInLedgerLive = "ripple";
-    }
-
-    const existingEntry = accountsByChain.get(chainInLedgerLive);
-
-    const account = accounts.find(
-      (a) => a.address === addrSplitted[2] && chainInLedgerLive === a.currency,
-    );
-
-    if (account) {
-      accountsByChain.set(
-        chain,
-        existingEntry ? [...existingEntry, account] : [account],
-      );
-    }
-  });
-  return Array.from(accountsByChain);
-};
 
 type Props = {
   session: SessionTypes.Struct;
@@ -99,14 +39,16 @@ type Props = {
 
 export default function SessionDetail({ session }: Props) {
   const { t } = useTranslation();
+  const {
+    sessionAccounts,
+    mainAccount,
+    handleSwitch,
+    handleDelete,
+    disconnecting,
+  } = useSessionDetails(session);
   const navigate = useNavigate({ from: "/detail/$topic" });
-  const queryClient = useQueryClient();
-  const client = useAtomValue(walletAPIClientAtom);
-  const accounts = useAccounts(client);
-  const walletKit = useAtomValue(walletKitAtom);
   const analytics = useAnalytics();
   const currenciesById = useAtomValue(walletCurrenciesByIdAtom);
-  const [disconnecting, setDisconnecting] = useState(false);
 
   useEffect(() => {
     analytics.page("Wallet Connect Session Detail", {
@@ -123,41 +65,13 @@ export default function SessionDetail({ session }: Props) {
     });
   }, [navigate]);
 
-  const handleDelete = useCallback(() => {
-    setDisconnecting(true);
-    void walletKit
-      .disconnectSession({
-        topic: session.topic,
-        reason: {
-          code: 3,
-          message: "Disconnect Session",
-        },
-      })
-      .then(() => {
-        analytics.track("button_clicked", {
-          button: "WC-Disconnect Session",
-          page: "Wallet Connect Session Detail",
-        });
-        void queryClient
-          .invalidateQueries({ queryKey: sessionsQueryKey })
-          .then(() => navigateToHome());
-      })
-      .catch((error) => {
-        setDisconnecting(false);
-        enqueueSnackbar(getErrorMessage(error), {
-          errorType: "Disconnect session error",
-          variant: "errorNotification",
-          anchorOrigin: {
-            vertical: "top",
-            horizontal: "right",
-          },
-        });
-        console.error(error);
-        void queryClient.invalidateQueries({
-          queryKey: sessionsQueryKey,
-        });
-      });
-  }, [analytics, navigateToHome, queryClient, session, walletKit]);
+  const navigateToEdit = useCallback(() => {
+    return navigate({
+      to: "/detail/$topic/edit",
+      params: { topic: session.topic },
+      search: (search) => search,
+    });
+  }, [navigate, session.topic]);
 
   const onGoBack = useCallback(() => {
     void navigateToHome();
@@ -166,21 +80,6 @@ export default function SessionDetail({ session }: Props) {
       page: "Wallet Connect Session Detail",
     });
   }, [analytics, navigateToHome]);
-
-  const metadata = session.peer.metadata;
-  const fullAddresses = useMemo(
-    () =>
-      Object.entries(session.namespaces).reduce(
-        (acc, elem) => acc.concat(elem[1].accounts),
-        [] as string[],
-      ),
-    [session],
-  );
-
-  const sessionAccounts = useMemo(
-    () => getAccountsFromAddresses(fullAddresses, accounts.data),
-    [accounts.data, fullAddresses],
-  );
 
   return (
     <Flex
@@ -200,73 +99,40 @@ export default function SessionDetail({ session }: Props) {
           justifyContent="space-between"
         >
           <Flex flexDirection="column" width="100%">
-            <Flex mt={8} mb={8} alignItems="center">
-              <BackButton onClick={onGoBack}>
-                <ArrowLeftMedium size={24} color="neutral.c100" />
-              </BackButton>
+            <DetailHeader session={session} onGoBack={onGoBack} />
 
-              <Text variant="h3" ml={5} color="neutral.c100">
-                {t("sessions.detail.title")}
-              </Text>
-            </Flex>
-
-            <DetailContainer>
-              <Row justifyContent="space-between" alignItems="center">
+            {sessionAccounts.length > 0 ? (
+              <>
                 <Flex
                   flexDirection="row"
                   justifyContent="space-between"
                   alignItems="center"
+                  mt={4}
                 >
-                  <ImageWithPlaceholder icon={metadata.icons[0]} />
+                  <Text variant="h4" color="neutral.c100">
+                    {t("sessions.detail.accounts")}
+                  </Text>
 
-                  <Flex flexDirection="column" ml={5}>
-                    <Text
-                      variant="body"
-                      fontWeight="semiBold"
-                      color="neutral.c100"
-                    >
-                      {metadata.name}
-                    </Text>
-
-                    <Text
-                      variant="small"
-                      fontWeight="medium"
-                      color="neutral.c70"
-                      mt={1}
-                    >
-                      {formatUrl(metadata.url)}
-                    </Text>
+                  <Flex>
+                    <ButtonsContainer>
+                      <Button
+                        variant="shade"
+                        size="medium"
+                        flex={1}
+                        onClick={() => void navigateToEdit()}
+                      >
+                        <Text
+                          variant="small"
+                          fontWeight="semiBold"
+                          color="neutral.c100"
+                        >
+                          {t("sessions.detail.editSession")}
+                        </Text>
+                      </Button>
+                    </ButtonsContainer>
                   </Flex>
                 </Flex>
-              </Row>
 
-              <Row mt={10} justifyContent="space-between" alignItems="center">
-                <Text variant="small" fontWeight="medium" color="neutral.c100">
-                  {t("sessions.detail.connected")}
-                </Text>
-
-                <Text variant="small" fontWeight="medium" color="neutral.c70">
-                  {new Date().toDateString()}
-                </Text>
-              </Row>
-              <Row mt={6} justifyContent="space-between" alignItems="center">
-                <Text variant="small" fontWeight="medium" color="neutral.c100">
-                  {t("sessions.detail.expires")}
-                </Text>
-                <Text variant="small" fontWeight="medium" color="neutral.c70">
-                  {
-                    //https://stackoverflow.com/a/37001827
-                    new Date(session.expiry * 1000).toDateString()
-                  }
-                </Text>
-              </Row>
-            </DetailContainer>
-
-            {sessionAccounts.length > 0 ? (
-              <>
-                <Text variant="h4" mt={8} mb={6} color="neutral.c100">
-                  {t("sessions.detail.accounts")}
-                </Text>
                 <CustomList>
                   {sessionAccounts.map(([chain, accounts]) => {
                     return (
@@ -284,6 +150,8 @@ export default function SessionDetail({ session }: Props) {
                             return (
                               <ListItem key={account.id}>
                                 <GenericRow
+                                  isSelected={mainAccount?.id === account.id}
+                                  onClick={() => void handleSwitch(account)}
                                   title={account.name}
                                   subtitle={truncate(account.address, 10)}
                                   rightElement={AccountBalance({
@@ -298,7 +166,7 @@ export default function SessionDetail({ session }: Props) {
                                       color={currency.color}
                                     />
                                   }
-                                  rowType={RowType.Default}
+                                  rowType={RowType.Toggle}
                                 />
                               </ListItem>
                             );
@@ -315,6 +183,7 @@ export default function SessionDetail({ session }: Props) {
               </>
             ) : null}
           </Flex>
+
           <ButtonsContainer mt={5}>
             <Button
               variant="shade"

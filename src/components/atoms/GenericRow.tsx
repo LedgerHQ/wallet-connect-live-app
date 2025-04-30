@@ -1,6 +1,7 @@
 import { Flex, Text, Checkbox, Box } from "@ledgerhq/react-ui";
 import { ChevronRightMedium } from "@ledgerhq/react-ui/assets/icons";
 import styled from "styled-components";
+import { useTranslation } from "react-i18next";
 import { RowType } from "./types";
 
 type Props = {
@@ -14,12 +15,29 @@ type Props = {
   rowType: RowType;
 };
 
-const Row = styled(Flex)<{ rowType: RowType }>`
+const TextInfo = styled(Text)<{ isSelected: boolean }>`
+  margin-right: 12px;
+  color: ${(props) => props.theme.colors.success.c50};
+  &:hover {
+    visibility: ${(props) => (props.isSelected ? "visible" : "hidden")};
+  }
+`;
+
+const Row = styled(Flex)<{ rowType: RowType; isSelected: boolean }>`
   border-radius: 12px;
-  background-color: ${(props) => props.theme.colors.neutral.c20};
+  background-color: ${(props) =>
+    props.rowType === RowType.Toggle && props.isSelected
+      ? props.theme.colors.success.c10
+      : props.theme.colors.neutral.c20};
   padding: 12px;
   cursor: ${(props) =>
     props.rowType === RowType.Default ? "default" : "pointer"};
+  &:hover {
+    background-color: ${(props) =>
+      props.rowType === RowType.Toggle &&
+      !props.isSelected &&
+      props.theme.colors.neutral.c30};
+  }
 `;
 
 export function GenericRow({
@@ -32,12 +50,15 @@ export function GenericRow({
   onClick,
   rowType,
 }: Readonly<Props>) {
+  const { t } = useTranslation();
+
   return (
     <Row
       justifyContent="space-between"
       onClick={rowType === RowType.Default ? undefined : onClick}
       rowType={rowType}
       alignItems="center"
+      isSelected={isSelected}
     >
       <Flex flexDirection="row" columnGap={3} flex={1}>
         {LeftIcon && <Box mr={2}>{LeftIcon}</Box>}
@@ -59,6 +80,12 @@ export function GenericRow({
           </Flex>
         </Flex>
       </Flex>
+
+      {rowType === RowType.Toggle && isSelected && (
+        <TextInfo mr={5} isSelected={isSelected}>
+          {t("sessions.detail.mainAccount")}
+        </TextInfo>
+      )}
 
       <Flex
         alignItems="center"

@@ -1,7 +1,7 @@
 import { SUPPORTED_NETWORK } from "@/data/network.config";
 import { getCurrencyByChainId, getDisplayName } from "@/utils/helper.util";
 import { Account } from "@ledgerhq/wallet-api-client";
-import { ProposalTypes } from "@walletconnect/types";
+import { ProposalTypes, SessionTypes } from "@walletconnect/types";
 
 export type AccountsInChain = {
   chain: string;
@@ -41,7 +41,9 @@ export function sortChains(chains: AccountsInChain[]) {
   return newOrder;
 }
 
-export const getChains = (proposal: ProposalTypes.Struct) => {
+export const getChains = (
+  proposal: ProposalTypes.Struct | SessionTypes.Struct,
+) => {
   const requiredNamespaces = Object.values(proposal.requiredNamespaces).map(
     (namespace) => ({
       ...namespace,
@@ -59,7 +61,7 @@ export const getChains = (proposal: ProposalTypes.Struct) => {
 };
 
 export const formatAccountsByChain = (
-  proposal: ProposalTypes.Struct,
+  proposal: ProposalTypes.Struct | SessionTypes.Struct,
   accounts: Account[],
 ) => {
   const families = getChains(proposal);
