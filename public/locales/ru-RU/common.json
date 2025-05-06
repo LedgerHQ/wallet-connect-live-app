@@ -95,6 +95,9 @@
       "title" : "Детали сессии",
       "account" : "Счёт",
       "accounts" : "Счета",
+      "mainAccount" : "Основной счёт",
+      "editSession" : "Редактировать сессию",
+      "confirm" : "Подтвердить",
       "connected" : "Подключено",
       "expires" : "Истекает",
       "disconnect" : "Отключить"
