@@ -95,6 +95,9 @@
       "title" : "تفاصيل الجلسة",
       "account" : "الحساب",
       "accounts" : "الحسابات",
+      "mainAccount" : "الحساب الرئيسي",
+      "editSession" : "تعديل الجلسة",
+      "confirm" : "تأكيد",
       "connected" : "متصل",
       "expires" : "تنتهي صلاحيته",
       "disconnect" : "قطع الاتصال"
