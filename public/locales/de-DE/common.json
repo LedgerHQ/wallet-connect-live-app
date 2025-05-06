@@ -95,6 +95,9 @@
       "title" : "Sitzungsdetails",
       "account" : "Konto",
       "accounts" : "Konten",
+      "mainAccount" : "Hauptkonto",
+      "editSession" : "Session bearbeiten",
+      "confirm" : "Bestätigen",
       "connected" : "Verbunden",
       "expires" : "Läuft ab",
       "disconnect" : "Trennen"

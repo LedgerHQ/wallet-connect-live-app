@@ -95,6 +95,9 @@
       "title" : "Oturum ayrıntıları",
       "account" : "Hesap",
       "accounts" : "Hesaplar",
+      "mainAccount" : "Ana hesap",
+      "editSession" : "Oturumu düzenle",
+      "confirm" : "Onayla",
       "connected" : "Bağlandı",
       "expires" : "Sona erme tarihi:",
       "disconnect" : "Bağlantıyı Kes"

@@ -11,7 +11,7 @@
   "close" : "ปิด",
   "error" : {
     "noInput" : "ไม่มีค่าอินพุต",
-    "invalidUri" : "URI ไม่ถูกต้อง"
+    "invalidUri" : "URL ไม่ถูกต้อง"
   },
   "connect" : {
     "title" : "เชื่อมต่อกับแอปเพื่อเริ่มต้น",
@@ -95,6 +95,9 @@
       "title" : "รายละเอียดเซสชั่น",
       "account" : "บัญชี",
       "accounts" : "บัญชี",
+      "mainAccount" : "บัญชีหลัก",
+      "editSession" : "แก้ไขเซสชัน",
+      "confirm" : "ยืนยัน",
       "connected" : "เชื่อมต่อแล้ว!",
       "expires" : "หมดอายุ",
       "disconnect" : "ยกเลิกการเชื่อมต่อ"

@@ -95,6 +95,9 @@
       "title" : "세션 세부 정보",
       "account" : "계정",
       "accounts" : "계정",
+      "mainAccount" : "메인 계정",
+      "editSession" : "세션 편집",
+      "confirm" : "확인",
       "connected" : "연결됨",
       "expires" : "만료",
       "disconnect" : "연결 해제"

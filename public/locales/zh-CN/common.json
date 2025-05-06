@@ -95,6 +95,9 @@
       "title" : "会话详情",
       "account" : "账户",
       "accounts" : "账户",
+      "mainAccount" : "主账户",
+      "editSession" : "编辑会话",
+      "confirm" : "确认",
       "connected" : "已连接",
       "expires" : "过期",
       "disconnect" : "断开连接"
