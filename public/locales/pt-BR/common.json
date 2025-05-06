@@ -95,6 +95,9 @@
       "title" : "Detalhes da sessão",
       "account" : "Conta",
       "accounts" : "Contas",
+      "mainAccount" : "Conta principal",
+      "editSession" : "Editar sessão",
+      "confirm" : "Confirmar",
       "connected" : "Conectado",
       "expires" : "Expira em",
       "disconnect" : "Desconectar"
