@@ -8122,7 +8122,7 @@ snapshots:
 
   c32check@2.0.0:
     dependencies:
-      '@noble/hashes': 1.7.0
+      '@noble/hashes': 1.8.0
       base-x: 4.0.0
 
   cac@6.7.14: {}
