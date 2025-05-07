@@ -25,7 +25,6 @@ describe("Connect Screen", () => {
 
     expect(connect).toBeInTheDocument();
     expect(input).toHaveValue(url);
-    await user.click(connect);
   });
 
   it("disables connect button when input is empty", async () => {

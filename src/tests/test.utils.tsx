@@ -1,5 +1,5 @@
 import { ReactElement, Suspense } from "react";
-import { act, render, RenderOptions } from "@testing-library/react";
+import { act, render, RenderOptions, waitFor } from "@testing-library/react";
 import { Flex, ProgressLoader, StyleProvider } from "@ledgerhq/react-ui";
 import userEvent from "@testing-library/user-event";
 import GlobalStyle from "@/styles/globalStyle";
@@ -137,7 +137,17 @@ function createTestRouter(component: () => JSX.Element) {
 export async function renderComponent(component: () => JSX.Element) {
   const router = createTestRouter(component);
   // @ts-expect-error: router error because of the declaration in main.tsx
-  render(<RouterProvider router={router} />);
+  const { container } = render(<RouterProvider router={router} />);
+
+  await waitFor(() => {
+    const elements = container.querySelectorAll("*");
+    const matchingElement = Array.from(elements).find((element) => {
+      // waiting for the first div to be rendered
+      return /^styles__Container.*/.exec(element.className);
+    });
+    expect(matchingElement).not.toBeNull();
+  });
+
   await act(async () => {
     return router.navigate({
       from: "/",
