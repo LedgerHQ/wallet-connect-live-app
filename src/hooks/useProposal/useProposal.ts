@@ -3,15 +3,6 @@ import { getErrorMessage } from "@/utils/helper.util";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
 import useAnalytics from "@/hooks/useAnalytics";
 import {
-  BIP122_CHAINS,
-  EIP155_CHAINS,
-  MULTIVERS_X_CHAINS,
-  RIPPLE_CHAINS,
-  SOLANA_CHAINS,
-  SupportedNamespace,
-} from "@/data/network.config";
-import {
-  BuildApprovedNamespacesParams,
   buildApprovedNamespaces,
   buildAuthObject,
   populateAuthPayload,
