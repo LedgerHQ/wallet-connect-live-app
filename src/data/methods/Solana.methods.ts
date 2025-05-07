@@ -1,5 +1,3 @@
-import { SolanaTransaction } from "@/utils/converters";
-
 /**
  * Methods
  */

@@ -1,13 +1,8 @@
-import {
-  SOLANA_REQUESTS,
-  SOLANA_SIGNING_METHODS,
-} from "@/data/methods/Solana.methods";
+import { SOLANA_SIGNING_METHODS } from "@/data/methods/Solana.methods";
 import { handleSolanaRequest } from "./Solana";
 import { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import type { IWalletKit } from "@reown/walletkit";
-import { PublicKey } from "@solana/web3.js";
 import { vi } from "vitest";
-import * as Utils from "./utils";
 import * as signTransactionModule from "./signTransaction/signTransaction";
 import * as signMessageModule from "./signMessage/signMessage";
 
@@ -65,7 +60,8 @@ describe("Testing Solana request handler mapping", () => {
     const request = {
       method: SOLANA_SIGNING_METHODS.SOLANA_SIGNMESSAGE,
       params: {
-        transaction: "some random transaction",
+        message: "some random message",
+        pubkey: "some random public key",
       },
     };
     const accounts: Account[] = [];
