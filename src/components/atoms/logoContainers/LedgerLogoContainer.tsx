@@ -29,8 +29,8 @@ const LiveAppLogoContainer = styled(Flex).attrs(() => ({
   color: ${(p) => p.theme.colors.neutral.c100};
   background-color: ${(p) => p.theme.colors.background.drawer};
   box-shadow: 0 2px 24px 0 #00000014;
-  width: ${(p) => (p.width ? p.width : "60px")};
-  height: ${(p) => (p.height ? p.height : "60px")};
+  width: ${(p) => p.width ?? "60px"};
+  height: ${(p) => p.height ?? "60px"};
 `;
 
 export default LogoContainer;

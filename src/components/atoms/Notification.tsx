@@ -15,6 +15,22 @@ declare module "notistack" {
   }
 }
 
+type Stringifiable = {
+  toString: () => string;
+};
+
+function hasToStringMethod(obj: unknown): obj is Stringifiable {
+  return (
+    typeof obj === "object" &&
+    obj !== null &&
+    typeof (obj as Stringifiable).toString === "function"
+  );
+}
+
+function toString(obj: unknown): string {
+  return hasToStringMethod(obj) ? obj.toString() : "";
+}
+
 const warningBadge = (
   <Notification.Badge
     color="warning.c50"
@@ -47,7 +63,7 @@ export const ErrorNotification = React.forwardRef<
         badge={warningBadge}
         hasBackground={true}
         title={errorType}
-        description={message?.toString() ?? ""}
+        description={toString(message)}
         role="alert"
       />
     </SnackbarContent>
@@ -78,7 +94,7 @@ export const ConnectionNotification = React.forwardRef<
       <Box width="100%">
         <Alert
           type={connected ? "success" : "error"}
-          title={message?.toString()}
+          title={toString(message)}
         />
       </Box>
     </SnackbarContent>
