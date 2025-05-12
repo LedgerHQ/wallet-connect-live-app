@@ -32,14 +32,15 @@ export async function signMessage(
 
   if (accountSign) {
     try {
-      const message = base58.decode(request.params.message);
       const signedMessage = await client.message.sign(
         accountSign.id,
-        Buffer.from(message),
+        Buffer.from(
+          base58.decodeUnsafe(request.params.message) ?? request.params.message,
+        ),
       );
 
       await acceptRequest(walletKit, topic, id, {
-        signature: base58.encode(signedMessage),
+        signature: signedMessage.toString(),
       });
     } catch (_error) {
       await rejectRequest(walletKit, topic, id, Errors.txDeclined);

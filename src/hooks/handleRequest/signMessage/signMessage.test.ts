@@ -232,7 +232,9 @@ describe("Testing sign message on Solana", () => {
       walletKit,
       topic,
       id,
-      hexadecimalSignature,
+      expect.objectContaining({
+        signature: Buffer.from(hexadecimalSignature, "hex").toString(),
+      }),
     );
 
     expect(rejectRequestSpy).not.toHaveBeenCalled();

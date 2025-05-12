@@ -136,7 +136,6 @@ function createTestRouter(component: () => JSX.Element) {
 // export function renderComponent(component: typeof _router) {
 export async function renderComponent(component: () => JSX.Element) {
   const router = createTestRouter(component);
-  // @ts-expect-error: router error because of the declaration in main.tsx
   const { container } = render(<RouterProvider router={router} />);
 
   await waitFor(() => {
