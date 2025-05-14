@@ -3,8 +3,8 @@ import { handleSolanaRequest } from "./Solana";
 import { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import type { IWalletKit } from "@reown/walletkit";
 import { vi } from "vitest";
-import * as signTransactionModule from "./signTransaction/signTransaction";
-import * as signMessageModule from "./signMessage/signMessage";
+import * as signTransactionModule from "./solanaHandlers/signTransaction";
+import * as signMessageModule from "./solanaHandlers/signMessage";
 
 vi.mock("./utils");
 

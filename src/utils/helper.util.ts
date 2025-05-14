@@ -94,13 +94,12 @@ export const getTicker = (chain: string) => SUPPORTED_NETWORK[chain].ticker;
 export const getColor = (chain: string) => SUPPORTED_NETWORK[chain]?.color;
 export const getDisplayName = (chain: string) =>
   SUPPORTED_NETWORK[chain]?.displayName ?? chain;
-export const getNamespace = (chain: string) => {
-  return SUPPORTED_NETWORK[chain]?.namespace ?? chain;
-};
+export const getNamespace = (chain: string) =>
+  SUPPORTED_NETWORK[chain]?.namespace ?? chain;
 
 export const getCurrencyByChainId = (chainId: string) => {
   const elem = Object.entries(SUPPORTED_NETWORK).find(
-    ([, network]) => network.namespace.toLowerCase() === chainId.toLowerCase(),
+    ([, network]) => network.namespace === chainId.toLowerCase(),
   );
   if (elem?.[0] === "solana (legacy)") return "solana";
   return elem?.[0] ?? chainId;

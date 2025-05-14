@@ -15,19 +15,14 @@
     "test:e2e-ui": "playwright test --ui"
   },
   "dependencies": {
-    "@ledgerhq/coin-framework": "^0.20.1",
-    "@ledgerhq/coin-solana": "0.9.0",
-    "@ledgerhq/cryptoassets": "^13.7.0",
     "@ledgerhq/hw-transport": "^6.31.4",
     "@ledgerhq/react-ui": "^0.16.4",
-    "@ledgerhq/wallet-api-client": "^1.6.0",
-    "@ledgerhq/wallet-api-simulator": "^1.2.0",
+    "@ledgerhq/wallet-api-client": "^1.8.0",
+    "@ledgerhq/wallet-api-simulator": "^1.2.10",
     "@reown/walletkit": "^1.2.3",
     "@segment/analytics-next": "^1.76.0",
     "@segment/snippet": "^5.2.1",
     "@sentry/react": "^8.37.1",
-    "@solana/codecs-strings": "2.0.0",
-    "@solana/spl-token": "^0.4.9",
     "@solana/web3.js": "1.98.0",
     "@tanstack/react-query": "^5.59.20",
     "@tanstack/react-query-devtools": "^5.59.20",
@@ -37,7 +32,6 @@
     "@walletconnect/utils": "^2.19.2",
     "bignumber.js": "^9.0.2",
     "bs58": "^5.0.0",
-    "buffer": "^6.0.3",
     "eip55": "^2.1.0",
     "i18next": "^23.16.4",
     "i18next-http-backend": "^2.6.2",
@@ -54,7 +48,6 @@
   "devDependencies": {
     "@eslint/js": "^9.14.0",
     "@playwright/test": "^1.48.2",
-    "@rollup/plugin-inject": "^5.0.5",
     "@sentry/vite-plugin": "^2.22.6",
     "@tanstack/eslint-plugin-query": "^5.59.20",
     "@testing-library/jest-dom": "^6.6.3",
@@ -98,7 +91,6 @@
   "pnpm": {
     "patchedDependencies": {
       "react-qr-reader": "patches/react-qr-reader.patch"
-    },
-    "allowNonAppliedPatches": true
+    }
   }
 }

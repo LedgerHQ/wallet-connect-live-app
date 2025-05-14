@@ -3,7 +3,7 @@ import {
   acceptRequest,
   rejectRequest,
   Errors,
-} from "@/hooks/handleRequest/utils";
+} from "@/hooks/requestHandlers/utils";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
 import { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import { IWalletKit } from "@reown/walletkit";

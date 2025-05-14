@@ -1,9 +1,9 @@
-import { ReactElement, Suspense } from "react";
-import { act, render, RenderOptions, waitFor } from "@testing-library/react";
-import { Flex, ProgressLoader, StyleProvider } from "@ledgerhq/react-ui";
-import userEvent from "@testing-library/user-event";
+import { ErrorFallback } from "@/components/screens/ErrorFallback";
 import GlobalStyle from "@/styles/globalStyle";
 import { Container } from "@/styles/styles";
+import { Flex, ProgressLoader, StyleProvider } from "@ledgerhq/react-ui";
+import { ErrorBoundary } from "@sentry/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   createMemoryHistory,
   createRootRoute,
@@ -12,9 +12,9 @@ import {
   Outlet,
   RouterProvider,
 } from "@tanstack/react-router";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ErrorBoundary } from "@sentry/react";
-import { ErrorFallback } from "@/components/screens/ErrorFallback";
+import { act, render, RenderOptions } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { ReactElement, Suspense } from "react";
 
 type PropsTheme = {
   children: React.ReactNode;
@@ -113,14 +113,14 @@ const Root = () => {
   );
 };
 
-function createTestRouter(component: () => JSX.Element) {
+function createTestRouter(component: () => JSX.Element, path = "/") {
   const rootRoute = createRootRoute({
     component: Root,
   });
 
   const componentRoute = createRoute({
     getParentRoute: () => rootRoute,
-    path: "/",
+    path,
     component,
   });
 
@@ -134,23 +134,16 @@ function createTestRouter(component: () => JSX.Element) {
 // const _router = createTestRouter(() => <></>);
 
 // export function renderComponent(component: typeof _router) {
-export async function renderComponent(component: () => JSX.Element) {
-  const router = createTestRouter(component);
-  const { container } = render(<RouterProvider router={router} />);
+export async function renderComponent(
+  component: () => JSX.Element,
+  path: "/" | "/connect" | "/protocol-not-supported" = "/",
+) {
+  const router = createTestRouter(component, path);
+  render(<RouterProvider<typeof router> router={router} />);
 
-  await waitFor(() => {
-    const elements = container.querySelectorAll("*");
-    const matchingElement = Array.from(elements).find((element) => {
-      // waiting for the first div to be rendered
-      return /^styles__Container.*/.exec(element.className);
-    });
-    expect(matchingElement).not.toBeNull();
-  });
-
-  await act(async () => {
+  await act(() => {
     return router.navigate({
-      from: "/",
-      to: "/",
+      to: path,
       search: (search) => ({
         theme: "dark",
         lang: "en",

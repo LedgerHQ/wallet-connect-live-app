@@ -4,7 +4,7 @@ import ProtocolNotSupported from "@/components/screens/ProtocolNotSupported";
 
 describe("ProtocolNotSupported Screen", () => {
   it("Page should appears", async () => {
-    await renderWithRouter(ProtocolNotSupported);
+    await renderWithRouter(ProtocolNotSupported, "/protocol-not-supported");
     const button = await screen.findByRole("button", { name: /close/i });
     expect(button).toBeInTheDocument();
   });

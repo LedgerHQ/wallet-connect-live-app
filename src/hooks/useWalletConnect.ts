@@ -28,15 +28,15 @@ import {
   useQueryFn as usePendingProposalsQueryFn,
 } from "./usePendingProposals";
 import { useQueryClient } from "@tanstack/react-query";
-import { handleEIP155Request } from "./handleRequest/EIP155";
-import { handleMvxRequest } from "./handleRequest/MultiversX";
-import { handleBIP122Request } from "./handleRequest/BIP122";
-import { handleXrpRequest } from "./handleRequest/Ripple";
-import { Errors, rejectRequest } from "./handleRequest/utils";
-import { handleWalletRequest } from "./handleRequest/Wallet";
+import { handleEIP155Request } from "./requestHandlers/EIP155";
+import { handleMvxRequest } from "./requestHandlers/MultiversX";
+import { handleBIP122Request } from "./requestHandlers/BIP122";
+import { handleXrpRequest } from "./requestHandlers/Ripple";
+import { Errors, rejectRequest } from "./requestHandlers/utils";
+import { handleWalletRequest } from "./requestHandlers/Wallet";
 import { isWalletRequest } from "../utils/helper.util";
 import { OneClickAuthPayload } from "@/types/types";
-import { handleSolanaRequest } from "./handleRequest/Solana";
+import { handleSolanaRequest } from "./requestHandlers/Solana";
 
 function useWalletConnectStatus() {
   const core = useAtomValue(coreAtom);

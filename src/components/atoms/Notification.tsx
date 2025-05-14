@@ -15,22 +15,6 @@ declare module "notistack" {
   }
 }
 
-type Stringifiable = {
-  toString: () => string;
-};
-
-function hasToStringMethod(obj: unknown): obj is Stringifiable {
-  return (
-    typeof obj === "object" &&
-    obj !== null &&
-    typeof (obj as Stringifiable).toString === "function"
-  );
-}
-
-function toString(obj: unknown): string {
-  return hasToStringMethod(obj) ? obj.toString() : "";
-}
-
 const warningBadge = (
   <Notification.Badge
     color="warning.c50"
@@ -52,6 +36,10 @@ export const ErrorNotification = React.forwardRef<
   // https://github.com/jsx-eslint/eslint-plugin-react/issues/3796
   const { id, errorType, message, ...other } = myProps;
 
+  if (typeof message !== "string") {
+    throw new Error("We don't support sending ReactNode as a message");
+  }
+
   return (
     <SnackbarContent
       ref={ref}
@@ -63,7 +51,7 @@ export const ErrorNotification = React.forwardRef<
         badge={warningBadge}
         hasBackground={true}
         title={errorType}
-        description={toString(message)}
+        description={message?.toString() ?? ""}
         role="alert"
       />
     </SnackbarContent>
@@ -84,6 +72,10 @@ export const ConnectionNotification = React.forwardRef<
   // https://github.com/jsx-eslint/eslint-plugin-react/issues/3796
   const { id, connected, message, ...other } = myProps;
 
+  if (typeof message !== "string") {
+    throw new Error("We don't support sending ReactNode as a message");
+  }
+
   return (
     <SnackbarContent
       ref={ref}
@@ -94,7 +86,7 @@ export const ConnectionNotification = React.forwardRef<
       <Box width="100%">
         <Alert
           type={connected ? "success" : "error"}
-          title={toString(message)}
+          title={message?.toString() ?? ""}
         />
       </Box>
     </SnackbarContent>

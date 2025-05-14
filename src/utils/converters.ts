@@ -7,28 +7,6 @@ import {
 import { BigNumber } from "bignumber.js";
 import eip55 from "eip55";
 
-import { VersionedMessage, VersionedTransaction } from "@solana/web3.js";
-
-export function encodeAccountIdWithTokenAccountAddress(
-  accountId: string,
-  address: string,
-): string {
-  return `${accountId}+${address}`;
-}
-
-export function toTokenId(mint: string): string {
-  return `solana/spl/${mint}`;
-}
-
-export type RawCommand = {
-  kind: "raw";
-  instructions: unknown;
-  versionnedMessage?: VersionedMessage; // lost in serialization
-  versionnedTx?: VersionedTransaction; // lost in serialization
-  msg?: Uint8Array; // uint8, not good
-  transaction?: string;
-};
-
 export type EthTransaction = {
   value: string;
   to?: string;

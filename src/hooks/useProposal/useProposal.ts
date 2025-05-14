@@ -26,7 +26,7 @@ import { OneClickAuthPayload } from "@/types/types";
 import { enqueueSnackbar } from "notistack";
 import { sortedRecentConnectionAppsAtom } from "../../store/recentConnectionAppsAtom";
 import { useSupportedNamespaces } from "../useSupportedNamespaces";
-import { formatMessage } from "../handleRequest/utils";
+import { formatMessage } from "../requestHandlers/utils";
 
 export function useProposal(
   proposal: ProposalTypes.Struct,

@@ -15,7 +15,7 @@ import {
   acceptRequest,
   Errors,
   rejectRequest,
-} from "@/hooks/handleRequest/utils";
+} from "@/hooks/requestHandlers/utils";
 import BigNumber from "bignumber.js";
 
 function toSolanaTransaction(serializedTransaction: string) {

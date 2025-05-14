@@ -2,8 +2,8 @@ import type { IWalletKit } from "@reown/walletkit";
 import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import { type SOLANA_REQUESTS } from "@/data/methods/Solana.methods";
 import { Errors, rejectRequest } from "./utils";
-import { signTransaction } from "./signTransaction/signTransaction";
-import { signMessage } from "./signMessage/signMessage";
+import { signTransaction } from "./solanaHandlers/signTransaction";
+import { signMessage } from "./solanaHandlers/signMessage";
 
 export async function handleSolanaRequest(
   request: SOLANA_REQUESTS,
@@ -14,7 +14,6 @@ export async function handleSolanaRequest(
   client: WalletAPIClient,
   walletKit: IWalletKit,
 ) {
-  console.log({ request });
   switch (request.method) {
     case "solana_signMessage":
       await signMessage(

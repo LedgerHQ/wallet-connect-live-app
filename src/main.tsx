@@ -2,8 +2,6 @@ import { StrictMode, Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider } from "@tanstack/react-router";
 import * as Sentry from "@sentry/react";
-import { Buffer as BufferPolyfill } from "buffer";
-globalThis.Buffer = BufferPolyfill;
 import { router } from "./router";
 import "@/i18n";
 
