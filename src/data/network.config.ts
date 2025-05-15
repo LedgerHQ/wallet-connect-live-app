@@ -191,7 +191,6 @@ export const SOLANA_CHAINS: Record<string, Network> = {
     ticker: "SOL",
     displayName: "Solana",
     color: "#1EF0A6",
-    decimals: 9,
   },
   // LEGACY, BUT SEEM WIDESPREAD IN ITS USAGE...
   "solana (legacy)": {
@@ -200,7 +199,6 @@ export const SOLANA_CHAINS: Record<string, Network> = {
     ticker: "SOL",
     displayName: "Solana",
     color: "#1EF0A6",
-    decimals: 9,
   },
   // DISABLED UNTIL AVAILABLE IN LL
   /*
@@ -210,7 +208,6 @@ export const SOLANA_CHAINS: Record<string, Network> = {
     ticker: "SOL",
     displayName: "Solana testnet",
     color: "#1EF0A6",
-    decimals: 9,
   },
   "solana devnet": {
     chainId: "EtWTRABZaYq6iMfeYKouRu166VU2xqa1",
@@ -218,7 +215,6 @@ export const SOLANA_CHAINS: Record<string, Network> = {
     ticker: "SOL",
     displayName: "Solana devnet",
     color: "#1EF0A6",
-    decimals: 9,
   }
  */
 };
