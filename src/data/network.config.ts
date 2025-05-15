@@ -182,7 +182,6 @@ export const RIPPLE_CHAINS: Record<string, Network> = {
 export const RIPPLE_NETWORK_BY_CHAIN_ID = getNetworkById(RIPPLE_CHAINS);
 
 export const SOLANA_CHAINS: Record<string, Network> = {
-  // "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp": {
   solana: {
     chainId: "1",
     namespace: "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
@@ -200,8 +199,6 @@ export const SOLANA_CHAINS: Record<string, Network> = {
     displayName: "Solana",
     color: "#1EF0A6",
   },
-  // DISABLED UNTIL AVAILABLE IN LL
-  /*
   "solana testnet": {
     chainId: "4uhcVJyU9pJkvQyS88uRDiswHXSCkY3z",
     namespace: "solana:4uhcVJyU9pJkvQyS88uRDiswHXSCkY3z", // work with APPs (legacy)
@@ -215,8 +212,7 @@ export const SOLANA_CHAINS: Record<string, Network> = {
     ticker: "SOL",
     displayName: "Solana devnet",
     color: "#1EF0A6",
-  }
- */
+  },
 };
 
 export const SOLANA_NETWORK_BY_CHAIN_ID = getNetworkById(SOLANA_CHAINS);
