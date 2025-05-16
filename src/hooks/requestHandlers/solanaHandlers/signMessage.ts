@@ -40,7 +40,7 @@ export async function signMessage(
       );
 
       await acceptRequest(walletKit, topic, id, {
-        signature: signedMessage.toString(),
+        signature: base58.encode(signedMessage),
       });
     } catch (_error) {
       await rejectRequest(walletKit, topic, id, Errors.txDeclined);
