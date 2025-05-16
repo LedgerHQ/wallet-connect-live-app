@@ -1,5 +1,9 @@
 import { SUPPORTED_NETWORK } from "@/data/network.config";
-import { getCurrencyByChainId, getDisplayName } from "@/utils/helper.util";
+import {
+  getCurrencyByChainId,
+  getDisplayName,
+  getNamespace,
+} from "@/utils/helper.util";
 import { Account } from "@ledgerhq/wallet-api-client";
 import { ProposalTypes, SessionTypes } from "@walletconnect/types";
 
@@ -68,26 +72,42 @@ export const formatAccountsByChain = (
 
   const chains = families
     .map((f) => f.chains ?? [])
-    .reduce((value, acc) => acc.concat(value), []);
+    .reduce((acc, value) => acc.concat(value), []);
 
-  const chainsDeduplicated = [...Array.from(new Set(chains))];
+  const chainsDeduplicated = Array.from(new Set(chains));
 
-  const mappedAccountsByChains: AccountsInChain[] = chainsDeduplicated.map(
-    (chain) => {
+  const mappedAccountsByChains = chainsDeduplicated.reduce<AccountsInChain[]>(
+    (acc, chain) => {
       const formattedChain = getCurrencyByChainId(chain);
 
-      return {
+      const chainIsRequired = families.some(
+        (family) => family.required && family.chains?.includes(chain),
+      );
+
+      // Remove solana (legacy) only if main solana is already present
+      // And the chain is not required
+      const ns = getNamespace(formattedChain);
+      if (
+        ns !== chain &&
+        !chainIsRequired &&
+        chainsDeduplicated.find((value) => value === ns)
+      ) {
+        return acc;
+      }
+
+      acc.push({
         chain: formattedChain,
         displayName: getDisplayName(formattedChain),
         isSupported: Boolean(SUPPORTED_NETWORK[formattedChain] !== undefined),
-        isRequired: families.some(
-          (family) => family.required && family.chains?.includes(chain),
-        ),
+        isRequired: chainIsRequired,
         accounts: accounts.filter((acc) => {
           return acc.currency === formattedChain;
         }),
-      };
+      });
+
+      return acc;
     },
+    [],
   );
 
   return mappedAccountsByChains;
