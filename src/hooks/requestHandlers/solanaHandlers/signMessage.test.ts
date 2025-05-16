@@ -3,6 +3,7 @@ import { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import type { IWalletKit } from "@reown/walletkit";
 import { PublicKey } from "@solana/web3.js";
 import { vi } from "vitest";
+import base58 from "bs58";
 import * as utils from "../utils";
 import * as utilsGeneric from "@/utils/generic";
 import { signMessage } from "./signMessage";
@@ -233,7 +234,7 @@ describe("Testing sign message on Solana", () => {
       topic,
       id,
       expect.objectContaining({
-        signature: Buffer.from(hexadecimalSignature, "hex").toString(),
+        signature: base58.encode(Buffer.from(hexadecimalSignature, "hex")),
       }),
     );
 
