@@ -74,7 +74,7 @@
     "title" : "セッション",
     "apps" : {
       "title" : "接続済みアプリ",
-      "noAppsMessage" : "接続済みアプリがこちらに表示されます",
+      "noAppsMessage" : "接続済みのアプリがこちらに表示されます",
       "dontKnow" : "お困りですか？いずれかをお試しください",
       "lastConnection" : "最後の接続",
       "tryNewApp" : "新しいアプリを試す",
@@ -95,6 +95,9 @@
       "title" : "セッションの詳細",
       "account" : "アカウント",
       "accounts" : "アカウント",
+      "mainAccount" : "メインアカウント",
+      "editSession" : "セッションを編集",
+      "confirm" : "確認",
       "connected" : "接続済み",
       "expires" : "期限切れ",
       "disconnect" : "接続を切断"
