@@ -1,11 +1,11 @@
-import { BigNumber } from "bignumber.js";
-import eip55 from "eip55";
 import {
+  BitcoinTransaction,
   ElrondTransaction,
   EthereumTransaction,
   RippleTransaction,
-  BitcoinTransaction,
 } from "@ledgerhq/wallet-api-client";
+import { BigNumber } from "bignumber.js";
+import eip55 from "eip55";
 
 export type EthTransaction = {
   value: string;

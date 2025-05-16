@@ -55,8 +55,7 @@ export const toLocaleString = (
     maxDecimalPlaces = Math.max(minDecimalPlaces, 3),
   } = options;
 
-  const grouping =
-    options?.useGrouping !== undefined ? options.useGrouping : true;
+  const grouping = options.useGrouping ?? true;
   const format = getLocaleFormat(locale, grouping);
   const nWithMaxDecimalPlaces = getFormattedBigNumber(
     n,

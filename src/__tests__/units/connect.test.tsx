@@ -5,7 +5,7 @@ import userEvent from "@testing-library/user-event";
 
 describe("Connect Screen", () => {
   it("Page should appears", async () => {
-    await renderWithRouter(() => <Connect />);
+    await renderWithRouter(() => <Connect />, "/connect");
     const scan = await screen.findByTestId("scan-button");
     const input = await screen.findByTestId("input-uri");
     const connectButton = await screen.findByTestId("connect-button");
@@ -17,7 +17,7 @@ describe("Connect Screen", () => {
   // TODO update to use router and params to check this
   it("Page should appears with Connect button and on click triggers action", async () => {
     const url = "https://jestjs.io/docs/jest-object";
-    await renderWithRouter(() => <Connect />);
+    await renderWithRouter(() => <Connect />, "/connect");
     const user = userEvent.setup();
     const connect = await screen.findByTestId("connect-button");
     const input = await screen.findByTestId("input-uri");
@@ -29,7 +29,7 @@ describe("Connect Screen", () => {
   });
 
   it("disables connect button when input is empty", async () => {
-    await renderWithRouter(() => <Connect />);
+    await renderWithRouter(() => <Connect />, "/connect");
     const connectButton = await screen.findByRole("button", {
       name: /connect.cta/,
     });

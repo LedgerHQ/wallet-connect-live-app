@@ -2,7 +2,7 @@ import { SignClientTypes } from "@walletconnect/types";
 import { useCallback, useEffect } from "react";
 import { WalletKitTypes } from "@reown/walletkit";
 import { enqueueSnackbar } from "notistack";
-import { getErrorMessage } from "@/utils/helper.util";
+import { getErrorMessage, isSolanaChain } from "@/utils/helper.util";
 import {
   coreAtom,
   connectionStatusAtom,
@@ -36,6 +36,7 @@ import { Errors, rejectRequest } from "./requestHandlers/utils";
 import { handleWalletRequest } from "./requestHandlers/Wallet";
 import { isWalletRequest } from "../utils/helper.util";
 import { OneClickAuthPayload } from "@/types/types";
+import { handleSolanaRequest } from "./requestHandlers/Solana";
 
 function useWalletConnectStatus() {
   const core = useAtomValue(coreAtom);
@@ -218,6 +219,16 @@ export default function useWalletConnect() {
             );
           } else if (isRippleChain(chainId, request)) {
             await handleXrpRequest(
+              request,
+              topic,
+              id,
+              chainId,
+              accounts.data,
+              client,
+              walletKit,
+            );
+          } else if (isSolanaChain(chainId, request)) {
+            await handleSolanaRequest(
               request,
               topic,
               id,

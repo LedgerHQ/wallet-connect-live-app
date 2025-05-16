@@ -36,6 +36,10 @@ export const ErrorNotification = React.forwardRef<
   // https://github.com/jsx-eslint/eslint-plugin-react/issues/3796
   const { id, errorType, message, ...other } = myProps;
 
+  if (typeof message !== "string") {
+    throw new Error("We don't support sending ReactNode as a message");
+  }
+
   return (
     <SnackbarContent
       ref={ref}
@@ -68,6 +72,10 @@ export const ConnectionNotification = React.forwardRef<
   // https://github.com/jsx-eslint/eslint-plugin-react/issues/3796
   const { id, connected, message, ...other } = myProps;
 
+  if (typeof message !== "string") {
+    throw new Error("We don't support sending ReactNode as a message");
+  }
+
   return (
     <SnackbarContent
       ref={ref}
@@ -78,7 +86,7 @@ export const ConnectionNotification = React.forwardRef<
       <Box width="100%">
         <Alert
           type={connected ? "success" : "error"}
-          title={message?.toString()}
+          title={message?.toString() ?? ""}
         />
       </Box>
     </SnackbarContent>

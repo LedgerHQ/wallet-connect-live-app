@@ -181,6 +181,42 @@ export const RIPPLE_CHAINS: Record<string, Network> = {
 
 export const RIPPLE_NETWORK_BY_CHAIN_ID = getNetworkById(RIPPLE_CHAINS);
 
+export const SOLANA_CHAINS: Record<string, Network> = {
+  solana: {
+    chainId: "1",
+    namespace: "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+    // ^ seem to only work for https://react-app.walletconnect.com/
+    // see https://github.com/WalletConnect/web-examples/blob/a172c268d4f3505aa6c251a70ddd7bae5676414b/advanced/wallets/react-wallet-v2/src/data/SolanaData.ts#L11
+    ticker: "SOL",
+    displayName: "Solana",
+    color: "#1EF0A6",
+  },
+  // LEGACY, BUT SEEM WIDESPREAD IN ITS USAGE...
+  "solana (legacy)": {
+    chainId: "1",
+    namespace: "solana:4sGjMW1sUnHzSxGspuhpqLDx6wiyjNtZ", // work with APPs (legacy)
+    ticker: "SOL",
+    displayName: "Solana",
+    color: "#1EF0A6",
+  },
+  "solana testnet": {
+    chainId: "4uhcVJyU9pJkvQyS88uRDiswHXSCkY3z",
+    namespace: "solana:4uhcVJyU9pJkvQyS88uRDiswHXSCkY3z", // work with APPs (legacy)
+    ticker: "SOL",
+    displayName: "Solana testnet",
+    color: "#1EF0A6",
+  },
+  "solana devnet": {
+    chainId: "EtWTRABZaYq6iMfeYKouRu166VU2xqa1",
+    namespace: "solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1", // work with APPs (legacy)
+    ticker: "SOL",
+    displayName: "Solana devnet",
+    color: "#1EF0A6",
+  },
+};
+
+export const SOLANA_NETWORK_BY_CHAIN_ID = getNetworkById(SOLANA_CHAINS);
+
 export const EIP155_CHAINS = {
   ...EIP155_CHAINS_MAINNET,
   ...EIP155_SEPOLIA_CHAINS,
@@ -194,6 +230,7 @@ export const SUPPORTED_NETWORK: Record<string, Network> = {
   ...MULTIVERS_X_CHAINS,
   ...BIP122_CHAINS,
   ...RIPPLE_CHAINS,
+  ...SOLANA_CHAINS,
 };
 
 export const SUPPORTED_NETWORK_NAMES: string[] = Object.values(
@@ -205,4 +242,5 @@ export enum SupportedNamespace {
   EIP155 = "eip155",
   MVX = "mvx",
   XRPL = "xrpl",
+  SOLANA = "solana",
 }
