@@ -199,14 +199,14 @@ export const SOLANA_CHAINS: Record<string, Network> = {
     displayName: "Solana",
     color: "#1EF0A6",
   },
-  "solana testnet": {
+  solana_testnet: {
     chainId: "4uhcVJyU9pJkvQyS88uRDiswHXSCkY3z",
     namespace: "solana:4uhcVJyU9pJkvQyS88uRDiswHXSCkY3z", // work with APPs (legacy)
     ticker: "SOL",
     displayName: "Solana testnet",
     color: "#1EF0A6",
   },
-  "solana devnet": {
+  solana_devnet: {
     chainId: "EtWTRABZaYq6iMfeYKouRu166VU2xqa1",
     namespace: "solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1", // work with APPs (legacy)
     ticker: "SOL",
