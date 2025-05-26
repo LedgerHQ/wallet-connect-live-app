@@ -26,6 +26,8 @@
     "base",
     "elrond",
     "solana",
+    "solana_devnet",
+    "solana_testnet",
     "ethereum_sepolia",
     "arbitrum_sepolia",
     "optimism_sepolia",
