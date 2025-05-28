@@ -9,12 +9,12 @@ import {
   walletKitAtom,
 } from "@/store/walletKit.store";
 import {
-  // isRippleChain,
-  // isSolanaChain,
   getErrorMessage,
   isBIP122Chain,
   isEIP155Chain,
   isMultiversXChain,
+  // isRippleChain,
+  isSolanaChain,
 } from "@/utils/helper.util";
 import { WalletKitTypes } from "@reown/walletkit";
 import * as Sentry from "@sentry/react";
@@ -37,9 +37,9 @@ import { queryKey as sessionsQueryKey } from "./useSessions";
 import { OneClickAuthPayload } from "@/types/types";
 import { ZodError } from "zod";
 import { isWalletRequest } from "../utils/helper.util";
+import { handleSolanaRequest } from "./requestHandlers/Solana";
 import { Errors, rejectRequest } from "./requestHandlers/utils";
 import { handleWalletRequest } from "./requestHandlers/Wallet";
-// import { handleSolanaRequest } from "./requestHandlers/Solana";
 
 function useWalletConnectStatus() {
   const core = useAtomValue(coreAtom);
@@ -230,16 +230,16 @@ export default function useWalletConnect() {
             //     client,
             //     walletKit,
             //   );
-            // } else if (isSolanaChain(chainId, request)) {
-            //   await handleSolanaRequest(
-            //     request,
-            //     topic,
-            //     id,
-            //     chainId,
-            //     accounts.data,
-            //     client,
-            //     walletKit,
-            //   );
+          } else if (isSolanaChain(chainId, request)) {
+            await handleSolanaRequest(
+              request,
+              topic,
+              id,
+              chainId,
+              accounts.data,
+              client,
+              walletKit,
+            );
           } else {
             console.error("Not Supported Chain");
             await rejectRequest(
