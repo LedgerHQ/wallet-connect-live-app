@@ -230,7 +230,7 @@ export const SUPPORTED_NETWORK: Record<string, Network> = {
   ...MULTIVERS_X_CHAINS,
   ...BIP122_CHAINS,
   ...RIPPLE_CHAINS,
-  ...SOLANA_CHAINS,
+  // ...SOLANA_CHAINS,
 };
 
 export const SUPPORTED_NETWORK_NAMES: string[] = Object.values(
@@ -242,5 +242,5 @@ export enum SupportedNamespace {
   EIP155 = "eip155",
   MVX = "mvx",
   XRPL = "xrpl",
-  SOLANA = "solana",
+  // SOLANA = "solana",
 }

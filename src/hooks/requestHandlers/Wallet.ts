@@ -14,14 +14,14 @@ import {
   isEIP155Chain,
   isMultiversXChain,
   isRippleChain,
-  isSolanaChain,
+  // isSolanaChain,
 } from "@/utils/helper.util";
 import {
   BIP122_NETWORK_BY_CHAIN_ID,
   EIP155_NETWORK_BY_CHAIN_ID,
   MULTIVERS_X_NETWORK_BY_CHAIN_ID,
   RIPPLE_NETWORK_BY_CHAIN_ID,
-  SOLANA_NETWORK_BY_CHAIN_ID,
+  // SOLANA_NETWORK_BY_CHAIN_ID,
 } from "@/data/network.config";
 import { queryKey as accountsQueryKey } from "@/hooks/useAccounts";
 
@@ -49,9 +49,9 @@ function getNetwork(currentChainId: string, newChainId: string) {
   if (isMultiversXChain(currentChainId)) {
     return getNetworkByChainId(MULTIVERS_X_NETWORK_BY_CHAIN_ID, newChainId);
   }
-  if (isSolanaChain(currentChainId)) {
-    return getNetworkByChainId(SOLANA_NETWORK_BY_CHAIN_ID, newChainId);
-  }
+  // if (isSolanaChain(currentChainId)) {
+  //   return getNetworkByChainId(SOLANA_NETWORK_BY_CHAIN_ID, newChainId);
+  // }
 }
 
 const addNewAccounts = async (
