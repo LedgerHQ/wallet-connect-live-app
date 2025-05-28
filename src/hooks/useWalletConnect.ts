@@ -2,6 +2,7 @@ import { SignClientTypes } from "@walletconnect/types";
 import { useCallback, useEffect } from "react";
 import { WalletKitTypes } from "@reown/walletkit";
 import { enqueueSnackbar } from "notistack";
+import { getErrorMessage, isSolanaChain } from "@/utils/helper.util";
 import {
   coreAtom,
   connectionStatusAtom,
@@ -16,8 +17,6 @@ import {
   isMultiversXChain,
   isBIP122Chain,
   isRippleChain,
-  // isSolanaChain,
-  getErrorMessage,
 } from "@/utils/helper.util";
 import { useNavigate } from "@tanstack/react-router";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
@@ -37,7 +36,7 @@ import { Errors, rejectRequest } from "./requestHandlers/utils";
 import { handleWalletRequest } from "./requestHandlers/Wallet";
 import { isWalletRequest } from "../utils/helper.util";
 import { OneClickAuthPayload } from "@/types/types";
-// import { handleSolanaRequest } from "./requestHandlers/Solana";
+import { handleSolanaRequest } from "./requestHandlers/Solana";
 
 function useWalletConnectStatus() {
   const core = useAtomValue(coreAtom);
@@ -228,16 +227,16 @@ export default function useWalletConnect() {
               client,
               walletKit,
             );
-          // } else if (isSolanaChain(chainId, request)) {
-          //   await handleSolanaRequest(
-          //     request,
-          //     topic,
-          //     id,
-          //     chainId,
-          //     accounts.data,
-          //     client,
-          //     walletKit,
-          //   );
+          } else if (isSolanaChain(chainId, request)) {
+            await handleSolanaRequest(
+              request,
+              topic,
+              id,
+              chainId,
+              accounts.data,
+              client,
+              walletKit,
+            );
           } else {
             console.error("Not Supported Chain");
             await rejectRequest(
