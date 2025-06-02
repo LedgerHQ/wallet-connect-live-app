@@ -1,11 +1,11 @@
 import { SOLANA_SIGNING_METHODS } from "@/data/methods/Solana.methods";
+import * as utilsGeneric from "@/utils/generic";
 import { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import type { IWalletKit } from "@reown/walletkit";
 import { PublicKey } from "@solana/web3.js";
-import { vi } from "vitest";
 import base58 from "bs58";
+import { vi } from "vitest";
 import * as utils from "../utils";
-import * as utilsGeneric from "@/utils/generic";
 import { signMessage } from "./signMessage";
 
 vi.mock("../../../utils");
@@ -18,7 +18,7 @@ describe("Testing sign message on Solana", () => {
 
   it("should throw an error when request can not be used to sign message", async () => {
     const request = {
-      method: SOLANA_SIGNING_METHODS.SOLANA_SIGNTRANSACTION,
+      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_TRANSACTION,
       params: {
         transaction: "some random transaction",
       },
@@ -37,7 +37,7 @@ describe("Testing sign message on Solana", () => {
     ).rejects.toEqual(
       new Error(
         "Method " +
-          SOLANA_SIGNING_METHODS.SOLANA_SIGNTRANSACTION +
+          SOLANA_SIGNING_METHODS.SOLANA_SIGN_TRANSACTION +
           " from request can not be used to sign message",
       ),
     );
@@ -58,7 +58,7 @@ describe("Testing sign message on Solana", () => {
     const topic = "topic";
     const id = 0;
     const request = {
-      method: SOLANA_SIGNING_METHODS.SOLANA_SIGNMESSAGE,
+      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_MESSAGE,
       params: {
         message: "hello from Wallet Connect",
         pubkey: PublicKey.unique().toString(),
@@ -123,7 +123,7 @@ describe("Testing sign message on Solana", () => {
     const id = 0;
     const message = "Hello from Wallet Connect";
     const request = {
-      method: SOLANA_SIGNING_METHODS.SOLANA_SIGNMESSAGE,
+      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_MESSAGE,
       params: {
         message: message,
         pubkey: PublicKey.unique().toString(),
@@ -192,7 +192,7 @@ describe("Testing sign message on Solana", () => {
     const id = 0;
     const message = "Hello from Wallet Connect";
     const request = {
-      method: SOLANA_SIGNING_METHODS.SOLANA_SIGNMESSAGE,
+      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_MESSAGE,
       params: {
         message: message,
         pubkey: PublicKey.unique().toString(),
