@@ -9,10 +9,9 @@ import {
 } from "@/hooks/requestHandlers/utils";
 import { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import { IWalletKit } from "@reown/walletkit";
-import base58 from "bs58";
 import { findSignerAccount, toLiveTransaction } from "./utils";
 
-export async function signTransaction(
+export async function signAndSendTransaction(
   request: SOLANA_REQUESTS,
   topic: string,
   id: number,
@@ -21,7 +20,7 @@ export async function signTransaction(
   client: WalletAPIClient,
   walletKit: IWalletKit,
 ) {
-  if (request.method !== "solana_signTransaction") {
+  if (request.method !== "solana_signAndSendTransaction") {
     throw new Error(
       `Method ${request.method} from request can not be used to sign transaction`,
     );
@@ -32,13 +31,13 @@ export async function signTransaction(
 
   if (account) {
     try {
-      const signature = await client.transaction.sign(
+      const signature = await client.transaction.signAndBroadcast(
         account.id,
         liveTransaction,
       );
 
       const result: SOLANA_RESPONSES[typeof request.method] = {
-        signature: base58.encode(signature),
+        signature: signature,
       };
 
       await acceptRequest(walletKit, topic, id, result);
