@@ -6,10 +6,9 @@ import { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import type { IWalletKit } from "@reown/walletkit";
 import { PublicKey } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
-import base58 from "bs58";
 import { vi } from "vitest";
 import * as utils from "../utils";
-import { signTransaction } from "./signTransaction";
+import { signAllTransactions } from "./signAllTransactions";
 
 vi.mock("../utils", async (importOriginal) => ({
   ...(await importOriginal()),
@@ -32,7 +31,7 @@ describe("Testing sign transaction on Solana", () => {
     };
 
     await expect(
-      signTransaction(
+      signAllTransactions(
         request,
         "some random topic",
         0,
@@ -45,7 +44,7 @@ describe("Testing sign transaction on Solana", () => {
       new Error(
         "Method " +
           SOLANA_SIGNING_METHODS.SOLANA_SIGN_MESSAGE +
-          " from request can not be used to sign transaction",
+          " from request can not be used to sign transactions",
       ),
     );
   });
@@ -61,16 +60,18 @@ describe("Testing sign transaction on Solana", () => {
     const topic = "topic";
     const id = 0;
     const request: SOLANA_REQUESTS = {
-      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_TRANSACTION,
+      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_ALL_TRANSACTION,
       params: {
-        transaction:
+        transactions: [
           "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAQABAzc1rOIrIJkfixB2PGXIAQSzJwuHJA9YroUmtv2PuvSPfowIh2C/3h3dzzLBfyCbgkLuUqrxMfrNiNDqLG0LBvIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH6MCIdgv94d3c8ywX8gm4JC7lKq8TH6zYjQ6ixtCwbyAQICAAEMAgAAAEBCDwAAAAAAAA==",
+          "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAQABAzc1rOIrIJkfixB2PGXIAQSzJwuHJA9YroUmtv2PuvSPfowIh2C/3h3dzzLBfyCbgkLuUqrxMfrNiNDqLG0LBvIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH6MCIdgv94d3c8ywX8gm4JC7lKq8TH6zYjQ6ixtCwbyAQICAAEMAgAAAEBCDwAAAAAAAA==",
+        ],
       },
     };
     const accounts: Account[] = [];
 
     await expect(
-      signTransaction(
+      signAllTransactions(
         request,
         topic,
         id,
@@ -108,10 +109,12 @@ describe("Testing sign transaction on Solana", () => {
     const topic = "topic";
     const id = 0;
     const request: SOLANA_REQUESTS = {
-      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_TRANSACTION,
+      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_ALL_TRANSACTION,
       params: {
-        transaction:
+        transactions: [
           "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAQABAzc1rOIrIJkfixB2PGXIAQSzJwuHJA9YroUmtv2PuvSPfowIh2C/3h3dzzLBfyCbgkLuUqrxMfrNiNDqLG0LBvIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH6MCIdgv94d3c8ywX8gm4JC7lKq8TH6zYjQ6ixtCwbyAQICAAEMAgAAAEBCDwAAAAAAAA==",
+          "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAQABAzc1rOIrIJkfixB2PGXIAQSzJwuHJA9YroUmtv2PuvSPfowIh2C/3h3dzzLBfyCbgkLuUqrxMfrNiNDqLG0LBvIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH6MCIdgv94d3c8ywX8gm4JC7lKq8TH6zYjQ6ixtCwbyAQICAAEMAgAAAEBCDwAAAAAAAA==",
+        ],
       },
     };
     const accounts: Account[] = [account];
@@ -120,7 +123,7 @@ describe("Testing sign transaction on Solana", () => {
     rejectRequestSpy.mockImplementationOnce(() => Promise.resolve());
 
     await expect(
-      signTransaction(
+      signAllTransactions(
         request,
         topic,
         id,
@@ -140,7 +143,7 @@ describe("Testing sign transaction on Solana", () => {
         family: "solana",
         amount: BigNumber(0),
         recipient: "",
-        raw: request.params.transaction,
+        raw: request.params.transactions[0],
         model: {
           kind: "transfer",
           uiState: {},
@@ -175,10 +178,12 @@ describe("Testing sign transaction on Solana", () => {
     const topic = "topic";
     const id = 0;
     const request: SOLANA_REQUESTS = {
-      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_TRANSACTION,
+      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_ALL_TRANSACTION,
       params: {
-        transaction:
+        transactions: [
           "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAQABAzc1rOIrIJkfixB2PGXIAQSzJwuHJA9YroUmtv2PuvSPfowIh2C/3h3dzzLBfyCbgkLuUqrxMfrNiNDqLG0LBvIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH6MCIdgv94d3c8ywX8gm4JC7lKq8TH6zYjQ6ixtCwbyAQICAAEMAgAAAEBCDwAAAAAAAA==",
+          "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAQABAzc1rOIrIJkfixB2PGXIAQSzJwuHJA9YroUmtv2PuvSPfowIh2C/3h3dzzLBfyCbgkLuUqrxMfrNiNDqLG0LBvIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH6MCIdgv94d3c8ywX8gm4JC7lKq8TH6zYjQ6ixtCwbyAQICAAEMAgAAAEBCDwAAAAAAAA==",
+        ],
       },
     };
     const accounts: Account[] = [account];
@@ -186,7 +191,7 @@ describe("Testing sign transaction on Solana", () => {
     const rejectRequestSpy = vi.spyOn(utils, "rejectRequest");
     rejectRequestSpy.mockImplementationOnce(() => Promise.resolve());
 
-    await signTransaction(
+    await signAllTransactions(
       request,
       topic,
       id,
@@ -205,7 +210,7 @@ describe("Testing sign transaction on Solana", () => {
         family: "solana",
         amount: BigNumber(0),
         recipient: "",
-        raw: request.params.transaction,
+        raw: request.params.transactions[0],
         model: {
           kind: "transfer",
           uiState: {},
@@ -250,10 +255,12 @@ describe("Testing sign transaction on Solana", () => {
     const topic = "topic";
     const id = 0;
     const request: SOLANA_REQUESTS = {
-      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_TRANSACTION,
+      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_ALL_TRANSACTION,
       params: {
-        transaction:
+        transactions: [
           "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAQABAzc1rOIrIJkfixB2PGXIAQSzJwuHJA9YroUmtv2PuvSPfowIh2C/3h3dzzLBfyCbgkLuUqrxMfrNiNDqLG0LBvIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH6MCIdgv94d3c8ywX8gm4JC7lKq8TH6zYjQ6ixtCwbyAQICAAEMAgAAAEBCDwAAAAAAAA==",
+          "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAQABAzc1rOIrIJkfixB2PGXIAQSzJwuHJA9YroUmtv2PuvSPfowIh2C/3h3dzzLBfyCbgkLuUqrxMfrNiNDqLG0LBvIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH6MCIdgv94d3c8ywX8gm4JC7lKq8TH6zYjQ6ixtCwbyAQICAAEMAgAAAEBCDwAAAAAAAA==",
+        ],
       },
     };
     const accounts: Account[] = [account];
@@ -261,7 +268,7 @@ describe("Testing sign transaction on Solana", () => {
     const acceptRequestSpy = vi.spyOn(utils, "acceptRequest");
     acceptRequestSpy.mockImplementationOnce(() => Promise.resolve());
 
-    await signTransaction(
+    await signAllTransactions(
       request,
       topic,
       id,
@@ -273,14 +280,14 @@ describe("Testing sign transaction on Solana", () => {
 
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { sign } = walletAPIClient.transaction;
-    expect(sign).toHaveBeenCalledTimes(1);
+    expect(sign).toHaveBeenCalledTimes(2);
     expect(sign).toHaveBeenCalledWith(
       account.id,
       expect.objectContaining({
         family: "solana",
         amount: BigNumber(0),
         recipient: "",
-        raw: request.params.transaction,
+        raw: request.params.transactions[0],
         model: {
           kind: "transfer",
           uiState: {},
@@ -288,10 +295,8 @@ describe("Testing sign transaction on Solana", () => {
       }),
     );
 
-    const dummySignature = new Uint8Array(64).fill(1); // 64-byte signature filled with ones
     const result = {
-      signature: base58.encode(dummySignature),
-      transaction: signedTransaction,
+      transactions: [signedTransaction, signedTransaction],
     };
 
     expect(acceptRequestSpy).toHaveBeenCalledTimes(1);
