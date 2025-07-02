@@ -5,6 +5,7 @@ import {
 import {
   acceptRequest,
   Errors,
+  isCanceledError,
   rejectRequest,
 } from "@/hooks/requestHandlers/utils";
 import { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
@@ -22,29 +23,29 @@ export async function signAndSendTransaction(
 ) {
   if (request.method !== "solana_signAndSendTransaction") {
     throw new Error(
-      `Method ${request.method} from request can not be used to sign transaction`,
+      `Method ${request.method} from request can not be used to sign and send transaction`,
     );
   }
 
   const liveTransaction = toLiveTransaction(request.params.transaction);
   const account = findSignerAccount(request.params.transaction, accounts);
 
-  if (account) {
-    try {
-      const signature = await client.transaction.signAndBroadcast(
-        account.id,
-        liveTransaction,
-      );
+  try {
+    const signature = await client.transaction.signAndBroadcast(
+      account.id,
+      liveTransaction,
+    );
 
-      const result: SOLANA_RESPONSES[typeof request.method] = {
-        signature: signature,
-      };
+    const result: SOLANA_RESPONSES[typeof request.method] = {
+      signature: signature,
+    };
 
-      await acceptRequest(walletKit, topic, id, result);
-    } catch (_error) {
-      await rejectRequest(walletKit, topic, id, Errors.txDeclined);
+    await acceptRequest(walletKit, topic, id, result);
+  } catch (error) {
+    if (isCanceledError(error)) {
+      await rejectRequest(walletKit, topic, id, Errors.userDecline);
+    } else {
+      throw error;
     }
-  } else {
-    await rejectRequest(walletKit, topic, id, Errors.txDeclined);
   }
 }

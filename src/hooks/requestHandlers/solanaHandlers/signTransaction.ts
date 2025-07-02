@@ -5,10 +5,12 @@ import {
 import {
   acceptRequest,
   Errors,
+  isCanceledError,
   rejectRequest,
 } from "@/hooks/requestHandlers/utils";
 import { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import { IWalletKit } from "@reown/walletkit";
+import { VersionedTransaction } from "@solana/web3.js";
 import base58 from "bs58";
 import { findSignerAccount, toLiveTransaction } from "./utils";
 
@@ -30,22 +32,25 @@ export async function signTransaction(
   const liveTransaction = toLiveTransaction(request.params.transaction);
   const account = findSignerAccount(request.params.transaction, accounts);
 
-  if (account) {
-    try {
-      const signature = await client.transaction.sign(
-        account.id,
-        liveTransaction,
-      );
+  try {
+    const signature = await client.transaction.sign(
+      account.id,
+      liveTransaction,
+    );
 
-      const result: SOLANA_RESPONSES[typeof request.method] = {
-        signature: base58.encode(signature),
-      };
+    const transaction = VersionedTransaction.deserialize(signature);
 
-      await acceptRequest(walletKit, topic, id, result);
-    } catch (_error) {
-      await rejectRequest(walletKit, topic, id, Errors.txDeclined);
+    const result: SOLANA_RESPONSES[typeof request.method] = {
+      signature: base58.encode(transaction.signatures[0]),
+      transaction: signature.toString("base64"),
+    };
+
+    await acceptRequest(walletKit, topic, id, result);
+  } catch (error) {
+    if (isCanceledError(error)) {
+      await rejectRequest(walletKit, topic, id, Errors.userDecline);
+    } else {
+      throw error;
     }
-  } else {
-    await rejectRequest(walletKit, topic, id, Errors.txDeclined);
   }
 }

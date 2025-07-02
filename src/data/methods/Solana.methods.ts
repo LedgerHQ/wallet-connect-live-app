@@ -74,6 +74,7 @@ export type SOLANA_RESPONSES = {
   };
   [SOLANA_SIGNING_METHODS.SOLANA_SIGN_TRANSACTION]: {
     signature: string;
+    transaction?: string;
   };
   [SOLANA_SIGNING_METHODS.SOLANA_SIGN_ALL_TRANSACTION]: {
     transactions: string[];

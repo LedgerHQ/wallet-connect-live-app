@@ -5,11 +5,11 @@ import {
 import {
   acceptRequest,
   Errors,
+  isCanceledError,
   rejectRequest,
 } from "@/hooks/requestHandlers/utils";
 import { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import { IWalletKit } from "@reown/walletkit";
-import base58 from "bs58";
 import { findSignerAccount, toLiveTransaction } from "./utils";
 
 export async function signAllTransactions(
@@ -23,7 +23,7 @@ export async function signAllTransactions(
 ) {
   if (request.method !== "solana_signAllTransactions") {
     throw new Error(
-      `Method ${request.method} from request can not be used to sign transaction`,
+      `Method ${request.method} from request can not be used to sign transactions`,
     );
   }
 
@@ -33,21 +33,20 @@ export async function signAllTransactions(
     const liveTransaction = toLiveTransaction(transaction);
     const account = findSignerAccount(transaction, accounts);
 
-    if (account) {
-      try {
-        const signature = await client.transaction.sign(
-          account.id,
-          liveTransaction,
-        );
+    try {
+      const signature = await client.transaction.sign(
+        account.id,
+        liveTransaction,
+      );
 
-        signatures.push(base58.encode(signature));
-      } catch (_error) {
-        await rejectRequest(walletKit, topic, id, Errors.txDeclined);
+      signatures.push(signature.toString("base64"));
+    } catch (error) {
+      if (isCanceledError(error)) {
+        await rejectRequest(walletKit, topic, id, Errors.userDecline);
         return;
+      } else {
+        throw error;
       }
-    } else {
-      await rejectRequest(walletKit, topic, id, Errors.txDeclined);
-      return;
     }
   }
 
