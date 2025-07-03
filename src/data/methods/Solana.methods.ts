@@ -8,7 +8,7 @@ export const SOLANA_SIGNING_METHODS = {
   SOLANA_REQUEST_ACCOUNTS: "solana_getAccounts",
   SOLANA_SIGN_TRANSACTION: "solana_signTransaction",
   SOLANA_SIGN_MESSAGE: "solana_signMessage",
-  SOLANA_SIGN_ALL_TRANSACTION: "solana_signAllTransactions",
+  SOLANA_SIGN_ALL_TRANSACTIONS: "solana_signAllTransactions",
   SOLANA_SIGN_AND_SEND_TRANSACTION: "solana_signAndSendTransaction",
 } as const;
 
@@ -46,7 +46,7 @@ export type SOLANA_REQUESTS =
       };
     }
   | {
-      method: typeof SOLANA_SIGNING_METHODS.SOLANA_SIGN_ALL_TRANSACTION;
+      method: typeof SOLANA_SIGNING_METHODS.SOLANA_SIGN_ALL_TRANSACTIONS;
       params: {
         transactions: string[];
       };
@@ -76,7 +76,7 @@ export type SOLANA_RESPONSES = {
     signature: string;
     transaction?: string;
   };
-  [SOLANA_SIGNING_METHODS.SOLANA_SIGN_ALL_TRANSACTION]: {
+  [SOLANA_SIGNING_METHODS.SOLANA_SIGN_ALL_TRANSACTIONS]: {
     transactions: string[];
   };
   [SOLANA_SIGNING_METHODS.SOLANA_SIGN_AND_SEND_TRANSACTION]: {

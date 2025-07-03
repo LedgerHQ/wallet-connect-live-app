@@ -1,6 +1,7 @@
 import {
   SOLANA_REQUESTS,
   SOLANA_RESPONSES,
+  SOLANA_SIGNING_METHODS,
 } from "@/data/methods/Solana.methods";
 import {
   acceptRequest,
@@ -23,7 +24,7 @@ export async function signTransaction(
   client: WalletAPIClient,
   walletKit: IWalletKit,
 ) {
-  if (request.method !== "solana_signTransaction") {
+  if (request.method !== SOLANA_SIGNING_METHODS.SOLANA_SIGN_TRANSACTION) {
     throw new Error(
       `Method ${request.method} from request can not be used to sign transaction`,
     );

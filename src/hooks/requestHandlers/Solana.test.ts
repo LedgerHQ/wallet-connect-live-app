@@ -99,7 +99,7 @@ describe("Testing Solana request handler mapping", () => {
     const topic = "topic";
     const id = 0;
     const request = {
-      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_ALL_TRANSACTION,
+      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_ALL_TRANSACTIONS,
       params: {
         transactions: ["transaction1", "transaction2"],
       },
