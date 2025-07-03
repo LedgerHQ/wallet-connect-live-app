@@ -1,14 +1,15 @@
-import { describe, expect, it, vi } from "vitest";
+import sessionProposal from "@/data/mocks/sessionProposal.example.json";
+import sessionProposalNotSupported from "@/data/mocks/sessionProposalNotSupported.example.json";
 import {
   formatAccountsByChain,
   getChains,
-  sortChains,
   sortAlphabetic,
+  sortChains,
 } from "@/hooks/useProposal/util";
-import sessionProposal from "@/data/mocks/sessionProposal.example.json";
-import sessionProposalNotSupported from "@/data/mocks/sessionProposalNotSupported.example.json";
+import { describe, expect, it, vi } from "vitest";
 
 import { ACCOUNT_MOCK } from "@/tests/mocks/account.mock";
+import { WalletInfo } from "@ledgerhq/wallet-api-client";
 import { ProposalTypes } from "@walletconnect/types";
 
 type Proposal = ProposalTypes.Struct;
@@ -106,8 +107,20 @@ describe("formatAccountsByChain", () => {
     getCurrencyByChainId,
   }));
 
+  const mockWalletInfo: WalletInfo["result"] = {
+    wallet: {
+      name: "ledger-live-desktop",
+      version: "2.121.0",
+    },
+    tracking: false,
+  };
+
   it("should format accounts by chain as expected", () => {
-    const result = formatAccountsByChain(proposalFormated, accountsFormatted);
+    const result = formatAccountsByChain(
+      proposalFormated,
+      accountsFormatted,
+      mockWalletInfo,
+    );
 
     expect(result).toEqual([
       {
@@ -144,6 +157,227 @@ describe("formatAccountsByChain", () => {
         accounts: [],
       },
     ]);
+  });
+
+  it("should filter out Solana chains when wallet version doesn't support them", () => {
+    const proposalWithSolana: Proposal = {
+      ...dataFromJSON,
+      requiredNamespaces: {
+        eip155: {
+          methods: ["eth_sendTransaction"],
+          chains: ["eip155:1"],
+          events: ["chainChanged"],
+        },
+        solana: {
+          methods: ["solana_signTransaction"],
+          chains: ["solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"],
+          events: [],
+        },
+      },
+      optionalNamespaces: {},
+    };
+
+    const accountsWithSolana = [
+      {
+        ...ACCOUNT_MOCK,
+        accountName: "ETH Account",
+        currency: "ethereum",
+      },
+      {
+        ...ACCOUNT_MOCK,
+        accountName: "SOL Account",
+        currency: "solana",
+      },
+    ];
+
+    // Test with unsupported version (below minimum)
+    const unsupportedWalletInfo: WalletInfo["result"] = {
+      wallet: {
+        name: "ledger-live-desktop",
+        version: "2.119.0", // Below minimum 2.120.0
+      },
+      tracking: false,
+    };
+
+    const resultUnsupported = formatAccountsByChain(
+      proposalWithSolana,
+      accountsWithSolana,
+      unsupportedWalletInfo,
+    );
+
+    // Should only contain Ethereum, Solana should be filtered out
+    expect(resultUnsupported).toEqual([
+      {
+        chain: "ethereum",
+        displayName: "Ethereum",
+        isSupported: true,
+        isRequired: true,
+        accounts: [
+          {
+            ...ACCOUNT_MOCK,
+            accountName: "ETH Account",
+            currency: "ethereum",
+          },
+        ],
+      },
+    ]);
+
+    // Test with supported version (meets minimum)
+    const supportedWalletInfo: WalletInfo["result"] = {
+      wallet: {
+        name: "ledger-live-desktop",
+        version: "2.121.0", // Above minimum 2.120.0
+      },
+      tracking: false,
+    };
+
+    const resultSupported = formatAccountsByChain(
+      proposalWithSolana,
+      accountsWithSolana,
+      supportedWalletInfo,
+    );
+
+    // Should contain both Ethereum and Solana
+    expect(resultSupported).toEqual([
+      {
+        chain: "ethereum",
+        displayName: "Ethereum",
+        isSupported: true,
+        isRequired: true,
+        accounts: [
+          {
+            ...ACCOUNT_MOCK,
+            accountName: "ETH Account",
+            currency: "ethereum",
+          },
+        ],
+      },
+      {
+        chain: "solana",
+        displayName: "Solana",
+        isSupported: true,
+        isRequired: true,
+        accounts: [
+          {
+            ...ACCOUNT_MOCK,
+            accountName: "SOL Account",
+            currency: "solana",
+          },
+        ],
+      },
+    ]);
+  });
+
+  it("should filter out Solana chains for mobile versions below minimum", () => {
+    const proposalWithSolana: Proposal = {
+      ...dataFromJSON,
+      requiredNamespaces: {
+        solana: {
+          methods: ["solana_signTransaction"],
+          chains: ["solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"],
+          events: [],
+        },
+      },
+      optionalNamespaces: {},
+    };
+
+    const accountsWithSolana = [
+      {
+        ...ACCOUNT_MOCK,
+        accountName: "SOL Account",
+        currency: "solana",
+      },
+    ];
+
+    // Test with unsupported mobile version
+    const unsupportedMobileWallet: WalletInfo["result"] = {
+      wallet: {
+        name: "ledger-live-mobile",
+        version: "3.84.0", // Below minimum 3.85.0
+      },
+      tracking: false,
+    };
+
+    const resultUnsupported = formatAccountsByChain(
+      proposalWithSolana,
+      accountsWithSolana,
+      unsupportedMobileWallet,
+    );
+
+    // Should be empty as Solana is filtered out
+    expect(resultUnsupported).toEqual([]);
+
+    // Test with supported mobile version
+    const supportedMobileWallet: WalletInfo["result"] = {
+      wallet: {
+        name: "ledger-live-mobile",
+        version: "3.86.0", // Above minimum 3.85.0
+      },
+      tracking: false,
+    };
+
+    const resultSupported = formatAccountsByChain(
+      proposalWithSolana,
+      accountsWithSolana,
+      supportedMobileWallet,
+    );
+
+    // Should contain Solana
+    expect(resultSupported).toEqual([
+      {
+        chain: "solana",
+        displayName: "Solana",
+        isSupported: true,
+        isRequired: true,
+        accounts: [
+          {
+            ...ACCOUNT_MOCK,
+            accountName: "SOL Account",
+            currency: "solana",
+          },
+        ],
+      },
+    ]);
+  });
+
+  it("should filter out Solana chains for unknown wallet types", () => {
+    const proposalWithSolana: Proposal = {
+      ...dataFromJSON,
+      requiredNamespaces: {
+        solana: {
+          methods: ["solana_signTransaction"],
+          chains: ["solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"],
+          events: [],
+        },
+      },
+      optionalNamespaces: {},
+    };
+
+    const accountsWithSolana = [
+      {
+        ...ACCOUNT_MOCK,
+        accountName: "SOL Account",
+        currency: "solana",
+      },
+    ];
+
+    // Test with unknown wallet type
+    const unknownWallet: WalletInfo["result"] = {
+      wallet: {
+        name: "unknown-wallet",
+        version: "1.0.0",
+      },
+      tracking: false,
+    };
+
+    const result = formatAccountsByChain(
+      proposalWithSolana,
+      accountsWithSolana,
+      unknownWallet,
+    );
+
+    // Should be empty as Solana is filtered out for unknown wallets
+    expect(result).toEqual([]);
   });
 });
 

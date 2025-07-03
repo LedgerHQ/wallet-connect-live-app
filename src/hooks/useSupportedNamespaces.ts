@@ -37,6 +37,7 @@ export function useSupportedNamespaces(
       const accountsByChain = formatAccountsByChain(
         session,
         accounts.data,
+        walletInfos,
       ).filter((a) => {
         return (
           a.accounts.length > 0 &&
@@ -88,7 +89,7 @@ export function useSupportedNamespaces(
         accounts: dataToSend.map((e) => e.account),
       };
     },
-    [accounts.data, session, selectedAccounts],
+    [session, accounts.data, walletInfos, selectedAccounts],
   );
 
   const buildMvxNamespace = useCallback(
@@ -99,6 +100,7 @@ export function useSupportedNamespaces(
       const accountsByChain = formatAccountsByChain(
         session,
         accounts.data,
+        walletInfos,
       ).filter(
         (a) =>
           a.accounts.length > 0 &&
@@ -150,7 +152,7 @@ export function useSupportedNamespaces(
         accounts: dataToSend.map((e) => e.account),
       };
     },
-    [accounts.data, session, selectedAccounts],
+    [session, accounts.data, walletInfos, selectedAccounts],
   );
 
   const buildBip122Namespace = useCallback(
@@ -161,6 +163,7 @@ export function useSupportedNamespaces(
       const accountsByChain = formatAccountsByChain(
         session,
         accounts.data,
+        walletInfos,
       ).filter(
         (a) =>
           a.accounts.length > 0 &&
@@ -212,7 +215,7 @@ export function useSupportedNamespaces(
         accounts: dataToSend.map((e) => e.account),
       };
     },
-    [accounts.data, session, selectedAccounts],
+    [session, accounts.data, walletInfos, selectedAccounts],
   );
 
   // const buildXrpNamespace = useCallback(
@@ -223,6 +226,7 @@ export function useSupportedNamespaces(
   //     const accountsByChain = formatAccountsByChain(
   //       session,
   //       accounts.data,
+  //       walletInfos,
   //     ).filter(
   //       (a) =>
   //         a.accounts.length > 0 &&
@@ -274,7 +278,7 @@ export function useSupportedNamespaces(
   //       accounts: dataToSend.map((e) => e.account),
   //     };
   //   },
-  //   [accounts.data, session, selectedAccounts],
+  //   [session, accounts.data, walletInfos, selectedAccounts],
   // );
 
   const buildSolanaNamespace = useCallback(
@@ -285,6 +289,7 @@ export function useSupportedNamespaces(
       const accountsByChain = formatAccountsByChain(
         session,
         accounts.data,
+        walletInfos,
       ).filter(
         (a) =>
           a.accounts.length > 0 &&
@@ -349,7 +354,7 @@ export function useSupportedNamespaces(
         accounts: dataToSend.map((e) => e.account),
       };
     },
-    [accounts.data, session, selectedAccounts],
+    [session, accounts.data, walletInfos, selectedAccounts],
   );
 
   const buildSupportedNamespaces = useCallback(
