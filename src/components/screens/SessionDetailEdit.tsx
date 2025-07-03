@@ -7,7 +7,7 @@ import { useSessionDetails } from "@/hooks/useSessionDetails";
 import {
   walletAPIClientAtom,
   walletCurrenciesByIdAtom,
-  walletInfosAtom,
+  walletInfoAtom,
 } from "@/store/wallet-api.store";
 import { ResponsiveContainer } from "@/styles/styles";
 import { Box, Button, Flex, InfiniteLoader, Text } from "@ledgerhq/react-ui";
@@ -33,7 +33,7 @@ export default function DetailEdit({ session }: Props) {
   const accounts = useAccounts(client);
   const analytics = useAnalytics();
   const currenciesById = useAtomValue(walletCurrenciesByIdAtom);
-  const walletInfos = useAtomValue(walletInfosAtom);
+  const walletInfo = useAtomValue(walletInfoAtom);
 
   useEffect(() => {
     analytics.page("Wallet Connect Session Detail Edit", {
@@ -52,8 +52,8 @@ export default function DetailEdit({ session }: Props) {
   }, [navigate, session.topic]);
 
   const accountsByChain = useMemo(
-    () => formatAccountsByChain(session, accounts.data, walletInfos),
-    [session, accounts, walletInfos],
+    () => formatAccountsByChain(session, accounts.data, walletInfo),
+    [session, accounts, walletInfo],
   );
 
   const entries = useMemo(() => {

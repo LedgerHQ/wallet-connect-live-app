@@ -8,7 +8,7 @@ import { formatAccountsByChain, sortChains } from "@/hooks/useProposal/util";
 import useVerification from "@/hooks/useVerification";
 import {
   walletCurrenciesByIdAtom,
-  walletInfosAtom,
+  walletInfoAtom,
 } from "@/store/wallet-api.store";
 import { ResponsiveContainer } from "@/styles/styles";
 import { OneClickAuthPayload } from "@/types/types";
@@ -63,7 +63,7 @@ export default function SessionProposal({
   const dApp = proposal.proposer.metadata.name;
   const dAppUrl = proposal.proposer.metadata.url;
   const currenciesById = useAtomValue(walletCurrenciesByIdAtom);
-  const walletInfos = useAtomValue(walletInfosAtom);
+  const walletInfo = useAtomValue(walletInfoAtom);
   const [approving, setApproving] = useState(false);
   const [rejecting, setRejecting] = useState(false);
 
@@ -138,8 +138,8 @@ export default function SessionProposal({
   ]);
 
   const accountsByChain = useMemo(
-    () => formatAccountsByChain(proposal, accounts, walletInfos),
-    [proposal, accounts, walletInfos],
+    () => formatAccountsByChain(proposal, accounts, walletInfo),
+    [proposal, accounts, walletInfo],
   );
 
   const requiredChains = useMemo(
