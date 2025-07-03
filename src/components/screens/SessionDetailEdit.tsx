@@ -1,23 +1,24 @@
-import { Box, Button, Flex, InfiniteLoader, Text } from "@ledgerhq/react-ui";
-import { useCallback, useEffect, useMemo } from "react";
-import styled from "styled-components";
-import { useTranslation } from "react-i18next";
 import { ButtonsContainer, List } from "@/components/atoms/containers/Elements";
 import DetailHeader from "@/components/atoms/DetailHeader";
-import { ResponsiveContainer } from "@/styles/styles";
-import useAnalytics from "@/hooks/useAnalytics";
-import { useNavigate } from "@tanstack/react-router";
-import { useAtomValue } from "jotai";
 import useAccounts from "@/hooks/useAccounts";
+import useAnalytics from "@/hooks/useAnalytics";
+import { formatAccountsByChain } from "@/hooks/useProposal/util";
+import { useSessionDetails } from "@/hooks/useSessionDetails";
 import {
   walletAPIClientAtom,
   walletCurrenciesByIdAtom,
+  walletInfoAtom,
 } from "@/store/wallet-api.store";
+import { ResponsiveContainer } from "@/styles/styles";
+import { Box, Button, Flex, InfiniteLoader, Text } from "@ledgerhq/react-ui";
+import { useNavigate } from "@tanstack/react-router";
 import { SessionTypes } from "@walletconnect/types";
-import { formatAccountsByChain } from "@/hooks/useProposal/util";
+import { useAtomValue } from "jotai";
+import { useCallback, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import styled from "styled-components";
 import { AccountRow } from "./sessionProposal/AccountRow";
 import { ChainRow } from "./sessionProposal/ChainRow";
-import { useSessionDetails } from "@/hooks/useSessionDetails";
 
 type Props = {
   session: SessionTypes.Struct;
@@ -32,6 +33,7 @@ export default function DetailEdit({ session }: Props) {
   const accounts = useAccounts(client);
   const analytics = useAnalytics();
   const currenciesById = useAtomValue(walletCurrenciesByIdAtom);
+  const walletInfo = useAtomValue(walletInfoAtom);
 
   useEffect(() => {
     analytics.page("Wallet Connect Session Detail Edit", {
@@ -50,8 +52,8 @@ export default function DetailEdit({ session }: Props) {
   }, [navigate, session.topic]);
 
   const accountsByChain = useMemo(
-    () => formatAccountsByChain(session, accounts.data),
-    [session, accounts],
+    () => formatAccountsByChain(session, accounts.data, walletInfo),
+    [session, accounts, walletInfo],
   );
 
   const entries = useMemo(() => {

@@ -1,43 +1,44 @@
-import { SignClientTypes } from "@walletconnect/types";
-import { useCallback, useEffect } from "react";
-import { WalletKitTypes } from "@reown/walletkit";
-import { enqueueSnackbar } from "notistack";
+import { walletAPIClientAtom, walletInfoAtom } from "@/store/wallet-api.store";
 import {
-  coreAtom,
   connectionStatusAtom,
-  walletKitAtom,
+  coreAtom,
   loadingAtom,
+  oneClickAuthPayloadAtom,
   showBackToBrowserModalAtom,
   verifyContextByTopicAtom,
-  oneClickAuthPayloadAtom,
+  walletKitAtom,
 } from "@/store/walletKit.store";
+import { OneClickAuthPayload } from "@/types/types";
 import {
+  getErrorMessage,
+  isBIP122Chain,
   isEIP155Chain,
   isMultiversXChain,
-  isBIP122Chain,
   isRippleChain,
-  // isSolanaChain,
-  getErrorMessage,
+  isSolanaChain,
+  isSolanaSupportEnabled,
 } from "@/utils/helper.util";
+import { WalletKitTypes } from "@reown/walletkit";
+import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
+import { SignClientTypes } from "@walletconnect/types";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { enqueueSnackbar } from "notistack";
+import { useCallback, useEffect } from "react";
+import { isWalletRequest } from "../utils/helper.util";
+import { handleBIP122Request } from "./requestHandlers/BIP122";
+import { handleEIP155Request } from "./requestHandlers/EIP155";
+import { handleMvxRequest } from "./requestHandlers/MultiversX";
+import { handleXrpRequest } from "./requestHandlers/Ripple";
+import { handleSolanaRequest } from "./requestHandlers/Solana";
+import { Errors, rejectRequest } from "./requestHandlers/utils";
+import { handleWalletRequest } from "./requestHandlers/Wallet";
 import useAccounts from "./useAccounts";
-import { walletAPIClientAtom } from "@/store/wallet-api.store";
-import { queryKey as sessionsQueryKey } from "./useSessions";
 import {
   queryKey as pendingProposalsQueryKey,
   useQueryFn as usePendingProposalsQueryFn,
 } from "./usePendingProposals";
-import { useQueryClient } from "@tanstack/react-query";
-import { handleEIP155Request } from "./requestHandlers/EIP155";
-import { handleMvxRequest } from "./requestHandlers/MultiversX";
-import { handleBIP122Request } from "./requestHandlers/BIP122";
-import { handleXrpRequest } from "./requestHandlers/Ripple";
-import { Errors, rejectRequest } from "./requestHandlers/utils";
-import { handleWalletRequest } from "./requestHandlers/Wallet";
-import { isWalletRequest } from "../utils/helper.util";
-import { OneClickAuthPayload } from "@/types/types";
-// import { handleSolanaRequest } from "./requestHandlers/Solana";
+import { queryKey as sessionsQueryKey } from "./useSessions";
 
 function useWalletConnectStatus() {
   const core = useAtomValue(coreAtom);
@@ -101,6 +102,7 @@ export default function useWalletConnect() {
   const queryClient = useQueryClient();
 
   const client = useAtomValue(walletAPIClientAtom);
+  const walletInfo = useAtomValue(walletInfoAtom);
   const setVerifyContextByTopic = useSetAtom(verifyContextByTopicAtom);
 
   const accounts = useAccounts(client);
@@ -187,6 +189,7 @@ export default function useWalletConnect() {
               client,
               walletKit,
               queryClient,
+              walletInfo,
             );
           } else if (isEIP155Chain(chainId, request)) {
             await handleEIP155Request(
@@ -228,16 +231,19 @@ export default function useWalletConnect() {
               client,
               walletKit,
             );
-          // } else if (isSolanaChain(chainId, request)) {
-          //   await handleSolanaRequest(
-          //     request,
-          //     topic,
-          //     id,
-          //     chainId,
-          //     accounts.data,
-          //     client,
-          //     walletKit,
-          //   );
+          } else if (
+            isSolanaChain(chainId, request) &&
+            isSolanaSupportEnabled(walletInfo)
+          ) {
+            await handleSolanaRequest(
+              request,
+              topic,
+              id,
+              chainId,
+              accounts.data,
+              client,
+              walletKit,
+            );
           } else {
             console.error("Not Supported Chain");
             await rejectRequest(
@@ -273,6 +279,7 @@ export default function useWalletConnect() {
       queryClient,
       setLoading,
       redirectToDapp,
+      walletInfo,
     ],
   );
 

@@ -3,8 +3,10 @@ import {
   getCurrencyByChainId,
   getDisplayName,
   getNamespace,
+  isSolanaChain,
+  isSolanaSupportEnabled,
 } from "@/utils/helper.util";
-import { Account } from "@ledgerhq/wallet-api-client";
+import { Account, WalletInfo } from "@ledgerhq/wallet-api-client";
 import { ProposalTypes, SessionTypes } from "@walletconnect/types";
 
 export type AccountsInChain = {
@@ -67,6 +69,7 @@ export const getChains = (
 export const formatAccountsByChain = (
   proposal: ProposalTypes.Struct | SessionTypes.Struct,
   accounts: Account[],
+  walletInfo: WalletInfo["result"],
 ) => {
   const families = getChains(proposal);
 
@@ -78,6 +81,11 @@ export const formatAccountsByChain = (
 
   const mappedAccountsByChains = chainsDeduplicated.reduce<AccountsInChain[]>(
     (acc, chain) => {
+      // Filter out Solana chains if Solana support is not enabled
+      if (isSolanaChain(chain) && !isSolanaSupportEnabled(walletInfo)) {
+        return acc;
+      }
+
       const formattedChain = getCurrencyByChainId(chain);
 
       const chainIsRequired = families.some(

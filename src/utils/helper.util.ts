@@ -2,9 +2,11 @@ import { BIP122_REQUESTS } from "@/data/methods/BIP122.methods";
 import { EIP155_REQUESTS } from "@/data/methods/EIP155Data.methods";
 import { MULTIVERSX_REQUESTS } from "@/data/methods/MultiversX.methods";
 import { RIPPLE_REQUESTS } from "@/data/methods/Ripple.methods";
-import { WALLET_REQUESTS } from "@/data/methods/Wallet.methods";
 import { SOLANA_REQUESTS } from "@/data/methods/Solana.methods";
+import { WALLET_REQUESTS } from "@/data/methods/Wallet.methods";
 import { SUPPORTED_NETWORK } from "@/data/network.config";
+import type { WalletInfo } from "@ledgerhq/wallet-api-client";
+import semver from "semver";
 
 /**
  * Truncates string (in the middle) via given lenght value
@@ -104,6 +106,43 @@ export const getCurrencyByChainId = (chainId: string) => {
   if (elem?.[0] === "solana (legacy)") return "solana";
   return elem?.[0] ?? chainId;
 };
+
+/**
+ * Minimum versions of Ledger Live that support Solana
+ */
+const SOLANA_MIN_VERSIONS: Record<string, string> = {
+  "ledger-live-desktop": "2.120.0", // Minimum desktop version
+  "ledger-live-mobile": "3.85.0", // Minimum mobile version
+};
+
+/**
+ * Check if Solana support should be enabled based on wallet version
+ */
+export function isSolanaSupportEnabled(
+  walletInfo: WalletInfo["result"],
+): boolean {
+  const {
+    wallet: { name, version },
+  } = walletInfo;
+
+  if (!version) {
+    return false;
+  }
+
+  // Check if the wallet name is supported and version meets minimum requirement
+  const minVersion = SOLANA_MIN_VERSIONS[name];
+  if (minVersion) {
+    try {
+      return semver.gte(version, minVersion);
+    } catch (error) {
+      // If version format is invalid, return false
+      console.warn(`Invalid version format: ${version}`, error);
+      return false;
+    }
+  }
+
+  return false;
+}
 
 export const getErrorMessage = (error: unknown) => {
   if (error instanceof Error) return error.message;
