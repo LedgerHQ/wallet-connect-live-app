@@ -14,7 +14,7 @@ import {
 } from "@/data/network.config";
 import useAccounts from "@/hooks/useAccounts";
 import { formatAccountsByChain } from "@/hooks/useProposal/util";
-import { walletAPIClientAtom, walletInfosAtom } from "@/store/wallet-api.store";
+import { walletAPIClientAtom, walletInfoAtom } from "@/store/wallet-api.store";
 import { getNamespace, isSolanaSupportEnabled } from "@/utils/helper.util";
 import { ProposalTypes, SessionTypes } from "@walletconnect/types";
 import { BuildApprovedNamespacesParams } from "@walletconnect/utils";
@@ -26,7 +26,7 @@ export function useSupportedNamespaces(
   selectedAccounts: string[],
 ) {
   const client = useAtomValue(walletAPIClientAtom);
-  const walletInfos = useAtomValue(walletInfosAtom);
+  const walletInfo = useAtomValue(walletInfoAtom);
   const accounts = useAccounts(client);
 
   const buildEip155Namespace = useCallback(
@@ -37,7 +37,7 @@ export function useSupportedNamespaces(
       const accountsByChain = formatAccountsByChain(
         session,
         accounts.data,
-        walletInfos,
+        walletInfo,
       ).filter((a) => {
         return (
           a.accounts.length > 0 &&
@@ -89,7 +89,7 @@ export function useSupportedNamespaces(
         accounts: dataToSend.map((e) => e.account),
       };
     },
-    [session, accounts.data, walletInfos, selectedAccounts],
+    [session, accounts.data, walletInfo, selectedAccounts],
   );
 
   const buildMvxNamespace = useCallback(
@@ -100,7 +100,7 @@ export function useSupportedNamespaces(
       const accountsByChain = formatAccountsByChain(
         session,
         accounts.data,
-        walletInfos,
+        walletInfo,
       ).filter(
         (a) =>
           a.accounts.length > 0 &&
@@ -152,7 +152,7 @@ export function useSupportedNamespaces(
         accounts: dataToSend.map((e) => e.account),
       };
     },
-    [session, accounts.data, walletInfos, selectedAccounts],
+    [session, accounts.data, walletInfo, selectedAccounts],
   );
 
   const buildBip122Namespace = useCallback(
@@ -163,7 +163,7 @@ export function useSupportedNamespaces(
       const accountsByChain = formatAccountsByChain(
         session,
         accounts.data,
-        walletInfos,
+        walletInfo,
       ).filter(
         (a) =>
           a.accounts.length > 0 &&
@@ -215,7 +215,7 @@ export function useSupportedNamespaces(
         accounts: dataToSend.map((e) => e.account),
       };
     },
-    [session, accounts.data, walletInfos, selectedAccounts],
+    [session, accounts.data, walletInfo, selectedAccounts],
   );
 
   // const buildXrpNamespace = useCallback(
@@ -226,7 +226,7 @@ export function useSupportedNamespaces(
   //     const accountsByChain = formatAccountsByChain(
   //       session,
   //       accounts.data,
-  //       walletInfos,
+  //       walletInfo,
   //     ).filter(
   //       (a) =>
   //         a.accounts.length > 0 &&
@@ -278,7 +278,7 @@ export function useSupportedNamespaces(
   //       accounts: dataToSend.map((e) => e.account),
   //     };
   //   },
-  //   [session, accounts.data, walletInfos, selectedAccounts],
+  //   [session, accounts.data, walletInfo, selectedAccounts],
   // );
 
   const buildSolanaNamespace = useCallback(
@@ -289,7 +289,7 @@ export function useSupportedNamespaces(
       const accountsByChain = formatAccountsByChain(
         session,
         accounts.data,
-        walletInfos,
+        walletInfo,
       ).filter(
         (a) =>
           a.accounts.length > 0 &&
@@ -354,7 +354,7 @@ export function useSupportedNamespaces(
         accounts: dataToSend.map((e) => e.account),
       };
     },
-    [session, accounts.data, walletInfos, selectedAccounts],
+    [session, accounts.data, walletInfo, selectedAccounts],
   );
 
   const buildSupportedNamespaces = useCallback(
@@ -390,7 +390,7 @@ export function useSupportedNamespaces(
       // }
       if (
         ("solana" in requiredNamespaces || "solana" in optionalNamespaces) &&
-        isSolanaSupportEnabled(walletInfos)
+        isSolanaSupportEnabled(walletInfo)
       ) {
         supportedNamespaces[SupportedNamespace.SOLANA] = buildSolanaNamespace(
           requiredNamespaces,
@@ -405,7 +405,7 @@ export function useSupportedNamespaces(
       buildMvxNamespace,
       // buildXrpNamespace,
       buildSolanaNamespace,
-      walletInfos,
+      walletInfo,
     ],
   );
 

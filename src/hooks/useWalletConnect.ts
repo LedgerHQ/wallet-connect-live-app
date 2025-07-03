@@ -1,4 +1,4 @@
-import { walletAPIClientAtom, walletInfosAtom } from "@/store/wallet-api.store";
+import { walletAPIClientAtom, walletInfoAtom } from "@/store/wallet-api.store";
 import {
   connectionStatusAtom,
   coreAtom,
@@ -102,7 +102,7 @@ export default function useWalletConnect() {
   const queryClient = useQueryClient();
 
   const client = useAtomValue(walletAPIClientAtom);
-  const walletInfos = useAtomValue(walletInfosAtom);
+  const walletInfo = useAtomValue(walletInfoAtom);
   const setVerifyContextByTopic = useSetAtom(verifyContextByTopicAtom);
 
   const accounts = useAccounts(client);
@@ -189,7 +189,7 @@ export default function useWalletConnect() {
               client,
               walletKit,
               queryClient,
-              walletInfos,
+              walletInfo,
             );
           } else if (isEIP155Chain(chainId, request)) {
             await handleEIP155Request(
@@ -233,7 +233,7 @@ export default function useWalletConnect() {
             //   );
           } else if (
             isSolanaChain(chainId, request) &&
-            isSolanaSupportEnabled(walletInfos)
+            isSolanaSupportEnabled(walletInfo)
           ) {
             await handleSolanaRequest(
               request,
@@ -283,7 +283,7 @@ export default function useWalletConnect() {
       queryClient,
       setLoading,
       redirectToDapp,
-      walletInfos,
+      walletInfo,
     ],
   );
 

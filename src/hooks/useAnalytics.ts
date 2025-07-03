@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useMemo } from "react";
-import { AnalyticsBrowser } from "@segment/analytics-next";
+import { walletInfoAtom, walletUserIdAtom } from "@/store/wallet-api.store";
 import { walletKitAtom } from "@/store/walletKit.store";
+import { AnalyticsBrowser } from "@segment/analytics-next";
 import { atom, useAtomValue } from "jotai";
+import { useCallback, useEffect, useMemo } from "react";
 import useSessions from "./useSessions";
-import { walletInfosAtom, walletUserIdAtom } from "@/store/wallet-api.store";
 
 const analyticsOptions = { ip: "0.0.0.0" };
 
@@ -16,7 +16,7 @@ const analyticsAtom = atom((get) => {
   // Using .then instead of await to return instantly the analytics object
   // And not wait for the infos before allowing the user to move in the UI
   // Then load analytics only once when we get the infos
-  void get(walletInfosAtom).then(({ wallet: { name }, tracking }) => {
+  void get(walletInfoAtom).then(({ wallet: { name }, tracking }) => {
     let writeKey: string | undefined;
     if (name === "ledger-live-desktop") {
       writeKey = import.meta.env.VITE_PUBLIC_SEGMENT_API_KEY_DESKTOP;
