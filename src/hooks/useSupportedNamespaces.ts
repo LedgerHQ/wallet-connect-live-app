@@ -14,8 +14,8 @@ import {
 } from "@/data/network.config";
 import useAccounts from "@/hooks/useAccounts";
 import { formatAccountsByChain } from "@/hooks/useProposal/util";
-import { walletAPIClientAtom } from "@/store/wallet-api.store";
-import { getNamespace } from "@/utils/helper.util";
+import { walletAPIClientAtom, walletInfosAtom } from "@/store/wallet-api.store";
+import { getNamespace, isSolanaSupportEnabled } from "@/utils/helper.util";
 import { ProposalTypes, SessionTypes } from "@walletconnect/types";
 import { BuildApprovedNamespacesParams } from "@walletconnect/utils";
 import { useAtomValue } from "jotai";
@@ -26,6 +26,7 @@ export function useSupportedNamespaces(
   selectedAccounts: string[],
 ) {
   const client = useAtomValue(walletAPIClientAtom);
+  const walletInfos = useAtomValue(walletInfosAtom);
   const accounts = useAccounts(client);
 
   const buildEip155Namespace = useCallback(
@@ -382,7 +383,10 @@ export function useSupportedNamespaces(
       //     optionalNamespaces,
       //   );
       // }
-      if ("solana" in requiredNamespaces || "solana" in optionalNamespaces) {
+      if (
+        ("solana" in requiredNamespaces || "solana" in optionalNamespaces) &&
+        isSolanaSupportEnabled(walletInfos)
+      ) {
         supportedNamespaces[SupportedNamespace.SOLANA] = buildSolanaNamespace(
           requiredNamespaces,
           optionalNamespaces,
@@ -396,6 +400,7 @@ export function useSupportedNamespaces(
       buildMvxNamespace,
       // buildXrpNamespace,
       buildSolanaNamespace,
+      walletInfos,
     ],
   );
 

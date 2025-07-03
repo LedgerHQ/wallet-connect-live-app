@@ -18,8 +18,13 @@ import {
   isMultiversXChain,
   // isRippleChain,
   isSolanaChain,
+  isSolanaSupportEnabled,
 } from "@/utils/helper.util";
-import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
+import type {
+  Account,
+  WalletAPIClient,
+  WalletInfo,
+} from "@ledgerhq/wallet-api-client";
 import type { IWalletKit } from "@reown/walletkit";
 import type { QueryClient } from "@tanstack/react-query";
 import { enqueueSnackbar } from "notistack";
@@ -36,7 +41,11 @@ function getNetworkByChainId(
   ];
 }
 
-function getNetwork(currentChainId: string, newChainId: string) {
+function getNetwork(
+  currentChainId: string,
+  newChainId: string,
+  walletInfo: WalletInfo["result"],
+) {
   if (isEIP155Chain(currentChainId)) {
     return getNetworkByChainId(EIP155_NETWORK_BY_CHAIN_ID, newChainId);
   }
@@ -49,7 +58,7 @@ function getNetwork(currentChainId: string, newChainId: string) {
   if (isMultiversXChain(currentChainId)) {
     return getNetworkByChainId(MULTIVERS_X_NETWORK_BY_CHAIN_ID, newChainId);
   }
-  if (isSolanaChain(currentChainId)) {
+  if (isSolanaChain(currentChainId) && isSolanaSupportEnabled(walletInfo)) {
     return getNetworkByChainId(SOLANA_NETWORK_BY_CHAIN_ID, newChainId);
   }
 }
@@ -92,10 +101,15 @@ export async function handleWalletRequest(
   client: WalletAPIClient,
   walletKit: IWalletKit,
   queryClient: QueryClient,
+  walletInfo: WalletInfo["result"],
 ) {
   switch (request.method) {
     case WALLET_METHODS.WALLET_SWITCH_ETHEREUM_CHAIN: {
-      const network = getNetwork(chainId, request.params[0].chainId);
+      const network = getNetwork(
+        chainId,
+        request.params[0].chainId,
+        walletInfo,
+      );
       if (network) {
         const session = walletKit.engine.signClient.session.get(topic);
         const namespace = chainId.split(":")[0];
@@ -141,7 +155,11 @@ export async function handleWalletRequest(
       break;
     }
     case WALLET_METHODS.WALLET_ADD_ETHEREUM_CHAIN: {
-      const network = getNetwork(chainId, request.params[0].chainId);
+      const network = getNetwork(
+        chainId,
+        request.params[0].chainId,
+        walletInfo,
+      );
       if (network) {
         const account = await addNewAccounts(client, queryClient, [network]);
         if (account) {
