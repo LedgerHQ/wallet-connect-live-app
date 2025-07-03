@@ -20,6 +20,9 @@ export function findSignerAccount(
   for (let i = 0; i < numRequiredSignatures; i++) {
     const pubkey = message.staticAccountKeys[i].toBase58();
     account = accounts.find((account) => account.address === pubkey);
+    if (account) {
+      break;
+    }
   }
 
   if (!account) {
