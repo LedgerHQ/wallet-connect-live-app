@@ -1,4 +1,7 @@
-import { type SOLANA_REQUESTS } from "@/data/methods/Solana.methods";
+import {
+  SOLANA_SIGNING_METHODS,
+  type SOLANA_REQUESTS,
+} from "@/data/methods/Solana.methods";
 import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import type { IWalletKit } from "@reown/walletkit";
 import { signAllTransactions } from "./solanaHandlers/signAllTransactions";
@@ -17,7 +20,7 @@ export async function handleSolanaRequest(
   walletKit: IWalletKit,
 ) {
   switch (request.method) {
-    case "solana_signMessage":
+    case SOLANA_SIGNING_METHODS.SOLANA_SIGN_MESSAGE:
       await signMessage(
         request,
         topic,
@@ -28,7 +31,7 @@ export async function handleSolanaRequest(
         walletKit,
       );
       break;
-    case "solana_signTransaction":
+    case SOLANA_SIGNING_METHODS.SOLANA_SIGN_TRANSACTION:
       await signTransaction(
         request,
         topic,
@@ -39,7 +42,7 @@ export async function handleSolanaRequest(
         walletKit,
       );
       break;
-    case "solana_signAllTransactions":
+    case SOLANA_SIGNING_METHODS.SOLANA_SIGN_ALL_TRANSACTIONS:
       await signAllTransactions(
         request,
         topic,
@@ -50,7 +53,7 @@ export async function handleSolanaRequest(
         walletKit,
       );
       break;
-    case "solana_signAndSendTransaction":
+    case SOLANA_SIGNING_METHODS.SOLANA_SIGN_AND_SEND_TRANSACTION:
       await signAndSendTransaction(
         request,
         topic,
