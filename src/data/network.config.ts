@@ -229,7 +229,7 @@ export const SUPPORTED_NETWORK: Record<string, Network> = {
   ...EIP155_CHAINS,
   ...MULTIVERS_X_CHAINS,
   ...BIP122_CHAINS,
-  ...RIPPLE_CHAINS,
+  // ...RIPPLE_CHAINS,
   // ...SOLANA_CHAINS,
 };
 
@@ -241,6 +241,6 @@ export enum SupportedNamespace {
   BIP122 = "bip122",
   EIP155 = "eip155",
   MVX = "mvx",
-  XRPL = "xrpl",
+  // XRPL = "xrpl",
   // SOLANA = "solana",
 }

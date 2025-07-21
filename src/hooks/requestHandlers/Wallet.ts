@@ -13,14 +13,14 @@ import {
   isBIP122Chain,
   isEIP155Chain,
   isMultiversXChain,
-  isRippleChain,
+  // isRippleChain,
   // isSolanaChain,
 } from "@/utils/helper.util";
 import {
   BIP122_NETWORK_BY_CHAIN_ID,
   EIP155_NETWORK_BY_CHAIN_ID,
   MULTIVERS_X_NETWORK_BY_CHAIN_ID,
-  RIPPLE_NETWORK_BY_CHAIN_ID,
+  // RIPPLE_NETWORK_BY_CHAIN_ID,
   // SOLANA_NETWORK_BY_CHAIN_ID,
 } from "@/data/network.config";
 import { queryKey as accountsQueryKey } from "@/hooks/useAccounts";
@@ -43,9 +43,9 @@ function getNetwork(currentChainId: string, newChainId: string) {
   if (isBIP122Chain(currentChainId)) {
     return getNetworkByChainId(BIP122_NETWORK_BY_CHAIN_ID, newChainId);
   }
-  if (isRippleChain(currentChainId)) {
-    return getNetworkByChainId(RIPPLE_NETWORK_BY_CHAIN_ID, newChainId);
-  }
+  // if (isRippleChain(currentChainId)) {
+  //   return getNetworkByChainId(RIPPLE_NETWORK_BY_CHAIN_ID, newChainId);
+  // }
   if (isMultiversXChain(currentChainId)) {
     return getNetworkByChainId(MULTIVERS_X_NETWORK_BY_CHAIN_ID, newChainId);
   }

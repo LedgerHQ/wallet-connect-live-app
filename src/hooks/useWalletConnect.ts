@@ -15,7 +15,7 @@ import {
   isEIP155Chain,
   isMultiversXChain,
   isBIP122Chain,
-  isRippleChain,
+  // isRippleChain,
   // isSolanaChain,
   getErrorMessage,
 } from "@/utils/helper.util";
@@ -32,7 +32,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { handleEIP155Request } from "./requestHandlers/EIP155";
 import { handleMvxRequest } from "./requestHandlers/MultiversX";
 import { handleBIP122Request } from "./requestHandlers/BIP122";
-import { handleXrpRequest } from "./requestHandlers/Ripple";
+// import { handleXrpRequest } from "./requestHandlers/Ripple";
 import { Errors, rejectRequest } from "./requestHandlers/utils";
 import { handleWalletRequest } from "./requestHandlers/Wallet";
 import { isWalletRequest } from "../utils/helper.util";
@@ -218,16 +218,16 @@ export default function useWalletConnect() {
               client,
               walletKit,
             );
-          } else if (isRippleChain(chainId, request)) {
-            await handleXrpRequest(
-              request,
-              topic,
-              id,
-              chainId,
-              accounts.data,
-              client,
-              walletKit,
-            );
+          // } else if (isRippleChain(chainId, request)) {
+          //   await handleXrpRequest(
+          //     request,
+          //     topic,
+          //     id,
+          //     chainId,
+          //     accounts.data,
+          //     client,
+          //     walletKit,
+          //   );
           // } else if (isSolanaChain(chainId, request)) {
           //   await handleSolanaRequest(
           //     request,
