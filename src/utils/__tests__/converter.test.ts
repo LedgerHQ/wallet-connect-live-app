@@ -1,8 +1,8 @@
-import { describe, expect, it } from "vitest";
-import BigNumber from "bignumber.js";
-import { EthTransaction, convertEthToLiveTX } from "../converters";
-import eip55 from "eip55";
 import { ethTx, to } from "@/tests/mocks/eth-transaction.mock";
+import BigNumber from "bignumber.js";
+import eip55 from "eip55";
+import { describe, expect, it } from "vitest";
+import { EthTransaction, convertEthToLiveTX } from "../converters";
 
 describe("Converter File", () => {
   it("convertEthToLiveTX correclty formatted", () => {
@@ -20,13 +20,14 @@ describe("Converter File", () => {
   });
 
   it("convertEthToLiveTX wrongly formatted", () => {
-    const ethTx: EthTransaction = {
+    const ethTx = {
       value: "",
       to: to,
+      from: "",
       gasPrice: "",
       gas: "",
       data: "",
-    };
+    } as const satisfies EthTransaction;
 
     const expected = {
       family: "ethereum",
@@ -42,12 +43,13 @@ describe("Converter File", () => {
   });
 
   it("convertEthToLiveTX should handle TX without recipient", () => {
-    const ethTx: EthTransaction = {
+    const ethTx = {
+      from: "",
       value: "",
       gasPrice: "",
       gas: "",
       data: "",
-    };
+    } as const satisfies EthTransaction;
 
     const expected = {
       family: "ethereum",
