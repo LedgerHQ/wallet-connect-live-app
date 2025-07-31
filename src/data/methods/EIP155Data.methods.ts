@@ -1,3 +1,6 @@
+import { ethTransactionSchema } from "@/utils/converters";
+import { z } from "zod";
+
 /**
  * @desc Refference list of eip155 chains
  * @url https://chainlist.org
@@ -18,6 +21,10 @@ export const EIP155_SIGNING_METHODS = {
   ETH_REQUEST_ACCOUNTS: "eth_requestAccounts",
 } as const;
 
+export const ethSignSchema = z.tuple([z.string(), z.string()]);
+
+export const ethSendTransactionSchema = z.tuple([ethTransactionSchema]);
+
 export type EIP155_REQUESTS =
   | {
       method:
@@ -26,23 +33,13 @@ export type EIP155_REQUESTS =
         | typeof EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA
         | typeof EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V3
         | typeof EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V4;
-      params: [string, string];
+      params: z.infer<typeof ethSignSchema>;
     }
   | {
       method:
         | typeof EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION
         | typeof EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION;
-      params: [
-        {
-          from: string;
-          to: string;
-          data: string;
-          gas: string;
-          gasPrice: string;
-          value: string;
-          nonce: string;
-        },
-      ];
+      params: z.infer<typeof ethSendTransactionSchema>;
     };
 
 /**

@@ -1,8 +1,11 @@
-import { SOLANA_REQUESTS } from "@/data/methods/Solana.methods";
+import {
+  SOLANA_REQUESTS,
+  solanaSignMessageSchema,
+} from "@/data/methods/Solana.methods";
 import {
   acceptRequest,
-  rejectRequest,
   Errors,
+  rejectRequest,
 } from "@/hooks/requestHandlers/utils";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
 import { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
@@ -24,9 +27,11 @@ export async function signMessage(
     );
   }
 
+  const params = solanaSignMessageSchema.parse(request.params);
+
   const accountSign = getAccountWithAddressAndChainId(
     accounts,
-    request.params.pubkey,
+    params.pubkey,
     "solana",
   );
 
@@ -34,9 +39,7 @@ export async function signMessage(
     try {
       const signedMessage = await client.message.sign(
         accountSign.id,
-        Buffer.from(
-          base58.decodeUnsafe(request.params.message) ?? request.params.message,
-        ),
+        Buffer.from(base58.decodeUnsafe(params.message) ?? params.message),
       );
 
       await acceptRequest(walletKit, topic, id, {

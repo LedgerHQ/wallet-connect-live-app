@@ -1,4 +1,5 @@
 import { SOLANA_SIGNING_METHODS } from "@/data/methods/Solana.methods";
+import * as utilsGeneric from "@/utils/generic";
 import { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import type { IWalletKit } from "@reown/walletkit";
 import {
@@ -7,11 +8,10 @@ import {
   VersionedMessage,
   VersionedTransaction,
 } from "@solana/web3.js";
+import BigNumber from "bignumber.js";
 import { vi } from "vitest";
 import * as utils from "../utils";
-import * as utilsGeneric from "@/utils/generic";
 import { signTransaction } from "./signTransaction";
-import BigNumber from "bignumber.js";
 
 vi.mock("../utils");
 
@@ -22,7 +22,7 @@ describe("Testing sign transaction on Solana", () => {
 
   it("should throw an error when request can not be used to sign transaction", async () => {
     const request = {
-      method: SOLANA_SIGNING_METHODS.SOLANA_SIGNMESSAGE,
+      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_MESSAGE,
       params: {
         message: "some random message",
         pubkey: PublicKey.unique().toString(),
@@ -42,7 +42,7 @@ describe("Testing sign transaction on Solana", () => {
     ).rejects.toEqual(
       new Error(
         "Method " +
-          SOLANA_SIGNING_METHODS.SOLANA_SIGNMESSAGE +
+          SOLANA_SIGNING_METHODS.SOLANA_SIGN_MESSAGE +
           " from request can not be used to sign transaction",
       ),
     );
@@ -63,7 +63,7 @@ describe("Testing sign transaction on Solana", () => {
     const topic = "topic";
     const id = 0;
     const request = {
-      method: SOLANA_SIGNING_METHODS.SOLANA_SIGNTRANSACTION,
+      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_TRANSACTION,
       params: {
         transaction: "transaction",
       },
@@ -143,7 +143,7 @@ describe("Testing sign transaction on Solana", () => {
     const topic = "topic";
     const id = 0;
     const request = {
-      method: SOLANA_SIGNING_METHODS.SOLANA_SIGNTRANSACTION,
+      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_TRANSACTION,
       params: {
         transaction: "transaction",
       },
@@ -235,7 +235,7 @@ describe("Testing sign transaction on Solana", () => {
     const topic = "topic";
     const id = 0;
     const request = {
-      method: SOLANA_SIGNING_METHODS.SOLANA_SIGNTRANSACTION,
+      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_TRANSACTION,
       params: {
         transaction: "transaction",
       },

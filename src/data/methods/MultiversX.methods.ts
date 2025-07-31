@@ -1,4 +1,5 @@
-import { MvxTransaction } from "@/utils/converters";
+import { mvxTransactionSchema } from "@/utils/converters";
+import { z } from "zod";
 
 /**
  * Methods
@@ -9,29 +10,35 @@ export const MULTIVERSX_SIGNING_METHODS = {
   MULTIVERSX_SIGN_MESSAGE: "mvx_signMessage",
 } as const;
 
+export const multiversxSignMessageSchema = z.object({
+  message: z.string(),
+  account: z.string(),
+  address: z.string(),
+});
+
+export const multiversxSignTransactionSchema = z.object({
+  transaction: mvxTransactionSchema,
+});
+
+export const multiversxSignTransactionsSchema = z.object({
+  transactions: z.array(mvxTransactionSchema),
+});
+
 /**
- * Requests 
+ * Requests
  */
 export type MULTIVERSX_REQUESTS =
   | {
       method: typeof MULTIVERSX_SIGNING_METHODS.MULTIVERSX_SIGN_MESSAGE;
-      params: {
-        message: string;
-        account: string;
-        address: string;
-      };
+      params: z.infer<typeof multiversxSignMessageSchema>;
     }
   | {
       method: typeof MULTIVERSX_SIGNING_METHODS.MULTIVERSX_SIGN_TRANSACTION;
-      params: {
-        transaction: MvxTransaction;
-      };
+      params: z.infer<typeof multiversxSignTransactionSchema>;
     }
   | {
       method: typeof MULTIVERSX_SIGNING_METHODS.MULTIVERSX_SIGN_TRANSACTIONS;
-      params: {
-        transactions: MvxTransaction[];
-      };
+      params: z.infer<typeof multiversxSignTransactionsSchema>;
     };
 
 /**

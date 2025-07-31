@@ -1,12 +1,14 @@
-import type { IWalletKit } from "@reown/walletkit";
-import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import {
   type BIP122_REQUESTS,
   BIP122_RESPONSES,
   BIP122_SIGNING_METHODS,
+  bip122SignMessageLegacySchema,
+  bip122SignMessageSchema,
 } from "@/data/methods/BIP122.methods";
+import { btcTransactionSchema, convertBtcToLiveTX } from "@/utils/converters";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
-import { convertBtcToLiveTX } from "@/utils/converters";
+import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
+import type { IWalletKit } from "@reown/walletkit";
 import {
   acceptRequest,
   Errors,
@@ -26,14 +28,16 @@ export async function handleBIP122Request(
 ) {
   switch (request.method) {
     case BIP122_SIGNING_METHODS.BIP122_SIGN_MESSAGE_LEGACY: {
+      const params = bip122SignMessageLegacySchema.parse(request.params);
+
       const accountSign = getAccountWithAddressAndChainId(
         accounts,
-        request.params.address,
+        params.address,
         chainId,
       );
       if (accountSign) {
         try {
-          const message = request.params.message;
+          const message = params.message;
           const signedMessage = await client.message.sign(
             accountSign.id,
             Buffer.from(message),
@@ -55,14 +59,15 @@ export async function handleBIP122Request(
       break;
     }
     case BIP122_SIGNING_METHODS.BIP122_SIGN_MESSAGE: {
+      const params = bip122SignMessageSchema.parse(request.params);
       const accountSign = getAccountWithAddressAndChainId(
         accounts,
-        request.params.address ?? request.params.account,
+        params.address ?? params.account,
         chainId,
       );
       if (accountSign) {
         try {
-          const message = request.params.message;
+          const message = params.message;
           const signedMessage = await client.message.sign(
             accountSign.id,
             Buffer.from(message),
@@ -86,10 +91,10 @@ export async function handleBIP122Request(
       break;
     }
     case BIP122_SIGNING_METHODS.BIP122_SEND_TRANSFERT: {
-      const btcTx = request.params;
+      const btcTx = btcTransactionSchema.parse(request.params);
       const accountTX = getAccountWithAddressAndChainId(
         accounts,
-        request.params.account,
+        btcTx.account,
         chainId,
       );
       if (accountTX) {

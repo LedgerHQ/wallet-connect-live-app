@@ -1,42 +1,44 @@
-import { SignClientTypes } from "@walletconnect/types";
-import { useCallback, useEffect } from "react";
-import { WalletKitTypes } from "@reown/walletkit";
-import { enqueueSnackbar } from "notistack";
+import { walletAPIClientAtom } from "@/store/wallet-api.store";
 import {
-  coreAtom,
   connectionStatusAtom,
-  walletKitAtom,
+  coreAtom,
   loadingAtom,
+  oneClickAuthPayloadAtom,
   showBackToBrowserModalAtom,
   verifyContextByTopicAtom,
-  oneClickAuthPayloadAtom,
+  walletKitAtom,
 } from "@/store/walletKit.store";
 import {
-  isEIP155Chain,
-  isMultiversXChain,
-  isBIP122Chain,
   // isRippleChain,
   // isSolanaChain,
   getErrorMessage,
+  isBIP122Chain,
+  isEIP155Chain,
+  isMultiversXChain,
 } from "@/utils/helper.util";
+import { WalletKitTypes } from "@reown/walletkit";
+import * as Sentry from "@sentry/react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
+import { SignClientTypes } from "@walletconnect/types";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { enqueueSnackbar } from "notistack";
+import { useCallback, useEffect } from "react";
+import { handleBIP122Request } from "./requestHandlers/BIP122";
+import { handleEIP155Request } from "./requestHandlers/EIP155";
+import { handleMvxRequest } from "./requestHandlers/MultiversX";
 import useAccounts from "./useAccounts";
-import { walletAPIClientAtom } from "@/store/wallet-api.store";
-import { queryKey as sessionsQueryKey } from "./useSessions";
 import {
   queryKey as pendingProposalsQueryKey,
   useQueryFn as usePendingProposalsQueryFn,
 } from "./usePendingProposals";
-import { useQueryClient } from "@tanstack/react-query";
-import { handleEIP155Request } from "./requestHandlers/EIP155";
-import { handleMvxRequest } from "./requestHandlers/MultiversX";
-import { handleBIP122Request } from "./requestHandlers/BIP122";
+import { queryKey as sessionsQueryKey } from "./useSessions";
 // import { handleXrpRequest } from "./requestHandlers/Ripple";
+import { OneClickAuthPayload } from "@/types/types";
+import { ZodError } from "zod";
+import { isWalletRequest } from "../utils/helper.util";
 import { Errors, rejectRequest } from "./requestHandlers/utils";
 import { handleWalletRequest } from "./requestHandlers/Wallet";
-import { isWalletRequest } from "../utils/helper.util";
-import { OneClickAuthPayload } from "@/types/types";
 // import { handleSolanaRequest } from "./requestHandlers/Solana";
 
 function useWalletConnectStatus() {
@@ -218,26 +220,26 @@ export default function useWalletConnect() {
               client,
               walletKit,
             );
-          // } else if (isRippleChain(chainId, request)) {
-          //   await handleXrpRequest(
-          //     request,
-          //     topic,
-          //     id,
-          //     chainId,
-          //     accounts.data,
-          //     client,
-          //     walletKit,
-          //   );
-          // } else if (isSolanaChain(chainId, request)) {
-          //   await handleSolanaRequest(
-          //     request,
-          //     topic,
-          //     id,
-          //     chainId,
-          //     accounts.data,
-          //     client,
-          //     walletKit,
-          //   );
+            // } else if (isRippleChain(chainId, request)) {
+            //   await handleXrpRequest(
+            //     request,
+            //     topic,
+            //     id,
+            //     chainId,
+            //     accounts.data,
+            //     client,
+            //     walletKit,
+            //   );
+            // } else if (isSolanaChain(chainId, request)) {
+            //   await handleSolanaRequest(
+            //     request,
+            //     topic,
+            //     id,
+            //     chainId,
+            //     accounts.data,
+            //     client,
+            //     walletKit,
+            //   );
           } else {
             console.error("Not Supported Chain");
             await rejectRequest(
@@ -249,6 +251,10 @@ export default function useWalletConnect() {
             );
           }
         } catch (error) {
+          if (error instanceof ZodError) {
+            Sentry.captureException(error);
+          }
+
           enqueueSnackbar(getErrorMessage(error), {
             errorType: "Session request error",
             variant: "errorNotification",

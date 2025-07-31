@@ -6,16 +6,23 @@ import {
 } from "@ledgerhq/wallet-api-client";
 import { BigNumber } from "bignumber.js";
 import eip55 from "eip55";
+import { z } from "zod";
 
-export type EthTransaction = {
-  value: string;
-  to?: string;
-  gasPrice: string;
-  gas: string;
-  data: string;
-};
+export const ethTransactionSchema = z.object({
+  from: z.string(),
+  to: z.string().optional(),
+  data: z.string(),
+  gas: z.string().optional(),
+  gasPrice: z.string().optional(),
+  value: z.string().optional(),
+  nonce: z.string().optional(),
+});
+
+export type EthTransaction = z.infer<typeof ethTransactionSchema>;
 
 export function convertEthToLiveTX(ethTX: EthTransaction): EthereumTransaction {
+  const nonce = Number(ethTX.nonce);
+
   return {
     family: "ethereum",
     amount:
@@ -34,24 +41,27 @@ export function convertEthToLiveTX(ethTX: EthTransaction): EthereumTransaction {
     data: ethTX.data
       ? Buffer.from(ethTX.data.replace("0x", ""), "hex")
       : undefined,
+    nonce: Number.isNaN(nonce) ? undefined : nonce,
   };
 }
 
-export type MvxTransaction = {
-  nonce: string;
-  value: string;
-  receiver: string;
-  sender: string;
-  gasPrice: number;
-  gasLimit: number;
-  data?: string;
-  chainID: string;
-  version?: string;
-  options?: string;
-  guardian?: string;
-  receiverUsername?: string;
-  senderUsername?: string;
-};
+export const mvxTransactionSchema = z.object({
+  nonce: z.string(),
+  value: z.string(),
+  receiver: z.string(),
+  sender: z.string(),
+  gasPrice: z.number(),
+  gasLimit: z.number(),
+  data: z.string().optional(),
+  chainID: z.string(),
+  version: z.string().optional(),
+  options: z.string().optional(),
+  guardian: z.string().optional(),
+  receiverUsername: z.string().optional(),
+  senderUsername: z.string().optional(),
+});
+
+export type MvxTransaction = z.infer<typeof mvxTransactionSchema>;
 
 export function convertMvxToLiveTX(tx: MvxTransaction): ElrondTransaction {
   return {
@@ -66,15 +76,17 @@ export function convertMvxToLiveTX(tx: MvxTransaction): ElrondTransaction {
 
 // Ressource :
 // https://xpring-eng.github.io/xrp-api/XRPAPI-data-types-transaction_common_fields.html
-export type XrpTransaction = {
-  hash?: string;
-  TransactionType: string;
-  Account: string;
-  Flags: number;
-  Amount: number | string;
-  Destination: string;
-  Fee?: string;
-};
+export const xrpTransactionSchema = z.object({
+  hash: z.string().optional(),
+  TransactionType: z.string(),
+  Account: z.string(),
+  Flags: z.number(),
+  Amount: z.union([z.number(), z.string()]),
+  Destination: z.string(),
+  Fee: z.string().optional(),
+});
+
+export type XrpTransaction = z.infer<typeof xrpTransactionSchema>;
 
 export function convertXrpToLiveTX(tx: XrpTransaction): RippleTransaction {
   const rippleTransaction: RippleTransaction = {
@@ -89,11 +101,16 @@ export function convertXrpToLiveTX(tx: XrpTransaction): RippleTransaction {
   return rippleTransaction;
 }
 
-export type BtcTransaction = {
-  account: string;
-  recipientAddress: string;
-  amount: string;
-};
+export const btcTransactionSchema = z.object({
+  account: z.string(),
+  recipientAddress: z.string(),
+  amount: z.string(),
+  // Uncomment when used in the future
+  // changeAddress: z.string().optional(),
+  // memo: z.string().optional(),
+});
+
+export type BtcTransaction = z.infer<typeof btcTransactionSchema>;
 
 export function convertBtcToLiveTX(btcTX: BtcTransaction): BitcoinTransaction {
   return {

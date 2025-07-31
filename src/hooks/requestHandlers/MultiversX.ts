@@ -1,18 +1,15 @@
-import type { IWalletKit } from "@reown/walletkit";
-import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import {
   type MULTIVERSX_REQUESTS,
   MULTIVERSX_RESPONSES,
   MULTIVERSX_SIGNING_METHODS,
+  multiversxSignTransactionSchema,
+  multiversxSignTransactionsSchema,
 } from "@/data/methods/MultiversX.methods";
-import { getAccountWithAddressAndChainId } from "@/utils/generic";
 import { convertMvxToLiveTX } from "@/utils/converters";
-import {
-  acceptRequest,
-  Errors,
-  isCanceledError,
-  rejectRequest,
-} from "./utils";
+import { getAccountWithAddressAndChainId } from "@/utils/generic";
+import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
+import type { IWalletKit } from "@reown/walletkit";
+import { acceptRequest, Errors, isCanceledError, rejectRequest } from "./utils";
 
 export async function handleMvxRequest(
   request: MULTIVERSX_REQUESTS,
@@ -27,14 +24,15 @@ export async function handleMvxRequest(
 
   switch (request.method) {
     case MULTIVERSX_SIGNING_METHODS.MULTIVERSX_SIGN_TRANSACTION: {
+      const params = multiversxSignTransactionSchema.parse(request.params);
       const accountTX = getAccountWithAddressAndChainId(
         accounts,
-        request.params.transaction.sender,
+        params.transaction.sender,
         ledgerLiveCurrency,
       );
       if (accountTX) {
         try {
-          const liveTx = convertMvxToLiveTX(request.params.transaction);
+          const liveTx = convertMvxToLiveTX(params.transaction);
           const hash = await client.transaction.signAndBroadcast(
             accountTX.id,
             liveTx,
@@ -57,9 +55,10 @@ export async function handleMvxRequest(
       break;
     }
     case MULTIVERSX_SIGNING_METHODS.MULTIVERSX_SIGN_TRANSACTIONS: {
+      const params = multiversxSignTransactionsSchema.parse(request.params);
       try {
         const signatures = await Promise.all(
-          request.params.transactions.map(
+          params.transactions.map(
             async (
               transaction,
             ): Promise<{

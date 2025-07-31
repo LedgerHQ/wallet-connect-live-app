@@ -1,10 +1,10 @@
 import { SOLANA_SIGNING_METHODS } from "@/data/methods/Solana.methods";
-import { handleSolanaRequest } from "./Solana";
 import { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import type { IWalletKit } from "@reown/walletkit";
 import { vi } from "vitest";
-import * as signTransactionModule from "./solanaHandlers/signTransaction";
+import { handleSolanaRequest } from "./Solana";
 import * as signMessageModule from "./solanaHandlers/signMessage";
+import * as signTransactionModule from "./solanaHandlers/signTransaction";
 
 vi.mock("./utils");
 
@@ -17,7 +17,7 @@ describe("Testing Solana request handler mapping", () => {
     const topic = "topic";
     const id = 0;
     const request = {
-      method: SOLANA_SIGNING_METHODS.SOLANA_SIGNTRANSACTION,
+      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_TRANSACTION,
       params: {
         transaction: "some random transaction",
       },
@@ -58,7 +58,7 @@ describe("Testing Solana request handler mapping", () => {
     const topic = "topic";
     const id = 0;
     const request = {
-      method: SOLANA_SIGNING_METHODS.SOLANA_SIGNMESSAGE,
+      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_MESSAGE,
       params: {
         message: "some random message",
         pubkey: "some random public key",

@@ -1,3 +1,6 @@
+import { btcTransactionSchema } from "@/utils/converters";
+import { z } from "zod";
+
 /**
  * Methods
  */
@@ -7,32 +10,34 @@ export const BIP122_SIGNING_METHODS = {
   BIP122_SEND_TRANSFERT: "sendTransfer",
 } as const;
 
+export const bip122SignMessageLegacySchema = z.object({
+  message: z.string(),
+  address: z.string(),
+});
+
+export const bip122SignMessageSchema = z.object({
+  message: z.string(),
+  account: z.string(),
+  address: z.string().optional(),
+  // Uncomment when used in the future
+  // protocol: z.union([z.literal("ecdsa"), z.literal("bip322")]).optional(),
+});
+
 /**
  * Requests specs : https://docs.reown.com/advanced/multichain/rpc-reference/bitcoin-rpc
  */
 export type BIP122_REQUESTS =
   | {
       method: typeof BIP122_SIGNING_METHODS.BIP122_SIGN_MESSAGE_LEGACY;
-      params: {
-        message: string;
-        address: string;
-      };
+      params: z.infer<typeof bip122SignMessageLegacySchema>;
     }
   | {
       method: typeof BIP122_SIGNING_METHODS.BIP122_SIGN_MESSAGE;
-      params: {
-        message: string;
-        account: string;
-        address?: string;
-      };
+      params: z.infer<typeof bip122SignMessageSchema>;
     }
   | {
       method: typeof BIP122_SIGNING_METHODS.BIP122_SEND_TRANSFERT;
-      params: {
-        account: string;
-        recipientAddress: string;
-        amount: string;
-      };
+      params: z.infer<typeof btcTransactionSchema>;
     };
 
 /**
