@@ -11,7 +11,7 @@ import { z } from "zod";
 export const ethTransactionSchema = z.object({
   from: z.string(),
   to: z.string().optional(),
-  data: z.string(),
+  data: z.string().optional(),
   gas: z.string().optional(),
   gasPrice: z.string().optional(),
   value: z.string().optional(),
@@ -46,7 +46,7 @@ export function convertEthToLiveTX(ethTX: EthTransaction): EthereumTransaction {
 }
 
 export const mvxTransactionSchema = z.object({
-  nonce: z.string(),
+  nonce: z.number(),
   value: z.string(),
   receiver: z.string(),
   sender: z.string(),
@@ -54,7 +54,7 @@ export const mvxTransactionSchema = z.object({
   gasLimit: z.number(),
   data: z.string().optional(),
   chainID: z.string(),
-  version: z.string().optional(),
+  version: z.number().optional(),
   options: z.string().optional(),
   guardian: z.string().optional(),
   receiverUsername: z.string().optional(),
@@ -80,7 +80,7 @@ export const xrpTransactionSchema = z.object({
   hash: z.string().optional(),
   TransactionType: z.string(),
   Account: z.string(),
-  Flags: z.number(),
+  Flags: z.number().optional(), // NOTE: conflicted documentation here, https://xrpl.org/docs/references/protocol/transactions/common-fields, the sample https://react-app.walletconnect.com/ code here doesn't set flags: https://github.com/reown-com/web-examples/pull/340
   Amount: z.union([z.number(), z.string()]),
   Destination: z.string(),
   Fee: z.string().optional(),
