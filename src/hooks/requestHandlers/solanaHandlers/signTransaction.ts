@@ -1,21 +1,24 @@
-import { getAccountWithAddressAndChainId } from "@/utils/generic";
 import {
-  PublicKey,
-  SystemProgram,
-  VersionedTransaction,
-} from "@solana/web3.js";
+  SOLANA_REQUESTS,
+  solanaSignTransactionSchema,
+} from "@/data/methods/Solana.methods";
+import {
+  acceptRequest,
+  Errors,
+  rejectRequest,
+} from "@/hooks/requestHandlers/utils";
+import { getAccountWithAddressAndChainId } from "@/utils/generic";
 import {
   Account,
   Transaction,
   WalletAPIClient,
 } from "@ledgerhq/wallet-api-client";
 import { IWalletKit } from "@reown/walletkit";
-import { SOLANA_REQUESTS } from "@/data/methods/Solana.methods";
 import {
-  acceptRequest,
-  Errors,
-  rejectRequest,
-} from "@/hooks/requestHandlers/utils";
+  PublicKey,
+  SystemProgram,
+  VersionedTransaction,
+} from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 
 function toSolanaTransaction(serializedTransaction: string) {
@@ -80,8 +83,10 @@ export async function signTransaction(
     );
   }
 
-  const liveTransaction = toLiveTransaction(request.params.transaction);
-  const signerAddress = findSignerAddress(request.params.transaction);
+  const params = solanaSignTransactionSchema.parse(request.params);
+
+  const liveTransaction = toLiveTransaction(params.transaction);
+  const signerAddress = findSignerAddress(params.transaction);
 
   const accountTx = getAccountWithAddressAndChainId(
     accounts,
