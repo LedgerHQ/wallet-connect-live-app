@@ -30,6 +30,8 @@ import { handleBIP122Request } from "./requestHandlers/BIP122";
 import { handleEIP155Request } from "./requestHandlers/EIP155";
 import { handleMvxRequest } from "./requestHandlers/MultiversX";
 // import { handleXrpRequest } from "./requestHandlers/Ripple";
+import * as Sentry from "@sentry/react";
+import { ZodError } from "zod";
 import { handleSolanaRequest } from "./requestHandlers/Solana";
 import { Errors, rejectRequest } from "./requestHandlers/utils";
 import { handleWalletRequest } from "./requestHandlers/Wallet";
