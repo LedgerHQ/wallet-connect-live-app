@@ -133,38 +133,38 @@ describe("isSolanaSupportEnabled", () => {
   });
 
   it("should return true for supported desktop versions at minimum requirement", () => {
-    const walletInfo = createWalletInfo("ledger-live-desktop", "2.120.0");
+    const walletInfo = createWalletInfo("ledger-live-desktop", "2.126.0");
     expect(isSolanaSupportEnabled(walletInfo)).toBe(true);
   });
 
   it("should return true for supported desktop versions above minimum requirement", () => {
-    const walletInfo = createWalletInfo("ledger-live-desktop", "2.120.1");
+    const walletInfo = createWalletInfo("ledger-live-desktop", "2.126.1");
     expect(isSolanaSupportEnabled(walletInfo)).toBe(true);
 
-    const walletInfo2 = createWalletInfo("ledger-live-desktop", "2.121.0");
+    const walletInfo2 = createWalletInfo("ledger-live-desktop", "2.127.0");
     expect(isSolanaSupportEnabled(walletInfo2)).toBe(true);
   });
 
   it("should return false for desktop versions below minimum requirement", () => {
-    const walletInfo = createWalletInfo("ledger-live-desktop", "2.119.9");
+    const walletInfo = createWalletInfo("ledger-live-desktop", "2.125.9");
     expect(isSolanaSupportEnabled(walletInfo)).toBe(false);
   });
 
   it("should return true for supported mobile versions at minimum requirement", () => {
-    const walletInfo = createWalletInfo("ledger-live-mobile", "3.85.0");
+    const walletInfo = createWalletInfo("ledger-live-mobile", "3.90.0");
     expect(isSolanaSupportEnabled(walletInfo)).toBe(true);
   });
 
   it("should return true for supported mobile versions above minimum requirement", () => {
-    const walletInfo = createWalletInfo("ledger-live-mobile", "3.85.1");
+    const walletInfo = createWalletInfo("ledger-live-mobile", "3.90.1");
     expect(isSolanaSupportEnabled(walletInfo)).toBe(true);
 
-    const walletInfo2 = createWalletInfo("ledger-live-mobile", "3.86.0");
+    const walletInfo2 = createWalletInfo("ledger-live-mobile", "3.91.0");
     expect(isSolanaSupportEnabled(walletInfo2)).toBe(true);
   });
 
   it("should return false for mobile versions below minimum requirement", () => {
-    const walletInfo = createWalletInfo("ledger-live-mobile", "3.84.9");
+    const walletInfo = createWalletInfo("ledger-live-mobile", "3.89.9");
     expect(isSolanaSupportEnabled(walletInfo)).toBe(false);
   });
 
@@ -179,15 +179,15 @@ describe("isSolanaSupportEnabled", () => {
   });
 
   it("should handle edge cases with different version formats", () => {
-    const walletInfo1 = createWalletInfo("ledger-live-desktop", "2.120.0");
+    const walletInfo1 = createWalletInfo("ledger-live-desktop", "2.126.0");
     expect(isSolanaSupportEnabled(walletInfo1)).toBe(true);
 
-    const walletInfo2 = createWalletInfo("ledger-live-mobile", "3.85.0");
+    const walletInfo2 = createWalletInfo("ledger-live-mobile", "3.90.0");
     expect(isSolanaSupportEnabled(walletInfo2)).toBe(true);
   });
 
   it("should handle invalid version formats gracefully", () => {
-    const walletInfo1 = createWalletInfo("ledger-live-desktop", "2.120");
+    const walletInfo1 = createWalletInfo("ledger-live-desktop", "2.126");
     expect(isSolanaSupportEnabled(walletInfo1)).toBe(false);
 
     const walletInfo2 = createWalletInfo("ledger-live-mobile", "invalid");
@@ -196,41 +196,41 @@ describe("isSolanaSupportEnabled", () => {
 
   it("should support version numbers with suffixes (pre-release versions)", () => {
     // Note: According to semver, pre-release versions are LOWER than their release versions
-    // 2.120.0-beta.1 < 2.120.0, so if minimum is 2.120.0, pre-release should be rejected
+    // 2.126.0-beta.1 < 2.126.0, so if minimum is 2.126.0, pre-release should be rejected
     const walletInfoBeta = createWalletInfo(
       "ledger-live-desktop",
-      "2.120.0-beta.1",
+      "2.126.0-beta.1",
     );
     expect(isSolanaSupportEnabled(walletInfoBeta)).toBe(false);
 
     // However, a higher version with pre-release suffix should work
     const walletInfoBetaHigher = createWalletInfo(
       "ledger-live-desktop",
-      "2.121.0-beta.1",
+      "2.127.0-beta.1",
     );
     expect(isSolanaSupportEnabled(walletInfoBetaHigher)).toBe(true);
 
     // Test rc versions - same behavior
-    const walletInfoRc = createWalletInfo("ledger-live-mobile", "3.85.0-rc.2");
-    expect(isSolanaSupportEnabled(walletInfoRc)).toBe(false); // Less than 3.85.0
+    const walletInfoRc = createWalletInfo("ledger-live-mobile", "3.90.0-rc.2");
+    expect(isSolanaSupportEnabled(walletInfoRc)).toBe(false); // Less than 3.90.0
 
     const walletInfoRcHigher = createWalletInfo(
       "ledger-live-mobile",
-      "3.86.0-rc.1",
+      "3.91.0-rc.1",
     );
-    expect(isSolanaSupportEnabled(walletInfoRcHigher)).toBe(true); // Greater than 3.85.0
+    expect(isSolanaSupportEnabled(walletInfoRcHigher)).toBe(true); // Greater than 3.90.0
 
     // Test alpha versions
     const walletInfoAlpha = createWalletInfo(
       "ledger-live-desktop",
-      "2.121.0-alpha.3",
+      "2.127.0-alpha.3",
     );
     expect(isSolanaSupportEnabled(walletInfoAlpha)).toBe(true);
 
     // Test that pre-release versions below minimum are rejected
     const walletInfoBelowMin = createWalletInfo(
       "ledger-live-desktop",
-      "2.119.0-beta.1",
+      "2.125.0-beta.1",
     );
     expect(isSolanaSupportEnabled(walletInfoBelowMin)).toBe(false);
   });

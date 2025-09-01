@@ -110,7 +110,7 @@ describe("formatAccountsByChain", () => {
   const mockWalletInfo: WalletInfo["result"] = {
     wallet: {
       name: "ledger-live-desktop",
-      version: "2.121.0",
+      version: "2.127.0",
     },
     tracking: false,
   };
@@ -194,7 +194,7 @@ describe("formatAccountsByChain", () => {
     const unsupportedWalletInfo: WalletInfo["result"] = {
       wallet: {
         name: "ledger-live-desktop",
-        version: "2.119.0", // Below minimum 2.120.0
+        version: "2.125.0", // Below minimum 2.126.0
       },
       tracking: false,
     };
@@ -226,7 +226,7 @@ describe("formatAccountsByChain", () => {
     const supportedWalletInfo: WalletInfo["result"] = {
       wallet: {
         name: "ledger-live-desktop",
-        version: "2.121.0", // Above minimum 2.120.0
+        version: "2.127.0", // Above minimum 2.126.0
       },
       tracking: false,
     };
@@ -293,7 +293,7 @@ describe("formatAccountsByChain", () => {
     const unsupportedMobileWallet: WalletInfo["result"] = {
       wallet: {
         name: "ledger-live-mobile",
-        version: "3.84.0", // Below minimum 3.85.0
+        version: "3.89.0", // Below minimum 3.90.0
       },
       tracking: false,
     };
@@ -311,7 +311,7 @@ describe("formatAccountsByChain", () => {
     const supportedMobileWallet: WalletInfo["result"] = {
       wallet: {
         name: "ledger-live-mobile",
-        version: "3.86.0", // Above minimum 3.85.0
+        version: "3.91.0", // Above minimum 3.90.0
       },
       tracking: false,
     };

@@ -111,8 +111,8 @@ export const getCurrencyByChainId = (chainId: string) => {
  * Minimum versions of Ledger Live that support Solana
  */
 const SOLANA_MIN_VERSIONS: Record<string, string> = {
-  "ledger-live-desktop": "2.120.0", // Minimum desktop version
-  "ledger-live-mobile": "3.85.0", // Minimum mobile version
+  "ledger-live-desktop": "2.126.0", // Minimum desktop version
+  "ledger-live-mobile": "3.90.0", // Minimum mobile version
 };
 
 /**
