@@ -8,7 +8,7 @@ export const RIPPLE_SIGNING_METHODS = {
   RIPPLE_SIGN_TRANSACTION: "xrpl_signTransaction",
 } as const;
 
-export const rippleSignTransactionSchema = z.object({
+export const rippleSignTransactionSchema = z.strictObject({
   tx_json: xrpTransactionSchema,
   autofill: z.boolean().optional(),
   submit: z.boolean().optional(),

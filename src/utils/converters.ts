@@ -8,7 +8,7 @@ import { BigNumber } from "bignumber.js";
 import eip55 from "eip55";
 import { z } from "zod";
 
-export const ethTransactionSchema = z.object({
+export const ethTransactionSchema = z.strictObject({
   from: z.string(),
   to: z.string().optional(),
   data: z.string().optional(),
@@ -45,7 +45,7 @@ export function convertEthToLiveTX(ethTX: EthTransaction): EthereumTransaction {
   };
 }
 
-export const mvxTransactionSchema = z.object({
+export const mvxTransactionSchema = z.strictObject({
   nonce: z.number(),
   value: z.string(),
   receiver: z.string(),
@@ -76,7 +76,7 @@ export function convertMvxToLiveTX(tx: MvxTransaction): ElrondTransaction {
 
 // Ressource :
 // https://xpring-eng.github.io/xrp-api/XRPAPI-data-types-transaction_common_fields.html
-export const xrpTransactionSchema = z.object({
+export const xrpTransactionSchema = z.strictObject({
   hash: z.string().optional(),
   TransactionType: z.string(),
   Account: z.string(),
@@ -101,7 +101,7 @@ export function convertXrpToLiveTX(tx: XrpTransaction): RippleTransaction {
   return rippleTransaction;
 }
 
-export const btcTransactionSchema = z.object({
+export const btcTransactionSchema = z.strictObject({
   account: z.string(),
   recipientAddress: z.string(),
   amount: z.string(),

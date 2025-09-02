@@ -10,12 +10,12 @@ export const BIP122_SIGNING_METHODS = {
   BIP122_SEND_TRANSFERT: "sendTransfer",
 } as const;
 
-export const bip122SignMessageLegacySchema = z.object({
+export const bip122SignMessageLegacySchema = z.strictObject({
   message: z.string(),
   address: z.string(),
 });
 
-export const bip122SignMessageSchema = z.object({
+export const bip122SignMessageSchema = z.strictObject({
   message: z.string(),
   account: z.string(),
   address: z.string().optional(),
