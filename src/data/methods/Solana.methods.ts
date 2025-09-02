@@ -12,11 +12,34 @@ export const SOLANA_SIGNING_METHODS = {
   SOLANA_SIGN_AND_SEND_TRANSACTION: "solana_signAndSendTransaction",
 } as const;
 
-export const solanaSignTransactionSchema = z.object({
+export const solanaSignAndSendTransactionSchema = z.strictObject({
+  transaction: z.string(),
+  sendOptions: z.strictObject({
+    skipPreflight: z.boolean(),
+    preflightCommitment: z.union([
+      z.literal("processed"),
+      z.literal("confirmed"),
+      z.literal("finalized"),
+      z.literal("recent"),
+      z.literal("single"),
+      z.literal("singleGossip"),
+      z.literal("root"),
+      z.literal("max"),
+    ]),
+    maxRetries: z.number(),
+    minContextSlot: z.number(),
+  }),
+});
+
+export const solanaSignAllTransactionsSchema = z.strictObject({
+  transactions: z.array(z.string()),
+});
+
+export const solanaSignTransactionSchema = z.strictObject({
   transaction: z.string(),
 });
 
-export const solanaSignMessageSchema = z.object({
+export const solanaSignMessageSchema = z.strictObject({
   message: z.string(),
   pubkey: z.string(),
 });
@@ -27,42 +50,19 @@ export const solanaSignMessageSchema = z.object({
 export type SOLANA_REQUESTS =
   | {
       method: typeof SOLANA_SIGNING_METHODS.SOLANA_SIGN_AND_SEND_TRANSACTION;
-      params: {
-        transaction: string;
-        sendOptions: {
-          skipPreflight: boolean;
-          preflightCommitment:
-            | "processed"
-            | "confirmed"
-            | "finalized"
-            | "recent"
-            | "single"
-            | "singleGossip"
-            | "root"
-            | "max";
-          maxRetries: number;
-          minContextSlot: number;
-        };
-      };
+      params: z.infer<typeof solanaSignAndSendTransactionSchema>;
     }
   | {
       method: typeof SOLANA_SIGNING_METHODS.SOLANA_SIGN_ALL_TRANSACTIONS;
-      params: {
-        transactions: string[];
-      };
+      params: z.infer<typeof solanaSignAllTransactionsSchema>;
     }
   | {
       method: typeof SOLANA_SIGNING_METHODS.SOLANA_SIGN_TRANSACTION;
-      params: {
-        transaction: string;
-      };
+      params: z.infer<typeof solanaSignTransactionSchema>;
     }
   | {
       method: typeof SOLANA_SIGNING_METHODS.SOLANA_SIGN_MESSAGE;
-      params: {
-        message: string;
-        pubkey: string;
-      };
+      params: z.infer<typeof solanaSignMessageSchema>;
     };
 
 /**

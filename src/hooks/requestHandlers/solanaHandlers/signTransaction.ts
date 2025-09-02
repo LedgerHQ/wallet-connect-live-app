@@ -2,6 +2,7 @@ import {
   SOLANA_REQUESTS,
   SOLANA_RESPONSES,
   SOLANA_SIGNING_METHODS,
+  solanaSignTransactionSchema,
 } from "@/data/methods/Solana.methods";
 import {
   acceptRequest,
@@ -30,8 +31,10 @@ export async function signTransaction(
     );
   }
 
-  const liveTransaction = toLiveTransaction(request.params.transaction);
-  const account = findSignerAccount(request.params.transaction, accounts);
+  const params = solanaSignTransactionSchema.parse(request.params);
+
+  const liveTransaction = toLiveTransaction(params.transaction);
+  const account = findSignerAccount(params.transaction, accounts);
 
   try {
     const signature = await client.transaction.sign(
