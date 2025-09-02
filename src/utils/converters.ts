@@ -117,9 +117,9 @@ export const btcTransactionSchema = z.strictObject({
   account: z.string(),
   recipientAddress: z.string(),
   amount: z.string(),
+  memo: z.string().optional(),
   // Uncomment when used in the future
   // changeAddress: z.string().optional(),
-  // memo: z.string().optional(),
 });
 
 export type BtcTransaction = z.infer<typeof btcTransactionSchema>;
@@ -129,5 +129,6 @@ export function convertBtcToLiveTX(btcTX: BtcTransaction): BitcoinTransaction {
     family: "bitcoin",
     amount: btcTX.amount ? new BigNumber(btcTX.amount) : new BigNumber(0),
     recipient: btcTX.recipientAddress,
+    opReturnData: btcTX.memo ? Buffer.from(btcTX.memo, "hex") : undefined,
   };
 }
