@@ -1,11 +1,11 @@
-import { atom } from "jotai";
 import {
   Currency,
   WalletAPIClient,
   WindowMessageTransport,
 } from "@ledgerhq/wallet-api-client";
-import { getSimulatorTransport } from "@ledgerhq/wallet-api-simulator/lib-es/transport";
 import { standardProfile } from "@ledgerhq/wallet-api-simulator/lib-es/profiles/standard";
+import { getSimulatorTransport } from "@ledgerhq/wallet-api-simulator/lib-es/transport";
+import { atom } from "jotai";
 
 function getIsSimulator() {
   if (
@@ -62,7 +62,7 @@ export const walletCurrenciesByIdAtom = atom(async (get) => {
   }, {});
 });
 
-export const walletInfosAtom = atom((get) => {
+export const walletInfoAtom = atom((get) => {
   const client = get(walletAPIClientAtom);
   return client.wallet.info();
 });

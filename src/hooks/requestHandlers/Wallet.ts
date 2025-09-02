@@ -1,12 +1,15 @@
-import { enqueueSnackbar } from "notistack";
-import type { IWalletKit } from "@reown/walletkit";
-import type { QueryClient } from "@tanstack/react-query";
-import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import {
   WALLET_METHODS,
   type WALLET_REQUESTS,
 } from "@/data/methods/Wallet.methods";
-import { Errors, rejectRequest } from "./utils";
+import {
+  BIP122_NETWORK_BY_CHAIN_ID,
+  EIP155_NETWORK_BY_CHAIN_ID,
+  MULTIVERS_X_NETWORK_BY_CHAIN_ID,
+  // RIPPLE_NETWORK_BY_CHAIN_ID,
+  SOLANA_NETWORK_BY_CHAIN_ID,
+} from "@/data/network.config";
+import { queryKey as accountsQueryKey } from "@/hooks/useAccounts";
 import {
   getErrorMessage,
   getNamespace,
@@ -14,16 +17,18 @@ import {
   isEIP155Chain,
   isMultiversXChain,
   // isRippleChain,
-  // isSolanaChain,
+  isSolanaChain,
+  isSolanaSupportEnabled,
 } from "@/utils/helper.util";
-import {
-  BIP122_NETWORK_BY_CHAIN_ID,
-  EIP155_NETWORK_BY_CHAIN_ID,
-  MULTIVERS_X_NETWORK_BY_CHAIN_ID,
-  // RIPPLE_NETWORK_BY_CHAIN_ID,
-  // SOLANA_NETWORK_BY_CHAIN_ID,
-} from "@/data/network.config";
-import { queryKey as accountsQueryKey } from "@/hooks/useAccounts";
+import type {
+  Account,
+  WalletAPIClient,
+  WalletInfo,
+} from "@ledgerhq/wallet-api-client";
+import type { IWalletKit } from "@reown/walletkit";
+import type { QueryClient } from "@tanstack/react-query";
+import { enqueueSnackbar } from "notistack";
+import { Errors, rejectRequest } from "./utils";
 
 function getNetworkByChainId(
   networkByChainId: Record<string | number, string>,
@@ -36,7 +41,11 @@ function getNetworkByChainId(
   ];
 }
 
-function getNetwork(currentChainId: string, newChainId: string) {
+function getNetwork(
+  currentChainId: string,
+  newChainId: string,
+  walletInfo: WalletInfo["result"],
+) {
   if (isEIP155Chain(currentChainId)) {
     return getNetworkByChainId(EIP155_NETWORK_BY_CHAIN_ID, newChainId);
   }
@@ -49,9 +58,9 @@ function getNetwork(currentChainId: string, newChainId: string) {
   if (isMultiversXChain(currentChainId)) {
     return getNetworkByChainId(MULTIVERS_X_NETWORK_BY_CHAIN_ID, newChainId);
   }
-  // if (isSolanaChain(currentChainId)) {
-  //   return getNetworkByChainId(SOLANA_NETWORK_BY_CHAIN_ID, newChainId);
-  // }
+  if (isSolanaChain(currentChainId) && isSolanaSupportEnabled(walletInfo)) {
+    return getNetworkByChainId(SOLANA_NETWORK_BY_CHAIN_ID, newChainId);
+  }
 }
 
 const addNewAccounts = async (
@@ -92,10 +101,15 @@ export async function handleWalletRequest(
   client: WalletAPIClient,
   walletKit: IWalletKit,
   queryClient: QueryClient,
+  walletInfo: WalletInfo["result"],
 ) {
   switch (request.method) {
     case WALLET_METHODS.WALLET_SWITCH_ETHEREUM_CHAIN: {
-      const network = getNetwork(chainId, request.params[0].chainId);
+      const network = getNetwork(
+        chainId,
+        request.params[0].chainId,
+        walletInfo,
+      );
       if (network) {
         const session = walletKit.engine.signClient.session.get(topic);
         const namespace = chainId.split(":")[0];
@@ -141,7 +155,11 @@ export async function handleWalletRequest(
       break;
     }
     case WALLET_METHODS.WALLET_ADD_ETHEREUM_CHAIN: {
-      const network = getNetwork(chainId, request.params[0].chainId);
+      const network = getNetwork(
+        chainId,
+        request.params[0].chainId,
+        walletInfo,
+      );
       if (network) {
         const account = await addNewAccounts(client, queryClient, [network]);
         if (account) {

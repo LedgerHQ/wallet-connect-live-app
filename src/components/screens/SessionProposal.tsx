@@ -2,28 +2,31 @@ import { ButtonsContainer, List } from "@/components/atoms/containers/Elements";
 import { AddAccountPlaceholder } from "@/components/screens/sessionProposal/AddAccountPlaceholder";
 import { ErrorBlockchainSupport } from "@/components/screens/sessionProposal/ErrorBlockchainSupport";
 import { InfoSessionProposal } from "@/components/screens/sessionProposal/InfoSessionProposal";
-import { formatUrl } from "@/utils/helper.util";
-import { useProposal } from "@/hooks/useProposal/useProposal";
-import { ResponsiveContainer } from "@/styles/styles";
-import { Flex, Button, Box, Text, InfiniteLoader } from "@ledgerhq/react-ui";
-import { ArrowLeftMedium } from "@ledgerhq/react-ui/assets/icons";
-import { useTranslation } from "react-i18next";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import styled, { useTheme } from "styled-components";
 import useAnalytics from "@/hooks/useAnalytics";
-import { tryDecodeURI } from "@/utils/image";
+import { useProposal } from "@/hooks/useProposal/useProposal";
 import { formatAccountsByChain, sortChains } from "@/hooks/useProposal/util";
+import useVerification from "@/hooks/useVerification";
+import {
+  walletCurrenciesByIdAtom,
+  walletInfoAtom,
+} from "@/store/wallet-api.store";
+import { ResponsiveContainer } from "@/styles/styles";
+import { OneClickAuthPayload } from "@/types/types";
+import { formatUrl } from "@/utils/helper.util";
+import { tryDecodeURI } from "@/utils/image";
+import { Box, Button, Flex, InfiniteLoader, Text } from "@ledgerhq/react-ui";
+import { ArrowLeftMedium } from "@ledgerhq/react-ui/assets/icons";
 import { ProposalTypes } from "@walletconnect/types";
+import { useAtomValue } from "jotai";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import styled, { useTheme } from "styled-components";
+import VerificationCard from "../verification/VerificationCard";
+import VerificationLabel from "../verification/VerificationLabel";
 import { AccountRow } from "./sessionProposal/AccountRow";
+import { ChainRow } from "./sessionProposal/ChainRow";
 import { ErrorMissingRequiredAccount } from "./sessionProposal/ErrorMissingRequiredAccount";
 import LogoHeader from "./sessionProposal/LogoHeader";
-import { ChainRow } from "./sessionProposal/ChainRow";
-import { walletCurrenciesByIdAtom } from "@/store/wallet-api.store";
-import { useAtomValue } from "jotai";
-import VerificationLabel from "../verification/VerificationLabel";
-import VerificationCard from "../verification/VerificationCard";
-import useVerification from "@/hooks/useVerification";
-import { OneClickAuthPayload } from "@/types/types";
 
 const BackButton = styled(Flex)`
   cursor: pointer;
@@ -60,6 +63,7 @@ export default function SessionProposal({
   const dApp = proposal.proposer.metadata.name;
   const dAppUrl = proposal.proposer.metadata.url;
   const currenciesById = useAtomValue(walletCurrenciesByIdAtom);
+  const walletInfo = useAtomValue(walletInfoAtom);
   const [approving, setApproving] = useState(false);
   const [rejecting, setRejecting] = useState(false);
 
@@ -134,8 +138,8 @@ export default function SessionProposal({
   ]);
 
   const accountsByChain = useMemo(
-    () => formatAccountsByChain(proposal, accounts),
-    [proposal, accounts],
+    () => formatAccountsByChain(proposal, accounts, walletInfo),
+    [proposal, accounts, walletInfo],
   );
 
   const requiredChains = useMemo(

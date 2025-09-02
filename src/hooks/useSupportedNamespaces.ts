@@ -2,20 +2,20 @@ import { BIP122_SIGNING_METHODS } from "@/data/methods/BIP122.methods";
 import { EIP155_SIGNING_METHODS } from "@/data/methods/EIP155Data.methods";
 import { MULTIVERSX_SIGNING_METHODS } from "@/data/methods/MultiversX.methods";
 // import { RIPPLE_SIGNING_METHODS } from "@/data/methods/Ripple.methods";
-// import { SOLANA_SIGNING_METHODS } from "@/data/methods/Solana.methods";
+import { SOLANA_SIGNING_METHODS } from "@/data/methods/Solana.methods";
 import { WALLET_METHODS } from "@/data/methods/Wallet.methods";
 import {
   BIP122_CHAINS,
   EIP155_CHAINS,
   MULTIVERS_X_CHAINS,
   // RIPPLE_CHAINS,
-  // SOLANA_CHAINS,
+  SOLANA_CHAINS,
   SupportedNamespace,
 } from "@/data/network.config";
 import useAccounts from "@/hooks/useAccounts";
 import { formatAccountsByChain } from "@/hooks/useProposal/util";
-import { walletAPIClientAtom } from "@/store/wallet-api.store";
-import { getNamespace } from "@/utils/helper.util";
+import { walletAPIClientAtom, walletInfoAtom } from "@/store/wallet-api.store";
+import { getNamespace, isSolanaSupportEnabled } from "@/utils/helper.util";
 import { ProposalTypes, SessionTypes } from "@walletconnect/types";
 import { BuildApprovedNamespacesParams } from "@walletconnect/utils";
 import { useAtomValue } from "jotai";
@@ -26,6 +26,7 @@ export function useSupportedNamespaces(
   selectedAccounts: string[],
 ) {
   const client = useAtomValue(walletAPIClientAtom);
+  const walletInfo = useAtomValue(walletInfoAtom);
   const accounts = useAccounts(client);
 
   const buildEip155Namespace = useCallback(
@@ -36,6 +37,7 @@ export function useSupportedNamespaces(
       const accountsByChain = formatAccountsByChain(
         session,
         accounts.data,
+        walletInfo,
       ).filter((a) => {
         return (
           a.accounts.length > 0 &&
@@ -87,7 +89,7 @@ export function useSupportedNamespaces(
         accounts: dataToSend.map((e) => e.account),
       };
     },
-    [accounts.data, session, selectedAccounts],
+    [session, accounts.data, walletInfo, selectedAccounts],
   );
 
   const buildMvxNamespace = useCallback(
@@ -98,6 +100,7 @@ export function useSupportedNamespaces(
       const accountsByChain = formatAccountsByChain(
         session,
         accounts.data,
+        walletInfo,
       ).filter(
         (a) =>
           a.accounts.length > 0 &&
@@ -149,7 +152,7 @@ export function useSupportedNamespaces(
         accounts: dataToSend.map((e) => e.account),
       };
     },
-    [accounts.data, session, selectedAccounts],
+    [session, accounts.data, walletInfo, selectedAccounts],
   );
 
   const buildBip122Namespace = useCallback(
@@ -160,6 +163,7 @@ export function useSupportedNamespaces(
       const accountsByChain = formatAccountsByChain(
         session,
         accounts.data,
+        walletInfo,
       ).filter(
         (a) =>
           a.accounts.length > 0 &&
@@ -211,7 +215,7 @@ export function useSupportedNamespaces(
         accounts: dataToSend.map((e) => e.account),
       };
     },
-    [accounts.data, session, selectedAccounts],
+    [session, accounts.data, walletInfo, selectedAccounts],
   );
 
   // const buildXrpNamespace = useCallback(
@@ -222,6 +226,7 @@ export function useSupportedNamespaces(
   //     const accountsByChain = formatAccountsByChain(
   //       session,
   //       accounts.data,
+  //       walletInfo,
   //     ).filter(
   //       (a) =>
   //         a.accounts.length > 0 &&
@@ -273,83 +278,84 @@ export function useSupportedNamespaces(
   //       accounts: dataToSend.map((e) => e.account),
   //     };
   //   },
-  //   [accounts.data, session, selectedAccounts],
+  //   [session, accounts.data, walletInfo, selectedAccounts],
   // );
 
-  // const buildSolanaNamespace = useCallback(
-  //   (
-  //     requiredNamespaces: ProposalTypes.RequiredNamespaces,
-  //     optionalNamespaces: ProposalTypes.OptionalNamespaces,
-  //   ) => {
-  //     const accountsByChain = formatAccountsByChain(
-  //       session,
-  //       accounts.data,
-  //     ).filter(
-  //       (a) =>
-  //         a.accounts.length > 0 &&
-  //         a.isSupported &&
-  //         Object.keys(SOLANA_CHAINS).includes(a.chain),
-  //     );
+  const buildSolanaNamespace = useCallback(
+    (
+      requiredNamespaces: ProposalTypes.RequiredNamespaces,
+      optionalNamespaces: ProposalTypes.OptionalNamespaces,
+    ) => {
+      const accountsByChain = formatAccountsByChain(
+        session,
+        accounts.data,
+        walletInfo,
+      ).filter(
+        (a) =>
+          a.accounts.length > 0 &&
+          a.isSupported &&
+          Object.keys(SOLANA_CHAINS).includes(a.chain),
+      );
 
-  //     const supportedMethods: string[] = [
-  //       ...Object.values(WALLET_METHODS),
-  //       ...Object.values(SOLANA_SIGNING_METHODS),
-  //     ];
+      const supportedMethods: string[] = [
+        ...Object.values(WALLET_METHODS),
+        ...Object.values(SOLANA_SIGNING_METHODS),
+      ];
 
-  //     const isLegacy =
-  //       requiredNamespaces[SupportedNamespace.SOLANA]?.chains?.[0] ===
-  //         "solana:4sGjMW1sUnHzSxGspuhpqLDx6wiyjNtZ" ||
-  //       optionalNamespaces[SupportedNamespace.SOLANA]?.chains?.[0] ===
-  //         "solana:4sGjMW1sUnHzSxGspuhpqLDx6wiyjNtZ";
+      const isLegacy =
+        requiredNamespaces[SupportedNamespace.SOLANA]?.chains?.[0] ===
+          "solana:4sGjMW1sUnHzSxGspuhpqLDx6wiyjNtZ" ||
+        optionalNamespaces[SupportedNamespace.SOLANA]?.chains?.[0] ===
+          "solana:4sGjMW1sUnHzSxGspuhpqLDx6wiyjNtZ";
 
-  //     const dataToSend = accountsByChain.reduce<
-  //       { account: string; chain: string }[]
-  //     >(
-  //       (accum, elem) =>
-  //         accum.concat(
-  //           elem.accounts
-  //             .filter((acc) => selectedAccounts.includes(acc.id))
-  //             .map((a) => {
-  //               let currency = a.currency;
-  //               if (isLegacy) {
-  //                 currency = "solana (legacy)";
-  //               }
-  //               return {
-  //                 account: `${getNamespace(currency)}:${a.address}`,
-  //                 chain: getNamespace(currency),
-  //               };
-  //             }),
-  //         ),
-  //       [],
-  //     );
+      const dataToSend = accountsByChain.reduce<
+        { account: string; chain: string }[]
+      >(
+        (accum, elem) =>
+          accum.concat(
+            elem.accounts
+              .filter((acc) => selectedAccounts.includes(acc.id))
+              .map((a) => {
+                let currency = a.currency;
+                if (isLegacy) {
+                  currency = "solana (legacy)";
+                }
+                return {
+                  account: `${getNamespace(currency)}:${a.address}`,
+                  chain: getNamespace(currency),
+                };
+              }),
+          ),
+        [],
+      );
 
-  //     const methods = [
-  //       ...new Set([
-  //         ...(requiredNamespaces[SupportedNamespace.SOLANA]?.methods.filter(
-  //           (method) => supportedMethods.includes(method),
-  //         ) ?? []),
-  //         ...(optionalNamespaces[SupportedNamespace.SOLANA]?.methods.filter(
-  //           (method) => supportedMethods.includes(method),
-  //         ) ?? []),
-  //       ]),
-  //     ];
+      const methods = [
+        ...new Set([
+          ...(requiredNamespaces[SupportedNamespace.SOLANA]?.methods.filter(
+            (method) => supportedMethods.includes(method),
+          ) ?? []),
+          ...(optionalNamespaces[SupportedNamespace.SOLANA]?.methods.filter(
+            (method) => supportedMethods.includes(method),
+          ) ?? []),
+        ]),
+      ];
 
-  //     const events = [
-  //       ...new Set([
-  //         ...(requiredNamespaces[SupportedNamespace.SOLANA]?.events ?? []),
-  //         ...(optionalNamespaces[SupportedNamespace.SOLANA]?.events ?? []),
-  //       ]),
-  //     ];
+      const events = [
+        ...new Set([
+          ...(requiredNamespaces[SupportedNamespace.SOLANA]?.events ?? []),
+          ...(optionalNamespaces[SupportedNamespace.SOLANA]?.events ?? []),
+        ]),
+      ];
 
-  //     return {
-  //       chains: [...new Set(dataToSend.map((e) => e.chain))],
-  //       methods,
-  //       events,
-  //       accounts: dataToSend.map((e) => e.account),
-  //     };
-  //   },
-  //   [accounts.data, session, selectedAccounts],
-  // );
+      return {
+        chains: [...new Set(dataToSend.map((e) => e.chain))],
+        methods,
+        events,
+        accounts: dataToSend.map((e) => e.account),
+      };
+    },
+    [session, accounts.data, walletInfo, selectedAccounts],
+  );
 
   const buildSupportedNamespaces = useCallback(
     (session: SessionTypes.Struct | ProposalTypes.Struct) => {
@@ -382,12 +388,15 @@ export function useSupportedNamespaces(
       //     optionalNamespaces,
       //   );
       // }
-      // if ("solana" in requiredNamespaces || "solana" in optionalNamespaces) {
-      //   supportedNamespaces[SupportedNamespace.SOLANA] = buildSolanaNamespace(
-      //     requiredNamespaces,
-      //     optionalNamespaces,
-      //   );
-      // }
+      if (
+        ("solana" in requiredNamespaces || "solana" in optionalNamespaces) &&
+        isSolanaSupportEnabled(walletInfo)
+      ) {
+        supportedNamespaces[SupportedNamespace.SOLANA] = buildSolanaNamespace(
+          requiredNamespaces,
+          optionalNamespaces,
+        );
+      }
       return supportedNamespaces;
     },
     [
@@ -395,7 +404,8 @@ export function useSupportedNamespaces(
       buildEip155Namespace,
       buildMvxNamespace,
       // buildXrpNamespace,
-      // buildSolanaNamespace,
+      buildSolanaNamespace,
+      walletInfo,
     ],
   );
 

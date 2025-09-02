@@ -8,13 +8,38 @@ export const SOLANA_SIGNING_METHODS = {
   SOLANA_REQUEST_ACCOUNTS: "solana_getAccounts",
   SOLANA_SIGN_TRANSACTION: "solana_signTransaction",
   SOLANA_SIGN_MESSAGE: "solana_signMessage",
+  SOLANA_SIGN_ALL_TRANSACTIONS: "solana_signAllTransactions",
+  SOLANA_SIGN_AND_SEND_TRANSACTION: "solana_signAndSendTransaction",
 } as const;
 
-export const solanaSignTransactionSchema = z.object({
+export const solanaSignAndSendTransactionSchema = z.strictObject({
+  transaction: z.string(),
+  sendOptions: z.strictObject({
+    skipPreflight: z.boolean(),
+    preflightCommitment: z.union([
+      z.literal("processed"),
+      z.literal("confirmed"),
+      z.literal("finalized"),
+      z.literal("recent"),
+      z.literal("single"),
+      z.literal("singleGossip"),
+      z.literal("root"),
+      z.literal("max"),
+    ]),
+    maxRetries: z.number(),
+    minContextSlot: z.number(),
+  }),
+});
+
+export const solanaSignAllTransactionsSchema = z.strictObject({
+  transactions: z.array(z.string()),
+});
+
+export const solanaSignTransactionSchema = z.strictObject({
   transaction: z.string(),
 });
 
-export const solanaSignMessageSchema = z.object({
+export const solanaSignMessageSchema = z.strictObject({
   message: z.string(),
   pubkey: z.string(),
 });
@@ -24,6 +49,14 @@ export const solanaSignMessageSchema = z.object({
  */
 export type SOLANA_REQUESTS =
   | {
+      method: typeof SOLANA_SIGNING_METHODS.SOLANA_SIGN_AND_SEND_TRANSACTION;
+      params: z.infer<typeof solanaSignAndSendTransactionSchema>;
+    }
+  | {
+      method: typeof SOLANA_SIGNING_METHODS.SOLANA_SIGN_ALL_TRANSACTIONS;
+      params: z.infer<typeof solanaSignAllTransactionsSchema>;
+    }
+  | {
       method: typeof SOLANA_SIGNING_METHODS.SOLANA_SIGN_TRANSACTION;
       params: z.infer<typeof solanaSignTransactionSchema>;
     }
@@ -31,3 +64,22 @@ export type SOLANA_REQUESTS =
       method: typeof SOLANA_SIGNING_METHODS.SOLANA_SIGN_MESSAGE;
       params: z.infer<typeof solanaSignMessageSchema>;
     };
+
+/**
+ * Responses specs: https://docs.walletconnect.com/advanced/multichain/rpc-reference/solana-rpc
+ */
+export type SOLANA_RESPONSES = {
+  [SOLANA_SIGNING_METHODS.SOLANA_SIGN_MESSAGE]: {
+    signature: string;
+  };
+  [SOLANA_SIGNING_METHODS.SOLANA_SIGN_TRANSACTION]: {
+    signature: string;
+    transaction?: string;
+  };
+  [SOLANA_SIGNING_METHODS.SOLANA_SIGN_ALL_TRANSACTIONS]: {
+    transactions: string[];
+  };
+  [SOLANA_SIGNING_METHODS.SOLANA_SIGN_AND_SEND_TRANSACTION]: {
+    signature: string;
+  };
+};

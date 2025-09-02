@@ -48,6 +48,7 @@
     "account.list",
     "account.request",
     "message.sign",
+    "transaction.sign",
     "transaction.signAndBroadcast",
     "wallet.userId",
     "wallet.info"

@@ -9,7 +9,7 @@ import BigNumber from "bignumber.js";
 import base58 from "bs58";
 import { vi } from "vitest";
 import * as utils from "../utils";
-import { signTransaction } from "./signTransaction";
+import { signAndSendTransaction } from "./signAndSendTransaction";
 
 vi.mock("../utils", async (importOriginal) => ({
   ...(await importOriginal()),
@@ -32,7 +32,7 @@ describe("Testing sign transaction on Solana", () => {
     };
 
     await expect(
-      signTransaction(
+      signAndSendTransaction(
         request,
         "some random topic",
         0,
@@ -45,7 +45,7 @@ describe("Testing sign transaction on Solana", () => {
       new Error(
         "Method " +
           SOLANA_SIGNING_METHODS.SOLANA_SIGN_MESSAGE +
-          " from request can not be used to sign transaction",
+          " from request can not be used to sign and send transaction",
       ),
     );
   });
@@ -53,7 +53,7 @@ describe("Testing sign transaction on Solana", () => {
   it("should throw the sign transaction request when no account found with the provided address and chain currency", async () => {
     const walletAPIClient = {
       transaction: {
-        sign: vi.fn(() => Promise.resolve("any random value")),
+        signAndBroadcast: vi.fn(() => Promise.resolve("any random value")),
       },
     } as unknown as WalletAPIClient;
 
@@ -61,16 +61,22 @@ describe("Testing sign transaction on Solana", () => {
     const topic = "topic";
     const id = 0;
     const request: SOLANA_REQUESTS = {
-      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_TRANSACTION,
+      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_AND_SEND_TRANSACTION,
       params: {
         transaction:
           "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAQABAzc1rOIrIJkfixB2PGXIAQSzJwuHJA9YroUmtv2PuvSPfowIh2C/3h3dzzLBfyCbgkLuUqrxMfrNiNDqLG0LBvIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH6MCIdgv94d3c8ywX8gm4JC7lKq8TH6zYjQ6ixtCwbyAQICAAEMAgAAAEBCDwAAAAAAAA==",
+        sendOptions: {
+          skipPreflight: true,
+          preflightCommitment: "confirmed",
+          maxRetries: 3,
+          minContextSlot: 0,
+        },
       },
     };
     const accounts: Account[] = [];
 
     await expect(
-      signTransaction(
+      signAndSendTransaction(
         request,
         topic,
         id,
@@ -82,8 +88,8 @@ describe("Testing sign transaction on Solana", () => {
     ).rejects.toEqual(new Error("No signer found for the current transaction"));
 
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { sign } = walletAPIClient.transaction;
-    expect(sign).not.toHaveBeenCalled();
+    const { signAndBroadcast } = walletAPIClient.transaction;
+    expect(signAndBroadcast).not.toHaveBeenCalled();
   });
 
   it("should throw the sign transaction request when sign and broadcast from Wallet API client fails", async () => {
@@ -100,7 +106,9 @@ describe("Testing sign transaction on Solana", () => {
 
     const walletAPIClient = {
       transaction: {
-        sign: vi.fn(() => Promise.reject(new Error("Error from unit test"))),
+        signAndBroadcast: vi.fn(() =>
+          Promise.reject(new Error("Error from unit test")),
+        ),
       },
     } as unknown as WalletAPIClient;
 
@@ -108,10 +116,16 @@ describe("Testing sign transaction on Solana", () => {
     const topic = "topic";
     const id = 0;
     const request: SOLANA_REQUESTS = {
-      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_TRANSACTION,
+      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_AND_SEND_TRANSACTION,
       params: {
         transaction:
           "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAQABAzc1rOIrIJkfixB2PGXIAQSzJwuHJA9YroUmtv2PuvSPfowIh2C/3h3dzzLBfyCbgkLuUqrxMfrNiNDqLG0LBvIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH6MCIdgv94d3c8ywX8gm4JC7lKq8TH6zYjQ6ixtCwbyAQICAAEMAgAAAEBCDwAAAAAAAA==",
+        sendOptions: {
+          skipPreflight: true,
+          preflightCommitment: "confirmed",
+          maxRetries: 3,
+          minContextSlot: 0,
+        },
       },
     };
     const accounts: Account[] = [account];
@@ -120,7 +134,7 @@ describe("Testing sign transaction on Solana", () => {
     rejectRequestSpy.mockImplementationOnce(() => Promise.resolve());
 
     await expect(
-      signTransaction(
+      signAndSendTransaction(
         request,
         topic,
         id,
@@ -132,9 +146,9 @@ describe("Testing sign transaction on Solana", () => {
     ).rejects.toEqual(new Error("Error from unit test"));
 
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { sign } = walletAPIClient.transaction;
-    expect(sign).toHaveBeenCalledTimes(1);
-    expect(sign).toHaveBeenCalledWith(
+    const { signAndBroadcast } = walletAPIClient.transaction;
+    expect(signAndBroadcast).toHaveBeenCalledTimes(1);
+    expect(signAndBroadcast).toHaveBeenCalledWith(
       account.id,
       expect.objectContaining({
         family: "solana",
@@ -167,7 +181,9 @@ describe("Testing sign transaction on Solana", () => {
 
     const walletAPIClient = {
       transaction: {
-        sign: vi.fn(() => Promise.reject(new Error("User cancelled"))),
+        signAndBroadcast: vi.fn(() =>
+          Promise.reject(new Error("User cancelled")),
+        ),
       },
     } as unknown as WalletAPIClient;
 
@@ -175,10 +191,16 @@ describe("Testing sign transaction on Solana", () => {
     const topic = "topic";
     const id = 0;
     const request: SOLANA_REQUESTS = {
-      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_TRANSACTION,
+      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_AND_SEND_TRANSACTION,
       params: {
         transaction:
           "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAQABAzc1rOIrIJkfixB2PGXIAQSzJwuHJA9YroUmtv2PuvSPfowIh2C/3h3dzzLBfyCbgkLuUqrxMfrNiNDqLG0LBvIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH6MCIdgv94d3c8ywX8gm4JC7lKq8TH6zYjQ6ixtCwbyAQICAAEMAgAAAEBCDwAAAAAAAA==",
+        sendOptions: {
+          skipPreflight: true,
+          preflightCommitment: "confirmed",
+          maxRetries: 3,
+          minContextSlot: 0,
+        },
       },
     };
     const accounts: Account[] = [account];
@@ -186,7 +208,7 @@ describe("Testing sign transaction on Solana", () => {
     const rejectRequestSpy = vi.spyOn(utils, "rejectRequest");
     rejectRequestSpy.mockImplementationOnce(() => Promise.resolve());
 
-    await signTransaction(
+    await signAndSendTransaction(
       request,
       topic,
       id,
@@ -197,9 +219,9 @@ describe("Testing sign transaction on Solana", () => {
     );
 
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { sign } = walletAPIClient.transaction;
-    expect(sign).toHaveBeenCalledTimes(1);
-    expect(sign).toHaveBeenCalledWith(
+    const { signAndBroadcast } = walletAPIClient.transaction;
+    expect(signAndBroadcast).toHaveBeenCalledTimes(1);
+    expect(signAndBroadcast).toHaveBeenCalledWith(
       account.id,
       expect.objectContaining({
         family: "solana",
@@ -236,13 +258,11 @@ describe("Testing sign transaction on Solana", () => {
       lastSyncDate: new Date(),
     };
 
-    const signedTransaction =
-      "AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQGAAQABAzc1rOIrIJkfixB2PGXIAQSzJwuHJA9YroUmtv2PuvSPfowIh2C/3h3dzzLBfyCbgkLuUqrxMfrNiNDqLG0LBvIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH6MCIdgv94d3c8ywX8gm4JC7lKq8TH6zYjQ6ixtCwbyAQICAAEMAgAAAEBCDwAAAAAAAA==";
+    const dummySignature = new Uint8Array(64).fill(1); // 64-byte signature filled with ones
+    const hash = base58.encode(dummySignature);
     const walletAPIClient = {
       transaction: {
-        sign: vi.fn(() =>
-          Promise.resolve(Buffer.from(signedTransaction, "base64")),
-        ),
+        signAndBroadcast: vi.fn(() => Promise.resolve(hash)),
       },
     } as unknown as WalletAPIClient;
 
@@ -250,10 +270,16 @@ describe("Testing sign transaction on Solana", () => {
     const topic = "topic";
     const id = 0;
     const request: SOLANA_REQUESTS = {
-      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_TRANSACTION,
+      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_AND_SEND_TRANSACTION,
       params: {
         transaction:
           "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAQABAzc1rOIrIJkfixB2PGXIAQSzJwuHJA9YroUmtv2PuvSPfowIh2C/3h3dzzLBfyCbgkLuUqrxMfrNiNDqLG0LBvIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH6MCIdgv94d3c8ywX8gm4JC7lKq8TH6zYjQ6ixtCwbyAQICAAEMAgAAAEBCDwAAAAAAAA==",
+        sendOptions: {
+          skipPreflight: true,
+          preflightCommitment: "confirmed",
+          maxRetries: 3,
+          minContextSlot: 0,
+        },
       },
     };
     const accounts: Account[] = [account];
@@ -261,7 +287,7 @@ describe("Testing sign transaction on Solana", () => {
     const acceptRequestSpy = vi.spyOn(utils, "acceptRequest");
     acceptRequestSpy.mockImplementationOnce(() => Promise.resolve());
 
-    await signTransaction(
+    await signAndSendTransaction(
       request,
       topic,
       id,
@@ -272,9 +298,9 @@ describe("Testing sign transaction on Solana", () => {
     );
 
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { sign } = walletAPIClient.transaction;
-    expect(sign).toHaveBeenCalledTimes(1);
-    expect(sign).toHaveBeenCalledWith(
+    const { signAndBroadcast } = walletAPIClient.transaction;
+    expect(signAndBroadcast).toHaveBeenCalledTimes(1);
+    expect(signAndBroadcast).toHaveBeenCalledWith(
       account.id,
       expect.objectContaining({
         family: "solana",
@@ -288,10 +314,8 @@ describe("Testing sign transaction on Solana", () => {
       }),
     );
 
-    const dummySignature = new Uint8Array(64).fill(1); // 64-byte signature filled with ones
     const result = {
-      signature: base58.encode(dummySignature),
-      transaction: signedTransaction,
+      signature: hash,
     };
 
     expect(acceptRequestSpy).toHaveBeenCalledTimes(1);

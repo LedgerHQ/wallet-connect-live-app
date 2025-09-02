@@ -1,0 +1,61 @@
+import {
+  SOLANA_REQUESTS,
+  SOLANA_RESPONSES,
+  SOLANA_SIGNING_METHODS,
+  solanaSignAllTransactionsSchema,
+} from "@/data/methods/Solana.methods";
+import {
+  acceptRequest,
+  Errors,
+  isCanceledError,
+  rejectRequest,
+} from "@/hooks/requestHandlers/utils";
+import { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
+import { IWalletKit } from "@reown/walletkit";
+import { findSignerAccount, toLiveTransaction } from "./utils";
+
+export async function signAllTransactions(
+  request: SOLANA_REQUESTS,
+  topic: string,
+  id: number,
+  _chainId: string,
+  accounts: Account[],
+  client: WalletAPIClient,
+  walletKit: IWalletKit,
+) {
+  if (request.method !== SOLANA_SIGNING_METHODS.SOLANA_SIGN_ALL_TRANSACTIONS) {
+    throw new Error(
+      `Method ${request.method} from request can not be used to sign transactions`,
+    );
+  }
+
+  const params = solanaSignAllTransactionsSchema.parse(request.params);
+  const signatures: string[] = [];
+
+  for (const transaction of params.transactions) {
+    const liveTransaction = toLiveTransaction(transaction);
+    const account = findSignerAccount(transaction, accounts);
+
+    try {
+      const signature = await client.transaction.sign(
+        account.id,
+        liveTransaction,
+      );
+
+      signatures.push(signature.toString("base64"));
+    } catch (error) {
+      if (isCanceledError(error)) {
+        await rejectRequest(walletKit, topic, id, Errors.userDecline);
+        return;
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  const result: SOLANA_RESPONSES[typeof request.method] = {
+    transactions: signatures,
+  };
+
+  await acceptRequest(walletKit, topic, id, result);
+}
