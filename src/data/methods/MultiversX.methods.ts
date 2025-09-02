@@ -10,17 +10,17 @@ export const MULTIVERSX_SIGNING_METHODS = {
   MULTIVERSX_SIGN_MESSAGE: "mvx_signMessage",
 } as const;
 
-export const multiversxSignMessageSchema = z.object({
+export const multiversxSignMessageSchema = z.strictObject({
   message: z.string(),
   account: z.string(),
   address: z.string(),
 });
 
-export const multiversxSignTransactionSchema = z.object({
+export const multiversxSignTransactionSchema = z.strictObject({
   transaction: mvxTransactionSchema,
 });
 
-export const multiversxSignTransactionsSchema = z.object({
+export const multiversxSignTransactionsSchema = z.strictObject({
   transactions: z.array(mvxTransactionSchema),
 });
 
