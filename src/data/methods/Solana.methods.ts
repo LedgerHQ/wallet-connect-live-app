@@ -37,6 +37,7 @@ export const solanaSignAllTransactionsSchema = z.strictObject({
 
 export const solanaSignTransactionSchema = z.strictObject({
   transaction: z.string(),
+  pubkey: z.string().optional(),
 });
 
 export const solanaSignMessageSchema = z.strictObject({

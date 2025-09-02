@@ -299,4 +299,139 @@ describe("Testing sign transaction on Solana", () => {
 
     acceptRequestSpy.mockReset();
   });
+
+  it("should throw an error when the provided pubkey does not match the account address", async () => {
+    const account: Account = {
+      id: "2fa370fd-2210-5487-b9c9-bc36971ebc72",
+      address: "4iWtrn54zi89sHQv6xHyYwDsrPJvqcSKRJGBLrbErCsx",
+      name: "Solana Account",
+      currency: "solana",
+      blockHeight: 0,
+      balance: BigNumber(0),
+      spendableBalance: BigNumber(0),
+      lastSyncDate: new Date(),
+    };
+
+    const walletAPIClient = {
+      transaction: {
+        sign: vi.fn(() => Promise.resolve("any random value")),
+      },
+    } as unknown as WalletAPIClient;
+
+    const walletKit = {} as IWalletKit;
+    const topic = "topic";
+    const id = 0;
+
+    // Create a different pubkey than the account address
+    const differentPubkey = PublicKey.unique().toString();
+
+    const request: SOLANA_REQUESTS = {
+      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_TRANSACTION,
+      params: {
+        transaction:
+          "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAQABAzc1rOIrIJkfixB2PGXIAQSzJwuHJA9YroUmtv2PuvSPfowIh2C/3h3dzzLBfyCbgkLuUqrxMfrNiNDqLG0LBvIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH6MCIdgv94d3c8ywX8gm4JC7lKq8TH6zYjQ6ixtCwbyAQICAAEMAgAAAEBCDwAAAAAAAA==",
+        pubkey: differentPubkey,
+      },
+    };
+    const accounts: Account[] = [account];
+
+    await expect(
+      signTransaction(
+        request,
+        topic,
+        id,
+        "any random value",
+        accounts,
+        walletAPIClient,
+        walletKit,
+      ),
+    ).rejects.toEqual(
+      new Error(
+        `The provided pubkey ${differentPubkey} does not match the account address ${account.address} found in the transaction`,
+      ),
+    );
+
+    // Ensure the transaction.sign method is never called when pubkey validation fails
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    const { sign } = walletAPIClient.transaction;
+    expect(sign).not.toHaveBeenCalled();
+  });
+
+  it("should successfully sign transaction when the provided pubkey matches the account address", async () => {
+    const account = {
+      id: "2fa370fd-2210-5487-b9c9-bc36971ebc72",
+      address: "4iWtrn54zi89sHQv6xHyYwDsrPJvqcSKRJGBLrbErCsx",
+      name: "Solana Account",
+      currency: "solana",
+      blockHeight: 0,
+      balance: BigNumber(0),
+      spendableBalance: BigNumber(0),
+      lastSyncDate: new Date(),
+    };
+
+    const signedTransaction =
+      "AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQGAAQABAzc1rOIrIJkfixB2PGXIAQSzJwuHJA9YroUmtv2PuvSPfowIh2C/3h3dzzLBfyCbgkLuUqrxMfrNiNDqLG0LBvIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH6MCIdgv94d3c8ywX8gm4JC7lKq8TH6zYjQ6ixtCwbyAQICAAEMAgAAAEBCDwAAAAAAAA==";
+    const walletAPIClient = {
+      transaction: {
+        sign: vi.fn(() =>
+          Promise.resolve(Buffer.from(signedTransaction, "base64")),
+        ),
+      },
+    } as unknown as WalletAPIClient;
+
+    const walletKit = {} as IWalletKit;
+    const topic = "topic";
+    const id = 0;
+
+    const request: SOLANA_REQUESTS = {
+      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_TRANSACTION,
+      params: {
+        transaction:
+          "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAQABAzc1rOIrIJkfixB2PGXIAQSzJwuHJA9YroUmtv2PuvSPfowIh2C/3h3dzzLBfyCbgkLuUqrxMfrNiNDqLG0LBvIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH6MCIdgv94d3c8ywX8gm4JC7lKq8TH6zYjQ6ixtCwbyAQICAAEMAgAAAEBCDwAAAAAAAA==",
+        pubkey: account.address, // Use the same address as the account
+      },
+    };
+    const accounts: Account[] = [account];
+
+    const acceptRequestSpy = vi.spyOn(utils, "acceptRequest");
+    acceptRequestSpy.mockImplementationOnce(() => Promise.resolve());
+
+    await signTransaction(
+      request,
+      topic,
+      id,
+      "any random value",
+      accounts,
+      walletAPIClient,
+      walletKit,
+    );
+
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    const { sign } = walletAPIClient.transaction;
+    expect(sign).toHaveBeenCalledTimes(1);
+    expect(sign).toHaveBeenCalledWith(
+      account.id,
+      expect.objectContaining({
+        family: "solana",
+        amount: BigNumber(0),
+        recipient: "",
+        raw: request.params.transaction,
+        model: {
+          kind: "transfer",
+          uiState: {},
+        },
+      }),
+    );
+
+    const dummySignature = new Uint8Array(64).fill(1); // 64-byte signature filled with ones
+    const result = {
+      signature: base58.encode(dummySignature),
+      transaction: signedTransaction,
+    };
+
+    expect(acceptRequestSpy).toHaveBeenCalledTimes(1);
+    expect(acceptRequestSpy).toHaveBeenCalledWith(walletKit, topic, id, result);
+
+    acceptRequestSpy.mockReset();
+  });
 });
