@@ -51,6 +51,7 @@ export default defineConfig({
     setupFiles: "./vitest.setup.ts",
     coverage: {
       provider: "v8", // or 'v8'
+      reporter: ["text", "html", "lcov", "json"],
     },
     // environment: 'happy-dom' // https://vitest.dev/config/#environment
     environment: "jsdom", // https://vitest.dev/config/#environment
