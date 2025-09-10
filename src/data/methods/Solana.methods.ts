@@ -14,21 +14,24 @@ export const SOLANA_SIGNING_METHODS = {
 
 export const solanaSignAndSendTransactionSchema = z.strictObject({
   transaction: z.string(),
-  sendOptions: z.strictObject({
-    skipPreflight: z.boolean(),
-    preflightCommitment: z.union([
-      z.literal("processed"),
-      z.literal("confirmed"),
-      z.literal("finalized"),
-      z.literal("recent"),
-      z.literal("single"),
-      z.literal("singleGossip"),
-      z.literal("root"),
-      z.literal("max"),
-    ]),
-    maxRetries: z.number(),
-    minContextSlot: z.number(),
-  }),
+  pubkey: z.string().optional(),
+  sendOptions: z
+    .strictObject({
+      skipPreflight: z.boolean(),
+      preflightCommitment: z.union([
+        z.literal("processed"),
+        z.literal("confirmed"),
+        z.literal("finalized"),
+        z.literal("recent"),
+        z.literal("single"),
+        z.literal("singleGossip"),
+        z.literal("root"),
+        z.literal("max"),
+      ]),
+      maxRetries: z.number(),
+      minContextSlot: z.number(),
+    })
+    .optional(),
 });
 
 export const solanaSignAllTransactionsSchema = z.strictObject({
@@ -38,6 +41,33 @@ export const solanaSignAllTransactionsSchema = z.strictObject({
 export const solanaSignTransactionSchema = z.strictObject({
   transaction: z.string(),
   pubkey: z.string().optional(),
+  // Deprecated fields not compatible with versioned transactions
+  feePayer: z.string().optional(),
+  instructions: z
+    .array(
+      z.strictObject({
+        programId: z.string(),
+        keys: z.array(
+          z.strictObject({
+            pubkey: z.string(),
+            isSigner: z.boolean(),
+            isWritable: z.boolean(),
+          }),
+        ),
+        data: z.string().or(z.array(z.number())).optional(),
+      }),
+    )
+    .optional(),
+  recentBlockhash: z.string().optional(),
+  signatures: z
+    .array(
+      z.strictObject({
+        pubkey: z.string().optional(),
+        publicKey: z.string().optional(),
+        signature: z.string().nullable().optional(),
+      }),
+    )
+    .optional(),
 });
 
 export const solanaSignMessageSchema = z.strictObject({

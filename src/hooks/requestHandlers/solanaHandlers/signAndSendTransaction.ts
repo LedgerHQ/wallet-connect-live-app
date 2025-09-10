@@ -36,6 +36,12 @@ export async function signAndSendTransaction(
   const liveTransaction = toLiveTransaction(params.transaction);
   const account = findSignerAccount(params.transaction, accounts);
 
+  if (params.pubkey && account.address !== params.pubkey) {
+    throw new Error(
+      `The provided pubkey ${params.pubkey} does not match the account address ${account.address} found in the transaction`,
+    );
+  }
+
   try {
     const signature = await client.transaction.signAndBroadcast(
       account.id,
