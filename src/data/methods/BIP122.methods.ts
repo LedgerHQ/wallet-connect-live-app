@@ -19,7 +19,9 @@ export const bip122SignMessageSchema = z.strictObject({
   message: z.string(),
   account: z.string(),
   address: z.string().optional(),
-  protocol: z.union([z.literal("ecdsa"), z.literal("bip322")]).optional(),
+  protocol: z
+    .union([z.literal("ecdsa"), z.literal("bip322"), z.literal("")])
+    .optional(),
 });
 
 /**
