@@ -14,8 +14,8 @@ export const ethTransactionSchema = z.strictObject({
   data: z.string().optional(),
   gas: z.string().optional(),
   gasPrice: z.string().optional(),
-  maxFeePerGas: z.string().optional(),
-  maxPriorityFeePerGas: z.string().optional(),
+  maxFeePerGas: z.string().nullable().optional(),
+  maxPriorityFeePerGas: z.string().nullable().optional(),
   value: z.string().optional(),
   nonce: z.string().optional(),
   chainId: z.string().optional(),
@@ -43,11 +43,12 @@ export function convertEthToLiveTX(ethTX: EthTransaction): EthereumTransaction {
         ? new BigNumber(ethTX.gas.replace("0x", ""), 16)
         : undefined,
     maxFeePerGas:
-      ethTX.maxFeePerGas !== undefined
+      ethTX.maxFeePerGas !== undefined && ethTX.maxFeePerGas !== null
         ? new BigNumber(ethTX.maxFeePerGas.replace("0x", ""), 16)
         : undefined,
     maxPriorityFeePerGas:
-      ethTX.maxPriorityFeePerGas !== undefined
+      ethTX.maxPriorityFeePerGas !== undefined &&
+      ethTX.maxPriorityFeePerGas !== null
         ? new BigNumber(ethTX.maxPriorityFeePerGas.replace("0x", ""), 16)
         : undefined,
     data: ethTX.data
