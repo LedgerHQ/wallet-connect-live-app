@@ -212,6 +212,9 @@ importers:
       prettier:
         specifier: ^3.3.3
         version: 3.6.2
+      tweetnacl:
+        specifier: ^1.0.3
+        version: 1.0.3
       typescript:
         specifier: 5.6.3
         version: 5.6.3
