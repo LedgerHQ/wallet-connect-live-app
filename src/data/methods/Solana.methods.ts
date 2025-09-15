@@ -64,7 +64,11 @@ export const solanaSignTransactionSchema = z.strictObject({
       z.strictObject({
         pubkey: z.string().optional(),
         publicKey: z.string().optional(),
-        signature: z.string().nullable().optional(),
+        signature: z
+          .string()
+          .or(z.object({ type: z.string(), data: z.array(z.number()) }))
+          .nullable()
+          .optional(),
       }),
     )
     .optional(),
