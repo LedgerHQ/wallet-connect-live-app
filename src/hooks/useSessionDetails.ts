@@ -10,6 +10,7 @@ import {
   getErrorMessage,
   getNamespace,
 } from "@/utils/helper.util";
+import { Account } from "@ledgerhq/wallet-api-client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { SessionTypes } from "@walletconnect/types";
@@ -21,7 +22,6 @@ import {
   queryKey as sessionsQueryKey,
   useQueryFn as useSessionsQueryFn,
 } from "./useSessions";
-import { Account } from "@ledgerhq/wallet-api-client";
 import { useSupportedNamespaces } from "./useSupportedNamespaces";
 
 export function useSessionDetails(session: SessionTypes.Struct) {
@@ -306,10 +306,6 @@ export function useSessionDetails(session: SessionTypes.Struct) {
         `${addrSplitted[0]}:${addrSplitted[1]}`,
       );
       let chainInLedgerLive = chain;
-
-      if (chain.startsWith("mvx")) {
-        chainInLedgerLive = "elrond";
-      }
 
       if (chain.startsWith("xrpl")) {
         chainInLedgerLive = "ripple";

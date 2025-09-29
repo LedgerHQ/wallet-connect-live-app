@@ -5,15 +5,12 @@ import { describe, expect, it } from "vitest";
 import {
   BtcTransaction,
   EthTransaction,
-  MvxTransaction,
   XrpTransaction,
   btcTransactionSchema,
   convertBtcToLiveTX,
   convertEthToLiveTX,
-  convertMvxToLiveTX,
   convertXrpToLiveTX,
   ethTransactionSchema,
-  mvxTransactionSchema,
   xrpTransactionSchema,
 } from "../converters";
 
@@ -177,84 +174,6 @@ describe("Ethereum Transaction Schema", () => {
     };
 
     const result = ethTransactionSchema.safeParse(invalidTx);
-    expect(result.success).toBe(false);
-  });
-});
-
-describe("MVX/Elrond Converter", () => {
-  it("convertMvxToLiveTX should convert correctly", () => {
-    const mvxTx: MvxTransaction = {
-      nonce: 42,
-      value: "1000000000000000000", // 1 EGLD
-      receiver: "erd1receiver",
-      sender: "erd1sender",
-      gasPrice: 1000000000,
-      gasLimit: 50000,
-      data: "transfer",
-      chainID: "1",
-      version: 1,
-    };
-
-    const converted = convertMvxToLiveTX(mvxTx);
-
-    expect(converted).toEqual({
-      family: "elrond",
-      mode: "send",
-      amount: new BigNumber("1000000000000000000"),
-      recipient: "erd1receiver",
-      gasLimit: 50000,
-      data: "transfer",
-    });
-  });
-
-  it("convertMvxToLiveTX should handle minimal transaction", () => {
-    const mvxTx: MvxTransaction = {
-      nonce: 0,
-      value: "0",
-      receiver: "erd1receiver",
-      sender: "erd1sender",
-      gasPrice: 1000000000,
-      gasLimit: 50000,
-      chainID: "1",
-    };
-
-    const converted = convertMvxToLiveTX(mvxTx);
-
-    expect(converted.amount).toEqual(new BigNumber("0"));
-    expect(converted.data).toBeUndefined();
-  });
-});
-
-describe("MVX Transaction Schema", () => {
-  it("should validate a complete MVX transaction", () => {
-    const validTx = {
-      nonce: 42,
-      value: "1000000000000000000",
-      receiver: "erd1receiver",
-      sender: "erd1sender",
-      gasPrice: 1000000000,
-      gasLimit: 50000,
-      data: "transfer",
-      chainID: "1",
-      version: 1,
-      options: "0",
-      guardian: "erd1guardian",
-      receiverUsername: "receiver.elrond",
-      senderUsername: "sender.elrond",
-    };
-
-    const result = mvxTransactionSchema.safeParse(validTx);
-    expect(result.success).toBe(true);
-  });
-
-  it("should reject transaction with missing required fields", () => {
-    const invalidTx = {
-      nonce: 42,
-      value: "1000000000000000000",
-      // missing receiver, sender, gasPrice, gasLimit, chainID
-    };
-
-    const result = mvxTransactionSchema.safeParse(invalidTx);
     expect(result.success).toBe(false);
   });
 });

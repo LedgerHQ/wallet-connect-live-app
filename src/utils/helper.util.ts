@@ -1,6 +1,5 @@
 import { BIP122_REQUESTS } from "@/data/methods/BIP122.methods";
 import { EIP155_REQUESTS } from "@/data/methods/EIP155Data.methods";
-import { MULTIVERSX_REQUESTS } from "@/data/methods/MultiversX.methods";
 import { RIPPLE_REQUESTS } from "@/data/methods/Ripple.methods";
 import { SOLANA_REQUESTS } from "@/data/methods/Solana.methods";
 import { WALLET_REQUESTS } from "@/data/methods/Wallet.methods";
@@ -48,15 +47,6 @@ export function isEIP155Chain(
   _request?: { method: string; params: any },
 ): _request is EIP155_REQUESTS {
   return chain.startsWith("eip155");
-}
-
-export function isMultiversXChain(
-  chain: string,
-  // request is passed and used here only for type narrowing
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  _request?: { method: string; params: any },
-): _request is MULTIVERSX_REQUESTS {
-  return chain.startsWith("mvx");
 }
 
 export function isBIP122Chain(

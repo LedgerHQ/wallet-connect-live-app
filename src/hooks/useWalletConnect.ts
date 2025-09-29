@@ -13,7 +13,6 @@ import {
   getErrorMessage,
   isBIP122Chain,
   isEIP155Chain,
-  isMultiversXChain,
   // isRippleChain,
   isSolanaChain,
   isSolanaSupportEnabled,
@@ -28,7 +27,6 @@ import { useCallback, useEffect } from "react";
 import { isWalletRequest } from "../utils/helper.util";
 import { handleBIP122Request } from "./requestHandlers/BIP122";
 import { handleEIP155Request } from "./requestHandlers/EIP155";
-import { handleMvxRequest } from "./requestHandlers/MultiversX";
 // import { handleXrpRequest } from "./requestHandlers/Ripple";
 import * as Sentry from "@sentry/react";
 import { ZodError } from "zod";
@@ -195,16 +193,6 @@ export default function useWalletConnect() {
             );
           } else if (isEIP155Chain(chainId, request)) {
             await handleEIP155Request(
-              request,
-              topic,
-              id,
-              chainId,
-              accounts.data,
-              client,
-              walletKit,
-            );
-          } else if (isMultiversXChain(chainId, request)) {
-            await handleMvxRequest(
               request,
               topic,
               id,

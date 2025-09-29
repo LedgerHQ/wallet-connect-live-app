@@ -1,6 +1,5 @@
 import {
   BitcoinTransaction,
-  ElrondTransaction,
   EthereumTransaction,
   RippleTransaction,
 } from "@ledgerhq/wallet-api-client";
@@ -55,35 +54,6 @@ export function convertEthToLiveTX(ethTX: EthTransaction): EthereumTransaction {
       ? Buffer.from(ethTX.data.replace("0x", ""), "hex")
       : undefined,
     nonce: Number.isNaN(nonce) ? undefined : nonce,
-  };
-}
-
-export const mvxTransactionSchema = z.strictObject({
-  nonce: z.number(),
-  value: z.string(),
-  receiver: z.string(),
-  sender: z.string(),
-  gasPrice: z.number(),
-  gasLimit: z.number(),
-  data: z.string().optional(),
-  chainID: z.string(),
-  version: z.number().optional(),
-  options: z.string().optional(),
-  guardian: z.string().optional(),
-  receiverUsername: z.string().optional(),
-  senderUsername: z.string().optional(),
-});
-
-export type MvxTransaction = z.infer<typeof mvxTransactionSchema>;
-
-export function convertMvxToLiveTX(tx: MvxTransaction): ElrondTransaction {
-  return {
-    family: "elrond",
-    mode: "send",
-    amount: tx.value !== undefined ? new BigNumber(tx.value) : new BigNumber(0),
-    recipient: tx.receiver,
-    gasLimit: tx.gasLimit,
-    data: tx.data,
   };
 }
 
