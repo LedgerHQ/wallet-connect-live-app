@@ -5,7 +5,6 @@ import {
 import {
   BIP122_NETWORK_BY_CHAIN_ID,
   EIP155_NETWORK_BY_CHAIN_ID,
-  MULTIVERS_X_NETWORK_BY_CHAIN_ID,
   // RIPPLE_NETWORK_BY_CHAIN_ID,
   SOLANA_NETWORK_BY_CHAIN_ID,
 } from "@/data/network.config";
@@ -15,7 +14,6 @@ import {
   getNamespace,
   isBIP122Chain,
   isEIP155Chain,
-  isMultiversXChain,
   // isRippleChain,
   isSolanaChain,
   isSolanaSupportEnabled,
@@ -55,9 +53,6 @@ function getNetwork(
   // if (isRippleChain(currentChainId)) {
   //   return getNetworkByChainId(RIPPLE_NETWORK_BY_CHAIN_ID, newChainId);
   // }
-  if (isMultiversXChain(currentChainId)) {
-    return getNetworkByChainId(MULTIVERS_X_NETWORK_BY_CHAIN_ID, newChainId);
-  }
   if (isSolanaChain(currentChainId) && isSolanaSupportEnabled(walletInfo)) {
     return getNetworkByChainId(SOLANA_NETWORK_BY_CHAIN_ID, newChainId);
   }

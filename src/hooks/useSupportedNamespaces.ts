@@ -1,13 +1,11 @@
 import { BIP122_SIGNING_METHODS } from "@/data/methods/BIP122.methods";
 import { EIP155_SIGNING_METHODS } from "@/data/methods/EIP155Data.methods";
-import { MULTIVERSX_SIGNING_METHODS } from "@/data/methods/MultiversX.methods";
 // import { RIPPLE_SIGNING_METHODS } from "@/data/methods/Ripple.methods";
 import { SOLANA_SIGNING_METHODS } from "@/data/methods/Solana.methods";
 import { WALLET_METHODS } from "@/data/methods/Wallet.methods";
 import {
   BIP122_CHAINS,
   EIP155_CHAINS,
-  MULTIVERS_X_CHAINS,
   // RIPPLE_CHAINS,
   SOLANA_CHAINS,
   SupportedNamespace,
@@ -79,69 +77,6 @@ export function useSupportedNamespaces(
         ...new Set([
           ...(requiredNamespaces[SupportedNamespace.EIP155]?.events ?? []),
           ...(optionalNamespaces[SupportedNamespace.EIP155]?.events ?? []),
-        ]),
-      ];
-
-      return {
-        chains: [...new Set(dataToSend.map((e) => e.chain))],
-        methods,
-        events,
-        accounts: dataToSend.map((e) => e.account),
-      };
-    },
-    [session, accounts.data, walletInfo, selectedAccounts],
-  );
-
-  const buildMvxNamespace = useCallback(
-    (
-      requiredNamespaces: ProposalTypes.RequiredNamespaces,
-      optionalNamespaces: ProposalTypes.OptionalNamespaces,
-    ) => {
-      const accountsByChain = formatAccountsByChain(
-        session,
-        accounts.data,
-        walletInfo,
-      ).filter(
-        (a) =>
-          a.accounts.length > 0 &&
-          a.isSupported &&
-          Object.keys(MULTIVERS_X_CHAINS).includes(a.chain),
-      );
-      const dataToSend = accountsByChain.reduce<
-        { account: string; chain: string }[]
-      >(
-        (accum, elem) =>
-          accum.concat(
-            elem.accounts
-              .filter((acc) => selectedAccounts.includes(acc.id))
-              .map((a) => ({
-                account: `${getNamespace(a.currency)}:${a.address}`,
-                chain: getNamespace(a.currency),
-              })),
-          ),
-        [],
-      );
-
-      const supportedMethods: string[] = [
-        ...Object.values(WALLET_METHODS),
-        ...Object.values(MULTIVERSX_SIGNING_METHODS),
-      ];
-
-      const methods = [
-        ...new Set([
-          ...(requiredNamespaces[SupportedNamespace.MVX]?.methods.filter(
-            (method) => supportedMethods.includes(method),
-          ) ?? []),
-          ...(optionalNamespaces[SupportedNamespace.MVX]?.methods.filter(
-            (method) => supportedMethods.includes(method),
-          ) ?? []),
-        ]),
-      ];
-
-      const events = [
-        ...new Set([
-          ...(requiredNamespaces[SupportedNamespace.MVX]?.events ?? []),
-          ...(optionalNamespaces[SupportedNamespace.MVX]?.events ?? []),
         ]),
       ];
 
@@ -376,12 +311,6 @@ export function useSupportedNamespaces(
           optionalNamespaces,
         );
       }
-      if ("mvx" in requiredNamespaces || "mvx" in optionalNamespaces) {
-        supportedNamespaces[SupportedNamespace.MVX] = buildMvxNamespace(
-          requiredNamespaces,
-          optionalNamespaces,
-        );
-      }
       // if ("xrpl" in requiredNamespaces || "xrpl" in optionalNamespaces) {
       //   supportedNamespaces[SupportedNamespace.XRPL] = buildXrpNamespace(
       //     requiredNamespaces,
@@ -402,7 +331,6 @@ export function useSupportedNamespaces(
     [
       buildBip122Namespace,
       buildEip155Namespace,
-      buildMvxNamespace,
       // buildXrpNamespace,
       buildSolanaNamespace,
       walletInfo,

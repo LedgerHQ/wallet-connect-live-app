@@ -115,19 +115,6 @@ export const EIP155_HOLESKY_CHAINS: Record<string, Network> = {
   },
 };
 
-export const MULTIVERS_X_CHAINS: Record<string, Network> = {
-  elrond: {
-    chainId: "1",
-    namespace: "mvx:1",
-    ticker: "EGLD",
-    displayName: "MultiversX",
-    color: "#23F7DD",
-  },
-};
-
-export const MULTIVERS_X_NETWORK_BY_CHAIN_ID =
-  getNetworkById(MULTIVERS_X_CHAINS);
-
 export const BIP122_MAINNET_CHAINS: Record<string, Network> = {
   bitcoin: {
     chainId: "000000000019d6689c085ae165831e93",
@@ -227,7 +214,6 @@ export const EIP155_NETWORK_BY_CHAIN_ID = getNetworkById(EIP155_CHAINS);
 
 export const SUPPORTED_NETWORK: Record<string, Network> = {
   ...EIP155_CHAINS,
-  ...MULTIVERS_X_CHAINS,
   ...BIP122_CHAINS,
   // ...RIPPLE_CHAINS,
   ...SOLANA_CHAINS,
@@ -240,7 +226,6 @@ export const SUPPORTED_NETWORK_NAMES: string[] = Object.values(
 export enum SupportedNamespace {
   BIP122 = "bip122",
   EIP155 = "eip155",
-  MVX = "mvx",
   // XRPL = "xrpl",
   SOLANA = "solana",
 }
