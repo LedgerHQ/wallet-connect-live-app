@@ -215,7 +215,7 @@ export const EIP155_NETWORK_BY_CHAIN_ID = getNetworkById(EIP155_CHAINS);
 export const SUPPORTED_NETWORK: Record<string, Network> = {
   ...EIP155_CHAINS,
   ...BIP122_CHAINS,
-  // ...RIPPLE_CHAINS,
+  ...RIPPLE_CHAINS,
   ...SOLANA_CHAINS,
 };
 
@@ -226,6 +226,6 @@ export const SUPPORTED_NETWORK_NAMES: string[] = Object.values(
 export enum SupportedNamespace {
   BIP122 = "bip122",
   EIP155 = "eip155",
-  // XRPL = "xrpl",
+  XRPL = "xrpl",
   SOLANA = "solana",
 }

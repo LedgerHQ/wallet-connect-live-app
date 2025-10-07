@@ -4,10 +4,10 @@ import {
   RIPPLE_SIGNING_METHODS,
   rippleSignTransactionSchema,
 } from "@/data/methods/Ripple.methods";
-import { convertXrpToLiveTX } from "@/utils/converters";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
 import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import type { IWalletKit } from "@reown/walletkit";
+import { decode, encode } from "ripple-binary-codec";
 import { acceptRequest, Errors, isCanceledError, rejectRequest } from "./utils";
 
 export async function handleXrpRequest(
@@ -31,14 +31,22 @@ export async function handleXrpRequest(
 
       if (accountTX) {
         try {
-          const liveTx = convertXrpToLiveTX(params.tx_json);
-          const hash = await client.transaction.signAndBroadcast(
-            accountTX.id,
-            liveTx,
-          );
+          const encoded_tx_json = encode(params.tx_json);
+          const { signedTransactionHex, transactionHash } =
+            await client.transaction.signRaw(
+              accountTX.id,
+              encoded_tx_json,
+              params.submit ?? true,
+            );
+
+          const final_tx_json = decode(signedTransactionHex);
+
+          if (transactionHash) {
+            final_tx_json.hash = transactionHash;
+          }
 
           const result: RIPPLE_RESPONSES[typeof request.method] = {
-            tx_json: { ...params.tx_json, hash },
+            tx_json: final_tx_json,
           };
 
           await acceptRequest(walletKit, topic, id, result);

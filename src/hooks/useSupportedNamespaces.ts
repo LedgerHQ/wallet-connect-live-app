@@ -1,19 +1,23 @@
 import { BIP122_SIGNING_METHODS } from "@/data/methods/BIP122.methods";
 import { EIP155_SIGNING_METHODS } from "@/data/methods/EIP155Data.methods";
-// import { RIPPLE_SIGNING_METHODS } from "@/data/methods/Ripple.methods";
+import { RIPPLE_SIGNING_METHODS } from "@/data/methods/Ripple.methods";
 import { SOLANA_SIGNING_METHODS } from "@/data/methods/Solana.methods";
 import { WALLET_METHODS } from "@/data/methods/Wallet.methods";
 import {
   BIP122_CHAINS,
   EIP155_CHAINS,
-  // RIPPLE_CHAINS,
+  RIPPLE_CHAINS,
   SOLANA_CHAINS,
   SupportedNamespace,
 } from "@/data/network.config";
 import useAccounts from "@/hooks/useAccounts";
 import { formatAccountsByChain } from "@/hooks/useProposal/util";
 import { walletAPIClientAtom, walletInfoAtom } from "@/store/wallet-api.store";
-import { getNamespace, isSolanaSupportEnabled } from "@/utils/helper.util";
+import {
+  getNamespace,
+  isSolanaSupportEnabled,
+  isXRPLSupportEnabled,
+} from "@/utils/helper.util";
 import { ProposalTypes, SessionTypes } from "@walletconnect/types";
 import { BuildApprovedNamespacesParams } from "@walletconnect/utils";
 import { useAtomValue } from "jotai";
@@ -153,68 +157,68 @@ export function useSupportedNamespaces(
     [session, accounts.data, walletInfo, selectedAccounts],
   );
 
-  // const buildXrpNamespace = useCallback(
-  //   (
-  //     requiredNamespaces: ProposalTypes.RequiredNamespaces,
-  //     optionalNamespaces: ProposalTypes.OptionalNamespaces,
-  //   ) => {
-  //     const accountsByChain = formatAccountsByChain(
-  //       session,
-  //       accounts.data,
-  //       walletInfo,
-  //     ).filter(
-  //       (a) =>
-  //         a.accounts.length > 0 &&
-  //         a.isSupported &&
-  //         Object.keys(RIPPLE_CHAINS).includes(a.chain),
-  //     );
-  //     const dataToSend = accountsByChain.reduce<
-  //       { account: string; chain: string }[]
-  //     >(
-  //       (accum, elem) =>
-  //         accum.concat(
-  //           elem.accounts
-  //             .filter((acc) => selectedAccounts.includes(acc.id))
-  //             .map((a) => ({
-  //               account: `${getNamespace(a.currency)}:${a.address}`,
-  //               chain: getNamespace(a.currency),
-  //             })),
-  //         ),
-  //       [],
-  //     );
+  const buildXrpNamespace = useCallback(
+    (
+      requiredNamespaces: ProposalTypes.RequiredNamespaces,
+      optionalNamespaces: ProposalTypes.OptionalNamespaces,
+    ) => {
+      const accountsByChain = formatAccountsByChain(
+        session,
+        accounts.data,
+        walletInfo,
+      ).filter(
+        (a) =>
+          a.accounts.length > 0 &&
+          a.isSupported &&
+          Object.keys(RIPPLE_CHAINS).includes(a.chain),
+      );
+      const dataToSend = accountsByChain.reduce<
+        { account: string; chain: string }[]
+      >(
+        (accum, elem) =>
+          accum.concat(
+            elem.accounts
+              .filter((acc) => selectedAccounts.includes(acc.id))
+              .map((a) => ({
+                account: `${getNamespace(a.currency)}:${a.address}`,
+                chain: getNamespace(a.currency),
+              })),
+          ),
+        [],
+      );
 
-  //     const supportedMethods: string[] = [
-  //       ...Object.values(WALLET_METHODS),
-  //       ...Object.values(RIPPLE_SIGNING_METHODS),
-  //     ];
+      const supportedMethods: string[] = [
+        ...Object.values(WALLET_METHODS),
+        ...Object.values(RIPPLE_SIGNING_METHODS),
+      ];
 
-  //     const methods = [
-  //       ...new Set([
-  //         ...(requiredNamespaces[SupportedNamespace.XRPL]?.methods.filter(
-  //           (method) => supportedMethods.includes(method),
-  //         ) ?? []),
-  //         ...(optionalNamespaces[SupportedNamespace.XRPL]?.methods.filter(
-  //           (method) => supportedMethods.includes(method),
-  //         ) ?? []),
-  //       ]),
-  //     ];
+      const methods = [
+        ...new Set([
+          ...(requiredNamespaces[SupportedNamespace.XRPL]?.methods.filter(
+            (method) => supportedMethods.includes(method),
+          ) ?? []),
+          ...(optionalNamespaces[SupportedNamespace.XRPL]?.methods.filter(
+            (method) => supportedMethods.includes(method),
+          ) ?? []),
+        ]),
+      ];
 
-  //     const events = [
-  //       ...new Set([
-  //         ...(requiredNamespaces[SupportedNamespace.XRPL]?.events ?? []),
-  //         ...(optionalNamespaces[SupportedNamespace.XRPL]?.events ?? []),
-  //       ]),
-  //     ];
+      const events = [
+        ...new Set([
+          ...(requiredNamespaces[SupportedNamespace.XRPL]?.events ?? []),
+          ...(optionalNamespaces[SupportedNamespace.XRPL]?.events ?? []),
+        ]),
+      ];
 
-  //     return {
-  //       chains: [...new Set(dataToSend.map((e) => e.chain))],
-  //       methods,
-  //       events,
-  //       accounts: dataToSend.map((e) => e.account),
-  //     };
-  //   },
-  //   [session, accounts.data, walletInfo, selectedAccounts],
-  // );
+      return {
+        chains: [...new Set(dataToSend.map((e) => e.chain))],
+        methods,
+        events,
+        accounts: dataToSend.map((e) => e.account),
+      };
+    },
+    [session, accounts.data, walletInfo, selectedAccounts],
+  );
 
   const buildSolanaNamespace = useCallback(
     (
@@ -311,12 +315,15 @@ export function useSupportedNamespaces(
           optionalNamespaces,
         );
       }
-      // if ("xrpl" in requiredNamespaces || "xrpl" in optionalNamespaces) {
-      //   supportedNamespaces[SupportedNamespace.XRPL] = buildXrpNamespace(
-      //     requiredNamespaces,
-      //     optionalNamespaces,
-      //   );
-      // }
+      if (
+        ("xrpl" in requiredNamespaces || "xrpl" in optionalNamespaces) &&
+        isXRPLSupportEnabled(walletInfo)
+      ) {
+        supportedNamespaces[SupportedNamespace.XRPL] = buildXrpNamespace(
+          requiredNamespaces,
+          optionalNamespaces,
+        );
+      }
       if (
         ("solana" in requiredNamespaces || "solana" in optionalNamespaces) &&
         isSolanaSupportEnabled(walletInfo)
@@ -331,7 +338,7 @@ export function useSupportedNamespaces(
     [
       buildBip122Namespace,
       buildEip155Namespace,
-      // buildXrpNamespace,
+      buildXrpNamespace,
       buildSolanaNamespace,
       walletInfo,
     ],

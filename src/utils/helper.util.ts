@@ -98,41 +98,47 @@ export const getCurrencyByChainId = (chainId: string) => {
 };
 
 /**
- * Minimum versions of Ledger Live that support Solana
+ * Generic helper factory to build feature support checkers based on minimum wallet versions.
+ * Returns a predicate that validates whether the provided walletInfo satisfies any of the
+ * required minimum versions (keyed by wallet name) using semver comparison.
  */
-const SOLANA_MIN_VERSIONS: Record<string, string> = {
-  "ledger-live-desktop": "2.126.0", // Minimum desktop version
-  "ledger-live-mobile": "3.90.0", // Minimum mobile version
-};
+function createSupportChecker(minVersions: Record<string, string>) {
+  return (walletInfo: WalletInfo["result"]): boolean => {
+    const {
+      wallet: { name, version },
+    } = walletInfo;
 
-/**
- * Check if Solana support should be enabled based on wallet version
- */
-export function isSolanaSupportEnabled(
-  walletInfo: WalletInfo["result"],
-): boolean {
-  const {
-    wallet: { name, version },
-  } = walletInfo;
+    if (!version) return false;
 
-  if (!version) {
-    return false;
-  }
+    const minVersion = minVersions[name];
+    if (!minVersion) return false;
 
-  // Check if the wallet name is supported and version meets minimum requirement
-  const minVersion = SOLANA_MIN_VERSIONS[name];
-  if (minVersion) {
     try {
       return semver.gte(version, minVersion);
     } catch (error) {
-      // If version format is invalid, return false
       console.warn(`Invalid version format: ${version}`, error);
       return false;
     }
-  }
-
-  return false;
+  };
 }
+
+/** Minimum versions of Ledger Live that support Solana */
+const SOLANA_MIN_VERSIONS: Record<string, string> = {
+  "ledger-live-desktop": "2.126.0",
+  "ledger-live-mobile": "3.90.0",
+};
+
+/** Minimum versions of Ledger Live that support XRP */
+const XRPL_MIN_VERSIONS: Record<string, string> = {
+  "ledger-live-desktop": "2.131.0",
+  "ledger-live-mobile": "3.95.0",
+};
+
+/** Check if Solana support should be enabled based on wallet version */
+export const isSolanaSupportEnabled = createSupportChecker(SOLANA_MIN_VERSIONS);
+
+/** Check if XRPL support should be enabled based on wallet version */
+export const isXRPLSupportEnabled = createSupportChecker(XRPL_MIN_VERSIONS);
 
 export const getErrorMessage = (error: unknown) => {
   if (error instanceof Error) return error.message;

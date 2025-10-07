@@ -13,23 +13,24 @@ import {
   getErrorMessage,
   isBIP122Chain,
   isEIP155Chain,
-  // isRippleChain,
+  isRippleChain,
   isSolanaChain,
   isSolanaSupportEnabled,
+  isXRPLSupportEnabled,
 } from "@/utils/helper.util";
 import { WalletKitTypes } from "@reown/walletkit";
+import * as Sentry from "@sentry/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { SignClientTypes } from "@walletconnect/types";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { enqueueSnackbar } from "notistack";
 import { useCallback, useEffect } from "react";
+import { ZodError } from "zod";
 import { isWalletRequest } from "../utils/helper.util";
 import { handleBIP122Request } from "./requestHandlers/BIP122";
 import { handleEIP155Request } from "./requestHandlers/EIP155";
-// import { handleXrpRequest } from "./requestHandlers/Ripple";
-import * as Sentry from "@sentry/react";
-import { ZodError } from "zod";
+import { handleXrpRequest } from "./requestHandlers/Ripple";
 import { handleSolanaRequest } from "./requestHandlers/Solana";
 import { Errors, rejectRequest } from "./requestHandlers/utils";
 import { handleWalletRequest } from "./requestHandlers/Wallet";
@@ -211,16 +212,19 @@ export default function useWalletConnect() {
               client,
               walletKit,
             );
-            // } else if (isRippleChain(chainId, request)) {
-            //   await handleXrpRequest(
-            //     request,
-            //     topic,
-            //     id,
-            //     chainId,
-            //     accounts.data,
-            //     client,
-            //     walletKit,
-            //   );
+          } else if (
+            isRippleChain(chainId, request) &&
+            isXRPLSupportEnabled(walletInfo)
+          ) {
+            await handleXrpRequest(
+              request,
+              topic,
+              id,
+              chainId,
+              accounts.data,
+              client,
+              walletKit,
+            );
           } else if (
             isSolanaChain(chainId, request) &&
             isSolanaSupportEnabled(walletInfo)

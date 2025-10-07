@@ -5,7 +5,7 @@ import {
 import {
   BIP122_NETWORK_BY_CHAIN_ID,
   EIP155_NETWORK_BY_CHAIN_ID,
-  // RIPPLE_NETWORK_BY_CHAIN_ID,
+  RIPPLE_NETWORK_BY_CHAIN_ID,
   SOLANA_NETWORK_BY_CHAIN_ID,
 } from "@/data/network.config";
 import { queryKey as accountsQueryKey } from "@/hooks/useAccounts";
@@ -14,9 +14,10 @@ import {
   getNamespace,
   isBIP122Chain,
   isEIP155Chain,
-  // isRippleChain,
+  isRippleChain,
   isSolanaChain,
   isSolanaSupportEnabled,
+  isXRPLSupportEnabled,
 } from "@/utils/helper.util";
 import type {
   Account,
@@ -50,9 +51,9 @@ function getNetwork(
   if (isBIP122Chain(currentChainId)) {
     return getNetworkByChainId(BIP122_NETWORK_BY_CHAIN_ID, newChainId);
   }
-  // if (isRippleChain(currentChainId)) {
-  //   return getNetworkByChainId(RIPPLE_NETWORK_BY_CHAIN_ID, newChainId);
-  // }
+  if (isRippleChain(currentChainId) && isXRPLSupportEnabled(walletInfo)) {
+    return getNetworkByChainId(RIPPLE_NETWORK_BY_CHAIN_ID, newChainId);
+  }
   if (isSolanaChain(currentChainId) && isSolanaSupportEnabled(walletInfo)) {
     return getNetworkByChainId(SOLANA_NETWORK_BY_CHAIN_ID, newChainId);
   }
