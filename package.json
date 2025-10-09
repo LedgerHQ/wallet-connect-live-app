@@ -17,8 +17,8 @@
   "dependencies": {
     "@ledgerhq/hw-transport": "^6.31.4",
     "@ledgerhq/react-ui": "^0.16.4",
-    "@ledgerhq/wallet-api-client": "^1.8.0",
-    "@ledgerhq/wallet-api-simulator": "^1.2.10",
+    "@ledgerhq/wallet-api-client": "^1.12.2",
+    "@ledgerhq/wallet-api-simulator": "^1.2.18",
     "@reown/walletkit": "^1.2.10",
     "@segment/analytics-next": "^1.76.0",
     "@segment/snippet": "^5.2.1",
@@ -42,6 +42,7 @@
     "react-i18next": "^15.1.1",
     "react-qr-reader": "2.2.1",
     "react-transition-group": "^4.4.2",
+    "ripple-binary-codec": "^2.5.0",
     "semver": "^7.7.2",
     "styled-components": "^5.3.11",
     "vite-plugin-node-polyfills": "^0.22.0",

@@ -1,7 +1,6 @@
 import {
   BitcoinTransaction,
   EthereumTransaction,
-  RippleTransaction,
 } from "@ledgerhq/wallet-api-client";
 import { BigNumber } from "bignumber.js";
 import eip55 from "eip55";
@@ -55,33 +54,6 @@ export function convertEthToLiveTX(ethTX: EthTransaction): EthereumTransaction {
       : undefined,
     nonce: Number.isNaN(nonce) ? undefined : nonce,
   };
-}
-
-// Ressource :
-// https://xpring-eng.github.io/xrp-api/XRPAPI-data-types-transaction_common_fields.html
-export const xrpTransactionSchema = z.strictObject({
-  hash: z.string().optional(),
-  TransactionType: z.string(),
-  Account: z.string(),
-  Flags: z.number().optional(), // NOTE: conflicted documentation here, https://xrpl.org/docs/references/protocol/transactions/common-fields, the sample https://react-app.walletconnect.com/ code here doesn't set flags: https://github.com/reown-com/web-examples/pull/340
-  Amount: z.union([z.number(), z.string()]),
-  Destination: z.string(),
-  Fee: z.string().optional(),
-});
-
-export type XrpTransaction = z.infer<typeof xrpTransactionSchema>;
-
-export function convertXrpToLiveTX(tx: XrpTransaction): RippleTransaction {
-  const rippleTransaction: RippleTransaction = {
-    family: "ripple",
-    tag: 0,
-    amount: tx.Amount ? new BigNumber(tx.Amount) : new BigNumber(0),
-    recipient: tx.Destination,
-  };
-
-  if (tx.Fee) rippleTransaction.fee = new BigNumber(tx.Fee);
-
-  return rippleTransaction;
 }
 
 export const btcTransactionSchema = z.strictObject({

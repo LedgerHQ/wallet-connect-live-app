@@ -3,8 +3,10 @@ import {
   getCurrencyByChainId,
   getDisplayName,
   getNamespace,
+  isRippleChain,
   isSolanaChain,
   isSolanaSupportEnabled,
+  isXRPLSupportEnabled,
 } from "@/utils/helper.util";
 import { Account, WalletInfo } from "@ledgerhq/wallet-api-client";
 import { ProposalTypes, SessionTypes } from "@walletconnect/types";
@@ -70,6 +72,7 @@ export const formatAccountsByChain = (
   proposal: ProposalTypes.Struct | SessionTypes.Struct,
   accounts: Account[],
   walletInfo: WalletInfo["result"],
+  walletCapabilities: string[],
 ) => {
   const families = getChains(proposal);
 
@@ -83,6 +86,11 @@ export const formatAccountsByChain = (
     (acc, chain) => {
       // Filter out Solana chains if Solana support is not enabled
       if (isSolanaChain(chain) && !isSolanaSupportEnabled(walletInfo)) {
+        return acc;
+      }
+
+      // Filter out Ripple chains if Ripple support is not enabled
+      if (isRippleChain(chain) && !isXRPLSupportEnabled(walletCapabilities)) {
         return acc;
       }
 

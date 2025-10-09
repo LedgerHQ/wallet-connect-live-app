@@ -9,6 +9,7 @@ import {
   getTicker,
   isEIP155Chain,
   isSolanaSupportEnabled,
+  isXRPLSupportEnabled,
   truncate,
 } from "../helper.util";
 
@@ -123,15 +124,16 @@ describe("truncate", () => {
   });
 });
 
-describe("isSolanaSupportEnabled", () => {
-  const createWalletInfo = (name: string, version?: string) => ({
-    wallet: {
-      name,
-      version: version ?? "",
-    },
-    tracking: false,
-  });
+// Reusable factory for walletInfo objects used in version support tests
+const createWalletInfo = (name: string, version?: string) => ({
+  wallet: {
+    name,
+    version: version ?? "",
+  },
+  tracking: false,
+});
 
+describe("isSolanaSupportEnabled", () => {
   it("should return true for supported desktop versions at minimum requirement", () => {
     const walletInfo = createWalletInfo("ledger-live-desktop", "2.126.0");
     expect(isSolanaSupportEnabled(walletInfo)).toBe(true);
@@ -233,5 +235,50 @@ describe("isSolanaSupportEnabled", () => {
       "2.125.0-beta.1",
     );
     expect(isSolanaSupportEnabled(walletInfoBelowMin)).toBe(false);
+  });
+});
+
+describe("isXRPLSupportEnabled", () => {
+  it("returns true when required capability is present", () => {
+    const caps = ["account.request", "transaction.signRaw", "wallet.open"];
+    expect(isXRPLSupportEnabled(caps)).toBe(true);
+  });
+
+  it("returns false when required capability is missing", () => {
+    const caps = ["account.request", "transaction.sign", "wallet.open"];
+    expect(isXRPLSupportEnabled(caps)).toBe(false);
+  });
+
+  it("returns false for empty capabilities array", () => {
+    expect(isXRPLSupportEnabled([])).toBe(false);
+  });
+
+  it("is case sensitive (mismatched case should return false)", () => {
+    const caps = ["Transaction.SignRaw"]; // wrong casing
+    expect(isXRPLSupportEnabled(caps)).toBe(false);
+  });
+
+  it("returns true regardless of capability order", () => {
+    const caps = ["transaction.signRaw", "account.request"];
+    expect(isXRPLSupportEnabled(caps)).toBe(true);
+  });
+
+  it("returns true when capability list contains duplicates including the required one", () => {
+    const caps = [
+      "transaction.signRaw",
+      "transaction.signRaw",
+      "account.request",
+    ];
+    expect(isXRPLSupportEnabled(caps)).toBe(true);
+  });
+
+  it("returns true when additional unrelated capabilities are present", () => {
+    const caps = [
+      "foo.bar",
+      "another.capability",
+      "transaction.signRaw",
+      "yet.another",
+    ];
+    expect(isXRPLSupportEnabled(caps)).toBe(true);
   });
 });

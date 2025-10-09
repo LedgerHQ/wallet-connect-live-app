@@ -67,6 +67,11 @@ export const walletInfoAtom = atom((get) => {
   return client.wallet.info();
 });
 
+export const walletCapabilitiesAtom = atom((get) => {
+  const client = get(walletAPIClientAtom);
+  return client.wallet.capabilities();
+});
+
 export const walletUserIdAtom = atom((get) => {
   const client = get(walletAPIClientAtom);
   return client.wallet.userId();

@@ -1,4 +1,4 @@
-import { XrpTransaction, xrpTransactionSchema } from "@/utils/converters";
+import { JsonObject } from "ripple-binary-codec/dist/types/serialized-type";
 import { z } from "zod";
 
 /**
@@ -9,7 +9,12 @@ export const RIPPLE_SIGNING_METHODS = {
 } as const;
 
 export const rippleSignTransactionSchema = z.strictObject({
-  tx_json: xrpTransactionSchema,
+  // we only check that Account exists here
+  // as it's the only mandatory field to find the account
+  // the rest of the tx_json is not validated here
+  tx_json: z.object({
+    Account: z.string(),
+  }),
   autofill: z.boolean().optional(),
   submit: z.boolean().optional(),
 });
@@ -27,6 +32,6 @@ export type RIPPLE_REQUESTS = {
  */
 export type RIPPLE_RESPONSES = {
   [RIPPLE_SIGNING_METHODS.RIPPLE_SIGN_TRANSACTION]: {
-    tx_json: XrpTransaction & { hash: string };
+    tx_json: JsonObject;
   };
 };

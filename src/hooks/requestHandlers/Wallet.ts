@@ -5,7 +5,7 @@ import {
 import {
   BIP122_NETWORK_BY_CHAIN_ID,
   EIP155_NETWORK_BY_CHAIN_ID,
-  // RIPPLE_NETWORK_BY_CHAIN_ID,
+  RIPPLE_NETWORK_BY_CHAIN_ID,
   SOLANA_NETWORK_BY_CHAIN_ID,
 } from "@/data/network.config";
 import { queryKey as accountsQueryKey } from "@/hooks/useAccounts";
@@ -14,9 +14,10 @@ import {
   getNamespace,
   isBIP122Chain,
   isEIP155Chain,
-  // isRippleChain,
+  isRippleChain,
   isSolanaChain,
   isSolanaSupportEnabled,
+  isXRPLSupportEnabled,
 } from "@/utils/helper.util";
 import type {
   Account,
@@ -43,6 +44,7 @@ function getNetwork(
   currentChainId: string,
   newChainId: string,
   walletInfo: WalletInfo["result"],
+  walletCapabilities: string[],
 ) {
   if (isEIP155Chain(currentChainId)) {
     return getNetworkByChainId(EIP155_NETWORK_BY_CHAIN_ID, newChainId);
@@ -50,9 +52,12 @@ function getNetwork(
   if (isBIP122Chain(currentChainId)) {
     return getNetworkByChainId(BIP122_NETWORK_BY_CHAIN_ID, newChainId);
   }
-  // if (isRippleChain(currentChainId)) {
-  //   return getNetworkByChainId(RIPPLE_NETWORK_BY_CHAIN_ID, newChainId);
-  // }
+  if (
+    isRippleChain(currentChainId) &&
+    isXRPLSupportEnabled(walletCapabilities)
+  ) {
+    return getNetworkByChainId(RIPPLE_NETWORK_BY_CHAIN_ID, newChainId);
+  }
   if (isSolanaChain(currentChainId) && isSolanaSupportEnabled(walletInfo)) {
     return getNetworkByChainId(SOLANA_NETWORK_BY_CHAIN_ID, newChainId);
   }
@@ -97,6 +102,7 @@ export async function handleWalletRequest(
   walletKit: IWalletKit,
   queryClient: QueryClient,
   walletInfo: WalletInfo["result"],
+  walletCapabilities: string[],
 ) {
   switch (request.method) {
     case WALLET_METHODS.WALLET_SWITCH_ETHEREUM_CHAIN: {
@@ -104,6 +110,7 @@ export async function handleWalletRequest(
         chainId,
         request.params[0].chainId,
         walletInfo,
+        walletCapabilities,
       );
       if (network) {
         const session = walletKit.engine.signClient.session.get(topic);
@@ -154,6 +161,7 @@ export async function handleWalletRequest(
         chainId,
         request.params[0].chainId,
         walletInfo,
+        walletCapabilities,
       );
       if (network) {
         const account = await addNewAccounts(client, queryClient, [network]);
