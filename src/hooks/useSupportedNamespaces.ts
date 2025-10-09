@@ -45,6 +45,7 @@ export function useSupportedNamespaces(
         session,
         accounts.data,
         walletInfo,
+        walletCapabilities,
       ).filter((a) => {
         return (
           a.accounts.length > 0 &&
@@ -96,7 +97,7 @@ export function useSupportedNamespaces(
         accounts: dataToSend.map((e) => e.account),
       };
     },
-    [session, accounts.data, walletInfo, selectedAccounts],
+    [session, accounts.data, walletInfo, walletCapabilities, selectedAccounts],
   );
 
   const buildBip122Namespace = useCallback(
@@ -108,6 +109,7 @@ export function useSupportedNamespaces(
         session,
         accounts.data,
         walletInfo,
+        walletCapabilities,
       ).filter(
         (a) =>
           a.accounts.length > 0 &&
@@ -159,7 +161,7 @@ export function useSupportedNamespaces(
         accounts: dataToSend.map((e) => e.account),
       };
     },
-    [session, accounts.data, walletInfo, selectedAccounts],
+    [session, accounts.data, walletInfo, walletCapabilities, selectedAccounts],
   );
 
   const buildXrpNamespace = useCallback(
@@ -171,6 +173,7 @@ export function useSupportedNamespaces(
         session,
         accounts.data,
         walletInfo,
+        walletCapabilities,
       ).filter(
         (a) =>
           a.accounts.length > 0 &&
@@ -222,7 +225,7 @@ export function useSupportedNamespaces(
         accounts: dataToSend.map((e) => e.account),
       };
     },
-    [session, accounts.data, walletInfo, selectedAccounts],
+    [session, accounts.data, walletInfo, walletCapabilities, selectedAccounts],
   );
 
   const buildSolanaNamespace = useCallback(
@@ -234,6 +237,7 @@ export function useSupportedNamespaces(
         session,
         accounts.data,
         walletInfo,
+        walletCapabilities,
       ).filter(
         (a) =>
           a.accounts.length > 0 &&
@@ -298,7 +302,7 @@ export function useSupportedNamespaces(
         accounts: dataToSend.map((e) => e.account),
       };
     },
-    [session, accounts.data, walletInfo, selectedAccounts],
+    [session, accounts.data, walletInfo, walletCapabilities, selectedAccounts],
   );
 
   const buildSupportedNamespaces = useCallback(
