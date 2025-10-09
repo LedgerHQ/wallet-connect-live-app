@@ -128,17 +128,13 @@ const SOLANA_MIN_VERSIONS: Record<string, string> = {
   "ledger-live-mobile": "3.90.0",
 };
 
-/** Minimum versions of Ledger Live that support XRP */
-const XRPL_MIN_VERSIONS: Record<string, string> = {
-  "ledger-live-desktop": "2.131.0",
-  "ledger-live-mobile": "3.95.0",
-};
-
 /** Check if Solana support should be enabled based on wallet version */
 export const isSolanaSupportEnabled = createSupportChecker(SOLANA_MIN_VERSIONS);
 
-/** Check if XRPL support should be enabled based on wallet version */
-export const isXRPLSupportEnabled = createSupportChecker(XRPL_MIN_VERSIONS);
+/** Check if XRPL support should be enabled based on wallet capabilities */
+export const isXRPLSupportEnabled = (walletCapabilities: string[]): boolean => {
+  return walletCapabilities.includes("transaction.signRaw");
+};
 
 export const getErrorMessage = (error: unknown) => {
   if (error instanceof Error) return error.message;

@@ -12,7 +12,11 @@ import {
 } from "@/data/network.config";
 import useAccounts from "@/hooks/useAccounts";
 import { formatAccountsByChain } from "@/hooks/useProposal/util";
-import { walletAPIClientAtom, walletInfoAtom } from "@/store/wallet-api.store";
+import {
+  walletAPIClientAtom,
+  walletCapabilitiesAtom,
+  walletInfoAtom,
+} from "@/store/wallet-api.store";
 import {
   getNamespace,
   isSolanaSupportEnabled,
@@ -29,6 +33,7 @@ export function useSupportedNamespaces(
 ) {
   const client = useAtomValue(walletAPIClientAtom);
   const walletInfo = useAtomValue(walletInfoAtom);
+  const walletCapabilities = useAtomValue(walletCapabilitiesAtom);
   const accounts = useAccounts(client);
 
   const buildEip155Namespace = useCallback(
@@ -317,7 +322,7 @@ export function useSupportedNamespaces(
       }
       if (
         ("xrpl" in requiredNamespaces || "xrpl" in optionalNamespaces) &&
-        isXRPLSupportEnabled(walletInfo)
+        isXRPLSupportEnabled(walletCapabilities)
       ) {
         supportedNamespaces[SupportedNamespace.XRPL] = buildXrpNamespace(
           requiredNamespaces,

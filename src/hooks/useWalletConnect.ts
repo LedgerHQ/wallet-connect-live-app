@@ -1,4 +1,8 @@
-import { walletAPIClientAtom, walletInfoAtom } from "@/store/wallet-api.store";
+import {
+  walletAPIClientAtom,
+  walletCapabilitiesAtom,
+  walletInfoAtom,
+} from "@/store/wallet-api.store";
 import {
   connectionStatusAtom,
   coreAtom,
@@ -104,6 +108,7 @@ export default function useWalletConnect() {
 
   const client = useAtomValue(walletAPIClientAtom);
   const walletInfo = useAtomValue(walletInfoAtom);
+  const walletCapabilities = useAtomValue(walletCapabilitiesAtom);
   const setVerifyContextByTopic = useSetAtom(verifyContextByTopicAtom);
 
   const accounts = useAccounts(client);
@@ -191,6 +196,7 @@ export default function useWalletConnect() {
               walletKit,
               queryClient,
               walletInfo,
+              walletCapabilities,
             );
           } else if (isEIP155Chain(chainId, request)) {
             await handleEIP155Request(
@@ -214,7 +220,7 @@ export default function useWalletConnect() {
             );
           } else if (
             isRippleChain(chainId, request) &&
-            isXRPLSupportEnabled(walletInfo)
+            isXRPLSupportEnabled(walletCapabilities)
           ) {
             await handleXrpRequest(
               request,

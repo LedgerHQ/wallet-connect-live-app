@@ -239,100 +239,46 @@ describe("isSolanaSupportEnabled", () => {
 });
 
 describe("isXRPLSupportEnabled", () => {
-  it("should return true for supported desktop versions at minimum requirement", () => {
-    const walletInfo = createWalletInfo("ledger-live-desktop", "2.131.0");
-    expect(isXRPLSupportEnabled(walletInfo)).toBe(true);
+  it("returns true when required capability is present", () => {
+    const caps = ["account.request", "transaction.signRaw", "wallet.open"];
+    expect(isXRPLSupportEnabled(caps)).toBe(true);
   });
 
-  it("should return true for supported desktop versions above minimum requirement", () => {
-    const walletInfo = createWalletInfo("ledger-live-desktop", "2.131.1");
-    expect(isXRPLSupportEnabled(walletInfo)).toBe(true);
-
-    const walletInfo2 = createWalletInfo("ledger-live-desktop", "2.132.0");
-    expect(isXRPLSupportEnabled(walletInfo2)).toBe(true);
+  it("returns false when required capability is missing", () => {
+    const caps = ["account.request", "transaction.sign", "wallet.open"];
+    expect(isXRPLSupportEnabled(caps)).toBe(false);
   });
 
-  it("should return false for desktop versions below minimum requirement", () => {
-    const walletInfo = createWalletInfo("ledger-live-desktop", "2.130.9");
-    expect(isXRPLSupportEnabled(walletInfo)).toBe(false);
+  it("returns false for empty capabilities array", () => {
+    expect(isXRPLSupportEnabled([])).toBe(false);
   });
 
-  it("should return true for supported mobile versions at minimum requirement", () => {
-    const walletInfo = createWalletInfo("ledger-live-mobile", "3.95.0");
-    expect(isXRPLSupportEnabled(walletInfo)).toBe(true);
+  it("is case sensitive (mismatched case should return false)", () => {
+    const caps = ["Transaction.SignRaw"]; // wrong casing
+    expect(isXRPLSupportEnabled(caps)).toBe(false);
   });
 
-  it("should return true for supported mobile versions above minimum requirement", () => {
-    const walletInfo = createWalletInfo("ledger-live-mobile", "3.95.1");
-    expect(isXRPLSupportEnabled(walletInfo)).toBe(true);
-
-    const walletInfo2 = createWalletInfo("ledger-live-mobile", "3.96.0");
-    expect(isXRPLSupportEnabled(walletInfo2)).toBe(true);
+  it("returns true regardless of capability order", () => {
+    const caps = ["transaction.signRaw", "account.request"];
+    expect(isXRPLSupportEnabled(caps)).toBe(true);
   });
 
-  it("should return false for mobile versions below minimum requirement", () => {
-    const walletInfo = createWalletInfo("ledger-live-mobile", "3.94.9");
-    expect(isXRPLSupportEnabled(walletInfo)).toBe(false);
+  it("returns true when capability list contains duplicates including the required one", () => {
+    const caps = [
+      "transaction.signRaw",
+      "transaction.signRaw",
+      "account.request",
+    ];
+    expect(isXRPLSupportEnabled(caps)).toBe(true);
   });
 
-  it("should return false for unsupported wallet names", () => {
-    const walletInfo = createWalletInfo("other-wallet", "10.0.0");
-    expect(isXRPLSupportEnabled(walletInfo)).toBe(false);
-  });
-
-  it("should return false when version is empty string", () => {
-    const walletInfo = createWalletInfo("ledger-live-desktop", "");
-    expect(isXRPLSupportEnabled(walletInfo)).toBe(false);
-  });
-
-  it("should handle edge cases with different version formats", () => {
-    const walletInfo1 = createWalletInfo("ledger-live-desktop", "2.131.0");
-    expect(isXRPLSupportEnabled(walletInfo1)).toBe(true);
-
-    const walletInfo2 = createWalletInfo("ledger-live-mobile", "3.95.0");
-    expect(isXRPLSupportEnabled(walletInfo2)).toBe(true);
-  });
-
-  it("should handle invalid version formats gracefully", () => {
-    const walletInfo1 = createWalletInfo("ledger-live-desktop", "2.131");
-    expect(isXRPLSupportEnabled(walletInfo1)).toBe(false);
-
-    const walletInfo2 = createWalletInfo("ledger-live-mobile", "invalid");
-    expect(isXRPLSupportEnabled(walletInfo2)).toBe(false);
-  });
-
-  it("should support version numbers with suffixes (pre-release versions)", () => {
-    const walletInfoBeta = createWalletInfo(
-      "ledger-live-desktop",
-      "2.131.0-beta.1",
-    );
-    expect(isXRPLSupportEnabled(walletInfoBeta)).toBe(false); // Less than 2.131.0
-
-    const walletInfoBetaHigher = createWalletInfo(
-      "ledger-live-desktop",
-      "2.132.0-beta.1",
-    );
-    expect(isXRPLSupportEnabled(walletInfoBetaHigher)).toBe(true); // Greater than 2.131.0
-
-    const walletInfoRc = createWalletInfo("ledger-live-mobile", "3.95.0-rc.2");
-    expect(isXRPLSupportEnabled(walletInfoRc)).toBe(false); // Less than 3.95.0
-
-    const walletInfoRcHigher = createWalletInfo(
-      "ledger-live-mobile",
-      "3.96.0-rc.1",
-    );
-    expect(isXRPLSupportEnabled(walletInfoRcHigher)).toBe(true); // Greater than 3.95.0
-
-    const walletInfoAlpha = createWalletInfo(
-      "ledger-live-desktop",
-      "2.132.0-alpha.3",
-    );
-    expect(isXRPLSupportEnabled(walletInfoAlpha)).toBe(true);
-
-    const walletInfoBelowMin = createWalletInfo(
-      "ledger-live-desktop",
-      "2.130.0-beta.1",
-    );
-    expect(isXRPLSupportEnabled(walletInfoBelowMin)).toBe(false);
+  it("returns true when additional unrelated capabilities are present", () => {
+    const caps = [
+      "foo.bar",
+      "another.capability",
+      "transaction.signRaw",
+      "yet.another",
+    ];
+    expect(isXRPLSupportEnabled(caps)).toBe(true);
   });
 });
