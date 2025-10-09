@@ -277,13 +277,14 @@ export default function useWalletConnect() {
     },
     [
       setVerifyContextByTopic,
+      walletCapabilities,
+      walletInfo,
       accounts.data,
       client,
       walletKit,
       queryClient,
       setLoading,
       redirectToDapp,
-      walletInfo,
     ],
   );
 
