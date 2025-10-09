@@ -341,11 +341,12 @@ export function useSupportedNamespaces(
       return supportedNamespaces;
     },
     [
+      walletCapabilities,
+      walletInfo,
       buildBip122Namespace,
       buildEip155Namespace,
       buildXrpNamespace,
       buildSolanaNamespace,
-      walletInfo,
     ],
   );
 
