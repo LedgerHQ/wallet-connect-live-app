@@ -7,6 +7,7 @@ import { useProposal } from "@/hooks/useProposal/useProposal";
 import { formatAccountsByChain, sortChains } from "@/hooks/useProposal/util";
 import useVerification from "@/hooks/useVerification";
 import {
+  walletCapabilitiesAtom,
   walletCurrenciesByIdAtom,
   walletInfoAtom,
 } from "@/store/wallet-api.store";
@@ -64,6 +65,7 @@ export default function SessionProposal({
   const dAppUrl = proposal.proposer.metadata.url;
   const currenciesById = useAtomValue(walletCurrenciesByIdAtom);
   const walletInfo = useAtomValue(walletInfoAtom);
+  const walletCapabilites = useAtomValue(walletCapabilitiesAtom);
   const [approving, setApproving] = useState(false);
   const [rejecting, setRejecting] = useState(false);
 
@@ -138,8 +140,9 @@ export default function SessionProposal({
   ]);
 
   const accountsByChain = useMemo(
-    () => formatAccountsByChain(proposal, accounts, walletInfo),
-    [proposal, accounts, walletInfo],
+    () =>
+      formatAccountsByChain(proposal, accounts, walletInfo, walletCapabilites),
+    [proposal, accounts, walletInfo, walletCapabilites],
   );
 
   const requiredChains = useMemo(

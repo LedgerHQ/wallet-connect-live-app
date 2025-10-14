@@ -5,13 +5,10 @@ import { describe, expect, it } from "vitest";
 import {
   BtcTransaction,
   EthTransaction,
-  XrpTransaction,
   btcTransactionSchema,
   convertBtcToLiveTX,
   convertEthToLiveTX,
-  convertXrpToLiveTX,
   ethTransactionSchema,
-  xrpTransactionSchema,
 } from "../converters";
 
 describe("Ethereum Converter", () => {
@@ -175,96 +172,6 @@ describe("Ethereum Transaction Schema", () => {
 
     const result = ethTransactionSchema.safeParse(invalidTx);
     expect(result.success).toBe(false);
-  });
-});
-
-describe("XRP Converter", () => {
-  it("convertXrpToLiveTX should convert correctly with string amount", () => {
-    const xrpTx: XrpTransaction = {
-      TransactionType: "Payment",
-      Account: "rSender123",
-      Amount: "1000000", // 1 XRP in drops
-      Destination: "rDestination456",
-      Fee: "12",
-    };
-
-    const converted = convertXrpToLiveTX(xrpTx);
-
-    expect(converted).toEqual({
-      family: "ripple",
-      tag: 0,
-      amount: new BigNumber("1000000"),
-      recipient: "rDestination456",
-      fee: new BigNumber("12"),
-    });
-  });
-
-  it("convertXrpToLiveTX should convert correctly with number amount", () => {
-    const xrpTx: XrpTransaction = {
-      TransactionType: "Payment",
-      Account: "rSender123",
-      Amount: 1000000,
-      Destination: "rDestination456",
-    };
-
-    const converted = convertXrpToLiveTX(xrpTx);
-
-    expect(converted.amount).toEqual(new BigNumber(1000000));
-    expect(converted.fee).toBeUndefined();
-  });
-
-  it("convertXrpToLiveTX should handle transaction without fee", () => {
-    const xrpTx: XrpTransaction = {
-      TransactionType: "Payment",
-      Account: "rSender123",
-      Amount: "0",
-      Destination: "rDestination456",
-    };
-
-    const converted = convertXrpToLiveTX(xrpTx);
-
-    expect(converted.fee).toBeUndefined();
-    expect(converted.amount).toEqual(new BigNumber("0"));
-  });
-});
-
-describe("XRP Transaction Schema", () => {
-  it("should validate a complete XRP transaction", () => {
-    const validTx = {
-      hash: "ABC123",
-      TransactionType: "Payment",
-      Account: "rSender123",
-      Flags: 2147483648,
-      Amount: "1000000",
-      Destination: "rDestination456",
-      Fee: "12",
-    };
-
-    const result = xrpTransactionSchema.safeParse(validTx);
-    expect(result.success).toBe(true);
-  });
-
-  it("should allow Amount as number or string", () => {
-    const txWithStringAmount = {
-      TransactionType: "Payment",
-      Account: "rSender123",
-      Amount: "1000000",
-      Destination: "rDestination456",
-    };
-
-    const txWithNumberAmount = {
-      TransactionType: "Payment",
-      Account: "rSender123",
-      Amount: 1000000,
-      Destination: "rDestination456",
-    };
-
-    expect(xrpTransactionSchema.safeParse(txWithStringAmount).success).toBe(
-      true,
-    );
-    expect(xrpTransactionSchema.safeParse(txWithNumberAmount).success).toBe(
-      true,
-    );
   });
 });
 

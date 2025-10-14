@@ -115,11 +115,15 @@ describe("formatAccountsByChain", () => {
     tracking: false,
   };
 
+  // Capabilities mock required by formatAccountsByChain (used for XRPL support checks)
+  const walletCapabilitiesMock: string[] = ["transaction.signRaw"]; // include signRaw to simulate XRPL-enabled environment
+
   it("should format accounts by chain as expected", () => {
     const result = formatAccountsByChain(
       proposalFormated,
       accountsFormatted,
       mockWalletInfo,
+      walletCapabilitiesMock,
     );
 
     expect(result).toEqual([
@@ -203,6 +207,7 @@ describe("formatAccountsByChain", () => {
       proposalWithSolana,
       accountsWithSolana,
       unsupportedWalletInfo,
+      walletCapabilitiesMock,
     );
 
     // Should only contain Ethereum, Solana should be filtered out
@@ -235,6 +240,7 @@ describe("formatAccountsByChain", () => {
       proposalWithSolana,
       accountsWithSolana,
       supportedWalletInfo,
+      walletCapabilitiesMock,
     );
 
     // Should contain both Ethereum and Solana
@@ -302,6 +308,7 @@ describe("formatAccountsByChain", () => {
       proposalWithSolana,
       accountsWithSolana,
       unsupportedMobileWallet,
+      walletCapabilitiesMock,
     );
 
     // Should be empty as Solana is filtered out
@@ -320,6 +327,7 @@ describe("formatAccountsByChain", () => {
       proposalWithSolana,
       accountsWithSolana,
       supportedMobileWallet,
+      walletCapabilitiesMock,
     );
 
     // Should contain Solana
@@ -374,10 +382,78 @@ describe("formatAccountsByChain", () => {
       proposalWithSolana,
       accountsWithSolana,
       unknownWallet,
+      walletCapabilitiesMock,
     );
 
     // Should be empty as Solana is filtered out for unknown wallets
     expect(result).toEqual([]);
+  });
+
+  it("should filter out Ripple chains when XRPL capability is NOT enabled", () => {
+    const proposalWithRipple: Proposal = {
+      ...dataFromJSON,
+      requiredNamespaces: {
+        xrpl: {
+          methods: ["xrpl_signTransaction"],
+          chains: ["xrpl:0"],
+          events: [],
+        },
+      },
+      optionalNamespaces: {},
+    } as unknown as Proposal;
+
+    const accountsWithRipple = [
+      {
+        ...ACCOUNT_MOCK,
+        accountName: "XRP Account",
+        currency: "ripple",
+      },
+    ];
+
+    const walletInfo: WalletInfo["result"] = {
+      wallet: {
+        name: "ledger-live-desktop",
+        version: "2.130.0",
+      },
+      tracking: false,
+    };
+
+    const capabilitiesWithoutXRPL: string[] = []; // XRPL capability missing
+
+    const result = formatAccountsByChain(
+      proposalWithRipple,
+      accountsWithRipple,
+      walletInfo,
+      capabilitiesWithoutXRPL,
+    );
+
+    // Ripple should be filtered out entirely when capability is absent
+    expect(result).toEqual([]);
+
+    // Now enable the capability and ensure ripple appears
+    const capabilitiesWithXRPL: string[] = ["transaction.signRaw"]; // enabling XRPL
+    const resultWithCapability = formatAccountsByChain(
+      proposalWithRipple,
+      accountsWithRipple,
+      walletInfo,
+      capabilitiesWithXRPL,
+    );
+
+    expect(resultWithCapability).toEqual([
+      {
+        chain: "ripple",
+        displayName: "Ripple",
+        isSupported: true,
+        isRequired: true,
+        accounts: [
+          {
+            ...ACCOUNT_MOCK,
+            accountName: "XRP Account",
+            currency: "ripple",
+          },
+        ],
+      },
+    ]);
   });
 });
 

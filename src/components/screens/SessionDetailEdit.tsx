@@ -6,6 +6,7 @@ import { formatAccountsByChain } from "@/hooks/useProposal/util";
 import { useSessionDetails } from "@/hooks/useSessionDetails";
 import {
   walletAPIClientAtom,
+  walletCapabilitiesAtom,
   walletCurrenciesByIdAtom,
   walletInfoAtom,
 } from "@/store/wallet-api.store";
@@ -34,6 +35,7 @@ export default function DetailEdit({ session }: Props) {
   const analytics = useAnalytics();
   const currenciesById = useAtomValue(walletCurrenciesByIdAtom);
   const walletInfo = useAtomValue(walletInfoAtom);
+  const walletCapabilites = useAtomValue(walletCapabilitiesAtom);
 
   useEffect(() => {
     analytics.page("Wallet Connect Session Detail Edit", {
@@ -52,8 +54,14 @@ export default function DetailEdit({ session }: Props) {
   }, [navigate, session.topic]);
 
   const accountsByChain = useMemo(
-    () => formatAccountsByChain(session, accounts.data, walletInfo),
-    [session, accounts, walletInfo],
+    () =>
+      formatAccountsByChain(
+        session,
+        accounts.data,
+        walletInfo,
+        walletCapabilites,
+      ),
+    [session, accounts.data, walletInfo, walletCapabilites],
   );
 
   const entries = useMemo(() => {
