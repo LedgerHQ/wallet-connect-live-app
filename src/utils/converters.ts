@@ -61,8 +61,7 @@ export const btcTransactionSchema = z.strictObject({
   recipientAddress: z.string(),
   amount: z.string(),
   memo: z.string().optional(),
-  // Uncomment when used in the future
-  // changeAddress: z.string().optional(),
+  changeAddress: z.string().optional(),
 });
 
 export type BtcTransaction = z.infer<typeof btcTransactionSchema>;
@@ -73,5 +72,6 @@ export function convertBtcToLiveTX(btcTX: BtcTransaction): BitcoinTransaction {
     amount: btcTX.amount ? new BigNumber(btcTX.amount) : new BigNumber(0),
     recipient: btcTX.recipientAddress,
     opReturnData: btcTX.memo ? Buffer.from(btcTX.memo, "hex") : undefined,
+    changeAddress: btcTX.changeAddress,
   };
 }
