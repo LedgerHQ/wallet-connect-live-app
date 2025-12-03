@@ -17,8 +17,8 @@
   "dependencies": {
     "@ledgerhq/hw-transport": "^6.31.4",
     "@ledgerhq/react-ui": "^0.16.4",
-    "@ledgerhq/wallet-api-client": "^1.12.2",
-    "@ledgerhq/wallet-api-simulator": "^1.2.18",
+    "@ledgerhq/wallet-api-client": "^1.12.6",
+    "@ledgerhq/wallet-api-simulator": "^2.0.1",
     "@reown/walletkit": "^1.2.10",
     "@segment/analytics-next": "^1.76.0",
     "@segment/snippet": "^5.2.1",
