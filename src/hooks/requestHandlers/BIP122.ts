@@ -4,9 +4,12 @@ import {
   BIP122_SIGNING_METHODS,
   bip122SignMessageLegacySchema,
   bip122SignMessageSchema,
+  bip122SignPsbtSchema,
 } from "@/data/methods/BIP122.methods";
 import { btcTransactionSchema, convertBtcToLiveTX } from "@/utils/converters";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
+import { isPSBTSupportEnabled } from "@/utils/helper.util";
+import { decodePsbt, validatePsbtAccount, validateSignInputs } from "@/utils/psbt";
 import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import type { IWalletKit } from "@reown/walletkit";
 import {
@@ -25,6 +28,7 @@ export async function handleBIP122Request(
   accounts: Account[],
   client: WalletAPIClient,
   walletkit: IWalletKit,
+  walletCapabilities: string[] = [],
 ) {
   switch (request.method) {
     case BIP122_SIGNING_METHODS.BIP122_SIGN_MESSAGE_LEGACY: {
@@ -119,6 +123,78 @@ export async function handleBIP122Request(
         }
       } else {
         await rejectRequest(walletkit, topic, id, Errors.txDeclined);
+      }
+      break;
+    }
+    case BIP122_SIGNING_METHODS.BIP122_SIGN_PSBT: {
+      const params = bip122SignPsbtSchema.parse(request.params);
+
+      // Check if wallet-api supports PSBT signing
+      if (!isPSBTSupportEnabled(walletCapabilities)) {
+        await rejectRequest(
+          walletkit,
+          topic,
+          id,
+          Errors.unsupportedMethods,
+          5101,
+        );
+        break;
+      }
+
+      const account = getAccountWithAddressAndChainId(
+        accounts,
+        params.account,
+        chainId,
+      );
+
+      if (!account) {
+        await rejectRequest(walletkit, topic, id, Errors.txDeclined);
+        break;
+      }
+
+      try {
+        // Decode PSBT
+        const psbt = decodePsbt(params.psbt);
+
+        // Validate PSBT account - check if any input belongs to the account
+        const validation = validatePsbtAccount(psbt, params.account, accounts);
+        if (!validation.isValid || !validation.account) {
+          await rejectRequest(walletkit, topic, id, Errors.txDeclined);
+          break;
+        }
+
+        // If signInputs is provided, validate them against the PSBT and account
+        if (params.signInputs && params.signInputs.length > 0) {
+          const signInputsValidation = validateSignInputs(
+            psbt,
+            params.signInputs,
+            validation.account,
+          );
+          if (!signInputsValidation.isValid) {
+            await rejectRequest(walletkit, topic, id, Errors.txDeclined);
+            break;
+          }
+        }
+
+        // Sign PSBT using wallet-api
+        const signedPsbtResult = await client.bitcoin.signPsbt(
+          account.id,
+          params.psbt,
+          params.broadcast ?? false,
+        );
+
+        const result: BIP122_RESPONSES[typeof request.method] = {
+          psbt: signedPsbtResult.psbtSigned,
+          ...(signedPsbtResult.txHash && { txid: signedPsbtResult.txHash }),
+        };
+
+        await acceptRequest(walletkit, topic, id, result);
+      } catch (error) {
+        if (isCanceledError(error)) {
+          await rejectRequest(walletkit, topic, id, Errors.txDeclined);
+        } else {
+          throw error;
+        }
       }
       break;
     }

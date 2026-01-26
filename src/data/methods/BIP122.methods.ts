@@ -8,6 +8,7 @@ export const BIP122_SIGNING_METHODS = {
   BIP122_SIGN_MESSAGE_LEGACY: "bip122_signMessage",
   BIP122_SIGN_MESSAGE: "signMessage",
   BIP122_SEND_TRANSFERT: "sendTransfer",
+  BIP122_SIGN_PSBT: "signPsbt",
 } as const;
 
 export const bip122SignMessageLegacySchema = z.strictObject({
@@ -22,6 +23,21 @@ export const bip122SignMessageSchema = z.strictObject({
   protocol: z
     .union([z.literal("ecdsa"), z.literal("bip322"), z.literal("")])
     .optional(),
+});
+
+export const bip122SignPsbtSchema = z.strictObject({
+  account: z.string(),
+  psbt: z.string(),
+  signInputs: z
+    .array(
+      z.strictObject({
+        address: z.string(),
+        index: z.number(),
+        sighashTypes: z.array(z.number()).optional(),
+      }),
+    )
+    .optional(),
+  broadcast: z.boolean().optional(),
 });
 
 /**
@@ -39,6 +55,10 @@ export type BIP122_REQUESTS =
   | {
       method: typeof BIP122_SIGNING_METHODS.BIP122_SEND_TRANSFERT;
       params: z.infer<typeof btcTransactionSchema>;
+    }
+  | {
+      method: typeof BIP122_SIGNING_METHODS.BIP122_SIGN_PSBT;
+      params: z.infer<typeof bip122SignPsbtSchema>;
     };
 
 /**
@@ -53,5 +73,9 @@ export type BIP122_RESPONSES = {
   };
   [BIP122_SIGNING_METHODS.BIP122_SEND_TRANSFERT]: {
     txid: string;
+  };
+  [BIP122_SIGNING_METHODS.BIP122_SIGN_PSBT]: {
+    psbt: string;
+    txid?: string;
   };
 };
