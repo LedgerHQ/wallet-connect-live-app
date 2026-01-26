@@ -6,6 +6,15 @@ import { BigNumber } from "bignumber.js";
 import eip55 from "eip55";
 import { z } from "zod";
 
+// EIP-2930: Access List validation
+// Format: [{ address: string, storageKeys: string[] }]
+// Address: 20 bytes (42 chars with 0x prefix)
+// Storage key: 32 bytes (66 chars with 0x prefix)
+const accessListItemSchema = z.object({
+  address: z.string().regex(/^0x[0-9a-fA-F]{40}$/, "Address must be 20 bytes (42 chars with 0x)"),
+  storageKeys: z.array(z.string().regex(/^0x[0-9a-fA-F]{64}$/, "Storage key must be 32 bytes (66 chars with 0x)"))
+});
+
 export const ethTransactionSchema = z.strictObject({
   from: z.string(),
   to: z.string().optional(),
@@ -18,6 +27,7 @@ export const ethTransactionSchema = z.strictObject({
   nonce: z.string().optional(),
   chainId: z.string().optional(),
   type: z.string().optional(),
+  accessList: z.array(accessListItemSchema).optional(),
 });
 
 export type EthTransaction = z.infer<typeof ethTransactionSchema>;

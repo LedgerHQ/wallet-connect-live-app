@@ -173,6 +173,291 @@ describe("Ethereum Transaction Schema", () => {
     const result = ethTransactionSchema.safeParse(invalidTx);
     expect(result.success).toBe(false);
   });
+
+  describe("accessList validation (EIP-2930)", () => {
+    it("should accept transaction without accessList (optional field)", () => {
+      const validTx = {
+        from: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
+        to: "0x5aeda56215b167893e80b4fe645ba6d5bab767de",
+      };
+
+      const result = ethTransactionSchema.safeParse(validTx);
+      expect(result.success).toBe(true);
+    });
+
+    it("should accept empty accessList", () => {
+      const validTx = {
+        from: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
+        to: "0x5aeda56215b167893e80b4fe645ba6d5bab767de",
+        accessList: [],
+      };
+
+      const result = ethTransactionSchema.safeParse(validTx);
+      expect(result.success).toBe(true);
+    });
+
+    it("should accept valid accessList with one item", () => {
+      const validTx = {
+        from: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
+        to: "0x5aeda56215b167893e80b4fe645ba6d5bab767de",
+        accessList: [
+          {
+            address: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
+            storageKeys: [
+              "0x0000000000000000000000000000000000000000000000000000000000000001",
+            ],
+          },
+        ],
+      };
+
+      const result = ethTransactionSchema.safeParse(validTx);
+      expect(result.success).toBe(true);
+    });
+
+    it("should accept valid accessList with multiple items and storage keys", () => {
+      const validTx = {
+        from: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
+        to: "0x5aeda56215b167893e80b4fe645ba6d5bab767de",
+        accessList: [
+          {
+            address: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
+            storageKeys: [
+              "0x0000000000000000000000000000000000000000000000000000000000000001",
+              "0x0000000000000000000000000000000000000000000000000000000000000002",
+            ],
+          },
+          {
+            address: "0x5aeda56215b167893e80b4fe645ba6d5bab767de",
+            storageKeys: [
+              "0x0000000000000000000000000000000000000000000000000000000000000003",
+            ],
+          },
+        ],
+      };
+
+      const result = ethTransactionSchema.safeParse(validTx);
+      expect(result.success).toBe(true);
+    });
+
+    it("should accept accessList item with empty storage keys array", () => {
+      const validTx = {
+        from: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
+        to: "0x5aeda56215b167893e80b4fe645ba6d5bab767de",
+        accessList: [
+          {
+            address: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
+            storageKeys: [],
+          },
+        ],
+      };
+
+      const result = ethTransactionSchema.safeParse(validTx);
+      expect(result.success).toBe(true);
+    });
+
+    it("should reject accessList with invalid address format (too short)", () => {
+      const invalidTx = {
+        from: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
+        to: "0x5aeda56215b167893e80b4fe645ba6d5bab767de",
+        accessList: [
+          {
+            address: "0x742d35cc6634c0532925a3b844bc9e7595f0be", // Too short (39 chars instead of 40)
+            storageKeys: [
+              "0x0000000000000000000000000000000000000000000000000000000000000001",
+            ],
+          },
+        ],
+      };
+
+      const result = ethTransactionSchema.safeParse(invalidTx);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.issues[0].message).toContain(
+          "Address must be 20 bytes"
+        );
+      }
+    });
+
+    it("should reject accessList with invalid address format (too long)", () => {
+      const invalidTx = {
+        from: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
+        to: "0x5aeda56215b167893e80b4fe645ba6d5bab767de",
+        accessList: [
+          {
+            address: "0x742d35cc6634c0532925a3b844bc9e7595f0bebba", // Too long (41 chars instead of 40)
+            storageKeys: [
+              "0x0000000000000000000000000000000000000000000000000000000000000001",
+            ],
+          },
+        ],
+      };
+
+      const result = ethTransactionSchema.safeParse(invalidTx);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.issues[0].message).toContain(
+          "Address must be 20 bytes"
+        );
+      }
+    });
+
+    it("should reject accessList with address missing 0x prefix", () => {
+      const invalidTx = {
+        from: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
+        to: "0x5aeda56215b167893e80b4fe645ba6d5bab767de",
+        accessList: [
+          {
+            address: "742d35cc6634c0532925a3b844bc9e7595f0bebb", // Missing 0x prefix
+            storageKeys: [
+              "0x0000000000000000000000000000000000000000000000000000000000000001",
+            ],
+          },
+        ],
+      };
+
+      const result = ethTransactionSchema.safeParse(invalidTx);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.issues[0].message).toContain(
+          "Address must be 20 bytes"
+        );
+      }
+    });
+
+    it("should reject accessList with invalid storage key format (too short)", () => {
+      const invalidTx = {
+        from: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
+        to: "0x5aeda56215b167893e80b4fe645ba6d5bab767de",
+        accessList: [
+          {
+            address: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
+            storageKeys: [
+              "0x00000000000000000000000000000000000000000000000000000000000001", // Too short (62 chars instead of 64)
+            ],
+          },
+        ],
+      };
+
+      const result = ethTransactionSchema.safeParse(invalidTx);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.issues[0].message).toContain(
+          "Storage key must be 32 bytes"
+        );
+      }
+    });
+
+    it("should reject accessList with invalid storage key format (too long)", () => {
+      const invalidTx = {
+        from: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
+        to: "0x5aeda56215b167893e80b4fe645ba6d5bab767de",
+        accessList: [
+          {
+            address: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
+            storageKeys: [
+              "0x00000000000000000000000000000000000000000000000000000000000000011", // Too long (67 chars instead of 66)
+            ],
+          },
+        ],
+      };
+
+      const result = ethTransactionSchema.safeParse(invalidTx);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.issues[0].message).toContain(
+          "Storage key must be 32 bytes"
+        );
+      }
+    });
+
+    it("should reject accessList with storage key missing 0x prefix", () => {
+      const invalidTx = {
+        from: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
+        to: "0x5aeda56215b167893e80b4fe645ba6d5bab767de",
+        accessList: [
+          {
+            address: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
+            storageKeys: [
+              "0000000000000000000000000000000000000000000000000000000000000001", // Missing 0x prefix
+            ],
+          },
+        ],
+      };
+
+      const result = ethTransactionSchema.safeParse(invalidTx);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.issues[0].message).toContain(
+          "Storage key must be 32 bytes"
+        );
+      }
+    });
+
+    it("should reject accessList with non-hex characters in address", () => {
+      const invalidTx = {
+        from: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
+        to: "0x5aeda56215b167893e80b4fe645ba6d5bab767de",
+        accessList: [
+          {
+            address: "0x742d35cc6634c0532925a3b844bc9e7595f0begg", // 'g' is not a hex character
+            storageKeys: [
+              "0x0000000000000000000000000000000000000000000000000000000000000001",
+            ],
+          },
+        ],
+      };
+
+      const result = ethTransactionSchema.safeParse(invalidTx);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.issues[0].message).toContain(
+          "Address must be 20 bytes"
+        );
+      }
+    });
+
+    it("should reject accessList with non-hex characters in storage key", () => {
+      const invalidTx = {
+        from: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
+        to: "0x5aeda56215b167893e80b4fe645ba6d5bab767de",
+        accessList: [
+          {
+            address: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
+            storageKeys: [
+              "0x000000000000000000000000000000000000000000000000000000000000000g", // 'g' is not a hex character
+            ],
+          },
+        ],
+      };
+
+      const result = ethTransactionSchema.safeParse(invalidTx);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.issues[0].message).toContain(
+          "Storage key must be 32 bytes"
+        );
+      }
+    });
+
+    it("should accept accessList with uppercase hex characters", () => {
+      const validTx = {
+        from: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
+        to: "0x5aeda56215b167893e80b4fe645ba6d5bab767de",
+        accessList: [
+          {
+            address: "0x742D35CC6634C0532925A3B844BC9E7595F0BEBB",
+            storageKeys: [
+              "0x0000000000000000000000000000000000000000000000000000000000000001",
+              "0x000000000000000000000000000000000000000000000000000000000000ABCD",
+            ],
+          },
+        ],
+      };
+
+      const result = ethTransactionSchema.safeParse(validTx);
+      expect(result.success).toBe(true);
+    });
+  });
 });
 
 describe("Bitcoin Converter", () => {
