@@ -201,12 +201,12 @@ describe("Ethereum Transaction Schema", () => {
         from: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
         to: "0x5aeda56215b167893e80b4fe645ba6d5bab767de",
         accessList: [
-          [
-            "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
-            [
+          {
+            address: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
+            storageKeys: [
               "0x0000000000000000000000000000000000000000000000000000000000000001",
             ],
-          ],
+          },
         ],
       };
 
@@ -219,19 +219,19 @@ describe("Ethereum Transaction Schema", () => {
         from: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
         to: "0x5aeda56215b167893e80b4fe645ba6d5bab767de",
         accessList: [
-          [
-            "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
-            [
+          {
+            address: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
+            storageKeys: [
               "0x0000000000000000000000000000000000000000000000000000000000000001",
               "0x0000000000000000000000000000000000000000000000000000000000000002",
             ],
-          ],
-          [
-            "0x5aeda56215b167893e80b4fe645ba6d5bab767de",
-            [
+          },
+          {
+            address: "0x5aeda56215b167893e80b4fe645ba6d5bab767de",
+            storageKeys: [
               "0x0000000000000000000000000000000000000000000000000000000000000003",
             ],
-          ],
+          },
         ],
       };
 
@@ -243,7 +243,12 @@ describe("Ethereum Transaction Schema", () => {
       const validTx = {
         from: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
         to: "0x5aeda56215b167893e80b4fe645ba6d5bab767de",
-        accessList: [["0x742d35cc6634c0532925a3b844bc9e7595f0bebb", []]],
+        accessList: [
+          {
+            address: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
+            storageKeys: [],
+          },
+        ],
       };
 
       const result = ethTransactionSchema.safeParse(validTx);
@@ -255,12 +260,12 @@ describe("Ethereum Transaction Schema", () => {
         from: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
         to: "0x5aeda56215b167893e80b4fe645ba6d5bab767de",
         accessList: [
-          [
-            "0x742d35cc6634c0532925a3b844bc9e7595f0be", // Too short (39 chars instead of 40)
-            [
+          {
+            address: "0x742d35cc6634c0532925a3b844bc9e7595f0be", // Too short (39 chars instead of 40)
+            storageKeys: [
               "0x0000000000000000000000000000000000000000000000000000000000000001",
             ],
-          ],
+          },
         ],
       };
 
@@ -278,12 +283,12 @@ describe("Ethereum Transaction Schema", () => {
         from: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
         to: "0x5aeda56215b167893e80b4fe645ba6d5bab767de",
         accessList: [
-          [
-            "0x742d35cc6634c0532925a3b844bc9e7595f0bebba", // Too long (41 chars instead of 40)
-            [
+          {
+            address: "0x742d35cc6634c0532925a3b844bc9e7595f0bebba", // Too long (41 chars instead of 40)
+            storageKeys: [
               "0x0000000000000000000000000000000000000000000000000000000000000001",
             ],
-          ],
+          },
         ],
       };
 
@@ -301,12 +306,12 @@ describe("Ethereum Transaction Schema", () => {
         from: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
         to: "0x5aeda56215b167893e80b4fe645ba6d5bab767de",
         accessList: [
-          [
-            "742d35cc6634c0532925a3b844bc9e7595f0bebb", // Missing 0x prefix
-            [
+          {
+            address: "742d35cc6634c0532925a3b844bc9e7595f0bebb", // Missing 0x prefix
+            storageKeys: [
               "0x0000000000000000000000000000000000000000000000000000000000000001",
             ],
-          ],
+          },
         ],
       };
 
@@ -324,12 +329,12 @@ describe("Ethereum Transaction Schema", () => {
         from: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
         to: "0x5aeda56215b167893e80b4fe645ba6d5bab767de",
         accessList: [
-          [
-            "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
-            [
+          {
+            address: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
+            storageKeys: [
               "0x00000000000000000000000000000000000000000000000000000000000001", // Too short (62 chars instead of 64)
             ],
-          ],
+          },
         ],
       };
 
@@ -347,12 +352,12 @@ describe("Ethereum Transaction Schema", () => {
         from: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
         to: "0x5aeda56215b167893e80b4fe645ba6d5bab767de",
         accessList: [
-          [
-            "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
-            [
+          {
+            address: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
+            storageKeys: [
               "0x00000000000000000000000000000000000000000000000000000000000000011", // Too long (67 chars instead of 66)
             ],
-          ],
+          },
         ],
       };
 
@@ -370,12 +375,12 @@ describe("Ethereum Transaction Schema", () => {
         from: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
         to: "0x5aeda56215b167893e80b4fe645ba6d5bab767de",
         accessList: [
-          [
-            "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
-            [
+          {
+            address: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
+            storageKeys: [
               "0000000000000000000000000000000000000000000000000000000000000001", // Missing 0x prefix
             ],
-          ],
+          },
         ],
       };
 
@@ -393,12 +398,12 @@ describe("Ethereum Transaction Schema", () => {
         from: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
         to: "0x5aeda56215b167893e80b4fe645ba6d5bab767de",
         accessList: [
-          [
-            "0x742d35cc6634c0532925a3b844bc9e7595f0begg", // 'g' is not a hex character
-            [
+          {
+            address: "0x742d35cc6634c0532925a3b844bc9e7595f0begg", // 'g' is not a hex character
+            storageKeys: [
               "0x0000000000000000000000000000000000000000000000000000000000000001",
             ],
-          ],
+          },
         ],
       };
 
@@ -416,12 +421,12 @@ describe("Ethereum Transaction Schema", () => {
         from: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
         to: "0x5aeda56215b167893e80b4fe645ba6d5bab767de",
         accessList: [
-          [
-            "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
-            [
+          {
+            address: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
+            storageKeys: [
               "0x000000000000000000000000000000000000000000000000000000000000000g", // 'g' is not a hex character
             ],
-          ],
+          },
         ],
       };
 
@@ -439,13 +444,13 @@ describe("Ethereum Transaction Schema", () => {
         from: "0x742d35cc6634c0532925a3b844bc9e7595f0bebb",
         to: "0x5aeda56215b167893e80b4fe645ba6d5bab767de",
         accessList: [
-          [
-            "0x742D35CC6634C0532925A3B844BC9E7595F0BEBB",
-            [
+          {
+            address: "0x742D35CC6634C0532925A3B844BC9E7595F0BEBB",
+            storageKeys: [
               "0x0000000000000000000000000000000000000000000000000000000000000001",
               "0x000000000000000000000000000000000000000000000000000000000000ABCD",
             ],
-          ],
+          },
         ],
       };
 
