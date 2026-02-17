@@ -72,6 +72,13 @@ export const EIP155_CHAINS_MAINNET: Record<string, Network> = {
     displayName: "Base",
     color: "#1755FE",
   },
+  core: {
+    chainId: 1116,
+    namespace: "eip155:1116",
+    ticker: "CORE",
+    displayName: "Core",
+    color: "#FF962B",
+  },
 };
 
 export const EIP155_SEPOLIA_CHAINS: Record<string, Network> = {

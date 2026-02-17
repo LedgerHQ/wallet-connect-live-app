@@ -24,6 +24,7 @@
     "arbitrum",
     "avalanche_c_chain",
     "base",
+    "core",
     "solana",
     "solana_devnet",
     "solana_testnet",
