@@ -50,6 +50,12 @@ describe("SUPPORTED_NETWORK", () => {
 
     expect(base?.displayName).toBe("Base");
   });
+
+  it("contains Core", () => {
+    const core: Network | undefined = SUPPORTED_NETWORK.core;
+
+    expect(core?.displayName).toBe("Core");
+  });
 });
 
 describe("EIP155_SEPOLIA_CHAINS", () => {
