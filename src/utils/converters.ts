@@ -11,8 +11,20 @@ import { z } from "zod";
 // Address: 20 bytes (42 chars with 0x prefix)
 // Storage key: 32 bytes (66 chars with 0x prefix)
 const accessListItemSchema = z.object({
-  address: z.string().regex(/^0x[0-9a-fA-F]{40}$/, "Address must be 20 bytes (42 chars with 0x)"),
-  storageKeys: z.array(z.string().regex(/^0x[0-9a-fA-F]{64}$/, "Storage key must be 32 bytes (66 chars with 0x)"))
+  address: z
+    .string()
+    .regex(
+      /^0x[0-9a-fA-F]{40}$/,
+      "Address must be 20 bytes (42 chars with 0x)",
+    ),
+  storageKeys: z.array(
+    z
+      .string()
+      .regex(
+        /^0x[0-9a-fA-F]{64}$/,
+        "Storage key must be 32 bytes (66 chars with 0x)",
+      ),
+  ),
 });
 
 export const ethTransactionSchema = z.strictObject({
@@ -20,12 +32,13 @@ export const ethTransactionSchema = z.strictObject({
   to: z.string().optional(),
   data: z.string().optional(),
   gas: z.string().optional(),
+  gasLimit: z.string().optional(),
   gasPrice: z.string().optional(),
   maxFeePerGas: z.string().nullable().optional(),
   maxPriorityFeePerGas: z.string().nullable().optional(),
   value: z.string().optional(),
   nonce: z.string().optional(),
-  chainId: z.string().optional(),
+  chainId: z.union([z.string(), z.number()]).optional(),
   type: z.string().optional(),
   accessList: z.array(accessListItemSchema).optional(),
 });
@@ -34,6 +47,7 @@ export type EthTransaction = z.infer<typeof ethTransactionSchema>;
 
 export function convertEthToLiveTX(ethTX: EthTransaction): EthereumTransaction {
   const nonce = Number(ethTX.nonce);
+  const gasLimit = ethTX.gasLimit ?? ethTX.gas;
 
   return {
     family: "ethereum",
@@ -47,8 +61,8 @@ export function convertEthToLiveTX(ethTX: EthTransaction): EthereumTransaction {
         ? new BigNumber(ethTX.gasPrice.replace("0x", ""), 16)
         : undefined,
     gasLimit:
-      ethTX.gas !== undefined
-        ? new BigNumber(ethTX.gas.replace("0x", ""), 16)
+      gasLimit !== undefined
+        ? new BigNumber(gasLimit.replace("0x", ""), 16)
         : undefined,
     maxFeePerGas:
       ethTX.maxFeePerGas !== undefined && ethTX.maxFeePerGas !== null
