@@ -11,7 +11,8 @@
   "close" : "Schließen",
   "error" : {
     "noInput" : "Kein Eingabewert",
-    "invalidUri" : "Ungültige URI"
+    "invalidUri" : "Ungültige URI",
+    "zodRequestBlocked" : "Wir haben diese Anfrage blockiert, weil die Daten aus der App ungültig oder nicht unterstützt sind. Wir vermeiden, weiterzufahren, um die Sicherheit zu gewährleisten."
   },
   "connect" : {
     "title" : "Zum Starten mit einer App verbinden",

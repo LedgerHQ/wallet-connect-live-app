@@ -22,14 +22,15 @@ import {
   isSolanaSupportEnabled,
   isXRPLSupportEnabled,
 } from "@/utils/helper.util";
+import { reportZodError } from "@/utils/sentryZod";
 import { WalletKitTypes } from "@reown/walletkit";
-import * as Sentry from "@sentry/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { SignClientTypes } from "@walletconnect/types";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { enqueueSnackbar } from "notistack";
 import { useCallback, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { ZodError } from "zod";
 import { isWalletRequest } from "../utils/helper.util";
 import { handleBIP122Request } from "./requestHandlers/BIP122";
@@ -99,6 +100,7 @@ function useWalletConnectStatus() {
 }
 
 export default function useWalletConnect() {
+  const { t } = useTranslation();
   useWalletConnectStatus();
 
   const navigate = useNavigate({ from: "/" });
@@ -256,10 +258,21 @@ export default function useWalletConnect() {
           }
         } catch (error) {
           if (error instanceof ZodError) {
-            Sentry.captureException(error);
+            reportZodError({
+              error,
+              topic,
+              request: { method: request.method },
+              chainId,
+              walletKit,
+            });
           }
 
-          enqueueSnackbar(getErrorMessage(error), {
+          const message =
+            error instanceof ZodError
+              ? t("error.zodRequestBlocked")
+              : getErrorMessage(error);
+
+          enqueueSnackbar(message, {
             errorType: "Session request error",
             variant: "errorNotification",
             anchorOrigin: {
@@ -267,6 +280,7 @@ export default function useWalletConnect() {
               horizontal: "right",
             },
           });
+
           await rejectRequest(walletKit, topic, id, Errors.txDeclined);
         }
       })().finally(() => {
@@ -283,6 +297,7 @@ export default function useWalletConnect() {
       client,
       walletKit,
       queryClient,
+      t,
       setLoading,
       redirectToDapp,
     ],

@@ -5,6 +5,7 @@ import {
   getColor,
   getCurrencyByChainId,
   getDisplayName,
+  getErrorMessage,
   getNamespace,
   getTicker,
   isEIP155Chain,
@@ -280,5 +281,17 @@ describe("isXRPLSupportEnabled", () => {
       "yet.another",
     ];
     expect(isXRPLSupportEnabled(caps)).toBe(true);
+  });
+});
+
+describe("getErrorMessage", () => {
+  it("returns error.message for Error instances", () => {
+    const err = new Error("Something went wrong");
+    expect(getErrorMessage(err)).toBe("Something went wrong");
+  });
+
+  it("returns String(value) for non-Error values", () => {
+    expect(getErrorMessage("oops")).toBe("oops");
+    expect(getErrorMessage(42)).toBe("42");
   });
 });
