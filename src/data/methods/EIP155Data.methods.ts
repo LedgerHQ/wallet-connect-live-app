@@ -21,7 +21,8 @@ export const EIP155_SIGNING_METHODS = {
   ETH_REQUEST_ACCOUNTS: "eth_requestAccounts",
 } as const;
 
-export const ethSignSchema = z.tuple([z.string(), z.string()]);
+// Some dApps send a legacy third "password" param with personal_sign; only the first two are used.
+export const ethSignSchema = z.tuple([z.string(), z.string()]).rest(z.string());
 
 export const ethSendTransactionSchema = z.tuple([ethTransactionSchema]);
 
