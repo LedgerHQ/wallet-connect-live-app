@@ -59,6 +59,7 @@ export const solanaSignTransactionSchema = z.strictObject({
     )
     .optional(),
   recentBlockhash: z.string().optional(),
+  lastValidBlockHeight: z.number().optional(), // Some wallets/dApps expect this field to be present
   signatures: z
     .array(
       z.strictObject({
@@ -72,6 +73,10 @@ export const solanaSignTransactionSchema = z.strictObject({
       }),
     )
     .optional(),
+  // These are internal representation fields from the @solana/web3.js Transaction object
+  // that leak through when the dApp serializes the transaction naively
+  _message: z.unknown().optional(),
+  _json: z.unknown().optional(),
 });
 
 export const solanaSignMessageSchema = z.strictObject({
