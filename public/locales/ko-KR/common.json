@@ -11,7 +11,8 @@
   "close" : "닫기",
   "error" : {
     "noInput" : "입력 값 없음",
-    "invalidUri" : "유효하지 않은 URI"
+    "invalidUri" : "유효하지 않은 URI",
+    "zodRequestBlocked" : "앱에서 전송된 데이터가 유효하지 않거나 지원되지 않아 이 요청을 차단했습니다. 보안을 위해 계속하지 않습니다."
   },
   "connect" : {
     "title" : "시작할 앱을 연결하세요",

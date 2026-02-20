@@ -11,7 +11,8 @@
   "close" : "Kapat",
   "error" : {
     "noInput" : "Değer girilmedi",
-    "invalidUri" : "Geçersiz URI"
+    "invalidUri" : "Geçersiz URI",
+    "zodRequestBlocked" : "Bu isteği engelledik çünkü uygulamanın verileri geçersiz veya desteklenmiyor. Güvenliği sağlamak için devam etmeyi önliyoruz."
   },
   "connect" : {
     "title" : "Başlamak için bir uygulamaya bağlanın",

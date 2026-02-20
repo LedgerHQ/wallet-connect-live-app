@@ -11,7 +11,8 @@
   "close" : "Fechar",
   "error" : {
     "noInput" : "Sem valor de entrada",
-    "invalidUri" : "URI inválida"
+    "invalidUri" : "URI inválida",
+    "zodRequestBlocked" : "Nós bloqueamos esta solicitação porque os dados da aplicação são inválidos ou não suportados. Evitamos continuar por segurança."
   },
   "connect" : {
     "title" : "Conecte-se a um aplicativo para iniciar",
