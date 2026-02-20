@@ -82,6 +82,7 @@ export const solanaSignTransactionSchema = z.strictObject({
 export const solanaSignMessageSchema = z.strictObject({
   message: z.string(),
   pubkey: z.string(),
+  format: z.string().optional(), // display hint from some wallets/dApps
 });
 
 /**
