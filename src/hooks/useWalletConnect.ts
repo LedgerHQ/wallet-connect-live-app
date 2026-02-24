@@ -217,6 +217,7 @@ export default function useWalletConnect() {
               accounts.data,
               client,
               walletKit,
+              walletCapabilities,
             );
           } else if (
             isRippleChain(chainId, request) &&

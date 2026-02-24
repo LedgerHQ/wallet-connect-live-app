@@ -136,6 +136,11 @@ export const isXRPLSupportEnabled = (walletCapabilities: string[]): boolean => {
   return walletCapabilities.includes("transaction.signRaw");
 };
 
+/** Check if PSBT support should be enabled based on wallet capabilities */
+export const isPSBTSupportEnabled = (walletCapabilities: string[]): boolean => {
+  return walletCapabilities.includes("bitcoin.signPsbt");
+};
+
 export const getErrorMessage = (error: unknown) => {
   if (error instanceof Error) return error.message;
   return String(error);
