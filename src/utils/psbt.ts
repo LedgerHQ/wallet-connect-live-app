@@ -77,13 +77,6 @@ export function decodePsbt(psbtBase64: string): Psbt {
 }
 
 /**
- * Convert Uint8Array or Buffer to Buffer
- */
-function toBuffer(data: Buffer | Uint8Array): Buffer {
-  return Buffer.isBuffer(data) ? data : Buffer.from(data);
-}
-
-/**
  * Helper function to compare addresses (case-insensitive)
  */
 function addressesMatch(addr1: string, addr2: string): boolean {
@@ -99,9 +92,11 @@ function isAddressInAccount(address: string, accountAddresses: string[]): boolea
 }
 
 /**
- * Extract address from a scriptPubKey buffer with script type detection
+ * Extract address from a scriptPubKey with script type detection.
+ * Accepts Uint8Array directly to ensure compatibility with bitcoinjs-lib v7,
+ * which uses valibot's v.instance(Uint8Array) validation internally.
  */
-function extractAddressFromScript(script: Buffer, network: networks.Network = networks.bitcoin): string | null {
+function extractAddressFromScript(script: Uint8Array, network: networks.Network = networks.bitcoin): string | null {
   try {
     const scriptLen = script.length;
     
@@ -176,21 +171,21 @@ function extractAddressFromInput(
   
   // Try to extract address from witnessUtxo (SegWit)
   if (input.witnessUtxo?.script) {
-    const scriptBuffer = toBuffer(input.witnessUtxo.script);
-    const address = extractAddressFromScript(scriptBuffer, network);
+    // Use new Uint8Array() to guarantee a plain Uint8Array, which bitcoinjs-lib v7
+    // requires for its valibot v.instance(Uint8Array) payment function validation.
+    const script = new Uint8Array(input.witnessUtxo.script);
+    const address = extractAddressFromScript(script, network);
     if (address) return address;
   }
   
   // Try to extract address from nonWitnessUtxo (non-SegWit)
   if (input.nonWitnessUtxo) {
     try {
-      const nonWitnessBuffer = toBuffer(input.nonWitnessUtxo);
-      const prevTx = Transaction.fromBuffer(nonWitnessBuffer);
+      const prevTx = Transaction.fromBuffer(new Uint8Array(input.nonWitnessUtxo));
       const prevOutIndex = psbt.txInputs[index]?.index;
       if (prevOutIndex !== undefined && prevOutIndex < prevTx.outs.length) {
         const prevOutput = prevTx.outs[prevOutIndex];
-        const scriptBuffer = toBuffer(prevOutput.script);
-        const address = extractAddressFromScript(scriptBuffer, network);
+        const address = extractAddressFromScript(new Uint8Array(prevOutput.script), network);
         if (address) return address;
       }
     } catch {
