@@ -1,5 +1,5 @@
-import { Psbt, payments, networks, Transaction } from "bitcoinjs-lib";
-import type { Account } from "@ledgerhq/wallet-api-client";
+import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
+import { networks, payments, Psbt, Transaction } from "bitcoinjs-lib";
 
 // Custom network definitions for chains not built into bitcoinjs-lib
 const LITECOIN_NETWORK: networks.Network = {
@@ -51,7 +51,9 @@ export type InvalidPsbtAccountResult = {
   inputAddresses?: string[];
 };
 
-export type PsbtAccountValidationResult = ValidPsbtAccountResult | InvalidPsbtAccountResult;
+export type PsbtAccountValidationResult =
+  | ValidPsbtAccountResult
+  | InvalidPsbtAccountResult;
 
 export type ValidSignInputsResult = {
   isValid: true;
@@ -62,7 +64,9 @@ export type InvalidSignInputsResult = {
   error: string;
 };
 
-export type SignInputsValidationResult = ValidSignInputsResult | InvalidSignInputsResult;
+export type SignInputsValidationResult =
+  | ValidSignInputsResult
+  | InvalidSignInputsResult;
 
 /**
  * Decode a base64 encoded PSBT
@@ -72,7 +76,9 @@ export function decodePsbt(psbtBase64: string): Psbt {
   try {
     return Psbt.fromBase64(psbtBase64);
   } catch (error) {
-    throw new Error(`Invalid PSBT format: ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error(
+      `Invalid PSBT format: ${error instanceof Error ? error.message : String(error)}`,
+    );
   }
 }
 
@@ -86,7 +92,10 @@ function addressesMatch(addr1: string, addr2: string): boolean {
 /**
  * Helper function to check if an address belongs to a list of account addresses
  */
-function isAddressInAccount(address: string, accountAddresses: string[]): boolean {
+function isAddressInAccount(
+  address: string,
+  accountAddresses: string[],
+): boolean {
   const lowerAddr = address.toLowerCase();
   return accountAddresses.some((accAddr) => accAddr === lowerAddr);
 }
@@ -96,41 +105,49 @@ function isAddressInAccount(address: string, accountAddresses: string[]): boolea
  * Accepts Uint8Array directly to ensure compatibility with bitcoinjs-lib v7,
  * which uses valibot's v.instance(Uint8Array) validation internally.
  */
-function extractAddressFromScript(script: Uint8Array, network: networks.Network = networks.bitcoin): string | null {
+function extractAddressFromScript(
+  script: Uint8Array,
+  network: networks.Network = networks.bitcoin,
+): string | null {
   try {
     const scriptLen = script.length;
-    
+
     // Optimize by detecting script type based on length and patterns
     // P2PKH: 25 bytes (OP_DUP OP_HASH160 <20 bytes> OP_EQUALVERIFY OP_CHECKSIG)
-    if (scriptLen === 25 && script[0] === 0x76 && script[1] === 0xa9 && script[2] === 0x14) {
+    if (
+      scriptLen === 25 &&
+      script[0] === 0x76 &&
+      script[1] === 0xa9 &&
+      script[2] === 0x14
+    ) {
       const p2pkh = payments.p2pkh({ output: script, network });
       if (p2pkh.address) return p2pkh.address;
     }
-    
+
     // P2SH: 23 bytes (OP_HASH160 <20 bytes> OP_EQUAL)
     if (scriptLen === 23 && script[0] === 0xa9 && script[1] === 0x14) {
       const p2sh = payments.p2sh({ output: script, network });
       if (p2sh.address) return p2sh.address;
     }
-    
+
     // P2WPKH: 22 bytes (OP_0 <20 bytes>)
     if (scriptLen === 22 && script[0] === 0x00 && script[1] === 0x14) {
       const p2wpkh = payments.p2wpkh({ output: script, network });
       if (p2wpkh.address) return p2wpkh.address;
     }
-    
+
     // P2WSH: 34 bytes (OP_0 <32 bytes>)
     if (scriptLen === 34 && script[0] === 0x00 && script[1] === 0x20) {
       const p2wsh = payments.p2wsh({ output: script, network });
       if (p2wsh.address) return p2wsh.address;
     }
-    
+
     // P2TR (Taproot): 34 bytes (OP_1 <32 bytes>)
     if (scriptLen === 34 && script[0] === 0x51 && script[1] === 0x20) {
       const p2tr = payments.p2tr({ output: script, network });
       if (p2tr.address) return p2tr.address;
     }
-    
+
     // Fallback: try all payment types if pattern detection fails
     const paymentTypes = [
       () => payments.p2pkh({ output: script, network }),
@@ -139,7 +156,7 @@ function extractAddressFromScript(script: Uint8Array, network: networks.Network 
       () => payments.p2wsh({ output: script, network }),
       () => payments.p2tr({ output: script, network }),
     ];
-    
+
     for (const paymentType of paymentTypes) {
       try {
         const payment = paymentType();
@@ -161,14 +178,14 @@ function extractAddressFromScript(script: Uint8Array, network: networks.Network 
 function extractAddressFromInput(
   psbt: Psbt,
   index: number,
-  network: networks.Network = networks.bitcoin
+  network: networks.Network = networks.bitcoin,
 ): string | null {
   if (index < 0 || index >= psbt.inputCount) {
     return null;
   }
-  
+
   const input = psbt.data.inputs[index];
-  
+
   // Try to extract address from witnessUtxo (SegWit)
   if (input.witnessUtxo?.script) {
     // Use new Uint8Array() to guarantee a plain Uint8Array, which bitcoinjs-lib v7
@@ -177,22 +194,27 @@ function extractAddressFromInput(
     const address = extractAddressFromScript(script, network);
     if (address) return address;
   }
-  
+
   // Try to extract address from nonWitnessUtxo (non-SegWit)
   if (input.nonWitnessUtxo) {
     try {
-      const prevTx = Transaction.fromBuffer(new Uint8Array(input.nonWitnessUtxo));
+      const prevTx = Transaction.fromBuffer(
+        new Uint8Array(input.nonWitnessUtxo),
+      );
       const prevOutIndex = psbt.txInputs[index]?.index;
       if (prevOutIndex !== undefined && prevOutIndex < prevTx.outs.length) {
         const prevOutput = prevTx.outs[prevOutIndex];
-        const address = extractAddressFromScript(new Uint8Array(prevOutput.script), network);
+        const address = extractAddressFromScript(
+          new Uint8Array(prevOutput.script),
+          network,
+        );
         if (address) return address;
       }
     } catch {
       // If we can't parse the transaction, return null
     }
   }
-  
+
   return null;
 }
 
@@ -202,16 +224,19 @@ function extractAddressFromInput(
  * @param network - The Bitcoin network (defaults to mainnet)
  * @returns Array of addresses (may contain null for inputs where address couldn't be extracted)
  */
-export function extractInputAddresses(psbt: Psbt, network: networks.Network = networks.bitcoin): string[] {
+export function extractInputAddresses(
+  psbt: Psbt,
+  network: networks.Network = networks.bitcoin,
+): string[] {
   const addresses: string[] = [];
-  
+
   for (let i = 0; i < psbt.inputCount; i++) {
     const address = extractAddressFromInput(psbt, i, network);
     if (address) {
       addresses.push(address);
     }
   }
-  
+
   return addresses;
 }
 
@@ -226,51 +251,53 @@ export function extractInputAddresses(psbt: Psbt, network: networks.Network = ne
 export function extractInputAddressesByIndices(
   psbt: Psbt,
   indices: number[],
-  network: networks.Network = networks.bitcoin
+  network: networks.Network = networks.bitcoin,
 ): Map<number, string | null> {
   const addressMap = new Map<number, string | null>();
-  
+
   for (const index of indices) {
     const address = extractAddressFromInput(psbt, index, network);
     addressMap.set(index, address);
   }
-  
+
   return addressMap;
 }
 
 /**
- * Get all addresses for an account
- * 
- * LIMITATION: This currently only returns the main account address.
- * 
- * In Bitcoin, a single account can have multiple addresses (change addresses,
- * different derivation paths, etc.). This implementation only checks the main
- * address, which means:
- * 
- * - PSBTs using change addresses from the same account may fail validation
- * - PSBTs using different derivation paths may fail validation
- * 
- * To fully support multi-address accounts, you would need to:
- * 1. Use the wallet-api's getAccountAddresses method if available
- * 2. Or maintain a cache of known addresses for each account
- * 3. Or derive addresses using the account's xpub/derivation path
- * 
+ * Fetch all payment addresses for an account via wallet-api's bitcoin.getAddresses,
+ * falling back to the main account address if the call fails or returns nothing.
+ *
+ * Callers should invoke this once and pass the result to validatePsbtAccount /
+ * validateSignInputs to avoid redundant calls.
+ *
  * @param account - The account to get addresses for
- * @returns Array of lowercase addresses (currently only the main address)
+ * @param client - The WalletAPIClient instance
+ * @returns Array of lowercase addresses
  */
-function getAccountAddresses(account: Account): string[] {
+export async function getAccountAddresses(
+  account: Account,
+  client: WalletAPIClient,
+): Promise<string[]> {
+  try {
+    const entries = await client.bitcoin.getAddresses(account.id, ["payment"]);
+    if (entries.length > 0) {
+      return entries.map((entry) => entry.address.toLowerCase());
+    }
+  } catch {
+    // Fall back to the main account address when the API call is unavailable or fails
+  }
   return [account.address.toLowerCase()];
 }
 
 /**
  * Validate that PSBT inputs match the provided account
- * 
+ *
  * @param psbt - The PSBT to validate
  * @param accountAddress - The address of the account to validate against
  * @param accounts - List of available accounts
  * @param network - The Bitcoin network (defaults to mainnet)
  * @returns Validation result with validated flag indicating if validation was actually performed
- * 
+ *
  * Note: The 'validated' flag indicates whether the validation was actually performed.
  * - validated: true, isValid: true = Validation passed
  * - validated: false, isValid: true = Validation couldn't be performed (no addresses extracted),
@@ -282,64 +309,62 @@ export function validatePsbtAccount(
   psbt: Psbt,
   accountAddress: string,
   accounts: Account[],
+  accountAddresses: string[],
   network: networks.Network = networks.bitcoin,
 ): PsbtAccountValidationResult {
   // Find the account
-  const account = accounts.find(
-    (acc) => addressesMatch(acc.address, accountAddress),
+  const account = accounts.find((acc) =>
+    addressesMatch(acc.address, accountAddress),
   );
-  
+
   if (!account) {
-    return { 
-      isValid: false, 
+    return {
+      isValid: false,
       validated: false,
     };
   }
-  
+
   // Extract addresses from PSBT inputs
   const inputAddresses = extractInputAddresses(psbt, network);
-  
+
   if (inputAddresses.length === 0) {
     // If we can't extract addresses, we can't validate
     // This might happen with certain PSBT formats or unsigned PSBTs
     // Return isValid: true but validated: false to indicate we're proceeding
     // optimistically and letting wallet-api handle the final validation
-    return { 
-      isValid: true, 
-      validated: false, 
-      account, 
-      inputAddresses: [] 
+    return {
+      isValid: true,
+      validated: false,
+      account,
+      inputAddresses: [],
     };
   }
-  
-  // Get all addresses for this account
-  const accountAddresses = getAccountAddresses(account);
-  
+
   // Check if any input address belongs to this account
   const hasMatchingAddress = inputAddresses.some((inputAddr) =>
     isAddressInAccount(inputAddr, accountAddresses),
   );
-  
+
   if (!hasMatchingAddress) {
-    return { 
-      isValid: false, 
-      validated: true, 
-      account, 
-      inputAddresses 
+    return {
+      isValid: false,
+      validated: true,
+      account,
+      inputAddresses,
     };
   }
-  
-  return { 
-    isValid: true, 
-    validated: true, 
-    account, 
-    inputAddresses 
+
+  return {
+    isValid: true,
+    validated: true,
+    account,
+    inputAddresses,
   };
 }
 
 /**
  * Validate signInputs parameter against PSBT and account
- * 
+ *
  * @param psbt - The PSBT to validate
  * @param signInputs - Array of inputs to sign with their addresses and indices
  * @param account - The account that should own the inputs
@@ -350,6 +375,7 @@ export function validateSignInputs(
   psbt: Psbt,
   signInputs: { address: string; index: number; sighashTypes?: number[] }[],
   account: Account,
+  accountAddresses: string[],
   network: networks.Network = networks.bitcoin,
 ): SignInputsValidationResult {
   // Validate that all indices are within bounds
@@ -361,37 +387,42 @@ export function validateSignInputs(
       };
     }
   }
-  
+
   // Extract addresses only for the specified inputs (optimization)
   const indices = signInputs.map((si) => si.index);
   const addressMap = extractInputAddressesByIndices(psbt, indices, network);
-  const accountAddresses = getAccountAddresses(account);
-  
+
   // Validate that all specified addresses belong to the account
   for (const signInput of signInputs) {
     const inputAddress = addressMap.get(signInput.index);
-    
+
     if (!inputAddress) {
       return {
         isValid: false,
         error: `Could not extract address for input index ${signInput.index}`,
       };
     }
-    
+
     // Check if the signInput address matches the actual input address
     const addressMatches = addressesMatch(signInput.address, inputAddress);
-    
+
     // Also check if both addresses belong to the account
-    const signInputInAccount = isAddressInAccount(signInput.address, accountAddresses);
-    const inputAddressInAccount = isAddressInAccount(inputAddress, accountAddresses);
-    
+    const signInputInAccount = isAddressInAccount(
+      signInput.address,
+      accountAddresses,
+    );
+    const inputAddressInAccount = isAddressInAccount(
+      inputAddress,
+      accountAddresses,
+    );
+
     if (!addressMatches && !signInputInAccount) {
       return {
         isValid: false,
         error: `Address ${signInput.address} does not match input address ${inputAddress}`,
       };
     }
-    
+
     if (!inputAddressInAccount) {
       return {
         isValid: false,
@@ -399,6 +430,6 @@ export function validateSignInputs(
       };
     }
   }
-  
+
   return { isValid: true };
 }

@@ -53,9 +53,17 @@ function makeAccount(overrides: Partial<Account> = {}): Account {
 
 function makeClient(
   signPsbtImpl: () => Promise<{ psbtSigned: string; txHash?: string }>,
+  getAddressesImpl?: (accountId: string) => Promise<{ address: string }[]>,
 ): WalletAPIClient {
+  const defaultGetAddresses = (accountId: string) => {
+    const account = [makeAccount()].find((a) => a.id === accountId);
+    return Promise.resolve(account ? [{ address: account.address }] : []);
+  };
   return {
-    bitcoin: { signPsbt: vi.fn(signPsbtImpl) },
+    bitcoin: {
+      signPsbt: vi.fn(signPsbtImpl),
+      getAddresses: vi.fn(getAddressesImpl ?? defaultGetAddresses),
+    },
   } as unknown as WalletAPIClient;
 }
 
@@ -151,7 +159,10 @@ describe("handleBIP122Request — BIP122_SIGN_PSBT", () => {
       requestId,
       BTC_CHAIN_ID,
       [makeAccount({ address: wrongAddress })],
-      makeClient(() => Promise.resolve({ psbtSigned: "irrelevant" })),
+      makeClient(
+        () => Promise.resolve({ psbtSigned: "irrelevant" }),
+        () => Promise.resolve([{ address: wrongAddress }]),
+      ),
       walletkit,
       ["bitcoin.signPsbt"],
     );
