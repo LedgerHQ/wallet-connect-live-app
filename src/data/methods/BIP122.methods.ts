@@ -32,7 +32,7 @@ export const bip122SignPsbtSchema = z.strictObject({
     .array(
       z.strictObject({
         address: z.string(),
-        index: z.number(),
+        index: z.number().int(),
         sighashTypes: z.array(z.number()).optional(),
       }),
     )
