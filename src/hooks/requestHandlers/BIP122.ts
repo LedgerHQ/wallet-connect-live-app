@@ -9,7 +9,13 @@ import {
 import { btcTransactionSchema, convertBtcToLiveTX } from "@/utils/converters";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
 import { isPSBTSupportEnabled } from "@/utils/helper.util";
-import { decodePsbt, getBip122Network, validatePsbtAccount, validateSignInputs } from "@/utils/psbt";
+import {
+  decodePsbt,
+  getAccountAddresses,
+  getBip122Network,
+  validatePsbtAccount,
+  validateSignInputs,
+} from "@/utils/psbt";
 import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import type { IWalletKit } from "@reown/walletkit";
 import {
@@ -158,8 +164,17 @@ export async function handleBIP122Request(
         // Decode PSBT
         const psbt = decodePsbt(params.psbt);
 
+        // Fetch all payment addresses for the account once (covers change addresses too)
+        const accountAddresses = await getAccountAddresses(account, client);
+
         // Validate PSBT account - check if any input belongs to the account
-        const validation = validatePsbtAccount(psbt, params.account, accounts, network);
+        const validation = validatePsbtAccount(
+          psbt,
+          params.account,
+          accounts,
+          accountAddresses,
+          network,
+        );
         if (!validation.isValid || !validation.account) {
           await rejectRequest(walletkit, topic, id, Errors.txDeclined);
           break;
@@ -171,6 +186,7 @@ export async function handleBIP122Request(
             psbt,
             params.signInputs,
             validation.account,
+            accountAddresses,
             network,
           );
           if (!signInputsValidation.isValid) {
