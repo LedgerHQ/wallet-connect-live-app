@@ -1,6 +1,41 @@
 import { Psbt, payments, networks, Transaction } from "bitcoinjs-lib";
 import type { Account } from "@ledgerhq/wallet-api-client";
 
+// Custom network definitions for chains not built into bitcoinjs-lib
+const LITECOIN_NETWORK: networks.Network = {
+  messagePrefix: "\x19Litecoin Signed Message:\n",
+  bech32: "ltc",
+  bip32: { public: 0x019da462, private: 0x019d9cfe },
+  pubKeyHash: 0x30,
+  scriptHash: 0x32,
+  wif: 0xb0,
+};
+
+const DOGECOIN_NETWORK: networks.Network = {
+  messagePrefix: "\x19Dogecoin Signed Message:\n",
+  bech32: "",
+  bip32: { public: 0x02facafd, private: 0x02fac398 },
+  pubKeyHash: 0x1e,
+  scriptHash: 0x16,
+  wif: 0x9e,
+};
+
+const BIP122_CHAIN_ID_TO_NETWORK: Record<string, networks.Network> = {
+  "bip122:000000000019d6689c085ae165831e93": networks.bitcoin,
+  "bip122:000000000933ea01ad0ee984209779ba": networks.testnet,
+  "bip122:12a765e31ffd4059bada1e25190f6e98": LITECOIN_NETWORK,
+  "bip122:82bc68038f6034c0596b6e313729793a": DOGECOIN_NETWORK,
+};
+
+/**
+ * Map a BIP122 chainId (e.g. "bip122:000000000933ea01ad0ee984209779ba") to
+ * its corresponding bitcoinjs-lib Network object.
+ * Falls back to Bitcoin mainnet for unknown chains.
+ */
+export function getBip122Network(chainId: string): networks.Network {
+  return BIP122_CHAIN_ID_TO_NETWORK[chainId] ?? networks.bitcoin;
+}
+
 // Type Definitions for better type safety
 export type ValidPsbtAccountResult = {
   isValid: true;
