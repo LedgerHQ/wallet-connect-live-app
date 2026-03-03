@@ -137,14 +137,13 @@ export async function handleBIP122Request(
 
       // Check if wallet-api supports PSBT signing
       if (!isPSBTSupportEnabled(walletCapabilities)) {
-        await rejectRequest(
+        return rejectRequest(
           walletkit,
           topic,
           id,
           Errors.unsupportedMethods,
           5101,
         );
-        break;
       }
 
       const account = getAccountWithAddressAndChainId(
@@ -154,8 +153,7 @@ export async function handleBIP122Request(
       );
 
       if (!account) {
-        await rejectRequest(walletkit, topic, id, Errors.txDeclined);
-        break;
+        return rejectRequest(walletkit, topic, id, Errors.txDeclined);
       }
 
       try {
@@ -175,8 +173,7 @@ export async function handleBIP122Request(
           network,
         );
         if (!validation.isValid || !validation.account) {
-          await rejectRequest(walletkit, topic, id, Errors.txDeclined);
-          break;
+          return rejectRequest(walletkit, topic, id, Errors.txDeclined);
         }
 
         // If signInputs is provided, validate them against the PSBT and account
@@ -189,8 +186,7 @@ export async function handleBIP122Request(
             network,
           );
           if (!signInputsValidation.isValid) {
-            await rejectRequest(walletkit, topic, id, Errors.txDeclined);
-            break;
+            return rejectRequest(walletkit, topic, id, Errors.txDeclined);
           }
         }
 
