@@ -32,6 +32,7 @@
     "@walletconnect/utils": "^2.21.8",
     "bignumber.js": "^9.0.2",
     "bitcoinjs-lib": "^7.0.0",
+    "tiny-secp256k1": "^2.2.4",
     "bs58": "^5.0.0",
     "eip55": "^2.1.0",
     "i18next": "^23.16.4",

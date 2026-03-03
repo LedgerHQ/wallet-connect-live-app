@@ -293,8 +293,8 @@ export async function getAccountAddresses(
  * Validate that PSBT inputs match the provided account
  *
  * @param psbt - The PSBT to validate
- * @param accountAddress - The address of the account to validate against
- * @param accounts - List of available accounts
+ * @param account - The account to validate against (must be pre-resolved by the caller)
+ * @param accountAddresses - All payment addresses belonging to the account
  * @param network - The Bitcoin network (defaults to mainnet)
  * @returns Validation result with validated flag indicating if validation was actually performed
  *
@@ -303,27 +303,13 @@ export async function getAccountAddresses(
  * - validated: false, isValid: true = Validation couldn't be performed (no addresses extracted),
  *   proceeding optimistically and letting wallet-api handle final validation
  * - validated: true, isValid: false = Validation failed (addresses don't match)
- * - validated: false, isValid: false = Account not found
  */
 export function validatePsbtAccount(
   psbt: Psbt,
-  accountAddress: string,
-  accounts: Account[],
+  account: Account,
   accountAddresses: string[],
   network: networks.Network = networks.bitcoin,
 ): PsbtAccountValidationResult {
-  // Find the account
-  const account = accounts.find((acc) =>
-    addressesMatch(acc.address, accountAddress),
-  );
-
-  if (!account) {
-    return {
-      isValid: false,
-      validated: false,
-    };
-  }
-
   // Extract addresses from PSBT inputs
   const inputAddresses = extractInputAddresses(psbt, network);
 
