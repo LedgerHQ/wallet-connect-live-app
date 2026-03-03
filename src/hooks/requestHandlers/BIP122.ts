@@ -170,8 +170,7 @@ export async function handleBIP122Request(
         // Validate PSBT account - check if any input belongs to the account
         const validation = validatePsbtAccount(
           psbt,
-          params.account,
-          accounts,
+          account,
           accountAddresses,
           network,
         );
