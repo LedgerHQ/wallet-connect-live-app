@@ -163,6 +163,7 @@ function extractAddressFromScript(
         if (payment.address) return payment.address;
       } catch {
         // Continue to next type
+        continue;
       }
     }
 
