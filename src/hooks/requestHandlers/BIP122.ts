@@ -31,11 +31,15 @@ export async function handleBIP122Request(
   topic: string,
   id: number,
   chainId: string,
-  accounts: Account[],
-  client: WalletAPIClient,
-  walletkit: IWalletKit,
-  walletCapabilities: string[] = [],
+  context: {
+    accounts: Account[];
+    client: WalletAPIClient;
+    walletkit: IWalletKit;
+    walletCapabilities?: string[];
+  },
 ) {
+  const { accounts, client, walletkit, walletCapabilities = [] } = context;
+
   switch (request.method) {
     case BIP122_SIGNING_METHODS.BIP122_SIGN_MESSAGE_LEGACY: {
       const params = bip122SignMessageLegacySchema.parse(request.params);
