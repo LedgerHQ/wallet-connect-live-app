@@ -99,6 +99,16 @@ function isAddressInAccount(
   return accountAddresses.includes(address.toLowerCase());
 }
 
+function resolvePaymentAddress(
+  paymentFactory: () => { address?: string },
+): string | null {
+  try {
+    return paymentFactory().address ?? null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Extract address from a scriptPubKey with script type detection.
  * Accepts Uint8Array directly to ensure compatibility with bitcoinjs-lib v7,
@@ -108,68 +118,52 @@ function extractAddressFromScript(
   script: Uint8Array,
   network: networks.Network = networks.bitcoin,
 ): string | null {
-  try {
-    const scriptLen = script.length;
+  const scriptLen = script.length;
+  const patternStrategies = [
+    {
+      matches: () =>
+        scriptLen === 25 &&
+        script[0] === 0x76 &&
+        script[1] === 0xa9 &&
+        script[2] === 0x14,
+      paymentFactory: () => payments.p2pkh({ output: script, network }),
+    },
+    {
+      matches: () =>
+        scriptLen === 23 && script[0] === 0xa9 && script[1] === 0x14,
+      paymentFactory: () => payments.p2sh({ output: script, network }),
+    },
+    {
+      matches: () =>
+        scriptLen === 22 && script[0] === 0x00 && script[1] === 0x14,
+      paymentFactory: () => payments.p2wpkh({ output: script, network }),
+    },
+    {
+      matches: () =>
+        scriptLen === 34 && script[0] === 0x00 && script[1] === 0x20,
+      paymentFactory: () => payments.p2wsh({ output: script, network }),
+    },
+    {
+      matches: () =>
+        scriptLen === 34 && script[0] === 0x51 && script[1] === 0x20,
+      paymentFactory: () => payments.p2tr({ output: script, network }),
+    },
+  ];
 
-    // Optimize by detecting script type based on length and patterns
-    // P2PKH: 25 bytes (OP_DUP OP_HASH160 <20 bytes> OP_EQUALVERIFY OP_CHECKSIG)
-    if (
-      scriptLen === 25 &&
-      script[0] === 0x76 &&
-      script[1] === 0xa9 &&
-      script[2] === 0x14
-    ) {
-      const p2pkh = payments.p2pkh({ output: script, network });
-      if (p2pkh.address) return p2pkh.address;
+  for (const { matches, paymentFactory } of patternStrategies) {
+    if (matches()) {
+      const address = resolvePaymentAddress(paymentFactory);
+      if (address) return address;
     }
-
-    // P2SH: 23 bytes (OP_HASH160 <20 bytes> OP_EQUAL)
-    if (scriptLen === 23 && script[0] === 0xa9 && script[1] === 0x14) {
-      const p2sh = payments.p2sh({ output: script, network });
-      if (p2sh.address) return p2sh.address;
-    }
-
-    // P2WPKH: 22 bytes (OP_0 <20 bytes>)
-    if (scriptLen === 22 && script[0] === 0x00 && script[1] === 0x14) {
-      const p2wpkh = payments.p2wpkh({ output: script, network });
-      if (p2wpkh.address) return p2wpkh.address;
-    }
-
-    // P2WSH: 34 bytes (OP_0 <32 bytes>)
-    if (scriptLen === 34 && script[0] === 0x00 && script[1] === 0x20) {
-      const p2wsh = payments.p2wsh({ output: script, network });
-      if (p2wsh.address) return p2wsh.address;
-    }
-
-    // P2TR (Taproot): 34 bytes (OP_1 <32 bytes>)
-    if (scriptLen === 34 && script[0] === 0x51 && script[1] === 0x20) {
-      const p2tr = payments.p2tr({ output: script, network });
-      if (p2tr.address) return p2tr.address;
-    }
-
-    // Fallback: try all payment types if pattern detection fails
-    const paymentTypes = [
-      () => payments.p2pkh({ output: script, network }),
-      () => payments.p2sh({ output: script, network }),
-      () => payments.p2wpkh({ output: script, network }),
-      () => payments.p2wsh({ output: script, network }),
-      () => payments.p2tr({ output: script, network }),
-    ];
-
-    for (const paymentType of paymentTypes) {
-      try {
-        const payment = paymentType();
-        if (payment.address) return payment.address;
-      } catch {
-        // Continue to next type
-        continue;
-      }
-    }
-
-    return null;
-  } catch {
-    return null;
   }
+
+  // Fallback: try all payment types if pattern detection fails.
+  for (const { paymentFactory } of patternStrategies) {
+    const address = resolvePaymentAddress(paymentFactory);
+    if (address) return address;
+  }
+
+  return null;
 }
 
 /**
