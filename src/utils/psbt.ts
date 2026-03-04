@@ -96,8 +96,7 @@ function isAddressInAccount(
   address: string,
   accountAddresses: string[],
 ): boolean {
-  const lowerAddr = address.toLowerCase();
-  return accountAddresses.some((accAddr) => accAddr === lowerAddr);
+  return accountAddresses.includes(address.toLowerCase());
 }
 
 /**
