@@ -1,7 +1,7 @@
 import { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import BigNumber from "bignumber.js";
 import { initEccLib, networks, payments, Psbt, Transaction } from "bitcoinjs-lib";
-import * as ecc from "tiny-secp256k1";
+import * as ecc from "@bitcoinerlab/secp256k1";
 import { describe, expect, it, vi } from "vitest";
 
 // P2TR (Taproot) payment functions in bitcoinjs-lib require an ECC library.

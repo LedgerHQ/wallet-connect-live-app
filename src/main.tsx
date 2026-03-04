@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider } from "@tanstack/react-router";
 import * as Sentry from "@sentry/react";
 import { initEccLib } from "bitcoinjs-lib";
-import * as ecc from "tiny-secp256k1";
+import * as ecc from "@bitcoinerlab/secp256k1";
 import { router } from "./router";
 import "@/i18n";
 
