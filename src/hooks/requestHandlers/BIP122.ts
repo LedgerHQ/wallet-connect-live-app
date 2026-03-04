@@ -176,7 +176,7 @@ export async function handleBIP122Request(
           accountAddresses,
           network,
         );
-        if (!validation.isValid || !validation.account) {
+        if (!validation.isValid) {
           return rejectRequest(walletkit, topic, id, Errors.txDeclined);
         }
 
