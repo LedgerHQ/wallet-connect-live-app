@@ -85,10 +85,12 @@ describe("handleBIP122Request — BIP122_SIGN_PSBT", () => {
       topic,
       requestId,
       BTC_CHAIN_ID,
-      [makeAccount()],
-      makeClient(() => Promise.resolve({ psbtSigned: "irrelevant" })),
-      walletkit,
-      [],
+      {
+        accounts: [makeAccount()],
+        client: makeClient(() => Promise.resolve({ psbtSigned: "irrelevant" })),
+        walletkit,
+        walletCapabilities: [],
+      },
     );
 
     expect(rejectSpy).toHaveBeenCalledWith(
@@ -112,10 +114,12 @@ describe("handleBIP122Request — BIP122_SIGN_PSBT", () => {
       topic,
       requestId,
       BTC_CHAIN_ID,
-      [],
-      makeClient(() => Promise.resolve({ psbtSigned: "irrelevant" })),
-      walletkit,
-      ["bitcoin.signPsbt"],
+      {
+        accounts: [],
+        client: makeClient(() => Promise.resolve({ psbtSigned: "irrelevant" })),
+        walletkit,
+        walletCapabilities: ["bitcoin.signPsbt"],
+      },
     );
 
     expect(rejectSpy).toHaveBeenCalledWith(
@@ -136,10 +140,12 @@ describe("handleBIP122Request — BIP122_SIGN_PSBT", () => {
         topic,
         requestId,
         BTC_CHAIN_ID,
-        [makeAccount()],
-        makeClient(() => Promise.resolve({ psbtSigned: "irrelevant" })),
-        walletkit,
-        ["bitcoin.signPsbt"],
+        {
+          accounts: [makeAccount()],
+          client: makeClient(() => Promise.resolve({ psbtSigned: "irrelevant" })),
+          walletkit,
+          walletCapabilities: ["bitcoin.signPsbt"],
+        },
       ),
     ).rejects.toThrow(/Invalid PSBT format/);
   });
@@ -158,13 +164,15 @@ describe("handleBIP122Request — BIP122_SIGN_PSBT", () => {
       topic,
       requestId,
       BTC_CHAIN_ID,
-      [makeAccount({ address: wrongAddress })],
-      makeClient(
-        () => Promise.resolve({ psbtSigned: "irrelevant" }),
-        () => Promise.resolve([{ address: wrongAddress }]),
-      ),
-      walletkit,
-      ["bitcoin.signPsbt"],
+      {
+        accounts: [makeAccount({ address: wrongAddress })],
+        client: makeClient(
+          () => Promise.resolve({ psbtSigned: "irrelevant" }),
+          () => Promise.resolve([{ address: wrongAddress }]),
+        ),
+        walletkit,
+        walletCapabilities: ["bitcoin.signPsbt"],
+      },
     );
 
     expect(rejectSpy).toHaveBeenCalledWith(
@@ -190,10 +198,12 @@ describe("handleBIP122Request — BIP122_SIGN_PSBT", () => {
       topic,
       requestId,
       BTC_CHAIN_ID,
-      [makeAccount()],
-      makeClient(() => Promise.resolve({ psbtSigned: "irrelevant" })),
-      walletkit,
-      ["bitcoin.signPsbt"],
+      {
+        accounts: [makeAccount()],
+        client: makeClient(() => Promise.resolve({ psbtSigned: "irrelevant" })),
+        walletkit,
+        walletCapabilities: ["bitcoin.signPsbt"],
+      },
     );
 
     expect(rejectSpy).toHaveBeenCalledWith(
@@ -218,10 +228,12 @@ describe("handleBIP122Request — BIP122_SIGN_PSBT", () => {
       topic,
       requestId,
       BTC_CHAIN_ID,
-      [makeAccount()],
-      client,
-      walletkit,
-      ["bitcoin.signPsbt"],
+      {
+        accounts: [makeAccount()],
+        client,
+        walletkit,
+        walletCapabilities: ["bitcoin.signPsbt"],
+      },
     );
 
     expect(acceptSpy).toHaveBeenCalledWith(walletkit, topic, requestId, {
@@ -243,10 +255,12 @@ describe("handleBIP122Request — BIP122_SIGN_PSBT", () => {
       topic,
       requestId,
       BTC_CHAIN_ID,
-      [makeAccount()],
-      client,
-      walletkit,
-      ["bitcoin.signPsbt"],
+      {
+        accounts: [makeAccount()],
+        client,
+        walletkit,
+        walletCapabilities: ["bitcoin.signPsbt"],
+      },
     );
 
     expect(acceptSpy).toHaveBeenCalledWith(walletkit, topic, requestId, {
@@ -269,10 +283,12 @@ describe("handleBIP122Request — BIP122_SIGN_PSBT", () => {
       topic,
       requestId,
       BTC_CHAIN_ID,
-      [makeAccount()],
-      client,
-      walletkit,
-      ["bitcoin.signPsbt"],
+      {
+        accounts: [makeAccount()],
+        client,
+        walletkit,
+        walletCapabilities: ["bitcoin.signPsbt"],
+      },
     );
 
     expect(rejectSpy).toHaveBeenCalledWith(
@@ -297,10 +313,12 @@ describe("handleBIP122Request — BIP122_SIGN_PSBT", () => {
         topic,
         requestId,
         BTC_CHAIN_ID,
-        [makeAccount()],
-        client,
-        walletkit,
-        ["bitcoin.signPsbt"],
+        {
+          accounts: [makeAccount()],
+          client,
+          walletkit,
+          walletCapabilities: ["bitcoin.signPsbt"],
+        },
       ),
     ).rejects.toThrow("Network failure");
   });
