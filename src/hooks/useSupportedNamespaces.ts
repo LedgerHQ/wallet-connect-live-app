@@ -1,4 +1,7 @@
-import { BIP122_SIGNING_METHODS } from "@/data/methods/BIP122.methods";
+import {
+  BIP122_QUERY_METHODS,
+  BIP122_SIGNING_METHODS,
+} from "@/data/methods/BIP122.methods";
 import { EIP155_SIGNING_METHODS } from "@/data/methods/EIP155Data.methods";
 import { RIPPLE_SIGNING_METHODS } from "@/data/methods/Ripple.methods";
 import { SOLANA_SIGNING_METHODS } from "@/data/methods/Solana.methods";
@@ -134,6 +137,7 @@ export function useSupportedNamespaces(
       const supportedMethods: string[] = [
         ...Object.values(WALLET_METHODS),
         ...Object.values(BIP122_SIGNING_METHODS),
+        ...Object.values(BIP122_QUERY_METHODS),
       ];
 
       const methods = [
