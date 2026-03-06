@@ -1,11 +1,14 @@
 import {
   type BIP122_REQUESTS,
+  BIP122_QUERY_METHODS,
   BIP122_RESPONSES,
   BIP122_SIGNING_METHODS,
+  bip122GetAccountAddressesSchema,
   bip122SignMessageLegacySchema,
   bip122SignMessageSchema,
   bip122SignPsbtSchema,
 } from "@/data/methods/BIP122.methods";
+import { fetchBip122Addresses } from "@/utils/bip122";
 import { btcTransactionSchema, convertBtcToLiveTX } from "@/utils/converters";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
 import { isPSBTSupportEnabled } from "@/utils/helper.util";
@@ -214,6 +217,28 @@ export async function handleBIP122Request(
           throw error;
         }
       }
+      break;
+    }
+    case BIP122_QUERY_METHODS.BIP122_GET_ACCOUNT_ADDRESSES: {
+      const params = bip122GetAccountAddressesSchema.parse(request.params);
+
+      const account = getAccountWithAddressAndChainId(
+        accounts,
+        params.account,
+        chainId,
+      );
+
+      if (!account) {
+        await rejectRequest(walletkit, topic, id, Errors.userDecline);
+        break;
+      }
+
+      const result = await fetchBip122Addresses(
+        account,
+        client,
+        params.intentions,
+      );
+      await acceptRequest(walletkit, topic, id, result);
       break;
     }
     default:

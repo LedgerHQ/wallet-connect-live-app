@@ -5,6 +5,7 @@ import {
   showBackToBrowserModalAtom,
   walletKitAtom,
 } from "@/store/walletKit.store";
+import { fetchBip122Addresses } from "@/utils/bip122";
 import {
   getCurrencyByChainId,
   getErrorMessage,
@@ -260,11 +261,14 @@ export function useSessionDetails(session: SessionTypes.Struct) {
       if (
         session.namespaces[namespace].events.includes("bip122_addressesChanged")
       ) {
+        const addressesData = await fetchBip122Addresses(account, client, [
+          "payment",
+        ]);
         await walletKit.emitSessionEvent({
           topic: session.topic,
           event: {
             name: "bip122_addressesChanged",
-            data: chainValue,
+            data: addressesData,
           },
           chainId,
         });
@@ -294,7 +298,7 @@ export function useSessionDetails(session: SessionTypes.Struct) {
         queryFn: sessionsQueryFn,
       });
     },
-    [queryClient, session, sessionsQueryFn, setShowModal, walletKit],
+    [client, queryClient, session, sessionsQueryFn, setShowModal, walletKit],
   );
 
   function getAccountsFromAddresses(addresses: string[], accounts: Account[]) {
