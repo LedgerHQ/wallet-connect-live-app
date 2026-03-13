@@ -1,11 +1,14 @@
 import {
   type BIP122_REQUESTS,
+  BIP122_QUERY_METHODS,
   BIP122_RESPONSES,
   BIP122_SIGNING_METHODS,
+  bip122GetAccountAddressesSchema,
   bip122SignMessageLegacySchema,
   bip122SignMessageSchema,
   bip122SignPsbtSchema,
 } from "@/data/methods/BIP122.methods";
+import { fetchBip122Addresses } from "@/utils/bip122";
 import { btcTransactionSchema, convertBtcToLiveTX } from "@/utils/converters";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
 import { isPSBTSupportEnabled } from "@/utils/helper.util";
@@ -36,9 +39,10 @@ export async function handleBIP122Request(
     client: WalletAPIClient;
     walletkit: IWalletKit;
     walletCapabilities?: string[];
+    sessionAddress?: string;
   },
 ) {
-  const { accounts, client, walletkit, walletCapabilities = [] } = context;
+  const { accounts, client, walletkit, walletCapabilities = [], sessionAddress } = context;
 
   switch (request.method) {
     case BIP122_SIGNING_METHODS.BIP122_SIGN_MESSAGE_LEGACY: {
@@ -214,6 +218,30 @@ export async function handleBIP122Request(
           throw error;
         }
       }
+      break;
+    }
+    case BIP122_QUERY_METHODS.BIP122_GET_ACCOUNT_ADDRESSES: {
+      // Some adapters (e.g. AppKit bitcoin adapter) send getAccountAddresses
+      // without params. Fall back to the selected account for the session.
+      const params = request.params != null
+        ? bip122GetAccountAddressesSchema.parse(request.params)
+        : undefined;
+
+      const selectedAddress = params?.account ?? sessionAddress;
+
+      const account = selectedAddress
+        ? getAccountWithAddressAndChainId(accounts, selectedAddress, chainId)
+        : undefined;
+
+      const intentions = params?.intentions;
+
+      if (!account) {
+        await rejectRequest(walletkit, topic, id, Errors.userDecline);
+        break;
+      }
+
+      const result = await fetchBip122Addresses(account, client, intentions);
+      await acceptRequest(walletkit, topic, id, result);
       break;
     }
     default:

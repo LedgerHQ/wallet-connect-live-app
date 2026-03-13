@@ -11,6 +11,10 @@ export const BIP122_SIGNING_METHODS = {
   BIP122_SIGN_PSBT: "signPsbt",
 } as const;
 
+export const BIP122_QUERY_METHODS = {
+  BIP122_GET_ACCOUNT_ADDRESSES: "getAccountAddresses",
+} as const;
+
 export const bip122SignMessageLegacySchema = z.strictObject({
   message: z.string(),
   address: z.string(),
@@ -40,6 +44,11 @@ export const bip122SignPsbtSchema = z.strictObject({
   broadcast: z.boolean().optional(),
 });
 
+export const bip122GetAccountAddressesSchema = z.strictObject({
+  account: z.string(),
+  intentions: z.array(z.string()).optional(),
+});
+
 /**
  * Requests specs : https://docs.reown.com/advanced/multichain/rpc-reference/bitcoin-rpc
  */
@@ -59,7 +68,18 @@ export type BIP122_REQUESTS =
   | {
       method: typeof BIP122_SIGNING_METHODS.BIP122_SIGN_PSBT;
       params: z.infer<typeof bip122SignPsbtSchema>;
+    }
+  | {
+      method: typeof BIP122_QUERY_METHODS.BIP122_GET_ACCOUNT_ADDRESSES;
+      params: z.infer<typeof bip122GetAccountAddressesSchema>;
     };
+
+export type BIP122AccountAddress = {
+  address: string;
+  publicKey?: string;
+  path?: string;
+  intention?: string;
+};
 
 /**
  * Responses specs : https://docs.reown.com/advanced/multichain/rpc-reference/bitcoin-rpc
@@ -78,4 +98,5 @@ export type BIP122_RESPONSES = {
     psbt: string;
     txid?: string;
   };
+  [BIP122_QUERY_METHODS.BIP122_GET_ACCOUNT_ADDRESSES]: BIP122AccountAddress[];
 };
