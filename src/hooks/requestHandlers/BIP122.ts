@@ -39,9 +39,10 @@ export async function handleBIP122Request(
     client: WalletAPIClient;
     walletkit: IWalletKit;
     walletCapabilities?: string[];
+    sessionAddress?: string;
   },
 ) {
-  const { accounts, client, walletkit, walletCapabilities = [] } = context;
+  const { accounts, client, walletkit, walletCapabilities = [], sessionAddress } = context;
 
   switch (request.method) {
     case BIP122_SIGNING_METHODS.BIP122_SIGN_MESSAGE_LEGACY: {
@@ -220,24 +221,26 @@ export async function handleBIP122Request(
       break;
     }
     case BIP122_QUERY_METHODS.BIP122_GET_ACCOUNT_ADDRESSES: {
-      const params = bip122GetAccountAddressesSchema.parse(request.params);
+      // Some adapters (e.g. AppKit bitcoin adapter) send getAccountAddresses
+      // without params. Fall back to the selected account for the session.
+      const params = request.params != null
+        ? bip122GetAccountAddressesSchema.parse(request.params)
+        : undefined;
 
-      const account = getAccountWithAddressAndChainId(
-        accounts,
-        params.account,
-        chainId,
-      );
+      const selectedAddress = params?.account ?? sessionAddress;
+
+      const account = selectedAddress
+        ? getAccountWithAddressAndChainId(accounts, selectedAddress, chainId)
+        : undefined;
+
+      const intentions = params?.intentions;
 
       if (!account) {
         await rejectRequest(walletkit, topic, id, Errors.userDecline);
         break;
       }
 
-      const result = await fetchBip122Addresses(
-        account,
-        client,
-        params.intentions,
-      );
+      const result = await fetchBip122Addresses(account, client, intentions);
       await acceptRequest(walletkit, topic, id, result);
       break;
     }
