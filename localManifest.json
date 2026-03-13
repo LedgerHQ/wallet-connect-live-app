@@ -48,6 +48,8 @@
     "account.list",
     "account.request",
     "message.sign",
+    "bitcoin.getAddresses",
+    "bitcoin.signPsbt",
     "transaction.sign",
     "transaction.signRaw",
     "transaction.signAndBroadcast",
