@@ -2,8 +2,14 @@ import { StrictMode, Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider } from "@tanstack/react-router";
 import * as Sentry from "@sentry/react";
+import { initEccLib } from "bitcoinjs-lib";
+import * as ecc from "@bitcoinerlab/secp256k1";
 import { router } from "./router";
 import "@/i18n";
+
+// Required for P2TR (Taproot) address extraction in bitcoinjs-lib v7.
+// Without this, any PSBT with Taproot inputs silently bypasses account validation.
+initEccLib(ecc);
 
 declare module "@tanstack/react-router" {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
