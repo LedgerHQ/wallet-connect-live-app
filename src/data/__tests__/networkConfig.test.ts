@@ -56,6 +56,12 @@ describe("SUPPORTED_NETWORK", () => {
 
     expect(core?.displayName).toBe("Core");
   });
+
+  it("contains Monad", () => {
+    const monad: Network | undefined = SUPPORTED_NETWORK.monad;
+
+    expect(monad?.displayName).toBe("Monad");
+  });
 });
 
 describe("EIP155_SEPOLIA_CHAINS", () => {

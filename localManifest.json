@@ -25,6 +25,7 @@
     "avalanche_c_chain",
     "base",
     "core",
+    "monad",
     "solana",
     "solana_devnet",
     "solana_testnet",

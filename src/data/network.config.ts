@@ -79,6 +79,13 @@ export const EIP155_CHAINS_MAINNET: Record<string, Network> = {
     displayName: "Core",
     color: "#FF962B",
   },
+  monad: {
+    chainId: 143,
+    namespace: "eip155:143",
+    ticker: "MON",
+    displayName: "Monad",
+    color: "#836EF9",
+  },
 };
 
 export const EIP155_SEPOLIA_CHAINS: Record<string, Network> = {

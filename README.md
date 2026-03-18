@@ -20,6 +20,7 @@ and is intended to be integrated within ledger products, enabling users to seaml
 | Cosmos            | ⏳          | -                  |                    |
 | Multivers-X       | ✅          | -                  |                    |
 | Solana            | ✅          | -                  |                    |
+| Monad             | ✅          | -                  |                    |
 
 ## Hosting
 
