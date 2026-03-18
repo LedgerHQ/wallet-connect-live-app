@@ -85,3 +85,11 @@ describe("EIP155_SEPOLIA_CHAINS", () => {
     expect(baseSepolia?.displayName).toBe("Base Sepolia");
   });
 });
+
+describe("EIP155_CHAINS_TESTNET", () => {
+  it("contains Monad Testnet", () => {
+    const monadTestnet: Network | undefined = SUPPORTED_NETWORK.monad_testnet;
+
+    expect(monadTestnet?.displayName).toBe("Monad Testnet");
+  });
+});

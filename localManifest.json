@@ -26,6 +26,7 @@
     "base",
     "core",
     "monad",
+    "monad_testnet",
     "solana",
     "solana_devnet",
     "solana_testnet",
