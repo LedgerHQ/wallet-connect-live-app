@@ -79,6 +79,13 @@ export const EIP155_CHAINS_MAINNET: Record<string, Network> = {
     displayName: "Core",
     color: "#FF962B",
   },
+  monad: {
+    chainId: 143,
+    namespace: "eip155:143",
+    ticker: "MON",
+    displayName: "Monad",
+    color: "#836EF9",
+  },
 };
 
 export const EIP155_SEPOLIA_CHAINS: Record<string, Network> = {
@@ -119,6 +126,16 @@ export const EIP155_HOLESKY_CHAINS: Record<string, Network> = {
     ticker: "ETH",
     displayName: "Ethereum Holesky",
     color: "#00ff00",
+  },
+};
+
+export const EIP155_CHAINS_TESTNET: Record<string, Network> = {
+  monad_testnet: {
+    chainId: 10143,
+    namespace: "eip155:10143",
+    ticker: "MON",
+    displayName: "Monad Testnet",
+    color: "#836EF9",
   },
 };
 
@@ -215,6 +232,7 @@ export const EIP155_CHAINS = {
   ...EIP155_CHAINS_MAINNET,
   ...EIP155_SEPOLIA_CHAINS,
   ...EIP155_HOLESKY_CHAINS,
+  ...EIP155_CHAINS_TESTNET,
 };
 
 export const EIP155_NETWORK_BY_CHAIN_ID = getNetworkById(EIP155_CHAINS);

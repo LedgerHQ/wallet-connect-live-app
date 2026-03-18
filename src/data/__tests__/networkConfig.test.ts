@@ -56,6 +56,12 @@ describe("SUPPORTED_NETWORK", () => {
 
     expect(core?.displayName).toBe("Core");
   });
+
+  it("contains Monad", () => {
+    const monad: Network | undefined = SUPPORTED_NETWORK.monad;
+
+    expect(monad?.displayName).toBe("Monad");
+  });
 });
 
 describe("EIP155_SEPOLIA_CHAINS", () => {
@@ -77,5 +83,13 @@ describe("EIP155_SEPOLIA_CHAINS", () => {
     const baseSepolia: Network | undefined = SUPPORTED_NETWORK.base_sepolia;
 
     expect(baseSepolia?.displayName).toBe("Base Sepolia");
+  });
+});
+
+describe("EIP155_CHAINS_TESTNET", () => {
+  it("contains Monad Testnet", () => {
+    const monadTestnet: Network | undefined = SUPPORTED_NETWORK.monad_testnet;
+
+    expect(monadTestnet?.displayName).toBe("Monad Testnet");
   });
 });
