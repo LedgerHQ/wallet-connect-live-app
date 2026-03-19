@@ -86,6 +86,13 @@ export const EIP155_CHAINS_MAINNET: Record<string, Network> = {
     displayName: "Monad",
     color: "#836EF9",
   },
+  adi: {
+    chainId: 36900,
+    namespace: "eip155:36900",
+    ticker: "ADI",
+    displayName: "ADI Chain",
+    color: "#1E72B9",
+  },
 };
 
 export const EIP155_SEPOLIA_CHAINS: Record<string, Network> = {
