@@ -21,6 +21,7 @@ and is intended to be integrated within ledger products, enabling users to seaml
 | Multivers-X       | ✅          | -                  |                    |
 | Solana            | ✅          | -                  |                    |
 | Monad             | ✅          | ✅                 |                    |
+| ADI Chain         | ✅          | -                  |                    |
 
 ## Hosting
 

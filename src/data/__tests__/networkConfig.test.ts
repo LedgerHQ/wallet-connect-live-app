@@ -62,6 +62,12 @@ describe("SUPPORTED_NETWORK", () => {
 
     expect(monad?.displayName).toBe("Monad");
   });
+
+  it("contains ADI Chain", () => {
+    const adi: Network | undefined = SUPPORTED_NETWORK.adi;
+
+    expect(adi?.displayName).toBe("ADI Chain");
+  });
 });
 
 describe("EIP155_SEPOLIA_CHAINS", () => {
