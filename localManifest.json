@@ -27,6 +27,7 @@
     "core",
     "monad",
     "monad_testnet",
+    "adi",
     "solana",
     "solana_devnet",
     "solana_testnet",
