@@ -214,9 +214,12 @@ export default function useWalletConnect() {
               topic,
               id,
               chainId,
-              accounts.data,
-              client,
-              walletKit,
+              {
+                accounts: accounts.data,
+                client,
+                walletkit: walletKit,
+                walletCapabilities,
+              },
             );
           } else if (
             isRippleChain(chainId, request) &&

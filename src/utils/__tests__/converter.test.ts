@@ -273,7 +273,7 @@ describe("Ethereum Transaction Schema", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.issues[0].message).toContain(
-          "Address must be 20 bytes"
+          "Address must be 20 bytes",
         );
       }
     });
@@ -296,7 +296,7 @@ describe("Ethereum Transaction Schema", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.issues[0].message).toContain(
-          "Address must be 20 bytes"
+          "Address must be 20 bytes",
         );
       }
     });
@@ -319,7 +319,7 @@ describe("Ethereum Transaction Schema", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.issues[0].message).toContain(
-          "Address must be 20 bytes"
+          "Address must be 20 bytes",
         );
       }
     });
@@ -342,7 +342,7 @@ describe("Ethereum Transaction Schema", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.issues[0].message).toContain(
-          "Storage key must be 32 bytes"
+          "Storage key must be 32 bytes",
         );
       }
     });
@@ -365,7 +365,7 @@ describe("Ethereum Transaction Schema", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.issues[0].message).toContain(
-          "Storage key must be 32 bytes"
+          "Storage key must be 32 bytes",
         );
       }
     });
@@ -388,7 +388,7 @@ describe("Ethereum Transaction Schema", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.issues[0].message).toContain(
-          "Storage key must be 32 bytes"
+          "Storage key must be 32 bytes",
         );
       }
     });
@@ -411,7 +411,7 @@ describe("Ethereum Transaction Schema", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.issues[0].message).toContain(
-          "Address must be 20 bytes"
+          "Address must be 20 bytes",
         );
       }
     });
@@ -434,7 +434,7 @@ describe("Ethereum Transaction Schema", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.issues[0].message).toContain(
-          "Storage key must be 32 bytes"
+          "Storage key must be 32 bytes",
         );
       }
     });
