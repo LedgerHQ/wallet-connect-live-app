@@ -100,7 +100,37 @@ export async function handleEIP155Request(
       }
       break;
     }
-    case EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION:
+    case EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION: {
+      const ethTx = ethSendTransactionSchema.parse(request.params)[0];
+      const accountTX = getAccountWithAddressAndChainId(
+        accounts,
+        ethTx.from,
+        chainId,
+      );
+      if (accountTX) {
+        try {
+          const liveTx = convertEthToLiveTX(ethTx);
+          const signedTxBuffer = await client.transaction.sign(
+            accountTX.id,
+            liveTx,
+          );
+
+          const result: EIP155_RESPONSES[typeof request.method] =
+            formatMessage(signedTxBuffer);
+
+          await acceptRequest(walletKit, topic, id, result);
+        } catch (error) {
+          if (isCanceledError(error)) {
+            await rejectRequest(walletKit, topic, id, Errors.txDeclined);
+          } else {
+            throw error;
+          }
+        }
+      } else {
+        await rejectRequest(walletKit, topic, id, Errors.txDeclined);
+      }
+      break;
+    }
     case EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION: {
       const ethTx = ethSendTransactionSchema.parse(request.params)[0];
       const accountTX = getAccountWithAddressAndChainId(
