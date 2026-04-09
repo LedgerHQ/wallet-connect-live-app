@@ -205,7 +205,7 @@ function extractAddressFromInput(
         if (address) return address;
       }
     } catch {
-      // If we can't parse the transaction, return null
+      return null;
     }
   }
 
