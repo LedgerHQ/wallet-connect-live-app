@@ -11,7 +11,8 @@
   "close": "Close",
   "error": {
     "noInput": "No input value",
-    "invalidUri": "Invalid URI"
+    "invalidUri": "Invalid URI",
+    "zodRequestBlocked": "We blocked this request because the data from the app is invalid or unsupported. We avoid continuing for security."
   },
   "connect": {
     "title": "Connect to an app to start",
