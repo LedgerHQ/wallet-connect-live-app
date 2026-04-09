@@ -104,7 +104,7 @@ export function useProposal(
         search: ({ uri: _, ...search }) => search,
       });
 
-      // Emit bip122_addressesChanged immediately after approval for all BIP122 accounts
+      // Emit bip122_addressesChanged immediately after approval once per BIP122 chain
       // per Reown spec: https://docs.reown.com/advanced/multichain/rpc-reference/bitcoin-rpc#bip122_addresseschanged
       const bip122Namespace = session.namespaces.bip122;
       if (bip122Namespace?.events.includes("bip122_addressesChanged")) {
