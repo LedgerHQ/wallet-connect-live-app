@@ -421,11 +421,45 @@ describe("validatePsbtAccount", () => {
     const result = validatePsbtAccount(
       psbt,
       account,
-      [differentAddress.toLowerCase()], // account owns P2PKH_ADDRESS, not P2WPKH_ADDRESS
+      [differentAddress], // account owns P2PKH_ADDRESS (Base58Check, kept as-is), not P2WPKH_ADDRESS
       networks.bitcoin,
     );
     expect(result.isValid).toBe(false);
     expect(result.validated).toBe(true);
+  });
+
+  it("matches Bech32 input addresses case-insensitively", () => {
+    const psbt = buildP2wpkhPsbt(); // input → P2WPKH_ADDRESS (bc1…)
+    const account = makeAccount({ address: P2WPKH_ADDRESS! });
+    const result = validatePsbtAccount(
+      psbt,
+      account,
+      [P2WPKH_ADDRESS!.toUpperCase()],
+      networks.bitcoin,
+    );
+    expect(result.isValid).toBe(true);
+    expect(result.validated).toBe(true);
+  });
+
+  it("matches Base58Check (P2PKH) input addresses case-sensitively", () => {
+    const psbt = buildP2pkhWitnessUtxoPsbt(); // input → P2PKH_ADDRESS
+    const account = makeAccount({ address: P2PKH_ADDRESS! });
+
+    const validResult = validatePsbtAccount(
+      psbt,
+      account,
+      [P2PKH_ADDRESS!],
+      networks.bitcoin,
+    );
+    expect(validResult.isValid).toBe(true);
+
+    const invalidResult = validatePsbtAccount(
+      psbt,
+      account,
+      [P2PKH_ADDRESS!.toLowerCase()],
+      networks.bitcoin,
+    );
+    expect(invalidResult.isValid).toBe(false);
   });
 });
 
@@ -485,7 +519,7 @@ describe("validateSignInputs", () => {
 
   it("returns an error when the extracted input address does not belong to the account", () => {
     const psbt = buildP2wpkhPsbt(); // input 0 → P2WPKH_ADDRESS
-    const unrelatedAccountAddresses = [P2PKH_ADDRESS!.toLowerCase()];
+    const unrelatedAccountAddresses = [P2PKH_ADDRESS!];
     const result = validateSignInputs(
       psbt,
       [{ address: P2WPKH_ADDRESS!, index: 0 }], // address matches input
@@ -516,7 +550,7 @@ describe("validateSignInputs", () => {
     const multiAddressAccount = makeAccount({ address: P2WPKH_ADDRESS! });
     const multiAccountAddresses = [
       P2WPKH_ADDRESS!.toLowerCase(),
-      P2PKH_ADDRESS!.toLowerCase(),
+      P2PKH_ADDRESS!,
     ];
     const psbt = buildP2wpkhPsbt(); // input 0 → P2WPKH_ADDRESS
 
@@ -593,5 +627,33 @@ describe("getAccountAddresses", () => {
 
     const addresses = await getAccountAddresses(account, mockClient);
     expect(addresses).toEqual(["bc1qmainaddr"]);
+  });
+
+  it("preserves original casing for Base58Check (P2PKH) addresses", async () => {
+    const base58Address = P2PKH_ADDRESS!;
+    const account = makeAccount({ address: base58Address });
+    const mockClient = {
+      bitcoin: {
+        getAddresses: vi.fn().mockResolvedValue([
+          { address: base58Address },
+        ]),
+      },
+    } as unknown as WalletAPIClient;
+
+    const addresses = await getAccountAddresses(account, mockClient);
+    expect(addresses).toEqual([base58Address]);
+  });
+
+  it("preserves Base58Check casing in fallback path", async () => {
+    const base58Address = P2PKH_ADDRESS!;
+    const account = makeAccount({ address: base58Address });
+    const mockClient = {
+      bitcoin: {
+        getAddresses: vi.fn().mockRejectedValue(new Error("API unavailable")),
+      },
+    } as unknown as WalletAPIClient;
+
+    const addresses = await getAccountAddresses(account, mockClient);
+    expect(addresses).toEqual([base58Address]);
   });
 });

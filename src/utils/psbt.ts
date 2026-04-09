@@ -1,5 +1,14 @@
 import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
-import { networks, payments, Psbt, Transaction } from "bitcoinjs-lib";
+import { initEccLib, networks, payments, Psbt, Transaction } from "bitcoinjs-lib";
+import * as ecc from "@bitcoinerlab/secp256k1";
+
+let eccInitialized = false;
+function ensureEccLib(): void {
+  if (!eccInitialized) {
+    initEccLib(ecc);
+    eccInitialized = true;
+  }
+}
 
 // Custom network definitions for chains not built into bitcoinjs-lib
 const LITECOIN_NETWORK: networks.Network = {
@@ -83,20 +92,48 @@ export function decodePsbt(psbtBase64: string): Psbt {
 }
 
 /**
- * Helper function to compare addresses (case-insensitive)
+ * Known Bech32/Bech32m human-readable part prefixes (HRP + "1" separator)
+ * for the networks this module supports.  Bech32 addresses are
+ * case-insensitive (BIP 173/350); Base58Check addresses are not.
  */
-function addressesMatch(addr1: string, addr2: string): boolean {
-  return addr1.toLowerCase() === addr2.toLowerCase();
+const BECH32_PREFIXES = ["bc1", "tb1", "bcrt1", "ltc1", "tltc1"];
+
+function isBech32Address(address: string): boolean {
+  const lower = address.toLowerCase();
+  return BECH32_PREFIXES.some((prefix) => lower.startsWith(prefix));
 }
 
 /**
- * Helper function to check if an address belongs to a list of account addresses
+ * Normalise an address for storage / comparison.
+ * Bech32/Bech32m → lowercase (canonical per BIP 173/350).
+ * Base58Check    → unchanged (casing is significant).
+ */
+function normalizeAddress(address: string): string {
+  return isBech32Address(address) ? address.toLowerCase() : address;
+}
+
+/**
+ * Compare two addresses using encoding-aware normalisation.
+ */
+function addressesMatch(addr1: string, addr2: string): boolean {
+  return normalizeAddress(addr1) === normalizeAddress(addr2);
+}
+
+/**
+ * Build a Set of normalised addresses for constant-time membership checks.
+ */
+function toNormalizedSet(addresses: string[]): Set<string> {
+  return new Set(addresses.map(normalizeAddress));
+}
+
+/**
+ * Check if an address belongs to a pre-normalised Set of account addresses.
  */
 function isAddressInAccount(
   address: string,
-  accountAddresses: string[],
+  accountAddressSet: Set<string>,
 ): boolean {
-  return accountAddresses.includes(address.toLowerCase());
+  return accountAddressSet.has(normalizeAddress(address));
 }
 
 function resolvePaymentAddress(
@@ -118,6 +155,7 @@ function extractAddressFromScript(
   script: Uint8Array,
   network: networks.Network = networks.bitcoin,
 ): string | null {
+  ensureEccLib();
   const scriptLen = script.length;
   const patternStrategies = [
     {
@@ -216,7 +254,7 @@ function extractAddressFromInput(
  * Extract addresses from PSBT inputs
  * @param psbt - The PSBT to extract addresses from
  * @param network - The Bitcoin network (defaults to mainnet)
- * @returns Array of addresses (may contain null for inputs where address couldn't be extracted)
+ * @returns Array of successfully extracted addresses; inputs whose address couldn't be extracted are omitted
  */
 export function extractInputAddresses(
   psbt: Psbt,
@@ -264,9 +302,12 @@ export function extractInputAddressesByIndices(
  * Callers should invoke this once and pass the result to validatePsbtAccount /
  * validateSignInputs to avoid redundant calls.
  *
+ * Bech32/Bech32m addresses are lowercased (canonical form per BIP 173/350).
+ * Base58Check addresses are returned verbatim because their casing is significant.
+ *
  * @param account - The account to get addresses for
  * @param client - The WalletAPIClient instance
- * @returns Array of lowercase addresses
+ * @returns Array of normalised addresses
  */
 export async function getAccountAddresses(
   account: Account,
@@ -275,12 +316,12 @@ export async function getAccountAddresses(
   try {
     const entries = await client.bitcoin.getAddresses(account.id, ["payment"]);
     if (entries.length > 0) {
-      return entries.map((entry) => entry.address.toLowerCase());
+      return entries.map((entry) => normalizeAddress(entry.address));
     }
   } catch {
     // Fall back to the main account address when the API call is unavailable or fails
   }
-  return [account.address.toLowerCase()];
+  return [normalizeAddress(account.address)];
 }
 
 /**
@@ -320,9 +361,11 @@ export function validatePsbtAccount(
     };
   }
 
+  const addressSet = toNormalizedSet(accountAddresses);
+
   // Check if any input address belongs to this account
   const hasMatchingAddress = inputAddresses.some((inputAddr) =>
-    isAddressInAccount(inputAddr, accountAddresses),
+    isAddressInAccount(inputAddr, addressSet),
   );
 
   if (!hasMatchingAddress) {
@@ -372,6 +415,8 @@ export function validateSignInputs(
   const indices = signInputs.map((si) => si.index);
   const addressMap = extractInputAddressesByIndices(psbt, indices, network);
 
+  const addressSet = toNormalizedSet(accountAddresses);
+
   // Validate that all specified addresses belong to the account
   for (const signInput of signInputs) {
     const inputAddress = addressMap.get(signInput.index);
@@ -389,11 +434,11 @@ export function validateSignInputs(
     // Also check if both addresses belong to the account
     const signInputInAccount = isAddressInAccount(
       signInput.address,
-      accountAddresses,
+      addressSet,
     );
     const inputAddressInAccount = isAddressInAccount(
       inputAddress,
-      accountAddresses,
+      addressSet,
     );
 
     if (!addressMatches && !signInputInAccount) {
