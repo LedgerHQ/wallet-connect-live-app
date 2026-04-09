@@ -3,7 +3,7 @@ import * as utils from "@/hooks/requestHandlers/utils";
 import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import type { IWalletKit } from "@reown/walletkit";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { sendTransaction } from "./sendTransaction";
+import { signTransaction } from "./signTransaction";
 
 vi.mock("@/hooks/requestHandlers/utils", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/hooks/requestHandlers/utils")>()),
@@ -11,7 +11,7 @@ vi.mock("@/hooks/requestHandlers/utils", async (importOriginal) => ({
   rejectRequest: vi.fn(),
 }));
 
-describe("Testing send transaction on EIP155", () => {
+describe("Testing sign transaction on EIP155", () => {
   const account = {
     id: "account-id",
     address: "0xAbC123",
@@ -37,9 +37,9 @@ describe("Testing send transaction on EIP155", () => {
     vi.clearAllMocks();
   });
 
-  it("should sign, broadcast, and accept sendTransaction requests", async () => {
-    const sign = vi.fn();
-    const signAndBroadcast = vi.fn(() => Promise.resolve("0xhash"));
+  it("should sign and accept signTransaction requests", async () => {
+    const sign = vi.fn(() => Promise.resolve(Buffer.from("deadbeef")));
+    const signAndBroadcast = vi.fn();
     const walletAPIClient = {
       transaction: {
         sign,
@@ -47,9 +47,9 @@ describe("Testing send transaction on EIP155", () => {
       },
     } as unknown as WalletAPIClient;
 
-    await sendTransaction(
+    await signTransaction(
       {
-        method: EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION,
+        method: EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION,
         params: [...params],
       },
       topic,
@@ -60,33 +60,33 @@ describe("Testing send transaction on EIP155", () => {
       walletKit,
     );
 
-    expect(sign).not.toHaveBeenCalled();
-    expect(signAndBroadcast).toHaveBeenCalledTimes(1);
-    expect(signAndBroadcast).toHaveBeenCalledWith(
+    expect(sign).toHaveBeenCalledTimes(1);
+    expect(sign).toHaveBeenCalledWith(
       account.id,
       expect.any(Object),
     );
+    expect(signAndBroadcast).not.toHaveBeenCalled();
     expect(utils.acceptRequest).toHaveBeenCalledTimes(1);
     expect(utils.acceptRequest).toHaveBeenCalledWith(
       walletKit,
       topic,
       id,
-      "0xhash",
+      "0xdeadbeef",
     );
     expect(utils.rejectRequest).not.toHaveBeenCalled();
   });
 
-  it("should throw when used with a non-send transaction method", async () => {
+  it("should throw when used with a non-sign transaction method", async () => {
     const walletAPIClient = {
       transaction: {
-        signAndBroadcast: vi.fn(),
+        sign: vi.fn(),
       },
     } as unknown as WalletAPIClient;
 
     await expect(
-      sendTransaction(
+      signTransaction(
         {
-          method: EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION,
+          method: EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION,
           params: [...params],
         },
         topic,
@@ -97,21 +97,21 @@ describe("Testing send transaction on EIP155", () => {
         walletKit,
       ),
     ).rejects.toThrow(
-      "Method eth_signTransaction from request can not be used to send transaction",
+      "Method eth_sendTransaction from request can not be used to sign transaction",
     );
   });
 
   it("should reject the request when no matching account is found", async () => {
-    const signAndBroadcast = vi.fn();
+    const sign = vi.fn();
     const walletAPIClient = {
       transaction: {
-        signAndBroadcast,
+        sign,
       },
     } as unknown as WalletAPIClient;
 
-    await sendTransaction(
+    await signTransaction(
       {
-        method: EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION,
+        method: EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION,
         params: [...params],
       },
       topic,
@@ -122,7 +122,7 @@ describe("Testing send transaction on EIP155", () => {
       walletKit,
     );
 
-    expect(signAndBroadcast).not.toHaveBeenCalled();
+    expect(sign).not.toHaveBeenCalled();
     expect(utils.acceptRequest).not.toHaveBeenCalled();
     expect(utils.rejectRequest).toHaveBeenCalledTimes(1);
     expect(utils.rejectRequest).toHaveBeenCalledWith(
@@ -134,18 +134,16 @@ describe("Testing send transaction on EIP155", () => {
   });
 
   it("should reject the request when the user cancels the transaction", async () => {
-    const signAndBroadcast = vi.fn(() =>
-      Promise.reject(new Error("User cancelled")),
-    );
+    const sign = vi.fn(() => Promise.reject(new Error("User cancelled")));
     const walletAPIClient = {
       transaction: {
-        signAndBroadcast,
+        sign,
       },
     } as unknown as WalletAPIClient;
 
-    await sendTransaction(
+    await signTransaction(
       {
-        method: EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION,
+        method: EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION,
         params: [...params],
       },
       topic,
@@ -156,7 +154,7 @@ describe("Testing send transaction on EIP155", () => {
       walletKit,
     );
 
-    expect(signAndBroadcast).toHaveBeenCalledTimes(1);
+    expect(sign).toHaveBeenCalledTimes(1);
     expect(utils.acceptRequest).not.toHaveBeenCalled();
     expect(utils.rejectRequest).toHaveBeenCalledTimes(1);
     expect(utils.rejectRequest).toHaveBeenCalledWith(
