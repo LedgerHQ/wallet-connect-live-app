@@ -1,22 +1,13 @@
 import {
-  EIP155_RESPONSES,
   EIP155_SIGNING_METHODS,
-  ethSendTransactionSchema,
-  ethSignSchema,
   type EIP155_REQUESTS,
 } from "@/data/methods/EIP155Data.methods";
-import { convertEthToLiveTX } from "@/utils/converters";
-import { stripHexPrefix } from "@/utils/currencyFormatter/helpers";
-import { getAccountWithAddressAndChainId } from "@/utils/generic";
 import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import type { IWalletKit } from "@reown/walletkit";
-import {
-  acceptRequest,
-  Errors,
-  formatMessage,
-  isCanceledError,
-  rejectRequest,
-} from "./utils";
+import { sendTransaction } from "./eip155Handlers/sendTransaction";
+import { signMessage } from "./eip155Handlers/signMessage";
+import { signTypedData } from "./eip155Handlers/signTypedData";
+import { Errors, rejectRequest } from "./utils";
 
 export async function handleEIP155Request(
   request: EIP155_REQUESTS,
@@ -29,108 +20,34 @@ export async function handleEIP155Request(
 ) {
   switch (request.method) {
     case EIP155_SIGNING_METHODS.ETH_SIGN:
-    case EIP155_SIGNING_METHODS.PERSONAL_SIGN: {
-      const isPersonalSign =
-        request.method === EIP155_SIGNING_METHODS.PERSONAL_SIGN;
-
-      const params = ethSignSchema.parse(request.params);
-      const address = isPersonalSign ? params[1] : params[0];
-      const message = isPersonalSign ? params[0] : params[1];
-
-      const accountSign = getAccountWithAddressAndChainId(
-        accounts,
-        address,
-        chainId,
-      );
-      if (accountSign) {
-        try {
-          const signedMessage = await client.message.sign(
-            accountSign.id,
-            Buffer.from(stripHexPrefix(message), "hex"),
-          );
-
-          const result: EIP155_RESPONSES[typeof request.method] =
-            formatMessage(signedMessage);
-
-          await acceptRequest(walletKit, topic, id, result);
-        } catch (error) {
-          if (isCanceledError(error)) {
-            await rejectRequest(walletKit, topic, id, Errors.userDecline);
-          } else {
-            throw error;
-          }
-        }
-      } else {
-        await rejectRequest(walletKit, topic, id, Errors.userDecline);
-      }
+    case EIP155_SIGNING_METHODS.PERSONAL_SIGN:
+      await signMessage(request, topic, id, chainId, accounts, client, walletKit);
       break;
-    }
     case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA:
     case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V3:
-    case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V4: {
-      const params = ethSignSchema.parse(request.params);
-      const address = params[0];
-      const message = stripHexPrefix(params[1]);
-
-      const accountSignTyped = getAccountWithAddressAndChainId(
-        accounts,
-        address,
+    case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V4:
+      await signTypedData(
+        request,
+        topic,
+        id,
         chainId,
+        accounts,
+        client,
+        walletKit,
       );
-      if (accountSignTyped) {
-        try {
-          const signedMessage = await client.message.sign(
-            accountSignTyped.id,
-            Buffer.from(message),
-          );
-
-          const result: EIP155_RESPONSES[typeof request.method] =
-            formatMessage(signedMessage);
-
-          await acceptRequest(walletKit, topic, id, result);
-        } catch (error) {
-          if (isCanceledError(error)) {
-            await rejectRequest(walletKit, topic, id, Errors.msgDecline);
-          } else {
-            throw error;
-          }
-        }
-      } else {
-        await rejectRequest(walletKit, topic, id, Errors.msgDecline);
-      }
       break;
-    }
     case EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION:
-    case EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION: {
-      const ethTx = ethSendTransactionSchema.parse(request.params)[0];
-      const accountTX = getAccountWithAddressAndChainId(
-        accounts,
-        ethTx.from,
+    case EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION:
+      await sendTransaction(
+        request,
+        topic,
+        id,
         chainId,
+        accounts,
+        client,
+        walletKit,
       );
-      if (accountTX) {
-        try {
-          const liveTx = convertEthToLiveTX(ethTx);
-          const hash = await client.transaction.signAndBroadcast(
-            accountTX.id,
-            liveTx,
-          );
-
-          const result: EIP155_RESPONSES[typeof request.method] = hash;
-
-          await acceptRequest(walletKit, topic, id, result);
-        } catch (error) {
-          if (isCanceledError(error)) {
-            await rejectRequest(walletKit, topic, id, Errors.txDeclined);
-          } else {
-            throw error;
-          }
-        }
-      } else {
-        await rejectRequest(walletKit, topic, id, Errors.txDeclined);
-      }
       break;
-    }
     default:
       await rejectRequest(
         walletKit,
