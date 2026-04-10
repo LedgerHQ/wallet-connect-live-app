@@ -136,7 +136,14 @@ export const isXRPLSupportEnabled = (walletCapabilities: string[]): boolean => {
   return walletCapabilities.includes("transaction.signRaw");
 };
 
-export const getErrorMessage = (error: unknown) => {
+export const getErrorMessage = (error: unknown): string => {
   if (error instanceof Error) return error.message;
+  if (typeof error === "object" && error !== null) {
+    try {
+      return JSON.stringify(error);
+    } catch {
+      return "Could not stringify error";
+    }
+  }
   return String(error);
 };

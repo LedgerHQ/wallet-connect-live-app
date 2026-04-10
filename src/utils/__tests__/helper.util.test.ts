@@ -5,6 +5,7 @@ import {
   getColor,
   getCurrencyByChainId,
   getDisplayName,
+  getErrorMessage,
   getNamespace,
   getTicker,
   isEIP155Chain,
@@ -280,5 +281,25 @@ describe("isXRPLSupportEnabled", () => {
       "yet.another",
     ];
     expect(isXRPLSupportEnabled(caps)).toBe(true);
+  });
+});
+
+describe("getErrorMessage", () => {
+  it("returns error.message for Error instances", () => {
+    const err = new Error("Something went wrong");
+    expect(getErrorMessage(err)).toBe("Something went wrong");
+  });
+
+  it("returns String(value) for non-Error values", () => {
+    expect(getErrorMessage("oops")).toBe("oops");
+    expect(getErrorMessage(42)).toBe("42");
+    expect(getErrorMessage({ foo: "bar" })).toBe('{"foo":"bar"}');
+  });
+
+  it("returns the serialization error for circular objects", () => {
+    const circular: { foo: string; self?: unknown } = { foo: "bar" };
+    circular.self = circular;
+
+    expect(getErrorMessage(circular)).toBe("Could not stringify error");
   });
 });

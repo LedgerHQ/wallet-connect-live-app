@@ -11,7 +11,8 @@
   "close" : "Fermer",
   "error" : {
     "noInput" : "Aucune saisie",
-    "invalidUri" : "URI invalide"
+    "invalidUri" : "URI invalide",
+    "zodRequestBlocked" : "Nous avons bloqué cette requête car les données envoyées par l’application sont invalides ou non prises en charge. Nous évitons de continuer pour des raisons de sécurité."
   },
   "connect" : {
     "title" : "Connectez-vous à une application pour commencer",

@@ -11,7 +11,8 @@
   "close" : "閉じる",
   "error" : {
     "noInput" : "入力値なし",
-    "invalidUri" : "無効なURI"
+    "invalidUri" : "無効なURI",
+    "zodRequestBlocked" : "アプリから送信されたデータが無効またはサポートされていないため、このリクエストをブロックしました。セキュリティのため、続行を避けています。"
   },
   "connect" : {
     "title" : "アプリに接続して開始",
