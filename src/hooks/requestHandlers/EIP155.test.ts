@@ -8,6 +8,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { handleEIP155Request } from "./EIP155";
 import * as sendTransactionModule from "./eip155Handlers/sendTransaction";
 import * as signMessageModule from "./eip155Handlers/signMessage";
+import * as signTransactionModule from "./eip155Handlers/signTransaction";
 import * as signTypedDataModule from "./eip155Handlers/signTypedData";
 import * as utils from "./utils";
 
@@ -125,12 +126,47 @@ describe("Testing EIP155 request handler mapping", () => {
     );
   });
 
-  it.each([
-    EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION,
-    EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION,
-  ])("should call send transaction when request method is %s", async (method) => {
+  it("should call sign transaction when request method is eth_signTransaction", async () => {
     const request: EIP155_REQUESTS = {
-      method,
+      method: EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION,
+      params: [
+        {
+          from: "0x123",
+        },
+      ],
+    };
+
+    const signTransactionSpy = vi.spyOn(
+      signTransactionModule,
+      "signTransaction",
+    );
+    signTransactionSpy.mockImplementationOnce(() => Promise.resolve());
+
+    await handleEIP155Request(
+      request,
+      topic,
+      id,
+      chainId,
+      accounts,
+      walletAPIClient,
+      walletKit,
+    );
+
+    expect(signTransactionSpy).toHaveBeenCalledTimes(1);
+    expect(signTransactionSpy).toHaveBeenCalledWith(
+      request,
+      topic,
+      id,
+      chainId,
+      accounts,
+      walletAPIClient,
+      walletKit,
+    );
+  });
+
+  it("should call send transaction when request method is eth_sendTransaction", async () => {
+    const request: EIP155_REQUESTS = {
+      method: EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION,
       params: [
         {
           from: "0x123",

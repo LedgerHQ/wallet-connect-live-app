@@ -7,6 +7,7 @@ import {
 import {
   acceptRequest,
   Errors,
+  formatMessage,
   isCanceledError,
   rejectRequest,
 } from "@/hooks/requestHandlers/utils";
@@ -15,7 +16,7 @@ import { getAccountWithAddressAndChainId } from "@/utils/generic";
 import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import type { IWalletKit } from "@reown/walletkit";
 
-export async function sendTransaction(
+export async function signTransaction(
   request: EIP155_REQUESTS,
   topic: string,
   id: number,
@@ -24,9 +25,9 @@ export async function sendTransaction(
   client: WalletAPIClient,
   walletKit: IWalletKit,
 ) {
-  if (request.method !== EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION) {
+  if (request.method !== EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION) {
     throw new Error(
-      `Method ${request.method} from request can not be used to send transaction`,
+      `Method ${request.method} from request can not be used to sign transaction`,
     );
   }
 
@@ -44,8 +45,9 @@ export async function sendTransaction(
 
   try {
     const liveTx = convertEthToLiveTX(ethTx);
-    const hash = await client.transaction.signAndBroadcast(account.id, liveTx);
-    const result: EIP155_RESPONSES[typeof request.method] = hash;
+    const signedTransaction = await client.transaction.sign(account.id, liveTx);
+    const result: EIP155_RESPONSES[typeof request.method] =
+      formatMessage(signedTransaction);
 
     await acceptRequest(walletKit, topic, id, result);
   } catch (error) {
