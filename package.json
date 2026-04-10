@@ -71,7 +71,7 @@
     "@types/styled-system": "^5.1.23",
     "@vitejs/plugin-react": "^4.3.3",
     "@vitest/coverage-v8": "^2.1.4",
-    "@walletconnect/types": "^2.21.8",
+    "@walletconnect/types": "^2.23.9",
     "babel-plugin-styled-components": "^2.1.4",
     "esbuild-plugin-polyfill-node": "^0.3.0",
     "eslint": "^9.14.0",
