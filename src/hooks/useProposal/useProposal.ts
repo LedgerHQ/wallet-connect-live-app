@@ -1,32 +1,33 @@
-import { useCallback, useState } from "react";
-import { getErrorMessage } from "@/utils/helper.util";
-import { getAccountWithAddressAndChainId } from "@/utils/generic";
+import useAccounts, { queryKey as accountsQueryKey } from "@/hooks/useAccounts";
 import useAnalytics from "@/hooks/useAnalytics";
+import { walletAPIClientAtom } from "@/store/wallet-api.store";
+import {
+  showBackToBrowserModalAtom,
+  walletKitAtom,
+} from "@/store/walletKit.store";
+import { OneClickAuthPayload } from "@/types/types";
+import { fetchBip122Addresses } from "@/utils/bip122";
+import { getAccountWithAddressAndChainId } from "@/utils/generic";
+import { getErrorMessage } from "@/utils/helper.util";
+import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
+import { ProposalTypes } from "@walletconnect/types";
 import {
   buildApprovedNamespaces,
   buildAuthObject,
   populateAuthPayload,
 } from "@walletconnect/utils";
-import { useNavigate } from "@tanstack/react-router";
-import { useQueryClient } from "@tanstack/react-query";
-import {
-  showBackToBrowserModalAtom,
-  walletKitAtom,
-} from "@/store/walletKit.store";
 import { useAtomValue, useSetAtom } from "jotai";
-import useAccounts, { queryKey as accountsQueryKey } from "@/hooks/useAccounts";
-import { walletAPIClientAtom } from "@/store/wallet-api.store";
+import { enqueueSnackbar } from "notistack";
+import { useCallback, useState } from "react";
+import { sortedRecentConnectionAppsAtom } from "../../store/recentConnectionAppsAtom";
+import { formatMessage } from "../requestHandlers/utils";
+import { queryKey as pendingProposalsQueryKey } from "../usePendingProposals";
 import {
   queryKey as sessionsQueryKey,
   useQueryFn as useSessionsQueryFn,
 } from "../useSessions";
-import { queryKey as pendingProposalsQueryKey } from "../usePendingProposals";
-import { ProposalTypes } from "@walletconnect/types";
-import { OneClickAuthPayload } from "@/types/types";
-import { enqueueSnackbar } from "notistack";
-import { sortedRecentConnectionAppsAtom } from "../../store/recentConnectionAppsAtom";
 import { useSupportedNamespaces } from "../useSupportedNamespaces";
-import { formatMessage } from "../requestHandlers/utils";
 
 export function useProposal(
   proposal: ProposalTypes.Struct,
@@ -103,6 +104,33 @@ export function useProposal(
         search: ({ uri: _, ...search }) => search,
       });
 
+      // Emit bip122_addressesChanged immediately after approval once per BIP122 chain
+      // per Reown spec: https://docs.reown.com/advanced/multichain/rpc-reference/bitcoin-rpc#bip122_addresseschanged
+      const bip122Namespace = session.namespaces.bip122;
+      if (bip122Namespace?.events.includes("bip122_addressesChanged")) {
+        const emittedChains = new Set<string>();
+        for (const caipAccount of bip122Namespace.accounts) {
+          const [namespace, chainRef, address] = caipAccount.split(":");
+          const chainId = `${namespace}:${chainRef}`;
+          if (emittedChains.has(chainId)) continue;
+          const account = accounts.data.find((a) => a.address === address);
+          if (account) {
+            const addressesData = await fetchBip122Addresses(account, client, [
+              "payment",
+            ]);
+            await walletKit.emitSessionEvent({
+              topic: session.topic,
+              event: {
+                name: "bip122_addressesChanged",
+                data: addressesData,
+              },
+              chainId,
+            });
+            emittedChains.add(chainId);
+          }
+        }
+      }
+
       redirectToDapp();
     } catch (error) {
       enqueueSnackbar(getErrorMessage(error), {
@@ -128,6 +156,8 @@ export function useProposal(
     sessionsQueryFn,
     addAppToLastConnectionApps,
     navigate,
+    accounts.data,
+    client,
   ]);
 
   const approveSessionAuthenticate = useCallback(async () => {

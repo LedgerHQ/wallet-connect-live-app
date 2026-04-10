@@ -211,6 +211,14 @@ export default function useWalletConnect() {
               walletKit,
             );
           } else if (isBIP122Chain(chainId, request)) {
+            const session =
+              walletKit.engine.signClient.session.get(topic);
+            const bip122Accounts =
+              session?.namespaces.bip122?.accounts ?? [];
+            const sessionAddress = bip122Accounts
+              .find((a) => a.startsWith(chainId + ":"))
+              ?.split(":")[2];
+
             await handleBIP122Request(
               request,
               topic,
@@ -221,6 +229,7 @@ export default function useWalletConnect() {
                 client,
                 walletkit: walletKit,
                 walletCapabilities,
+                sessionAddress,
               },
             );
           } else if (

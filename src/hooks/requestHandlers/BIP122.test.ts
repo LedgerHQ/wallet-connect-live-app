@@ -1,4 +1,7 @@
-import { BIP122_SIGNING_METHODS } from "@/data/methods/BIP122.methods";
+import {
+  BIP122_QUERY_METHODS,
+  BIP122_SIGNING_METHODS,
+} from "@/data/methods/BIP122.methods";
 import { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import type { IWalletKit } from "@reown/walletkit";
 import BigNumber from "bignumber.js";
@@ -142,7 +145,9 @@ describe("handleBIP122Request — BIP122_SIGN_PSBT", () => {
         BTC_CHAIN_ID,
         {
           accounts: [makeAccount()],
-          client: makeClient(() => Promise.resolve({ psbtSigned: "irrelevant" })),
+          client: makeClient(() =>
+            Promise.resolve({ psbtSigned: "irrelevant" }),
+          ),
           walletkit,
           walletCapabilities: ["bitcoin.signPsbt"],
         },
@@ -321,5 +326,157 @@ describe("handleBIP122Request — BIP122_SIGN_PSBT", () => {
         },
       ),
     ).rejects.toThrow("Network failure");
+  });
+});
+
+describe("handleBIP122Request — BIP122_GET_ACCOUNT_ADDRESSES", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  function callGetAccountAddresses(
+    overrides: {
+      params?: Partial<{ account: string; intentions: string[] }>;
+      accounts?: Account[];
+      getAddressesImpl?: (...args: unknown[]) => Promise<unknown>;
+    } = {},
+  ) {
+    const client = makeClient(
+      () => Promise.resolve({ psbtSigned: "irrelevant" }),
+      overrides.getAddressesImpl as
+        | ((accountId: string) => Promise<{ address: string }[]>)
+        | undefined,
+    );
+    return handleBIP122Request(
+      {
+        method: BIP122_QUERY_METHODS.BIP122_GET_ACCOUNT_ADDRESSES,
+        params: { account: testAddress!, ...overrides.params },
+      },
+      topic,
+      requestId,
+      BTC_CHAIN_ID,
+      {
+        accounts: overrides.accounts ?? [makeAccount()],
+        client,
+        walletkit,
+      },
+    );
+  }
+
+  it("returns the full address list from getAddresses on success", async () => {
+    const acceptSpy = vi.spyOn(utils, "acceptRequest");
+    const entry = {
+      address: testAddress!,
+      publicKey:
+        "0330d54fd0dd420a6e5f8d3624f5f3482cae350f79d5f0753bf5beef9c2d91af3c",
+      path: "m/84'/0'/0'/0/0",
+      intention: "payment",
+    };
+
+    await callGetAccountAddresses({
+      getAddressesImpl: () => Promise.resolve([entry]),
+    });
+
+    expect(acceptSpy).toHaveBeenCalledWith(walletkit, topic, requestId, [
+      entry,
+    ]);
+  });
+
+  it("rejects with userDecline when no account matches the address and chain", async () => {
+    const rejectSpy = vi.spyOn(utils, "rejectRequest");
+
+    await callGetAccountAddresses({ accounts: [] });
+
+    expect(rejectSpy).toHaveBeenCalledWith(
+      walletkit,
+      topic,
+      requestId,
+      utils.Errors.userDecline,
+    );
+  });
+
+  it.each([
+    ["throws", () => Promise.reject(new Error("Unsupported method"))],
+    ["returns empty", () => Promise.resolve([])],
+  ])(
+    "falls back to single-address array when getAddresses %s",
+    async (_, getAddressesImpl) => {
+      const acceptSpy = vi.spyOn(utils, "acceptRequest");
+
+      await callGetAccountAddresses({ getAddressesImpl });
+
+      expect(acceptSpy).toHaveBeenCalledWith(walletkit, topic, requestId, [
+        { address: testAddress! },
+      ]);
+    },
+  );
+
+  it("forwards the intentions param and returns the filtered result", async () => {
+    const acceptSpy = vi.spyOn(utils, "acceptRequest");
+    const paymentEntry = { address: testAddress!, intention: "payment" };
+
+    await callGetAccountAddresses({
+      params: { intentions: ["payment"] },
+      getAddressesImpl: () => Promise.resolve([paymentEntry]),
+    });
+
+    expect(acceptSpy).toHaveBeenCalledWith(walletkit, topic, requestId, [
+      paymentEntry,
+    ]);
+  });
+
+  it("falls back to the session-selected account when params are undefined (AppKit adapter)", async () => {
+    const acceptSpy = vi.spyOn(utils, "acceptRequest");
+    const client = makeClient(
+      () => Promise.resolve({ psbtSigned: "irrelevant" }),
+      () => Promise.resolve([{ address: testAddress! }]),
+    );
+
+    await handleBIP122Request(
+      {
+        method: BIP122_QUERY_METHODS.BIP122_GET_ACCOUNT_ADDRESSES,
+        params: undefined as unknown as { account: string },
+      },
+      topic,
+      requestId,
+      BTC_CHAIN_ID,
+      {
+        accounts: [makeAccount()],
+        client,
+        walletkit,
+        sessionAddress: testAddress!,
+      },
+    );
+
+    expect(acceptSpy).toHaveBeenCalledWith(walletkit, topic, requestId, [
+      { address: testAddress! },
+    ]);
+  });
+
+  it("rejects with userDecline when params are undefined and no session account matches", async () => {
+    const rejectSpy = vi.spyOn(utils, "rejectRequest");
+    const client = makeClient(
+      () => Promise.resolve({ psbtSigned: "irrelevant" }),
+    );
+
+    await handleBIP122Request(
+      {
+        method: BIP122_QUERY_METHODS.BIP122_GET_ACCOUNT_ADDRESSES,
+        params: undefined as unknown as { account: string },
+      },
+      topic,
+      requestId,
+      BTC_CHAIN_ID,
+      {
+        accounts: [makeAccount()],
+        client,
+        walletkit,
+      },
+    );
+
+    expect(rejectSpy).toHaveBeenCalledWith(
+      walletkit,
+      topic,
+      requestId,
+      utils.Errors.userDecline,
+    );
   });
 });

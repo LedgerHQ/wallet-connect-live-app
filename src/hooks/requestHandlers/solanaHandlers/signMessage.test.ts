@@ -8,7 +8,11 @@ import { vi } from "vitest";
 import * as utils from "../utils";
 import { signMessage } from "./signMessage";
 
-vi.mock("../../../utils");
+vi.mock("../utils", async (importOriginal) => ({
+  ...(await importOriginal()),
+  acceptRequest: vi.fn(),
+  rejectRequest: vi.fn(),
+}));
 vi.mock("@/utils/generic");
 
 describe("Testing sign message on Solana", () => {
