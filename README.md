@@ -22,6 +22,7 @@ and is intended to be integrated within ledger products, enabling users to seaml
 | Solana            | ✅          | -                  |                    |
 | Monad             | ✅          | ✅                 |                    |
 | ADI Chain         | ✅          | -                  |                    |
+| Sei EVM           | ✅          | -                  | -                  |
 
 ## Hosting
 
@@ -58,7 +59,7 @@ Check name with Wallet Api Tool
 ],
 ```
 
-2 - Update `@/data/config.ts` by adding in `EIP155_CHAINS` as a `<key,value>` format the new chain with this specific skeleton :
+2 - Update [`src/data/network.config.ts`](src/data/network.config.ts) by adding in `EIP155_CHAINS_MAINNET` (merged into `EIP155_CHAINS`) as a `<key,value>` format the new chain with this specific skeleton :
 `key` is the currency name (Same as point 1)
 
 ```ts
