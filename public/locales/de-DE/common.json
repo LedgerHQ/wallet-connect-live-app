@@ -12,7 +12,7 @@
   "error" : {
     "noInput" : "Kein Eingabewert",
     "invalidUri" : "Ungültige URI",
-    "zodRequestBlocked" : "Wir haben diese Anfrage blockiert, weil die Daten aus der App ungültig oder nicht unterstützt sind. Wir vermeiden, weiterzufahren, um die Sicherheit zu gewährleisten."
+    "zodRequestBlocked" : "Wir haben diese Anfrage blockiert, weil die Daten von der App ungültig sind oder nicht unterstützt werden. Aus Sicherheitsgründen vermeiden wir es, den Vorgang fortzusetzen."
   },
   "connect" : {
     "title" : "Zum Starten mit einer App verbinden",
