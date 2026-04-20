@@ -36,6 +36,7 @@
     "optimism_sepolia",
     "base_sepolia",
     "ripple",
+    "sei_evm",
     "ethereum_holesky"
   ],
   "content": {

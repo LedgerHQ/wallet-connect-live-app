@@ -38,6 +38,10 @@ describe("Helper Util", () => {
     const polygon = getCurrencyByChainId("eip155:137");
 
     expect(polygon).toEqual("polygon");
+
+    const seiEvm = getCurrencyByChainId("eip155:1329");
+
+    expect(seiEvm).toEqual("sei_evm");
   });
 
   it("getDisplayName", () => {

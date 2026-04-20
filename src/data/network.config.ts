@@ -93,6 +93,13 @@ export const EIP155_CHAINS_MAINNET: Record<string, Network> = {
     displayName: "ADI Chain",
     color: "#1E72B9",
   },
+  sei_evm: {
+    chainId: 1329,
+    namespace: "eip155:1329",
+    ticker: "SEI",
+    displayName: "Sei EVM",
+    color: "#7B2CBF",
+  },
 };
 
 export const EIP155_SEPOLIA_CHAINS: Record<string, Network> = {

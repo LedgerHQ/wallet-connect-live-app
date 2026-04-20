@@ -68,6 +68,15 @@ describe("SUPPORTED_NETWORK", () => {
 
     expect(adi?.displayName).toBe("ADI Chain");
   });
+
+  it("contains Sei EVM", () => {
+    const seiEvm: Network | undefined = SUPPORTED_NETWORK.sei_evm;
+
+    expect(seiEvm?.displayName).toBe("Sei EVM");
+    expect(seiEvm?.chainId).toBe(1329);
+    expect(seiEvm?.namespace).toBe("eip155:1329");
+    expect(seiEvm?.ticker).toBe("SEI");
+  });
 });
 
 describe("EIP155_SEPOLIA_CHAINS", () => {
