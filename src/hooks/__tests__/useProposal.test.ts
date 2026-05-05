@@ -442,7 +442,7 @@ describe("formatAccountsByChain", () => {
     expect(resultWithCapability).toEqual([
       {
         chain: "ripple",
-        displayName: "Ripple",
+        displayName: "XRPL",
         isSupported: true,
         isRequired: true,
         accounts: [

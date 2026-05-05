@@ -199,7 +199,7 @@ export const RIPPLE_CHAINS: Record<string, Network> = {
     chainId: "0",
     namespace: "xrpl:0",
     ticker: "XRP",
-    displayName: "Ripple",
+    displayName: "XRPL",
     color: "#23F7DD",
   },
 };
