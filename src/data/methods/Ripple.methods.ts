@@ -12,7 +12,7 @@ export const rippleSignTransactionSchema = z.strictObject({
   // we only check that Account exists here
   // as it's the only mandatory field to find the account
   // the rest of the tx_json is not validated here
-  tx_json: z.object({
+  tx_json: z.looseObject({
     Account: z.string(),
   }),
   autofill: z.boolean().optional(),
