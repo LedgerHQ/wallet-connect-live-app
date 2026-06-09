@@ -23,6 +23,7 @@ and is intended to be integrated within ledger products, enabling users to seaml
 | Monad             | ✅          | ✅                 |                    |
 | ADI Chain         | ✅          | -                  |                    |
 | Sei EVM           | ✅          | -                  | -                  |
+| Tezos             | ✅          | -                  | -                  |
 
 ## Hosting
 

@@ -37,7 +37,8 @@
     "base_sepolia",
     "ripple",
     "sei_evm",
-    "ethereum_holesky"
+    "ethereum_holesky",
+    "tezos"
   ],
   "content": {
     "shortDescription": {

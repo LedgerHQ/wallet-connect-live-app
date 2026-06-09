@@ -242,6 +242,16 @@ export const SOLANA_CHAINS: Record<string, Network> = {
 
 export const SOLANA_NETWORK_BY_CHAIN_ID = getNetworkById(SOLANA_CHAINS);
 
+export const TEZOS_CHAINS: Record<string, Network> = {
+  tezos: {
+    chainId: "NetXdQprcVkpaWU",
+    namespace: "tezos:NetXdQprcVkpaWU",
+    ticker: "XTZ",
+    displayName: "Tezos",
+    color: "#2C7DF7",
+  },
+};
+
 export const EIP155_CHAINS = {
   ...EIP155_CHAINS_MAINNET,
   ...EIP155_SEPOLIA_CHAINS,
@@ -256,6 +266,7 @@ export const SUPPORTED_NETWORK: Record<string, Network> = {
   ...BIP122_CHAINS,
   ...RIPPLE_CHAINS,
   ...SOLANA_CHAINS,
+  ...TEZOS_CHAINS,
 };
 
 export const SUPPORTED_NETWORK_NAMES: string[] = Object.values(
