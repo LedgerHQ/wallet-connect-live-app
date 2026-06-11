@@ -23,11 +23,11 @@ importers:
         specifier: ^0.16.4
         version: 0.16.5(@emotion/is-prop-valid@1.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react-native-svg@15.12.1(react-native@0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.81.0(@babel/core@7.29.0))(@types/react@18.3.12)(bufferutil@4.0.9)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1))(react@18.3.1)(styled-components@5.3.11(@babel/core@7.29.0)(react-dom@18.3.1(react@18.3.1))(react-is@18.3.1)(react@18.3.1))
       '@ledgerhq/wallet-api-client':
-        specifier: ^1.13.1
-        version: 1.13.1(@ton/crypto@3.3.0)
+        specifier: ^1.15.0
+        version: 1.15.0(@ton/crypto@3.3.0)
       '@ledgerhq/wallet-api-simulator':
-        specifier: ^2.2.1
-        version: 2.2.1(@ton/crypto@3.3.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        specifier: ^2.3.0
+        version: 2.3.0(@ton/crypto@3.3.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@reown/walletkit':
         specifier: ^1.5.5
         version: 1.5.5(bufferutil@4.0.9)(react-native@0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.81.0(@babel/core@7.29.0))(@types/react@18.3.12)(bufferutil@4.0.9)(react@18.3.1)(utf-8-validate@5.0.10))(typescript@5.6.3)(utf-8-validate@5.0.10)(zod@4.1.1)
@@ -70,6 +70,9 @@ importers:
       bs58:
         specifier: ^5.0.0
         version: 5.0.0
+      bs58check:
+        specifier: ^4.0.0
+        version: 4.0.0
       eip55:
         specifier: ^2.1.0
         version: 2.1.1
@@ -1117,8 +1120,8 @@ packages:
       '@types/react':
         optional: true
 
-  '@ledgerhq/devices@8.10.0':
-    resolution: {integrity: sha512-ytT66KI8MizFX6dGJKthOzPDw5uNRmmg+RaMta62jbFePKYqfXtYTp6Wc0ErTXaL8nFS3IujHENwKthPmsj6jw==}
+  '@ledgerhq/devices@8.15.0':
+    resolution: {integrity: sha512-pHrjZzC81ER6BDKjIzTzubLynFzS15CQ7EQeEfrbrSisc3BFLGrnC7+cXdGWK7eTRAkwH7Uw3M2QM/mbjfhwlw==}
 
   '@ledgerhq/devices@8.5.0':
     resolution: {integrity: sha512-zDB6Pdk6NYYbYis8cWoLLkL9k/IvjhC3hkuuz2lhpJ2AxIs3/PDMUKoyK4DpjPtRyKk1W1lwsnpc6J1i87r4/Q==}
@@ -1126,14 +1129,14 @@ packages:
   '@ledgerhq/errors@6.24.0':
     resolution: {integrity: sha512-UMy+nGH4hmlaML7vPiSwGQ/mOoq/rwExYGEZVpb9TPoG0AcSfzpG43LAdAemvCTX/gK0MUO+int4FpNkD1ZrtQ==}
 
-  '@ledgerhq/errors@6.29.0':
-    resolution: {integrity: sha512-mmDsGN662zd0XGKyjzSKkg+5o1/l9pvV1HkVHtbzaydvHAtRypghmVoWMY9XAQDLXiUBXGIsLal84NgmGeuKWA==}
+  '@ledgerhq/errors@6.35.0':
+    resolution: {integrity: sha512-qk9PbqIvze7NXGogVxNCsz60rNo5FrGj8gKqs7pcyDk+em5L6s70G7cRxR+1HTXdam4WoPfntUq+WX9zQUynkg==}
 
   '@ledgerhq/hw-transport@6.31.9':
     resolution: {integrity: sha512-HqB2Whl2qbrzyvs9gC/GmLhIy8RO4CWzjqHS4k0bPWDZRqKa8m6H32vjrbXGO//pUL1Mlu87UwvxvLyuICdjwg==}
 
-  '@ledgerhq/hw-transport@6.32.0':
-    resolution: {integrity: sha512-bf2nxzDQ21DV/bsmExfWI0tatoVeoqhu/ePWalD/nPgPnTn/ZIDq7VBU+TY5p0JZaE87NQwmRUAjm6C1Exe61A==}
+  '@ledgerhq/hw-transport@6.35.3':
+    resolution: {integrity: sha512-FLR4/2mV6srMaic3cr/kweD9RQhpv4+8Q6T6P4PPOyScuz84siH+8NXLgREIeh328W/FxEGG2norjS+tOQW0vA==}
 
   '@ledgerhq/icons-ui@0.8.1':
     resolution: {integrity: sha512-R1l7wWz1nblFx5GENn/sr0oXEBDYnwwOnkd+L829SFsWj9oOgH4g15E/LsXwDvJJ1H4SVY9uD+NJxoYsRWllNw==}
@@ -1150,8 +1153,8 @@ packages:
   '@ledgerhq/logs@6.13.0':
     resolution: {integrity: sha512-4+qRW2Pc8V+btL0QEmdB2X+uyx0kOWMWE1/LWsq5sZy3Q5tpi4eItJS6mB0XL3wGW59RQ+8bchNQQ1OW/va8Og==}
 
-  '@ledgerhq/logs@6.14.0':
-    resolution: {integrity: sha512-kJFu1+asWQmU9XlfR1RM3lYR76wuEoPyZvkI/CNjpft78BQr3+MMf3Nu77ABzcKFnhIcmAkOLlDQ6B8L6hDXHA==}
+  '@ledgerhq/logs@6.17.0':
+    resolution: {integrity: sha512-yra33g5q/AU7+PwAws+GaVpQGUuxnDREjVBnviJjcaJLVKuLzI4pnj8Bd3nY3fypM5k1yZEYKEXfUuGFUjP2+w==}
 
   '@ledgerhq/react-ui@0.16.5':
     resolution: {integrity: sha512-xy9XNnvE/rHAdPryOEjJXH12eVff8v3ayaiVe35OAMMjPjOave/K/ZSzW8bk2ji5Ju2kc4GYPato7VC90FurTw==}
@@ -1167,17 +1170,17 @@ packages:
   '@ledgerhq/ui-shared@0.2.2':
     resolution: {integrity: sha512-3ASYnyqnZFMRnySADZziM3IIJ2SRQ7lKrRPwpihhf+SsyP7TIo6o4UXMY8eYOupdTARlElS4Qpk4nRL/Ln62Ng==}
 
-  '@ledgerhq/wallet-api-client@1.13.1':
-    resolution: {integrity: sha512-uohDyB+KdN3vtF0HpviElWOyfsLBmS4bwmblrNkurATaWWFGCXE0oCB9k9vjIz0gRKIhjEvbccTlRWKQhyRnqA==}
+  '@ledgerhq/wallet-api-client@1.15.0':
+    resolution: {integrity: sha512-mu8WsLI7FonzErvfb5Z13hUjeCYJFYoyqCsDfMSGRF4L32N/Ae7feeFNqpAtsbCZtu9ssiNdsrdDaEy8EnZ1Bg==}
 
-  '@ledgerhq/wallet-api-core@1.29.0':
-    resolution: {integrity: sha512-xpIQAkMaQOKlPFQV50GzEjiG6xFBPn8NNxkyJKbKWMrF4WuNdbU2pK9VTgN4Cxnx4Nm8uR2G2GRjQ/zbJU888A==}
+  '@ledgerhq/wallet-api-core@1.33.0':
+    resolution: {integrity: sha512-oMJe09hoqckbYSttBIBPfjBcCdpn0CR8lPm/jw8fa7vk2DsC8XLhZgC86OAZU9Fid4/hr90oqk5HXD+siO0a0w==}
 
-  '@ledgerhq/wallet-api-server@3.2.0':
-    resolution: {integrity: sha512-NFqQYptfiNvH8S2qQYfeP6aeNxQ/sUwhN4pJTyTsn2roFQQQBRWwuogZmoV7bYAlUsj4o5gnKZ878HF2pha/lw==}
+  '@ledgerhq/wallet-api-server@3.4.0':
+    resolution: {integrity: sha512-ivLU2iqa4Z0gyG1UhE7M7YyWrz0VRAr4yHbL+DAMPnAR2kAAjczpYjPvNC9SeFBTuE0w5o7YUuukzqftbImneA==}
 
-  '@ledgerhq/wallet-api-simulator@2.2.1':
-    resolution: {integrity: sha512-9qMekBnJev3TYFqDvbSZB7B10KfHAqRHZCMY0Z21zMCDUukEjd4DxyeKVoiW+n8R+qNIe84UOWHfCVZWcJg7vA==}
+  '@ledgerhq/wallet-api-simulator@2.3.0':
+    resolution: {integrity: sha512-mOt2UBgfuC2OQXddOPDuEPzdzWz3mB8qEX3kEt6kSXedT1g9+oZZRk3343BZHCGeQ4jHGwWDrHPogEy42yowCQ==}
 
   '@lukeed/csprng@1.1.0':
     resolution: {integrity: sha512-Z7C/xXCiGWsg0KuKsHTKJxbWhpI3Vs5GwLfOean7MGyVFGqdRgBbAjOCh6u4bbjPc/8MJ2pZmK/0DLdCbivLDA==}
@@ -4254,10 +4257,6 @@ packages:
     resolution: {integrity: sha512-V7+vQEJ06Z+c5tSye8S+nHUfI51xoXIXjHQ99cQtKUkQqqO1kO/KCJUfZXuB47h/YBlDhah2H3hdUGXn8ie0oA==}
     engines: {node: '>=8.6'}
 
-  picomatch@4.0.3:
-    resolution: {integrity: sha512-5gTmgEY/sqK6gFXLIsQNH19lWb4ebPDLA4SdLP7dsWkIXHWlG66oPuVvXSGFPppYZz8ZDZq0dYYrbHfBCVUb1Q==}
-    engines: {node: '>=12'}
-
   picomatch@4.0.4:
     resolution: {integrity: sha512-QP88BAKvMam/3NxH6vj2o21R6MjxZUAd6nlwAS/pnGvN9IVLocLHxGYIzFhg6fUQ+5th6P4dv4eW9jX3DSIj7A==}
     engines: {node: '>=12'}
@@ -5258,10 +5257,6 @@ packages:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
     hasBin: true
 
-  uuid@9.0.1:
-    resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
-    hasBin: true
-
   valibot@1.2.0:
     resolution: {integrity: sha512-mm1rxUsmOxzrwnX5arGS+U4T25RdvpPjPN4yR0u9pUBov9+zGVtO84tif1eY4r6zWxVxu3KzIyknJy3rxfRZZg==}
     peerDependencies:
@@ -5488,6 +5483,18 @@ packages:
       utf-8-validate:
         optional: true
 
+  ws@8.21.0:
+    resolution: {integrity: sha512-Vsp28b7DRcimFQvrqu2Wek3z1iYxDCWqHYB8Qsnk/S4RfaCQzPGPyBNuVjJV3cd6UiKtUtp6sNM77gWvzcCH+g==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
+
   xml-name-validator@4.0.0:
     resolution: {integrity: sha512-ICP2e+jsHvAj2E2lIHxa5tjXRlKDJo4IdvPvCXbXQGdzSfmSpNVyIKMvoZHjDY9DP0zV17iI85o90vRFXNccRw==}
     engines: {node: '>=12'}
@@ -5527,11 +5534,11 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  zod@3.25.76:
-    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
-
   zod@4.1.1:
     resolution: {integrity: sha512-SgMZK/h8Tigt9nnKkfJMvB/mKjiJXaX26xegP4sa+0wHIFVFWVlsQGdhklDmuargBD3Hsi3rsQRIzwJIhTPJHA==}
+
+  zod@4.4.3:
+    resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
 
 snapshots:
 
@@ -6536,10 +6543,10 @@ snapshots:
     optionalDependencies:
       '@types/react': 18.3.12
 
-  '@ledgerhq/devices@8.10.0':
+  '@ledgerhq/devices@8.15.0':
     dependencies:
-      '@ledgerhq/errors': 6.29.0
-      '@ledgerhq/logs': 6.14.0
+      '@ledgerhq/errors': 6.35.0
+      '@ledgerhq/logs': 6.17.0
       rxjs: 7.8.2
       semver: 7.7.3
 
@@ -6552,7 +6559,7 @@ snapshots:
 
   '@ledgerhq/errors@6.24.0': {}
 
-  '@ledgerhq/errors@6.29.0': {}
+  '@ledgerhq/errors@6.35.0': {}
 
   '@ledgerhq/hw-transport@6.31.9':
     dependencies:
@@ -6561,11 +6568,11 @@ snapshots:
       '@ledgerhq/logs': 6.13.0
       events: 3.3.0
 
-  '@ledgerhq/hw-transport@6.32.0':
+  '@ledgerhq/hw-transport@6.35.3':
     dependencies:
-      '@ledgerhq/devices': 8.10.0
-      '@ledgerhq/errors': 6.29.0
-      '@ledgerhq/logs': 6.14.0
+      '@ledgerhq/devices': 8.15.0
+      '@ledgerhq/errors': 6.35.0
+      '@ledgerhq/logs': 6.17.0
       events: 3.3.0
 
   '@ledgerhq/icons-ui@0.8.1(@types/react@18.3.12)(react-native-svg@15.12.1(react-native@0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.81.0(@babel/core@7.29.0))(@types/react@18.3.12)(bufferutil@4.0.9)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1))(react@18.3.1)(styled-components@5.3.11(@babel/core@7.29.0)(react-dom@18.3.1(react@18.3.1))(react-is@18.3.1)(react@18.3.1))(styled-system@5.1.5)':
@@ -6579,7 +6586,7 @@ snapshots:
 
   '@ledgerhq/logs@6.13.0': {}
 
-  '@ledgerhq/logs@6.14.0': {}
+  '@ledgerhq/logs@6.17.0': {}
 
   '@ledgerhq/react-ui@0.16.5(@emotion/is-prop-valid@1.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react-native-svg@15.12.1(react-native@0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.81.0(@babel/core@7.29.0))(@types/react@18.3.12)(bufferutil@4.0.9)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1))(react@18.3.1)(styled-components@5.3.11(@babel/core@7.29.0)(react-dom@18.3.1(react@18.3.1))(react-is@18.3.1)(react@18.3.1))':
     dependencies:
@@ -6609,43 +6616,42 @@ snapshots:
 
   '@ledgerhq/ui-shared@0.2.2': {}
 
-  '@ledgerhq/wallet-api-client@1.13.1(@ton/crypto@3.3.0)':
+  '@ledgerhq/wallet-api-client@1.15.0(@ton/crypto@3.3.0)':
     dependencies:
-      '@ledgerhq/hw-transport': 6.32.0
-      '@ledgerhq/wallet-api-core': 1.29.0(@ton/crypto@3.3.0)
+      '@ledgerhq/hw-transport': 6.35.3
+      '@ledgerhq/wallet-api-core': 1.33.0(@ton/crypto@3.3.0)
       bignumber.js: 9.3.1
     transitivePeerDependencies:
       - '@ton/crypto'
       - encoding
 
-  '@ledgerhq/wallet-api-core@1.29.0(@ton/crypto@3.3.0)':
+  '@ledgerhq/wallet-api-core@1.33.0(@ton/crypto@3.3.0)':
     dependencies:
-      '@ledgerhq/errors': 6.29.0
+      '@ledgerhq/errors': 6.35.0
       '@stacks/transactions': 6.17.0
       '@ton/core': 0.62.1(@ton/crypto@3.3.0)
       bignumber.js: 9.3.1
-      uuid: 9.0.1
-      zod: 3.25.76
+      zod: 4.4.3
     transitivePeerDependencies:
       - '@ton/crypto'
       - encoding
 
-  '@ledgerhq/wallet-api-server@3.2.0(@ton/crypto@3.3.0)':
+  '@ledgerhq/wallet-api-server@3.4.0(@ton/crypto@3.3.0)':
     dependencies:
-      '@ledgerhq/wallet-api-core': 1.29.0(@ton/crypto@3.3.0)
+      '@ledgerhq/wallet-api-core': 1.33.0(@ton/crypto@3.3.0)
       bignumber.js: 9.3.1
-      picomatch: 4.0.3
+      picomatch: 4.0.4
     transitivePeerDependencies:
       - '@ton/crypto'
       - encoding
 
-  '@ledgerhq/wallet-api-simulator@2.2.1(@ton/crypto@3.3.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
+  '@ledgerhq/wallet-api-simulator@2.3.0(@ton/crypto@3.3.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
     dependencies:
-      '@ledgerhq/hw-transport': 6.32.0
-      '@ledgerhq/wallet-api-client': 1.13.1(@ton/crypto@3.3.0)
-      '@ledgerhq/wallet-api-core': 1.29.0(@ton/crypto@3.3.0)
-      '@ledgerhq/wallet-api-server': 3.2.0(@ton/crypto@3.3.0)
-      ws: 8.19.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@ledgerhq/hw-transport': 6.35.3
+      '@ledgerhq/wallet-api-client': 1.15.0(@ton/crypto@3.3.0)
+      '@ledgerhq/wallet-api-core': 1.33.0(@ton/crypto@3.3.0)
+      '@ledgerhq/wallet-api-server': 3.4.0(@ton/crypto@3.3.0)
+      ws: 8.21.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - '@ton/crypto'
       - bufferutil
@@ -8491,7 +8497,7 @@ snapshots:
 
   c32check@2.0.0:
     dependencies:
-      '@noble/hashes': 1.1.5
+      '@noble/hashes': 1.8.0
       base-x: 4.0.1
 
   cac@6.7.14: {}
@@ -10661,8 +10667,6 @@ snapshots:
 
   picomatch@2.3.2: {}
 
-  picomatch@4.0.3: {}
-
   picomatch@4.0.4: {}
 
   pino-abstract-transport@2.0.0:
@@ -11764,8 +11768,6 @@ snapshots:
 
   uuid@8.3.2: {}
 
-  uuid@9.0.1: {}
-
   valibot@1.2.0(typescript@5.6.3):
     optionalDependencies:
       typescript: 5.6.3
@@ -12003,6 +12005,11 @@ snapshots:
       bufferutil: 4.0.9
       utf-8-validate: 5.0.10
 
+  ws@8.21.0(bufferutil@4.0.9)(utf-8-validate@5.0.10):
+    optionalDependencies:
+      bufferutil: 4.0.9
+      utf-8-validate: 5.0.10
+
   xml-name-validator@4.0.0: {}
 
   xmlchars@2.2.0: {}
@@ -12031,6 +12038,6 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  zod@3.25.76: {}
-
   zod@4.1.1: {}
+
+  zod@4.4.3: {}

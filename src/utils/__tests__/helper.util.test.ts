@@ -10,6 +10,8 @@ import {
   getTicker,
   isEIP155Chain,
   isSolanaSupportEnabled,
+  isTezosChain,
+  isTezosSupportEnabled,
   isXRPLSupportEnabled,
   truncate,
 } from "../helper.util";
@@ -42,6 +44,10 @@ describe("Helper Util", () => {
     const seiEvm = getCurrencyByChainId("eip155:1329");
 
     expect(seiEvm).toEqual("sei_evm");
+
+    // Both registered Tezos chain-id forms resolve to the LL currency `tezos`.
+    expect(getCurrencyByChainId("tezos:NetXdQprcVkpaWU")).toEqual("tezos");
+    expect(getCurrencyByChainId("tezos:mainnet")).toEqual("tezos");
   });
 
   it("getDisplayName", () => {
@@ -285,6 +291,43 @@ describe("isXRPLSupportEnabled", () => {
       "yet.another",
     ];
     expect(isXRPLSupportEnabled(caps)).toBe(true);
+  });
+});
+
+describe("isTezosChain", () => {
+  it("matches both Tezos chain-id forms", () => {
+    expect(isTezosChain("tezos:NetXdQprcVkpaWU")).toBe(true);
+    expect(isTezosChain("tezos:mainnet")).toBe(true);
+  });
+
+  it("does not match other namespaces", () => {
+    expect(isTezosChain("eip155:1")).toBe(false);
+    expect(isTezosChain("solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp")).toBe(false);
+  });
+});
+
+describe("isTezosSupportEnabled", () => {
+  it("requires transaction.signRaw, message.sign and account.getPublicKey", () => {
+    expect(
+      isTezosSupportEnabled([
+        "transaction.signRaw",
+        "message.sign",
+        "account.getPublicKey",
+      ]),
+    ).toBe(true);
+  });
+
+  it("returns false when any capability is missing", () => {
+    expect(
+      isTezosSupportEnabled(["transaction.signRaw", "message.sign"]),
+    ).toBe(false);
+    expect(
+      isTezosSupportEnabled(["transaction.signRaw", "account.getPublicKey"]),
+    ).toBe(false);
+    expect(
+      isTezosSupportEnabled(["message.sign", "account.getPublicKey"]),
+    ).toBe(false);
+    expect(isTezosSupportEnabled([])).toBe(false);
   });
 });
 

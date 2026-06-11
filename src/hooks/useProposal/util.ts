@@ -6,6 +6,8 @@ import {
   isRippleChain,
   isSolanaChain,
   isSolanaSupportEnabled,
+  isTezosChain,
+  isTezosSupportEnabled,
   isXRPLSupportEnabled,
 } from "@/utils/helper.util";
 import { Account, WalletInfo } from "@ledgerhq/wallet-api-client";
@@ -91,6 +93,10 @@ export const formatAccountsByChain = (
 
       // Filter out Ripple chains if Ripple support is not enabled
       if (isRippleChain(chain) && !isXRPLSupportEnabled(walletCapabilities)) {
+        return acc;
+      }
+
+      if (isTezosChain(chain) && !isTezosSupportEnabled(walletCapabilities)) {
         return acc;
       }
 

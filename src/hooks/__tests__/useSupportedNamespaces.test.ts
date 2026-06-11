@@ -291,4 +291,257 @@ describe("useSupportedNamespaces", () => {
       },
     });
   });
+
+  it("includes the Tezos namespace under the canonical chain when both capabilities are present", () => {
+    const tez = makeAccount("tez-1", "tezos", "tz1abc");
+
+    mockedUseAccounts.mockReturnValue({
+      data: [tez],
+    } as ReturnType<typeof useAccounts>);
+
+    store.set(walletCapabilitiesAtom as never, [
+      "transaction.signRaw",
+      "message.sign",
+      "account.getPublicKey",
+    ]);
+
+    mockedFormatAccountsByChain.mockReturnValue([
+      {
+        chain: "tezos",
+        displayName: "Tezos",
+        isSupported: true,
+        isRequired: true,
+        accounts: [tez],
+      },
+    ]);
+
+    const proposal = {
+      ...sessionProposal,
+      requiredNamespaces: {
+        tezos: {
+          methods: ["tezos_send", "tezos_sign", "tezos_getAccounts"],
+          chains: ["tezos:NetXdQprcVkpaWU"],
+          events: [],
+        },
+      },
+      optionalNamespaces: {},
+    };
+
+    const { result } = renderHook(
+      () => useSupportedNamespaces(proposal, ["tez-1"]),
+      { wrapper: createHookWrapper(store) },
+    );
+
+    expect(result.current.buildSupportedNamespaces(proposal)).toEqual({
+      tezos: {
+        chains: ["tezos:NetXdQprcVkpaWU"],
+        methods: ["tezos_send", "tezos_sign", "tezos_getAccounts"],
+        events: [],
+        accounts: ["tezos:NetXdQprcVkpaWU:tz1abc"],
+      },
+    });
+  });
+
+  it("advertises accounts under the Taquito alias chain when the dApp requests it", () => {
+    const tez = makeAccount("tez-1", "tezos", "tz1abc");
+
+    mockedUseAccounts.mockReturnValue({
+      data: [tez],
+    } as ReturnType<typeof useAccounts>);
+
+    store.set(walletCapabilitiesAtom as never, [
+      "transaction.signRaw",
+      "message.sign",
+      "account.getPublicKey",
+    ]);
+
+    mockedFormatAccountsByChain.mockReturnValue([
+      {
+        chain: "tezos",
+        displayName: "Tezos",
+        isSupported: true,
+        isRequired: true,
+        accounts: [tez],
+      },
+    ]);
+
+    const proposal = {
+      ...sessionProposal,
+      requiredNamespaces: {
+        tezos: {
+          methods: ["tezos_send"],
+          chains: ["tezos:mainnet"],
+          events: [],
+        },
+      },
+      optionalNamespaces: {},
+    };
+
+    const { result } = renderHook(
+      () => useSupportedNamespaces(proposal, ["tez-1"]),
+      { wrapper: createHookWrapper(store) },
+    );
+
+    expect(result.current.buildSupportedNamespaces(proposal)).toEqual({
+      tezos: {
+        chains: ["tezos:mainnet"],
+        methods: ["tezos_send"],
+        events: [],
+        accounts: ["tezos:mainnet:tz1abc"],
+      },
+    });
+  });
+
+  it("advertises accounts under both chain-id forms when the dApp requests both", () => {
+    const tez = makeAccount("tez-1", "tezos", "tz1abc");
+
+    mockedUseAccounts.mockReturnValue({
+      data: [tez],
+    } as ReturnType<typeof useAccounts>);
+
+    store.set(walletCapabilitiesAtom as never, [
+      "transaction.signRaw",
+      "message.sign",
+      "account.getPublicKey",
+    ]);
+
+    mockedFormatAccountsByChain.mockReturnValue([
+      {
+        chain: "tezos",
+        displayName: "Tezos",
+        isSupported: true,
+        isRequired: true,
+        accounts: [tez],
+      },
+    ]);
+
+    const proposal = {
+      ...sessionProposal,
+      requiredNamespaces: {
+        tezos: {
+          methods: ["tezos_send"],
+          chains: ["tezos:NetXdQprcVkpaWU", "tezos:mainnet"],
+          events: [],
+        },
+      },
+      optionalNamespaces: {},
+    };
+
+    const { result } = renderHook(
+      () => useSupportedNamespaces(proposal, ["tez-1"]),
+      { wrapper: createHookWrapper(store) },
+    );
+
+    expect(result.current.buildSupportedNamespaces(proposal)).toEqual({
+      tezos: {
+        chains: ["tezos:NetXdQprcVkpaWU", "tezos:mainnet"],
+        methods: ["tezos_send"],
+        events: [],
+        accounts: [
+          "tezos:NetXdQprcVkpaWU:tz1abc",
+          "tezos:mainnet:tz1abc",
+        ],
+      },
+    });
+  });
+
+  it("deduplicates accounts when both chain forms surface the same account", () => {
+    const tez = makeAccount("tez-1", "tezos", "tz1abc");
+
+    mockedUseAccounts.mockReturnValue({
+      data: [tez],
+    } as ReturnType<typeof useAccounts>);
+
+    store.set(walletCapabilitiesAtom as never, [
+      "transaction.signRaw",
+      "message.sign",
+      "account.getPublicKey",
+    ]);
+
+    mockedFormatAccountsByChain.mockReturnValue([
+      {
+        chain: "tezos",
+        displayName: "Tezos",
+        isSupported: true,
+        isRequired: true,
+        accounts: [tez],
+      },
+      {
+        chain: "tezos",
+        displayName: "Tezos",
+        isSupported: true,
+        isRequired: true,
+        accounts: [tez],
+      },
+    ]);
+
+    const proposal = {
+      ...sessionProposal,
+      requiredNamespaces: {
+        tezos: {
+          methods: ["tezos_send"],
+          chains: ["tezos:NetXdQprcVkpaWU", "tezos:mainnet"],
+          events: [],
+        },
+      },
+      optionalNamespaces: {},
+    };
+
+    const { result } = renderHook(
+      () => useSupportedNamespaces(proposal, ["tez-1"]),
+      { wrapper: createHookWrapper(store) },
+    );
+
+    expect(result.current.buildSupportedNamespaces(proposal)).toEqual({
+      tezos: {
+        chains: ["tezos:NetXdQprcVkpaWU", "tezos:mainnet"],
+        methods: ["tezos_send"],
+        events: [],
+        accounts: [
+          "tezos:NetXdQprcVkpaWU:tz1abc",
+          "tezos:mainnet:tz1abc",
+        ],
+      },
+    });
+  });
+
+  it("omits the Tezos namespace when the capability gate is disabled", () => {
+    const tez = makeAccount("tez-1", "tezos", "tz1abc");
+
+    mockedUseAccounts.mockReturnValue({
+      data: [tez],
+    } as ReturnType<typeof useAccounts>);
+
+    // message.sign is missing, so the gate must reject Tezos.
+    store.set(walletCapabilitiesAtom as never, ["transaction.signRaw"]);
+
+    mockedFormatAccountsByChain.mockReturnValue([
+      {
+        chain: "tezos",
+        displayName: "Tezos",
+        isSupported: true,
+        isRequired: false,
+        accounts: [tez],
+      },
+    ]);
+
+    const proposal = {
+      ...sessionProposal,
+      requiredNamespaces: {},
+      optionalNamespaces: {
+        tezos: {
+          methods: ["tezos_send"],
+          chains: ["tezos:NetXdQprcVkpaWU"],
+          events: [],
+        },
+      },
+    };
+
+    const { result } = renderHook(
+      () => useSupportedNamespaces(proposal, ["tez-1"]),
+      { wrapper: createHookWrapper(store) },
+    );
+
+    expect(result.current.buildSupportedNamespaces(proposal)).toEqual({});
+  });
 });

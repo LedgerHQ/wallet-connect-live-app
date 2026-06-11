@@ -104,6 +104,15 @@ describe("SUPPORTED_NETWORK", () => {
     expect(zeroGravity?.namespace).toBe("eip155:16661");
     expect(zeroGravity?.ticker).toBe("0G");
   });
+
+  it("contains Tezos", () => {
+    const tezos: Network | undefined = SUPPORTED_NETWORK.tezos;
+
+    expect(tezos?.displayName).toBe("Tezos");
+    expect(tezos?.chainId).toBe("NetXdQprcVkpaWU");
+    expect(tezos?.namespace).toBe("tezos:NetXdQprcVkpaWU");
+    expect(tezos?.ticker).toBe("XTZ");
+  });
 });
 
 describe("EIP155_SEPOLIA_CHAINS", () => {

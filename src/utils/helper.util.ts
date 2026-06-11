@@ -2,10 +2,15 @@ import { BIP122_REQUESTS } from "@/data/methods/BIP122.methods";
 import { EIP155_REQUESTS } from "@/data/methods/EIP155Data.methods";
 import { RIPPLE_REQUESTS } from "@/data/methods/Ripple.methods";
 import { SOLANA_REQUESTS } from "@/data/methods/Solana.methods";
+import { TEZOS_REQUESTS } from "@/data/methods/Tezos.methods";
 import { WALLET_REQUESTS } from "@/data/methods/Wallet.methods";
-import { SUPPORTED_NETWORK } from "@/data/network.config";
+import { SUPPORTED_NETWORK, TEZOS_CHAINS } from "@/data/network.config";
 import type { WalletInfo } from "@ledgerhq/wallet-api-client";
 import semver from "semver";
+
+const TEZOS_NAMESPACES = new Set(
+  Object.values(TEZOS_CHAINS).map((network) => network.namespace),
+);
 
 /**
  * Truncates string (in the middle) via given lenght value
@@ -75,6 +80,16 @@ export function isSolanaChain(
   return chain.includes("solana");
 }
 
+export function isTezosChain(
+  chain: string,
+  // request is passed and used here only for type narrowing
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  _request?: { method: string; params: any },
+): _request is TEZOS_REQUESTS {
+  // Exact match only: an unregistered `tezos:*` (e.g. ghostnet) must not reach the mainnet handler.
+  return TEZOS_NAMESPACES.has(chain);
+}
+
 /**
  * Formats url to to remove protocol
  */
@@ -94,6 +109,7 @@ export const getCurrencyByChainId = (chainId: string) => {
     return network.namespace === chainId;
   });
   if (elem?.[0] === "solana (legacy)") return "solana";
+  if (elem?.[0] === "tezos (taquito)") return "tezos";
   return elem?.[0] ?? chainId;
 };
 
@@ -134,6 +150,15 @@ export const isSolanaSupportEnabled = createSupportChecker(SOLANA_MIN_VERSIONS);
 /** Check if XRPL support should be enabled based on wallet capabilities */
 export const isXRPLSupportEnabled = (walletCapabilities: string[]): boolean => {
   return walletCapabilities.includes("transaction.signRaw");
+};
+
+/** Check if Tezos support should be enabled based on wallet capabilities */
+export const isTezosSupportEnabled = (walletCapabilities: string[]): boolean => {
+  return (
+    walletCapabilities.includes("transaction.signRaw") &&
+    walletCapabilities.includes("message.sign") &&
+    walletCapabilities.includes("account.getPublicKey")
+  );
 };
 
 /** Check if PSBT support should be enabled based on wallet capabilities */
