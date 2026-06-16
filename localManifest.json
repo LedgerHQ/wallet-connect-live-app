@@ -37,6 +37,7 @@
     "base_sepolia",
     "ripple",
     "sei_evm",
+    "somnia",
     "ethereum_holesky"
   ],
   "content": {
