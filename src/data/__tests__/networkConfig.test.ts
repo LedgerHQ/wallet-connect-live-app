@@ -86,6 +86,15 @@ describe("SUPPORTED_NETWORK", () => {
     expect(somnia?.namespace).toBe("eip155:5031");
     expect(somnia?.ticker).toBe("SOMI");
   });
+
+  it("contains Etherlink", () => {
+    const etherlink: Network | undefined = SUPPORTED_NETWORK.etherlink;
+
+    expect(etherlink?.displayName).toBe("Etherlink");
+    expect(etherlink?.chainId).toBe(42793);
+    expect(etherlink?.namespace).toBe("eip155:42793");
+    expect(etherlink?.ticker).toBe("XTZ");
+  });
 });
 
 describe("EIP155_SEPOLIA_CHAINS", () => {
