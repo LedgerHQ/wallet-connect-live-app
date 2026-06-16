@@ -12,7 +12,7 @@
   "error" : {
     "noInput" : "Aucune saisie",
     "invalidUri" : "URI invalide",
-    "zodRequestBlocked" : "Nous avons bloqué cette requête car les données envoyées par l’application sont invalides ou non prises en charge. Nous évitons de continuer pour des raisons de sécurité."
+    "zodRequestBlocked" : "Nous avons bloqué cette demande, car les données de l’app sont invalides ou non prises en charge. Pour des raisons de sécurité, il n’est pas possible de poursuivre."
   },
   "connect" : {
     "title" : "Connectez-vous à une application pour commencer",

@@ -12,7 +12,7 @@
   "error" : {
     "noInput" : "无输入值",
     "invalidUri" : "URI 无效",
-    "zodRequestBlocked" : "我们阻止了这个请求，因为应用程序的数据无效或不受支持。我们避免继续以确保安全。"
+    "zodRequestBlocked" : "我们阻止了此请求，因为来自该应用程序的数据无效或不受支持。出于安全考虑，我们避免继续操作。"
   },
   "connect" : {
     "title" : "连接到应用程序即可开始",

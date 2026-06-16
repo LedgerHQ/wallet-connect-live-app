@@ -12,7 +12,7 @@
   "error" : {
     "noInput" : "Değer girilmedi",
     "invalidUri" : "Geçersiz URI",
-    "zodRequestBlocked" : "Bu isteği engelledik çünkü uygulamanın verileri geçersiz veya desteklenmiyor. Güvenliği sağlamak için devam etmeyi önlüyoruz."
+    "zodRequestBlocked" : "Uygulamadan gelen veriler geçersiz olduğu veya desteklenmediği için bu isteği engelledik. Güvenliğiniz için işleme devam edilmiyor."
   },
   "connect" : {
     "title" : "Başlamak için bir uygulamaya bağlanın",

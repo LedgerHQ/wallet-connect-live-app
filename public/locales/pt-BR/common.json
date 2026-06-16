@@ -12,7 +12,7 @@
   "error" : {
     "noInput" : "Sem valor de entrada",
     "invalidUri" : "URI inválida",
-    "zodRequestBlocked" : "Nós bloqueamos esta solicitação porque os dados da aplicação são inválidos ou não suportados. Evitamos continuar por segurança."
+    "zodRequestBlocked" : "Bloqueamos esta solicitação porque os dados provenientes do aplicativo são inválidos ou incompatíveis. Evitamos continuar por segurança."
   },
   "connect" : {
     "title" : "Conecte-se a um aplicativo para iniciar",
