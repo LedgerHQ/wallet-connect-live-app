@@ -100,6 +100,13 @@ export const EIP155_CHAINS_MAINNET: Record<string, Network> = {
     displayName: "Sei EVM",
     color: "#7B2CBF",
   },
+  somnia: {
+    chainId: 5031,
+    namespace: "eip155:5031",
+    ticker: "SOMI",
+    displayName: "Somnia",
+    color: "#6F0191",
+  },
 };
 
 export const EIP155_SEPOLIA_CHAINS: Record<string, Network> = {

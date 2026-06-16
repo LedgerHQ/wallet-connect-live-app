@@ -77,6 +77,15 @@ describe("SUPPORTED_NETWORK", () => {
     expect(seiEvm?.namespace).toBe("eip155:1329");
     expect(seiEvm?.ticker).toBe("SEI");
   });
+
+  it("contains Somnia", () => {
+    const somnia: Network | undefined = SUPPORTED_NETWORK.somnia;
+
+    expect(somnia?.displayName).toBe("Somnia");
+    expect(somnia?.chainId).toBe(5031);
+    expect(somnia?.namespace).toBe("eip155:5031");
+    expect(somnia?.ticker).toBe("SOMI");
+  });
 });
 
 describe("EIP155_SEPOLIA_CHAINS", () => {
