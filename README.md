@@ -24,6 +24,7 @@ and is intended to be integrated within ledger products, enabling users to seaml
 | ADI Chain         | ✅          | -                  |                    |
 | Sei EVM           | ✅          | -                  | -                  |
 | Somnia            | ✅          | -                  | -                  |
+| Etherlink         | ✅          | -                  | -                  |
 
 ## Hosting
 

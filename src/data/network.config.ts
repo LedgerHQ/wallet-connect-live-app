@@ -107,6 +107,13 @@ export const EIP155_CHAINS_MAINNET: Record<string, Network> = {
     displayName: "Somnia",
     color: "#6F0191",
   },
+  etherlink: {
+    chainId: 42793,
+    namespace: "eip155:42793",
+    ticker: "XTZ",
+    displayName: "Etherlink",
+    color: "#38FF9C",
+  },
 };
 
 export const EIP155_SEPOLIA_CHAINS: Record<string, Network> = {
