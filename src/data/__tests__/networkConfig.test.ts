@@ -95,6 +95,15 @@ describe("SUPPORTED_NETWORK", () => {
     expect(etherlink?.namespace).toBe("eip155:42793");
     expect(etherlink?.ticker).toBe("XTZ");
   });
+
+  it("contains 0G", () => {
+    const zeroGravity: Network | undefined = SUPPORTED_NETWORK.zero_gravity;
+
+    expect(zeroGravity?.displayName).toBe("0G");
+    expect(zeroGravity?.chainId).toBe(16661);
+    expect(zeroGravity?.namespace).toBe("eip155:16661");
+    expect(zeroGravity?.ticker).toBe("0G");
+  });
 });
 
 describe("EIP155_SEPOLIA_CHAINS", () => {

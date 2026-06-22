@@ -25,6 +25,7 @@ and is intended to be integrated within ledger products, enabling users to seaml
 | Sei EVM           | ✅          | -                  | -                  |
 | Somnia            | ✅          | -                  | -                  |
 | Etherlink         | ✅          | -                  | -                  |
+| 0G                | ✅          | -                  | -                  |
 
 ## Hosting
 
