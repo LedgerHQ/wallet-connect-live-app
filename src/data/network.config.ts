@@ -114,6 +114,13 @@ export const EIP155_CHAINS_MAINNET: Record<string, Network> = {
     displayName: "Etherlink",
     color: "#38FF9C",
   },
+  zero_gravity: {
+    chainId: 16661,
+    namespace: "eip155:16661",
+    ticker: "0G",
+    displayName: "0G",
+    color: "#9200E1",
+  },
 };
 
 export const EIP155_SEPOLIA_CHAINS: Record<string, Network> = {
