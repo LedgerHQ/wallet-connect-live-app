@@ -8,6 +8,7 @@ import { handleBIP122Request } from "../requestHandlers/BIP122";
 import { handleEIP155Request } from "../requestHandlers/EIP155";
 import { handleXrpRequest } from "../requestHandlers/Ripple";
 import { handleSolanaRequest } from "../requestHandlers/Solana";
+import { handleTezosRequest } from "../requestHandlers/Tezos";
 import { handleWalletRequest } from "../requestHandlers/Wallet";
 import { Errors, rejectRequest } from "../requestHandlers/utils";
 import useAccounts from "../useAccounts";
@@ -57,6 +58,10 @@ vi.mock("../requestHandlers/Ripple", () => ({
 
 vi.mock("../requestHandlers/Solana", () => ({
   handleSolanaRequest: vi.fn(),
+}));
+
+vi.mock("../requestHandlers/Tezos", () => ({
+  handleTezosRequest: vi.fn(),
 }));
 
 vi.mock("../requestHandlers/Wallet", () => ({
@@ -120,6 +125,7 @@ const mockedHandleEIP155Request = vi.mocked(handleEIP155Request);
 const mockedHandleBIP122Request = vi.mocked(handleBIP122Request);
 const mockedHandleXrpRequest = vi.mocked(handleXrpRequest);
 const mockedHandleSolanaRequest = vi.mocked(handleSolanaRequest);
+const mockedHandleTezosRequest = vi.mocked(handleTezosRequest);
 const mockedRejectRequest = vi.mocked(rejectRequest);
 const mockedUseNavigate = vi.mocked(useNavigate);
 
@@ -212,6 +218,7 @@ describe("useWalletConnect", () => {
     mockedHandleBIP122Request.mockResolvedValue(undefined);
     mockedHandleXrpRequest.mockResolvedValue(undefined);
     mockedHandleSolanaRequest.mockResolvedValue(undefined);
+    mockedHandleTezosRequest.mockResolvedValue(undefined);
     mockedRejectRequest.mockResolvedValue(undefined);
   });
 
@@ -302,6 +309,130 @@ describe("useWalletConnect", () => {
       });
     },
   );
+
+  it.each([
+    { name: "canonical", chainId: "tezos:NetXdQprcVkpaWU" },
+    { name: "taquito alias", chainId: "tezos:mainnet" },
+  ])(
+    "dispatches tezos requests ($name chain) when the capabilities are present",
+    async ({ chainId }) => {
+      store.set(walletCapabilitiesAtom as never, [
+        "transaction.signRaw",
+        "message.sign",
+        "account.getPublicKey",
+      ]);
+
+      mountHook();
+
+      walletKitListeners.get("session_request")?.({
+        topic: "topic-1",
+        id: 1,
+        params: { chainId, request: { method: "tezos_send", params: {} } },
+        verifyContext: {},
+      });
+
+      await waitFor(() => {
+        expect(mockedHandleTezosRequest).toHaveBeenCalled();
+      });
+    },
+  );
+
+  it("rejects an unregistered tezos chain even when capabilities are present", async () => {
+    store.set(walletCapabilitiesAtom as never, [
+      "transaction.signRaw",
+      "message.sign",
+      "account.getPublicKey",
+    ]);
+
+    mountHook();
+
+    walletKitListeners.get("session_request")?.({
+      topic: "topic-1",
+      id: 8,
+      params: {
+        chainId: "tezos:ghostnet",
+        request: { method: "tezos_send", params: {} },
+      },
+      verifyContext: {},
+    });
+
+    await waitFor(() => {
+      expect(mockedHandleTezosRequest).not.toHaveBeenCalled();
+      expect(mockedRejectRequest).toHaveBeenCalledWith(
+        walletKitMock,
+        "topic-1",
+        8,
+        Errors.unsupportedChains,
+        5100,
+      );
+    });
+  });
+
+  it("scopes tezos requests to the session-approved accounts", async () => {
+    store.set(walletCapabilitiesAtom as never, [
+      "transaction.signRaw",
+      "message.sign",
+      "account.getPublicKey",
+    ]);
+
+    const approved = { id: "tez-1", address: "tz1approved", currency: "tezos" };
+    const unapproved = { id: "tez-2", address: "tz1other", currency: "tezos" };
+    mockedUseAccounts.mockReturnValue({
+      data: [approved, unapproved],
+    } as ReturnType<typeof useAccounts>);
+    walletKitMock.engine.signClient.session.get.mockReturnValue({
+      ...sessionRecord,
+      namespaces: {
+        ...sessionRecord.namespaces,
+        tezos: { accounts: ["tezos:NetXdQprcVkpaWU:tz1approved"] },
+      },
+    } as typeof sessionRecord);
+
+    mountHook();
+
+    walletKitListeners.get("session_request")?.({
+      topic: "topic-1",
+      id: 9,
+      params: {
+        chainId: "tezos:NetXdQprcVkpaWU",
+        request: { method: "tezos_getAccounts", params: {} },
+      },
+      verifyContext: {},
+    });
+
+    await waitFor(() => {
+      expect(mockedHandleTezosRequest).toHaveBeenCalled();
+    });
+    expect(mockedHandleTezosRequest.mock.calls[0][4]).toEqual([approved]);
+  });
+
+  it("rejects tezos requests when the capability gate is disabled", async () => {
+    // Only transaction.signRaw is present (message.sign missing), so the gate is off.
+    store.set(walletCapabilitiesAtom as never, ["transaction.signRaw"]);
+
+    mountHook();
+
+    walletKitListeners.get("session_request")?.({
+      topic: "topic-1",
+      id: 7,
+      params: {
+        chainId: "tezos:NetXdQprcVkpaWU",
+        request: { method: "tezos_send", params: {} },
+      },
+      verifyContext: {},
+    });
+
+    await waitFor(() => {
+      expect(mockedHandleTezosRequest).not.toHaveBeenCalled();
+      expect(mockedRejectRequest).toHaveBeenCalledWith(
+        walletKitMock,
+        "topic-1",
+        7,
+        Errors.unsupportedChains,
+        5100,
+      );
+    });
+  });
 
   it("rejects unsupported chains", async () => {
     mountHook();

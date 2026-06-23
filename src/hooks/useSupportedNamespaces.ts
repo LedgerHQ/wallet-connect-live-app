@@ -5,6 +5,7 @@ import {
 import { EIP155_SIGNING_METHODS } from "@/data/methods/EIP155Data.methods";
 import { RIPPLE_SIGNING_METHODS } from "@/data/methods/Ripple.methods";
 import { SOLANA_SIGNING_METHODS } from "@/data/methods/Solana.methods";
+import { TEZOS_SIGNING_METHODS } from "@/data/methods/Tezos.methods";
 import { WALLET_METHODS } from "@/data/methods/Wallet.methods";
 import {
   BIP122_CHAINS,
@@ -12,6 +13,7 @@ import {
   RIPPLE_CHAINS,
   SOLANA_CHAINS,
   SupportedNamespace,
+  TEZOS_CHAINS,
 } from "@/data/network.config";
 import useAccounts from "@/hooks/useAccounts";
 import { formatAccountsByChain } from "@/hooks/useProposal/util";
@@ -23,6 +25,7 @@ import {
 import {
   getNamespace,
   isSolanaSupportEnabled,
+  isTezosSupportEnabled,
   isXRPLSupportEnabled,
 } from "@/utils/helper.util";
 import { ProposalTypes, SessionTypes } from "@walletconnect/types";
@@ -309,6 +312,83 @@ export function useSupportedNamespaces(
     [session, accounts.data, walletInfo, walletCapabilities, selectedAccounts],
   );
 
+  const buildTezosNamespace = useCallback(
+    (
+      requiredNamespaces: ProposalTypes.RequiredNamespaces,
+      optionalNamespaces: ProposalTypes.OptionalNamespaces,
+    ) => {
+      const accountsByChain = formatAccountsByChain(
+        session,
+        accounts.data,
+        walletInfo,
+        walletCapabilities,
+      ).filter(
+        (a) =>
+          a.accounts.length > 0 &&
+          a.isSupported &&
+          Object.keys(TEZOS_CHAINS).includes(a.chain),
+      );
+
+      const supportedMethods = new Set<string>([
+        ...Object.values(WALLET_METHODS),
+        ...Object.values(TEZOS_SIGNING_METHODS),
+      ]);
+
+      // Advertise accounts under every requested registered chain form (D2), not just the first.
+      const registeredNamespaces = new Set(
+        Object.values(TEZOS_CHAINS).map((network) => network.namespace),
+      );
+      const requestedChains = [
+        ...new Set([
+          ...(requiredNamespaces[SupportedNamespace.TEZOS]?.chains ?? []),
+          ...(optionalNamespaces[SupportedNamespace.TEZOS]?.chains ?? []),
+        ]),
+      ].filter((chain) => registeredNamespaces.has(chain));
+
+      const selectedTezosAccounts = Array.from(
+        new Map(
+          accountsByChain
+            .flatMap((elem) => elem.accounts)
+            .filter((acc) => selectedAccounts.includes(acc.id))
+            .map((acc) => [acc.id, acc] as const),
+        ).values(),
+      );
+
+      const dataToSend = requestedChains.flatMap((chain) =>
+        selectedTezosAccounts.map((a) => ({
+          account: `${chain}:${a.address}`,
+          chain,
+        })),
+      );
+
+      const methods = [
+        ...new Set([
+          ...(requiredNamespaces[SupportedNamespace.TEZOS]?.methods.filter(
+            (method) => supportedMethods.has(method),
+          ) ?? []),
+          ...(optionalNamespaces[SupportedNamespace.TEZOS]?.methods.filter(
+            (method) => supportedMethods.has(method),
+          ) ?? []),
+        ]),
+      ];
+
+      const events = [
+        ...new Set([
+          ...(requiredNamespaces[SupportedNamespace.TEZOS]?.events ?? []),
+          ...(optionalNamespaces[SupportedNamespace.TEZOS]?.events ?? []),
+        ]),
+      ];
+
+      return {
+        chains: [...new Set(dataToSend.map((e) => e.chain))],
+        methods,
+        events,
+        accounts: dataToSend.map((e) => e.account),
+      };
+    },
+    [session, accounts.data, walletInfo, walletCapabilities, selectedAccounts],
+  );
+
   const buildSupportedNamespaces = useCallback(
     (session: SessionTypes.Struct | ProposalTypes.Struct) => {
       const { requiredNamespaces, optionalNamespaces } = session;
@@ -346,6 +426,15 @@ export function useSupportedNamespaces(
           optionalNamespaces,
         );
       }
+      if (
+        ("tezos" in requiredNamespaces || "tezos" in optionalNamespaces) &&
+        isTezosSupportEnabled(walletCapabilities)
+      ) {
+        supportedNamespaces[SupportedNamespace.TEZOS] = buildTezosNamespace(
+          requiredNamespaces,
+          optionalNamespaces,
+        );
+      }
       return supportedNamespaces;
     },
     [
@@ -355,6 +444,7 @@ export function useSupportedNamespaces(
       buildEip155Namespace,
       buildXrpNamespace,
       buildSolanaNamespace,
+      buildTezosNamespace,
     ],
   );
 

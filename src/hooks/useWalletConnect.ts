@@ -20,6 +20,8 @@ import {
   isRippleChain,
   isSolanaChain,
   isSolanaSupportEnabled,
+  isTezosChain,
+  isTezosSupportEnabled,
   isXRPLSupportEnabled,
 } from "@/utils/helper.util";
 import { reportZodError } from "@/utils/sentryZod";
@@ -37,6 +39,7 @@ import { handleBIP122Request } from "./requestHandlers/BIP122";
 import { handleEIP155Request } from "./requestHandlers/EIP155";
 import { handleXrpRequest } from "./requestHandlers/Ripple";
 import { handleSolanaRequest } from "./requestHandlers/Solana";
+import { handleTezosRequest } from "./requestHandlers/Tezos";
 import { Errors, rejectRequest } from "./requestHandlers/utils";
 import { handleWalletRequest } from "./requestHandlers/Wallet";
 import useAccounts from "./useAccounts";
@@ -255,6 +258,27 @@ export default function useWalletConnect() {
               id,
               chainId,
               accounts.data,
+              client,
+              walletKit,
+            );
+          } else if (
+            isTezosChain(chainId, request) &&
+            isTezosSupportEnabled(walletCapabilities)
+          ) {
+            const session = walletKit.engine.signClient.session.get(topic);
+            const sessionTezosAddresses = new Set(
+              (session?.namespaces.tezos?.accounts ?? []).map(
+                (account) => account.split(":")[2],
+              ),
+            );
+            await handleTezosRequest(
+              request,
+              topic,
+              id,
+              chainId,
+              accounts.data.filter((account) =>
+                sessionTezosAddresses.has(account.address),
+              ),
               client,
               walletKit,
             );

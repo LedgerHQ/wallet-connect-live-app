@@ -40,7 +40,8 @@
     "somnia",
     "etherlink",
     "zero_gravity",
-    "ethereum_holesky"
+    "ethereum_holesky",
+    "tezos"
   ],
   "content": {
     "shortDescription": {
@@ -54,6 +55,7 @@
     "currency.list",
     "account.list",
     "account.request",
+    "account.getPublicKey",
     "message.sign",
     "bitcoin.getAddresses",
     "bitcoin.signPsbt",
