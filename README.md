@@ -26,6 +26,7 @@ and is intended to be integrated within ledger products, enabling users to seaml
 | Somnia            | ✅          | -                  | -                  |
 | Etherlink         | ✅          | -                  | -                  |
 | 0G                | ✅          | -                  | -                  |
+| Robinhood Chain   | ✅          | -                  | -                  |
 | Tezos             | ✅          | -                  | -                  |
 
 ## Hosting
