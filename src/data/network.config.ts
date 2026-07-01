@@ -281,6 +281,16 @@ export const TEZOS_CHAINS: Record<string, Network> = {
   },
 };
 
+export const COSMOS_CHAINS: Record<string, Network> = {
+  babylon: {
+    chainId: "bbn-1",
+    namespace: "cosmos:bbn-1",
+    ticker: "BABY",
+    displayName: "Babylon",
+    color: "#CE6533",
+  },
+};
+
 export const EIP155_CHAINS = {
   ...EIP155_CHAINS_MAINNET,
   ...EIP155_SEPOLIA_CHAINS,
@@ -296,6 +306,7 @@ export const SUPPORTED_NETWORK: Record<string, Network> = {
   ...RIPPLE_CHAINS,
   ...SOLANA_CHAINS,
   ...TEZOS_CHAINS,
+  ...COSMOS_CHAINS,
 };
 
 export const SUPPORTED_NETWORK_NAMES: string[] = Object.values(
@@ -308,4 +319,5 @@ export enum SupportedNamespace {
   XRPL = "xrpl",
   SOLANA = "solana",
   TEZOS = "tezos",
+  COSMOS = "cosmos",
 }

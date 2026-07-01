@@ -17,7 +17,7 @@ and is intended to be integrated within ledger products, enabling users to seaml
 | Avalanche C-Chain | ✅          | -                  |                    |
 | Rootstock         | ✅          | -                  |                    |
 | Base              | ✅          | ✅                 |                    |
-| Cosmos            | ⏳          | -                  |                    |
+| Babylon           | ✅          | -                  |                    |
 | Multivers-X       | ✅          | -                  |                    |
 | Solana            | ✅          | -                  |                    |
 | Monad             | ✅          | ✅                 |                    |
