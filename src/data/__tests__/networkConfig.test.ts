@@ -113,6 +113,15 @@ describe("SUPPORTED_NETWORK", () => {
     expect(tezos?.namespace).toBe("tezos:NetXdQprcVkpaWU");
     expect(tezos?.ticker).toBe("XTZ");
   });
+
+  it("contains Babylon", () => {
+    const babylon: Network | undefined = SUPPORTED_NETWORK.babylon;
+
+    expect(babylon?.displayName).toBe("Babylon");
+    expect(babylon?.chainId).toBe("bbn-1");
+    expect(babylon?.namespace).toBe("cosmos:bbn-1");
+    expect(babylon?.ticker).toBe("BABY");
+  });
 });
 
 describe("EIP155_SEPOLIA_CHAINS", () => {
