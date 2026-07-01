@@ -121,6 +121,13 @@ export const EIP155_CHAINS_MAINNET: Record<string, Network> = {
     displayName: "0G",
     color: "#9200E1",
   },
+  robinhood: {
+    chainId: 4663,
+    namespace: "eip155:4663",
+    ticker: "ETH",
+    displayName: "Robinhood Chain",
+    color: "#00C805",
+  },
 };
 
 export const EIP155_SEPOLIA_CHAINS: Record<string, Network> = {
