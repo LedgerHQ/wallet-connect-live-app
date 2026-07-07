@@ -41,6 +41,8 @@
     "etherlink",
     "zero_gravity",
     "robinhood",
+    "arc",
+    "arc_testnet",
     "ethereum_holesky",
     "tezos"
   ],

@@ -27,6 +27,7 @@ and is intended to be integrated within ledger products, enabling users to seaml
 | Etherlink         | ✅          | -                  | -                  |
 | 0G                | ✅          | -                  | -                  |
 | Robinhood Chain   | ✅          | -                  | -                  |
+| Arc               | ✅          | ✅                 | -                  |
 | Tezos             | ✅          | -                  | -                  |
 
 ## Hosting
