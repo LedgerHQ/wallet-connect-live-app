@@ -128,6 +128,13 @@ export const EIP155_CHAINS_MAINNET: Record<string, Network> = {
     displayName: "Robinhood Chain",
     color: "#00C805",
   },
+  arc: {
+    chainId: 5042,
+    namespace: "eip155:5042",
+    ticker: "USDC",
+    displayName: "Arc",
+    color: "#1A2B5F",
+  },
 };
 
 export const EIP155_SEPOLIA_CHAINS: Record<string, Network> = {
@@ -178,6 +185,13 @@ export const EIP155_CHAINS_TESTNET: Record<string, Network> = {
     ticker: "MON",
     displayName: "Monad Testnet",
     color: "#836EF9",
+  },
+  arc_testnet: {
+    chainId: 5042002,
+    namespace: "eip155:5042002",
+    ticker: "USDC",
+    displayName: "Arc Testnet",
+    color: "#6B7280",
   },
 };
 
