@@ -1,15 +1,24 @@
 import { BIP122_REQUESTS } from "@/data/methods/BIP122.methods";
+import { COSMOS_REQUESTS } from "@/data/methods/Cosmos.methods";
 import { EIP155_REQUESTS } from "@/data/methods/EIP155Data.methods";
 import { RIPPLE_REQUESTS } from "@/data/methods/Ripple.methods";
 import { SOLANA_REQUESTS } from "@/data/methods/Solana.methods";
 import { TEZOS_REQUESTS } from "@/data/methods/Tezos.methods";
 import { WALLET_REQUESTS } from "@/data/methods/Wallet.methods";
-import { SUPPORTED_NETWORK, TEZOS_CHAINS } from "@/data/network.config";
+import {
+  COSMOS_CHAINS,
+  SUPPORTED_NETWORK,
+  TEZOS_CHAINS,
+} from "@/data/network.config";
 import type { WalletInfo } from "@ledgerhq/wallet-api-client";
 import semver from "semver";
 
 const TEZOS_NAMESPACES = new Set(
   Object.values(TEZOS_CHAINS).map((network) => network.namespace),
+);
+
+const COSMOS_NAMESPACES = new Set(
+  Object.values(COSMOS_CHAINS).map((network) => network.namespace),
 );
 
 /**
@@ -90,6 +99,16 @@ export function isTezosChain(
   return TEZOS_NAMESPACES.has(chain);
 }
 
+export function isCosmosChain(
+  chain: string,
+  // request is passed and used here only for type narrowing
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  _request?: { method: string; params: any },
+): _request is COSMOS_REQUESTS {
+  // Exact match only: an unregistered `cosmos:*` (e.g. osmosis) must not reach the babylon handler.
+  return COSMOS_NAMESPACES.has(chain);
+}
+
 /**
  * Formats url to to remove protocol
  */
@@ -146,6 +165,22 @@ const SOLANA_MIN_VERSIONS: Record<string, string> = {
 
 /** Check if Solana support should be enabled based on wallet version */
 export const isSolanaSupportEnabled = createSupportChecker(SOLANA_MIN_VERSIONS);
+
+/**
+ * Minimum versions of Ledger Live that support Cosmos (Babylon) over WalletConnect.
+ * Cosmos is version-gated (not capability-gated): the `transaction.signRaw` capability is
+ * already advertised for other families, so its presence does not prove the cosmos
+ * `signRawOperation` + `account.getPublicKey` resolvers are wired into that LL build.
+ * TODO(LIVE-33217): confirm these against the release CHANGELOG — activation depends on
+ * LIVE-33211 (cosmos per-account public key) shipping; 4.11.0 is a projection.
+ */
+const COSMOS_MIN_VERSIONS: Record<string, string> = {
+  "ledger-live-desktop": "4.11.0",
+  "ledger-live-mobile": "4.11.0",
+};
+
+/** Check if Cosmos (Babylon) support should be enabled based on wallet version */
+export const isCosmosSupportEnabled = createSupportChecker(COSMOS_MIN_VERSIONS);
 
 /** Check if XRPL support should be enabled based on wallet capabilities */
 export const isXRPLSupportEnabled = (walletCapabilities: string[]): boolean => {

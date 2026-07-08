@@ -16,6 +16,8 @@ import { OneClickAuthPayload } from "@/types/types";
 import {
   getErrorMessage,
   isBIP122Chain,
+  isCosmosChain,
+  isCosmosSupportEnabled,
   isEIP155Chain,
   isRippleChain,
   isSolanaChain,
@@ -36,6 +38,7 @@ import { useTranslation } from "react-i18next";
 import { ZodError } from "zod";
 import { isWalletRequest } from "../utils/helper.util";
 import { handleBIP122Request } from "./requestHandlers/BIP122";
+import { handleCosmosRequest } from "./requestHandlers/Cosmos";
 import { handleEIP155Request } from "./requestHandlers/EIP155";
 import { handleXrpRequest } from "./requestHandlers/Ripple";
 import { handleSolanaRequest } from "./requestHandlers/Solana";
@@ -279,6 +282,27 @@ export default function useWalletConnect() {
               chainId,
               accounts.data.filter((account) =>
                 sessionTezosAddresses.has(account.address),
+              ),
+              client,
+              walletKit,
+            );
+          } else if (
+            isCosmosChain(chainId, request) &&
+            isCosmosSupportEnabled(walletInfo)
+          ) {
+            const session = walletKit.engine.signClient.session.get(topic);
+            const sessionCosmosAddresses = new Set(
+              (session?.namespaces.cosmos?.accounts ?? []).map(
+                (account) => account.split(":")[2],
+              ),
+            );
+            await handleCosmosRequest(
+              request,
+              topic,
+              id,
+              chainId,
+              accounts.data.filter((account) =>
+                sessionCosmosAddresses.has(account.address),
               ),
               client,
               walletKit,
