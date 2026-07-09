@@ -102,8 +102,9 @@ vi.mock("@tanstack/react-router", async () => {
   };
 });
 
+const mockedTranslation = vi.fn<() => string>();
 vi.mock("react-i18next", () => ({
-  useTranslation: vi.fn().mockReturnValue({ t: vi.fn() }) 
+  useTranslation: vi.fn().mockReturnValue({ t: vi.fn().mockImplementation(() => mockedTranslation()) }) 
 }));
 
 import {
@@ -120,7 +121,6 @@ import {
   verifyContextByTopicAtom,
   walletKitAtom,
 } from "@/store/walletKit.store";
-import { useTranslation } from "react-i18next";
 
 const { useNavigate } = await import("@tanstack/react-router");
 
@@ -133,7 +133,6 @@ const mockedHandleSolanaRequest = vi.mocked(handleSolanaRequest);
 const mockedHandleTezosRequest = vi.mocked(handleTezosRequest);
 const mockedRejectRequest = vi.mocked(rejectRequest);
 const mockedUseNavigate = vi.mocked(useNavigate);
-const mockedTranslation = vi.mocked(useTranslation().t);
 
 describe("useWalletConnect", () => {
   let store: TestStore;

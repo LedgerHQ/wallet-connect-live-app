@@ -66,7 +66,7 @@ function useWalletConnectStatus() {
         },
       });
     }
-  }, [connectionStatus, core.relayer, setConnectionStatus]);
+  }, [connectionStatus, core.relayer, setConnectionStatus, t]);
 
   useEffect(() => {
     const onConnect = () => {
@@ -100,7 +100,7 @@ function useWalletConnectStatus() {
       core.relayer.off("relayer_connect", onConnect);
       core.relayer.off("relayer_disconnect", onDisconnect);
     };
-  }, [core.relayer, setConnectionStatus]);
+  }, [core.relayer, setConnectionStatus, t]);
 }
 
 export default function useWalletConnect() {
