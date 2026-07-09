@@ -52,11 +52,12 @@ import { queryKey as sessionsQueryKey } from "./useSessions";
 function useWalletConnectStatus() {
   const core = useAtomValue(coreAtom);
   const [connectionStatus, setConnectionStatus] = useAtom(connectionStatusAtom);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (core.relayer.connected && connectionStatus !== "connected") {
       setConnectionStatus("connected");
-      enqueueSnackbar("Connected to WalletConnect", {
+      enqueueSnackbar(t("connect.connected"), {
         connected: true,
         variant: "connectionNotification",
         anchorOrigin: {
@@ -70,7 +71,7 @@ function useWalletConnectStatus() {
   useEffect(() => {
     const onConnect = () => {
       setConnectionStatus("connected");
-      enqueueSnackbar("Connected to WalletConnect", {
+      enqueueSnackbar(t("connect.connected"), {
         connected: true,
         variant: "connectionNotification",
         anchorOrigin: {
@@ -82,7 +83,7 @@ function useWalletConnectStatus() {
 
     const onDisconnect = () => {
       setConnectionStatus("disconnected");
-      enqueueSnackbar("Disconnected from WalletConnect", {
+      enqueueSnackbar(t("connect.disconnected"), {
         connected: false,
         variant: "connectionNotification",
         anchorOrigin: {
