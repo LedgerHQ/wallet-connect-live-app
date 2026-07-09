@@ -102,6 +102,11 @@ vi.mock("@tanstack/react-router", async () => {
   };
 });
 
+const mockedTranslation = vi.fn<() => string>();
+vi.mock("react-i18next", () => ({
+  useTranslation: vi.fn().mockReturnValue({ t: vi.fn().mockImplementation(() => mockedTranslation()) }) 
+}));
+
 import {
   walletAPIClientAtom,
   walletCapabilitiesAtom,
@@ -229,6 +234,7 @@ describe("useWalletConnect", () => {
   }
 
   it("shows a connected notification when the relayer is already connected", () => {
+    mockedTranslation.mockReturnValueOnce("Connected to WalletConnect");
     coreMock.relayer.connected = true;
 
     mountHook();
