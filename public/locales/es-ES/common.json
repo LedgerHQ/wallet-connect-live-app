@@ -25,7 +25,9 @@
     "errorProtocol" : {
       "title" : "La dApp a la que intentas conectarte no está actualizada",
       "desc" : "WalletConnect V1 ya no es compatible; para garantizar una conexión segura y sin problemas, la dApp que usas debe actualizarse a WalletConnect V2."
-    }
+    },
+    "connected" : "Conectado a WalletConnect",
+    "disconnected" : "Desconectado de WalletConnect"
   },
   "sessionProposal" : {
     "connectTo" : "Conectar a {{name}}",
