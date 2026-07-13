@@ -25,7 +25,9 @@
     "errorProtocol" : {
       "title" : "Bağlanmaya çalıştığınız Dapp güncel değil",
       "desc" : "WalletConnect V1 artık desteklenmiyor ve sorunsuz ve güvenli bir bağlantı sağlamak için, kullandığınız Dapp'in WalletConnect V2'ye güncellenmesi gerekiyor."
-    }
+    },
+    "connected" : "WalletConnect'e bağlandı",
+    "disconnected" : "WalletConnect bağlantısı kesildi"
   },
   "sessionProposal" : {
     "connectTo" : "Şuraya bağlan: {{name}}",
