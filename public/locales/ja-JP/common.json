@@ -25,7 +25,9 @@
     "errorProtocol" : {
       "title" : "接続しようとしているDappは最新ではありません",
       "desc" : "WalletConnect V1は現在サポートされておりません。スムーズで安全な接続を確保するには、使用されているDappをWalletConnect V2にアップグレードする必要があります。"
-    }
+    },
+    "connected" : "WalletConnectに接続しました",
+    "disconnected" : "WalletConnectから切断しました"
   },
   "sessionProposal" : {
     "connectTo" : "{{name}}に接続",
