@@ -25,7 +25,9 @@
     "errorProtocol" : {
       "title" : "La dApp à laquelle vous essayez de vous connecter n’est pas à jour",
       "desc" : "WalletConnect v1 n’est plus pris en charge. Pour une connexion fluide et sécurisée, la dApp que vous utilisez doit être mise à niveau vers WalletConnect v2."
-    }
+    },
+    "connected" : "Connecté à WalletConnect",
+    "disconnected" : "Déconnecté de WalletConnect"
   },
   "sessionProposal" : {
     "connectTo" : "Connexion à {{name}}",
@@ -51,7 +53,7 @@
       "invalid" : {
         "title" : "Domaine différent",
         "label" : "Domaine différent",
-        "description" : "Le domaine de ce site Web ne correspond pas à l’émetteur de cette demande. Si vous l’approuvez, vous pourriez risquer de perdre des actifs."
+        "description" : "Le domaine de ce site web ne correspond pas à l’émetteur de cette demande. Si vous l’approuvez, vous pourriez risquer de perdre des actifs."
       },
       "scam" : {
         "title" : "Risque de sécurité connu",
