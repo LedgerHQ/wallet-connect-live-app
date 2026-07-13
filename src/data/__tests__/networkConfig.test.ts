@@ -1,5 +1,6 @@
 import { SUPPORTED_NETWORK } from "@/data/network.config";
 import { Network } from "@/data/types";
+import { getCurrencyByChainId, getNamespace } from "@/utils/helper.util";
 
 describe("SUPPORTED_NETWORK", () => {
   it("contains Ethereum", () => {
@@ -112,6 +113,23 @@ describe("SUPPORTED_NETWORK", () => {
     expect(tezos?.chainId).toBe("NetXdQprcVkpaWU");
     expect(tezos?.namespace).toBe("tezos:NetXdQprcVkpaWU");
     expect(tezos?.ticker).toBe("XTZ");
+  });
+
+  it("contains Babylon", () => {
+    const babylon: Network | undefined = SUPPORTED_NETWORK.babylon;
+
+    expect(babylon?.displayName).toBe("Babylon");
+    expect(babylon?.chainId).toBe("bbn-1");
+    expect(babylon?.namespace).toBe("cosmos:bbn-1");
+    expect(babylon?.ticker).toBe("BABY");
+  });
+
+  it("resolves Babylon from its CAIP-2 chain id", () => {
+    // Acceptance criterion (LIVE-33214): Babylon resolves as a supported cosmos
+    // chain under CAIP-2 cosmos:bbn-1. Assert both directions of the resolvers so
+    // the entry stays discoverable, not merely present.
+    expect(getCurrencyByChainId("cosmos:bbn-1")).toBe("babylon");
+    expect(getNamespace("babylon")).toBe("cosmos:bbn-1");
   });
 });
 

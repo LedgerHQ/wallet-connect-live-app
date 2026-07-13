@@ -5,6 +5,7 @@ import { enqueueSnackbar } from "notistack";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ZodError } from "zod";
 import { handleBIP122Request } from "../requestHandlers/BIP122";
+import { handleCosmosRequest } from "../requestHandlers/Cosmos";
 import { handleEIP155Request } from "../requestHandlers/EIP155";
 import { handleXrpRequest } from "../requestHandlers/Ripple";
 import { handleSolanaRequest } from "../requestHandlers/Solana";
@@ -46,6 +47,10 @@ vi.mock("../useAccounts", () => ({
 
 vi.mock("../requestHandlers/BIP122", () => ({
   handleBIP122Request: vi.fn(),
+}));
+
+vi.mock("../requestHandlers/Cosmos", () => ({
+  handleCosmosRequest: vi.fn(),
 }));
 
 vi.mock("../requestHandlers/EIP155", () => ({
@@ -128,6 +133,7 @@ const mockedUseAccounts = vi.mocked(useAccounts);
 const mockedHandleWalletRequest = vi.mocked(handleWalletRequest);
 const mockedHandleEIP155Request = vi.mocked(handleEIP155Request);
 const mockedHandleBIP122Request = vi.mocked(handleBIP122Request);
+const mockedHandleCosmosRequest = vi.mocked(handleCosmosRequest);
 const mockedHandleXrpRequest = vi.mocked(handleXrpRequest);
 const mockedHandleSolanaRequest = vi.mocked(handleSolanaRequest);
 const mockedHandleTezosRequest = vi.mocked(handleTezosRequest);
@@ -221,6 +227,7 @@ describe("useWalletConnect", () => {
     mockedHandleWalletRequest.mockResolvedValue(undefined);
     mockedHandleEIP155Request.mockResolvedValue(undefined);
     mockedHandleBIP122Request.mockResolvedValue(undefined);
+    mockedHandleCosmosRequest.mockResolvedValue(undefined);
     mockedHandleXrpRequest.mockResolvedValue(undefined);
     mockedHandleSolanaRequest.mockResolvedValue(undefined);
     mockedHandleTezosRequest.mockResolvedValue(undefined);
@@ -458,6 +465,92 @@ describe("useWalletConnect", () => {
         walletKitMock,
         "topic-1",
         9,
+        Errors.unsupportedChains,
+        5100,
+      );
+    });
+  });
+
+  it("dispatches cosmos requests to the cosmos handler when the version gate is on", async () => {
+    store.set(walletInfoAtom as never, {
+      wallet: { name: "ledger-live-desktop", version: "4.11.0" },
+      tracking: false,
+    });
+
+    mountHook();
+
+    walletKitListeners.get("session_request")?.({
+      topic: "topic-1",
+      id: 11,
+      params: {
+        chainId: "cosmos:bbn-1",
+        request: { method: "cosmos_signAmino", params: {} },
+      },
+      verifyContext: {},
+    });
+
+    await waitFor(() => {
+      expect(mockedHandleCosmosRequest).toHaveBeenCalled();
+    });
+  });
+
+  it("scopes cosmos requests to the session-approved accounts", async () => {
+    store.set(walletInfoAtom as never, {
+      wallet: { name: "ledger-live-desktop", version: "4.11.0" },
+      tracking: false,
+    });
+
+    const approved = { id: "bbn-1", address: "bbn1approved", currency: "babylon" };
+    const unapproved = { id: "bbn-2", address: "bbn1other", currency: "babylon" };
+    mockedUseAccounts.mockReturnValue({
+      data: [approved, unapproved],
+    } as ReturnType<typeof useAccounts>);
+    walletKitMock.engine.signClient.session.get.mockReturnValue({
+      ...sessionRecord,
+      namespaces: {
+        ...sessionRecord.namespaces,
+        cosmos: { accounts: ["cosmos:bbn-1:bbn1approved"] },
+      },
+    } as typeof sessionRecord);
+
+    mountHook();
+
+    walletKitListeners.get("session_request")?.({
+      topic: "topic-1",
+      id: 12,
+      params: {
+        chainId: "cosmos:bbn-1",
+        request: { method: "cosmos_getAccounts", params: {} },
+      },
+      verifyContext: {},
+    });
+
+    await waitFor(() => {
+      expect(mockedHandleCosmosRequest).toHaveBeenCalled();
+    });
+    expect(mockedHandleCosmosRequest.mock.calls[0][4]).toEqual([approved]);
+  });
+
+  it("rejects cosmos requests when the version gate is disabled", async () => {
+    // Default walletInfo is 2.127.0 (< 4.11.0), so cosmos support is off.
+    mountHook();
+
+    walletKitListeners.get("session_request")?.({
+      topic: "topic-1",
+      id: 13,
+      params: {
+        chainId: "cosmos:bbn-1",
+        request: { method: "cosmos_signAmino", params: {} },
+      },
+      verifyContext: {},
+    });
+
+    await waitFor(() => {
+      expect(mockedHandleCosmosRequest).not.toHaveBeenCalled();
+      expect(mockedRejectRequest).toHaveBeenCalledWith(
+        walletKitMock,
+        "topic-1",
+        13,
         Errors.unsupportedChains,
         5100,
       );

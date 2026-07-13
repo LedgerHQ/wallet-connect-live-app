@@ -544,4 +544,92 @@ describe("useSupportedNamespaces", () => {
 
     expect(result.current.buildSupportedNamespaces(proposal)).toEqual({});
   });
+
+  it("builds the cosmos namespace and drops cosmos_signDirect when the version gate is on", () => {
+    const bbn = makeAccount("bbn-1", "babylon", "bbn1abc");
+
+    mockedUseAccounts.mockReturnValue({
+      data: [bbn],
+    } as ReturnType<typeof useAccounts>);
+
+    store.set(walletInfoAtom as never, {
+      wallet: { name: "ledger-live-desktop", version: "4.11.0" },
+      tracking: false,
+    } satisfies WalletInfo["result"]);
+
+    mockedFormatAccountsByChain.mockReturnValue([
+      {
+        chain: "babylon",
+        displayName: "Babylon",
+        isSupported: true,
+        isRequired: true,
+        accounts: [bbn],
+      },
+    ]);
+
+    const proposal = {
+      ...sessionProposal,
+      requiredNamespaces: {
+        cosmos: {
+          // signDirect is requested but unsupported — it must be filtered out.
+          methods: ["cosmos_getAccounts", "cosmos_signAmino", "cosmos_signDirect"],
+          chains: ["cosmos:bbn-1"],
+          events: [],
+        },
+      },
+      optionalNamespaces: {},
+    };
+
+    const { result } = renderHook(
+      () => useSupportedNamespaces(proposal, ["bbn-1"]),
+      { wrapper: createHookWrapper(store) },
+    );
+
+    expect(result.current.buildSupportedNamespaces(proposal)).toEqual({
+      cosmos: {
+        chains: ["cosmos:bbn-1"],
+        methods: ["cosmos_getAccounts", "cosmos_signAmino"],
+        events: [],
+        accounts: ["cosmos:bbn-1:bbn1abc"],
+      },
+    });
+  });
+
+  it("omits the cosmos namespace when the version gate is disabled", () => {
+    const bbn = makeAccount("bbn-1", "babylon", "bbn1abc");
+
+    mockedUseAccounts.mockReturnValue({
+      data: [bbn],
+    } as ReturnType<typeof useAccounts>);
+
+    // baseWalletInfo is 2.127.0 (< 4.11.0), so cosmos support is off.
+    mockedFormatAccountsByChain.mockReturnValue([
+      {
+        chain: "babylon",
+        displayName: "Babylon",
+        isSupported: true,
+        isRequired: false,
+        accounts: [bbn],
+      },
+    ]);
+
+    const proposal = {
+      ...sessionProposal,
+      requiredNamespaces: {},
+      optionalNamespaces: {
+        cosmos: {
+          methods: ["cosmos_signAmino"],
+          chains: ["cosmos:bbn-1"],
+          events: [],
+        },
+      },
+    };
+
+    const { result } = renderHook(
+      () => useSupportedNamespaces(proposal, ["bbn-1"]),
+      { wrapper: createHookWrapper(store) },
+    );
+
+    expect(result.current.buildSupportedNamespaces(proposal)).toEqual({});
+  });
 });

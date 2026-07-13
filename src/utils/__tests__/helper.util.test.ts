@@ -8,6 +8,8 @@ import {
   getErrorMessage,
   getNamespace,
   getTicker,
+  isCosmosChain,
+  isCosmosSupportEnabled,
   isEIP155Chain,
   isSolanaSupportEnabled,
   isTezosChain,
@@ -328,6 +330,61 @@ describe("isTezosSupportEnabled", () => {
       isTezosSupportEnabled(["message.sign", "account.getPublicKey"]),
     ).toBe(false);
     expect(isTezosSupportEnabled([])).toBe(false);
+  });
+});
+
+describe("isCosmosChain", () => {
+  it("matches the registered Babylon chain id", () => {
+    expect(isCosmosChain("cosmos:bbn-1")).toBe(true);
+  });
+
+  it("does not match unregistered cosmos chains", () => {
+    // Exact match only — another cosmos chain must not reach the babylon handler.
+    expect(isCosmosChain("cosmos:osmosis-1")).toBe(false);
+    expect(isCosmosChain("cosmos:1")).toBe(false);
+  });
+
+  it("does not match other namespaces", () => {
+    expect(isCosmosChain("eip155:1")).toBe(false);
+    expect(isCosmosChain("tezos:mainnet")).toBe(false);
+  });
+});
+
+describe("isCosmosSupportEnabled", () => {
+  it("returns true for supported desktop versions at/above the minimum", () => {
+    expect(
+      isCosmosSupportEnabled(createWalletInfo("ledger-live-desktop", "4.11.0")),
+    ).toBe(true);
+    expect(
+      isCosmosSupportEnabled(createWalletInfo("ledger-live-desktop", "4.12.0")),
+    ).toBe(true);
+  });
+
+  it("returns false for desktop versions below the minimum", () => {
+    expect(
+      isCosmosSupportEnabled(createWalletInfo("ledger-live-desktop", "4.10.9")),
+    ).toBe(false);
+  });
+
+  it("returns true for supported mobile versions at/above the minimum", () => {
+    expect(
+      isCosmosSupportEnabled(createWalletInfo("ledger-live-mobile", "4.11.0")),
+    ).toBe(true);
+  });
+
+  it("returns false for mobile versions below the minimum", () => {
+    expect(
+      isCosmosSupportEnabled(createWalletInfo("ledger-live-mobile", "4.10.9")),
+    ).toBe(false);
+  });
+
+  it("returns false for unsupported wallet names and empty versions", () => {
+    expect(
+      isCosmosSupportEnabled(createWalletInfo("other-wallet", "9.0.0")),
+    ).toBe(false);
+    expect(
+      isCosmosSupportEnabled(createWalletInfo("ledger-live-desktop", "")),
+    ).toBe(false);
   });
 });
 
