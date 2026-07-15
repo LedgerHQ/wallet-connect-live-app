@@ -25,7 +25,9 @@
     "errorProtocol" : {
       "title" : "DApp ที่คุณพยายามเชื่อมต่อไม่ใช่เวอร์ชันล่าสุด",
       "desc" : "ระบบไม่รองรับ WalletConnect V1 อีกต่อไป เพื่อให้การเชื่อมต่อราบรื่นและปลอดภัย DApp ที่คุณใช้จะต้องอัปเกรดเป็น WalletConnect V2"
-    }
+    },
+    "connected" : "เชื่อมต่อกับ WalletConnect แล้ว",
+    "disconnected" : "ตัดการเชื่อมต่อกับ WalletConnect แล้ว"
   },
   "sessionProposal" : {
     "connectTo" : "เชื่อมต่อกับ {{name}}",

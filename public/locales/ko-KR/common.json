@@ -25,7 +25,9 @@
     "errorProtocol" : {
       "title" : "연결하려는 디앱(Dapp)이 최신 상태가 아닙니다.",
       "desc" : "WalletConnect V1은 더 이상 지원되지 않으며, 원활하고 안전한 연결을 보장하기 위해 사용 중인 디앱을 WalletConnect V2로 업그레이드해야 합니다."
-    }
+    },
+    "connected" : "WalletConnect에 연결되었습니다",
+    "disconnected" : "WalletConnect에서 연결 해제되었습니다"
   },
   "sessionProposal" : {
     "connectTo" : "{{name}}에 연결하기",

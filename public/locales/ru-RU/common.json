@@ -25,7 +25,9 @@
     "errorProtocol" : {
       "title" : "Вы подключаетесь к неактуальной версии децентрализованного приложения",
       "desc" : "WalletConnect V1 больше не поддерживается. Для плавного и безопасного подключения используемое D dApp-приложение должно обновиться до версии WalletConnect V2."
-    }
+    },
+    "connected" : "Подключено к WalletConnect",
+    "disconnected" : "Отключено от WalletConnect"
   },
   "sessionProposal" : {
     "connectTo" : "Подключиться к {{name}}",
