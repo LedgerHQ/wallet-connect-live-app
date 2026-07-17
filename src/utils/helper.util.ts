@@ -178,9 +178,10 @@ export const isSolanaSupportEnabled = createSupportChecker(SOLANA_MIN_VERSIONS);
  * already use them, so this returns true on any LL build that advertises them but has not wired
  * the cosmos resolvers (cosmos `signRawOperation` + the `cosmos` entry in
  * `ACCOUNT_PUBLIC_KEY_RESOLVERS`). On such a build Babylon is offered but requests fail
- * (`getPublicKey` throws "not implemented"); the handler degrades gracefully (skips
- * empty/throwing accounts, rejects the session) rather than crashing. A per-family capability
- * (e.g. `cosmos.signRaw`) would be needed to close the window entirely.
+ * (`getPublicKey` throws "not implemented"): `cosmos_getAccounts` skips the unusable accounts
+ * and accepts with an empty list, while `cosmos_signAmino` rethrows and the dispatch catch
+ * answers the dApp with a JSON-RPC error (`txDeclined`) — no crash, but a broken connect UX.
+ * A per-family capability (e.g. `cosmos.signRaw`) would be needed to close the window entirely.
  * (Deliberately chosen over the previous min-LL-version gate for LIVE-27227.)
  */
 export const isCosmosSupportEnabled = (walletCapabilities: string[]): boolean => {
