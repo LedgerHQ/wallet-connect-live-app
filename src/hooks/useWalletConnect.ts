@@ -288,7 +288,7 @@ export default function useWalletConnect() {
             );
           } else if (
             isCosmosChain(chainId, request) &&
-            isCosmosSupportEnabled(walletInfo)
+            isCosmosSupportEnabled(walletCapabilities)
           ) {
             const session = walletKit.engine.signClient.session.get(topic);
             const sessionCosmosAddresses = new Set(

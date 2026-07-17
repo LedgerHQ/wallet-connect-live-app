@@ -516,7 +516,7 @@ export function useSupportedNamespaces(
       }
       if (
         ("cosmos" in requiredNamespaces || "cosmos" in optionalNamespaces) &&
-        isCosmosSupportEnabled(walletInfo)
+        isCosmosSupportEnabled(walletCapabilities)
       ) {
         supportedNamespaces[SupportedNamespace.COSMOS] = buildCosmosNamespace(
           requiredNamespaces,

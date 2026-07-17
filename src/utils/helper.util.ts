@@ -167,20 +167,28 @@ const SOLANA_MIN_VERSIONS: Record<string, string> = {
 export const isSolanaSupportEnabled = createSupportChecker(SOLANA_MIN_VERSIONS);
 
 /**
- * Minimum versions of Ledger Live that support Cosmos (Babylon) over WalletConnect.
- * Cosmos is version-gated (not capability-gated): the `transaction.signRaw` capability is
- * already advertised for other families, so its presence does not prove the cosmos
- * `signRawOperation` + `account.getPublicKey` resolvers are wired into that LL build.
- * TODO(LIVE-33217): confirm these against the release CHANGELOG — activation depends on
- * LIVE-33211 (cosmos per-account public key) shipping; 4.11.0 is a projection.
+ * Check if Cosmos (Babylon) support should be enabled based on wallet capabilities.
+ * The cosmos handler calls `transaction.signRaw` (cosmos_signAmino) and
+ * `account.getPublicKey` (cosmos_getAccounts), so the host must advertise both.
+ *
+ * KNOWN, ACCEPTED FALSE POSITIVE — do not "fix" by removing the check:
+ * `walletCapabilities` (from `wallet.capabilities()`) is a build-global list of registered
+ * wallet-api methods, NOT a per-family signal. Both `transaction.signRaw` and
+ * `account.getPublicKey` are advertised generically by Ledger Live for other families that
+ * already use them, so this returns true on any LL build that advertises them but has not wired
+ * the cosmos resolvers (cosmos `signRawOperation` + the `cosmos` entry in
+ * `ACCOUNT_PUBLIC_KEY_RESOLVERS`). On such a build Babylon is offered but requests fail
+ * (`getPublicKey` throws "not implemented"); the handler degrades gracefully (skips
+ * empty/throwing accounts, rejects the session) rather than crashing. A per-family capability
+ * (e.g. `cosmos.signRaw`) would be needed to close the window entirely.
+ * (Deliberately chosen over the previous min-LL-version gate for LIVE-27227.)
  */
-const COSMOS_MIN_VERSIONS: Record<string, string> = {
-  "ledger-live-desktop": "4.11.0",
-  "ledger-live-mobile": "4.11.0",
+export const isCosmosSupportEnabled = (walletCapabilities: string[]): boolean => {
+  return (
+    walletCapabilities.includes("transaction.signRaw") &&
+    walletCapabilities.includes("account.getPublicKey")
+  );
 };
-
-/** Check if Cosmos (Babylon) support should be enabled based on wallet version */
-export const isCosmosSupportEnabled = createSupportChecker(COSMOS_MIN_VERSIONS);
 
 /** Check if XRPL support should be enabled based on wallet capabilities */
 export const isXRPLSupportEnabled = (walletCapabilities: string[]): boolean => {
