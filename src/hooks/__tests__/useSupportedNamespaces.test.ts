@@ -545,17 +545,17 @@ describe("useSupportedNamespaces", () => {
     expect(result.current.buildSupportedNamespaces(proposal)).toEqual({});
   });
 
-  it("builds the cosmos namespace and drops cosmos_signDirect when the version gate is on", () => {
+  it("builds the cosmos namespace and drops cosmos_signDirect when the capability gate is on", () => {
     const bbn = makeAccount("bbn-1", "babylon", "bbn1abc");
 
     mockedUseAccounts.mockReturnValue({
       data: [bbn],
     } as ReturnType<typeof useAccounts>);
 
-    store.set(walletInfoAtom as never, {
-      wallet: { name: "ledger-live-desktop", version: "4.11.0" },
-      tracking: false,
-    } satisfies WalletInfo["result"]);
+    store.set(walletCapabilitiesAtom as never, [
+      "transaction.signRaw",
+      "account.getPublicKey",
+    ]);
 
     mockedFormatAccountsByChain.mockReturnValue([
       {
@@ -595,14 +595,14 @@ describe("useSupportedNamespaces", () => {
     });
   });
 
-  it("omits the cosmos namespace when the version gate is disabled", () => {
+  it("omits the cosmos namespace when the capability gate is disabled", () => {
     const bbn = makeAccount("bbn-1", "babylon", "bbn1abc");
 
     mockedUseAccounts.mockReturnValue({
       data: [bbn],
     } as ReturnType<typeof useAccounts>);
 
-    // baseWalletInfo is 2.127.0 (< 4.11.0), so cosmos support is off.
+    // walletCapabilities is empty (beforeEach), so cosmos support is off.
     mockedFormatAccountsByChain.mockReturnValue([
       {
         chain: "babylon",

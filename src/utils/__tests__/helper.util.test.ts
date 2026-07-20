@@ -351,40 +351,19 @@ describe("isCosmosChain", () => {
 });
 
 describe("isCosmosSupportEnabled", () => {
-  it("returns true for supported desktop versions at/above the minimum", () => {
+  it("requires transaction.signRaw and account.getPublicKey", () => {
     expect(
-      isCosmosSupportEnabled(createWalletInfo("ledger-live-desktop", "4.11.0")),
-    ).toBe(true);
-    expect(
-      isCosmosSupportEnabled(createWalletInfo("ledger-live-desktop", "4.12.0")),
-    ).toBe(true);
-  });
-
-  it("returns false for desktop versions below the minimum", () => {
-    expect(
-      isCosmosSupportEnabled(createWalletInfo("ledger-live-desktop", "4.10.9")),
-    ).toBe(false);
-  });
-
-  it("returns true for supported mobile versions at/above the minimum", () => {
-    expect(
-      isCosmosSupportEnabled(createWalletInfo("ledger-live-mobile", "4.11.0")),
+      isCosmosSupportEnabled([
+        "transaction.signRaw",
+        "account.getPublicKey",
+      ]),
     ).toBe(true);
   });
 
-  it("returns false for mobile versions below the minimum", () => {
-    expect(
-      isCosmosSupportEnabled(createWalletInfo("ledger-live-mobile", "4.10.9")),
-    ).toBe(false);
-  });
-
-  it("returns false for unsupported wallet names and empty versions", () => {
-    expect(
-      isCosmosSupportEnabled(createWalletInfo("other-wallet", "9.0.0")),
-    ).toBe(false);
-    expect(
-      isCosmosSupportEnabled(createWalletInfo("ledger-live-desktop", "")),
-    ).toBe(false);
+  it("returns false when any capability is missing", () => {
+    expect(isCosmosSupportEnabled(["transaction.signRaw"])).toBe(false);
+    expect(isCosmosSupportEnabled(["account.getPublicKey"])).toBe(false);
+    expect(isCosmosSupportEnabled([])).toBe(false);
   });
 });
 

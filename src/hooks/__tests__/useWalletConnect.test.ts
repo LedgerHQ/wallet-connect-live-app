@@ -471,11 +471,11 @@ describe("useWalletConnect", () => {
     });
   });
 
-  it("dispatches cosmos requests to the cosmos handler when the version gate is on", async () => {
-    store.set(walletInfoAtom as never, {
-      wallet: { name: "ledger-live-desktop", version: "4.11.0" },
-      tracking: false,
-    });
+  it("dispatches cosmos requests to the cosmos handler when the capability gate is on", async () => {
+    store.set(walletCapabilitiesAtom as never, [
+      "transaction.signRaw",
+      "account.getPublicKey",
+    ]);
 
     mountHook();
 
@@ -495,10 +495,10 @@ describe("useWalletConnect", () => {
   });
 
   it("scopes cosmos requests to the session-approved accounts", async () => {
-    store.set(walletInfoAtom as never, {
-      wallet: { name: "ledger-live-desktop", version: "4.11.0" },
-      tracking: false,
-    });
+    store.set(walletCapabilitiesAtom as never, [
+      "transaction.signRaw",
+      "account.getPublicKey",
+    ]);
 
     const approved = { id: "bbn-1", address: "bbn1approved", currency: "babylon" };
     const unapproved = { id: "bbn-2", address: "bbn1other", currency: "babylon" };
@@ -531,8 +531,9 @@ describe("useWalletConnect", () => {
     expect(mockedHandleCosmosRequest.mock.calls[0][4]).toEqual([approved]);
   });
 
-  it("rejects cosmos requests when the version gate is disabled", async () => {
-    // Default walletInfo is 2.127.0 (< 4.11.0), so cosmos support is off.
+  it("rejects cosmos requests when the capability gate is disabled", async () => {
+    // Default walletCapabilities is ["transaction.signRaw"] (no account.getPublicKey),
+    // so cosmos support is off.
     mountHook();
 
     walletKitListeners.get("session_request")?.({
