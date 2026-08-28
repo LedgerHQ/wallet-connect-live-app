@@ -1,4 +1,12 @@
-import { SUPPORTED_NETWORK } from "@/data/network.config";
+import {
+  BIP122_TEST_CHAINS,
+  EIP155_CHAINS_TESTNET,
+  EIP155_HOLESKY_CHAINS,
+  EIP155_SEPOLIA_CHAINS,
+  SOLANA_TEST_CHAINS,
+  SUPPORTED_NETWORK,
+  SUPPORTED_NETWORK_NAMES,
+} from "@/data/network.config";
 import { Network } from "@/data/types";
 import { getCurrencyByChainId, getNamespace } from "@/utils/helper.util";
 
@@ -160,5 +168,61 @@ describe("EIP155_CHAINS_TESTNET", () => {
     const monadTestnet: Network | undefined = SUPPORTED_NETWORK.monad_testnet;
 
     expect(monadTestnet?.displayName).toBe("Monad Testnet");
+  });
+});
+
+describe("SUPPORTED_NETWORK_NAMES", () => {
+  it("lists every name once", () => {
+    expect(SUPPORTED_NETWORK_NAMES).toEqual([
+      ...new Set(SUPPORTED_NETWORK_NAMES),
+    ]);
+  });
+
+  it("advertises a chain whose aliases share a display name only once", () => {
+    // "solana (legacy)" and "tezos (taquito)" are separate CAIP-2 registrations
+    // of the same chain (LIVE-36162): they stay in SUPPORTED_NETWORK so requests
+    // resolve, but the user-facing copy names the chain once.
+    expect(SUPPORTED_NETWORK.solana.displayName).toBe(
+      SUPPORTED_NETWORK["solana (legacy)"].displayName,
+    );
+    expect(SUPPORTED_NETWORK.tezos.displayName).toBe(
+      SUPPORTED_NETWORK["tezos (taquito)"].displayName,
+    );
+    expect(
+      SUPPORTED_NETWORK_NAMES.filter((name) => name === "Solana"),
+    ).toHaveLength(1);
+    expect(
+      SUPPORTED_NETWORK_NAMES.filter((name) => name === "Tezos"),
+    ).toHaveLength(1);
+  });
+
+  it("does not advertise Babylon while its rollout is on hold", () => {
+    // LIVE-27227 is On Hold, so Babylon must not be advertised even though its
+    // cosmos handlers are wired and SUPPORTED_NETWORK still resolves it.
+    expect(SUPPORTED_NETWORK.babylon).toBeDefined();
+    expect(SUPPORTED_NETWORK_NAMES).not.toContain("Babylon");
+  });
+
+  it("does not advertise testnets", () => {
+    const testnetNames = [
+      ...Object.values(EIP155_SEPOLIA_CHAINS),
+      ...Object.values(EIP155_HOLESKY_CHAINS),
+      ...Object.values(EIP155_CHAINS_TESTNET),
+      ...Object.values(BIP122_TEST_CHAINS),
+      ...Object.values(SOLANA_TEST_CHAINS),
+    ].map((network: Network) => network.displayName);
+
+    expect(testnetNames.length).toBeGreaterThan(0);
+    testnetNames.forEach((name) => {
+      expect(SUPPORTED_NETWORK_NAMES).not.toContain(name);
+    });
+  });
+
+  it("advertises the mainnet chains", () => {
+    expect(SUPPORTED_NETWORK_NAMES).toContain("Ethereum");
+    expect(SUPPORTED_NETWORK_NAMES).toContain("Bitcoin");
+    expect(SUPPORTED_NETWORK_NAMES).toContain("XRPL");
+    expect(SUPPORTED_NETWORK_NAMES).toContain("Solana");
+    expect(SUPPORTED_NETWORK_NAMES).toContain("Tezos");
   });
 });
