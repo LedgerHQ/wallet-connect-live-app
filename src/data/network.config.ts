@@ -248,7 +248,7 @@ export const RIPPLE_CHAINS: Record<string, Network> = {
 
 export const RIPPLE_NETWORK_BY_CHAIN_ID = getNetworkById(RIPPLE_CHAINS);
 
-export const SOLANA_CHAINS: Record<string, Network> = {
+export const SOLANA_MAINNET_CHAINS: Record<string, Network> = {
   solana: {
     chainId: "1",
     namespace: "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
@@ -266,6 +266,9 @@ export const SOLANA_CHAINS: Record<string, Network> = {
     displayName: "Solana",
     color: "#1EF0A6",
   },
+};
+
+export const SOLANA_TEST_CHAINS: Record<string, Network> = {
   solana_testnet: {
     chainId: "4uhcVJyU9pJkvQyS88uRDiswHXSCkY3z",
     namespace: "solana:4uhcVJyU9pJkvQyS88uRDiswHXSCkY3z", // work with APPs (legacy)
@@ -280,6 +283,11 @@ export const SOLANA_CHAINS: Record<string, Network> = {
     displayName: "Solana devnet",
     color: "#1EF0A6",
   },
+};
+
+export const SOLANA_CHAINS = {
+  ...SOLANA_MAINNET_CHAINS,
+  ...SOLANA_TEST_CHAINS,
 };
 
 export const SOLANA_NETWORK_BY_CHAIN_ID = getNetworkById(SOLANA_CHAINS);
@@ -330,9 +338,28 @@ export const SUPPORTED_NETWORK: Record<string, Network> = {
   ...COSMOS_CHAINS,
 };
 
-export const SUPPORTED_NETWORK_NAMES: string[] = Object.values(
-  SUPPORTED_NETWORK,
-).map((network: Network) => network.displayName);
+/**
+ * Networks named in the "we currently support" copy of the unsupported-chain
+ * screen. Advertising is opt-in per map: testnets stay out, and Babylon stays
+ * out while LIVE-27227 is On Hold even though its cosmos handlers are wired.
+ * A new mainnet map has to be added here or it will never be advertised.
+ */
+const ADVERTISED_NETWORKS: Record<string, Network> = {
+  ...EIP155_CHAINS_MAINNET,
+  ...BIP122_MAINNET_CHAINS,
+  ...RIPPLE_CHAINS,
+  ...SOLANA_MAINNET_CHAINS,
+  ...TEZOS_CHAINS,
+};
+
+// Alias entries ("solana (legacy)", "tezos (taquito)") reuse a canonical display name.
+export const SUPPORTED_NETWORK_NAMES: string[] = [
+  ...new Set(
+    Object.values(ADVERTISED_NETWORKS).map(
+      (network: Network) => network.displayName,
+    ),
+  ),
+];
 
 export enum SupportedNamespace {
   BIP122 = "bip122",
