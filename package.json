@@ -98,6 +98,11 @@
   "pnpm": {
     "patchedDependencies": {
       "react-qr-reader": "patches/react-qr-reader.patch"
+    },
+    "overrides": {
+      "@ledgerhq/wallet-api-core": "file:../wallet-api-hashi-poc/poc-artifacts/ledgerhq-wallet-api-core-2.1.0.tgz",
+      "@ledgerhq/wallet-api-client": "file:../wallet-api-hashi-poc/poc-artifacts/ledgerhq-wallet-api-client-1.16.0.tgz",
+      "@ledgerhq/wallet-api-server": "file:../wallet-api-hashi-poc/poc-artifacts/ledgerhq-wallet-api-server-3.5.0.tgz"
     }
   }
 }
