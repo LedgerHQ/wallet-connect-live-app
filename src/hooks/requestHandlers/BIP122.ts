@@ -9,6 +9,7 @@ import {
   bip122SignPsbtSchema,
 } from "@/data/methods/BIP122.methods";
 import { fetchBip122Addresses } from "@/utils/bip122";
+import { selectDeviceApp } from "@/utils/derivedApps";
 import { btcTransactionSchema, convertBtcToLiveTX } from "@/utils/converters";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
 import { isPSBTSupportEnabled } from "@/utils/helper.util";
@@ -198,11 +199,19 @@ export async function handleBIP122Request(
           }
         }
 
+        const deviceApp = selectDeviceApp(psbt, chainId);
+        if (deviceApp.kind === "unsupported") {
+          return rejectRequest(walletkit, topic, id, Errors.txDeclined);
+        }
+
         // Sign PSBT using wallet-api
         const signedPsbtResult = await client.bitcoin.signPsbt(
           account.id,
           params.psbt,
           params.broadcast ?? false,
+          deviceApp.kind === "derived"
+            ? { hwAppId: deviceApp.hwAppId }
+            : undefined,
         );
 
         const result: BIP122_RESPONSES[typeof request.method] = {
