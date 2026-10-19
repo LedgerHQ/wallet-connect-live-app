@@ -116,6 +116,38 @@ export function formatUrl(url: string) {
   return url.split("//")[1] ?? url;
 }
 
+const FORBIDDEN_REDIRECT_PROTOCOLS = new Set([
+  // Never needed to go back to a dApp, and could trigger Ledger Wallet deeplinks
+  "ledgerwallet:",
+  "ledgerlive:",
+  // Can run script or read local content when passed to window.open
+  "javascript:",
+  "data:",
+  "vbscript:",
+  "file:",
+  "blob:",
+]);
+
+/**
+ * Returns the first valid and allowed redirect url provided by the dApp metadata
+ * (native first, then universal), or undefined if none is safe to open
+ */
+export function getSafeRedirectUrl(redirect?: {
+  native?: string;
+  universal?: string;
+}): string | undefined {
+  for (const candidate of [redirect?.native, redirect?.universal]) {
+    if (!candidate) continue;
+    try {
+      const url = new URL(candidate);
+      if (!FORBIDDEN_REDIRECT_PROTOCOLS.has(url.protocol)) return url.href;
+    } catch {
+      // Invalid url, try the next candidate
+    }
+  }
+  return undefined;
+}
+
 export const getTicker = (chain: string) => SUPPORTED_NETWORK[chain].ticker;
 export const getColor = (chain: string) => SUPPORTED_NETWORK[chain]?.color;
 export const getDisplayName = (chain: string) =>

@@ -8,7 +8,7 @@ import {
 import { OneClickAuthPayload } from "@/types/types";
 import { fetchBip122Addresses } from "@/utils/bip122";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
-import { getErrorMessage } from "@/utils/helper.util";
+import { getErrorMessage, getSafeRedirectUrl } from "@/utils/helper.util";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { ProposalTypes } from "@walletconnect/types";
@@ -65,9 +65,7 @@ export function useProposal(
   const sessionsQueryFn = useSessionsQueryFn(walletKit);
 
   const setShowModal = useSetAtom(showBackToBrowserModalAtom);
-  const url =
-    proposal.proposer.metadata.redirect?.native ??
-    proposal.proposer.metadata.redirect?.universal;
+  const url = getSafeRedirectUrl(proposal.proposer.metadata.redirect);
   const redirectToDapp = useCallback(() => {
     if (url) {
       window.open(url);

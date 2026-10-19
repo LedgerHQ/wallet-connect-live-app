@@ -16,6 +16,7 @@ import {
 import { OneClickAuthPayload } from "@/types/types";
 import {
   getErrorMessage,
+  getSafeRedirectUrl,
   isBIP122Chain,
   isCosmosChain,
   isCosmosSupportEnabled,
@@ -183,9 +184,7 @@ export default function useWalletConnect() {
     (topic: string) => {
       const session = walletKit.engine.signClient.session.get(topic);
       if (session) {
-        const url =
-          session.peer.metadata.redirect?.native ??
-          session.peer.metadata.redirect?.universal;
+        const url = getSafeRedirectUrl(session.peer.metadata.redirect);
         if (url) {
           window.open(url);
         } else {

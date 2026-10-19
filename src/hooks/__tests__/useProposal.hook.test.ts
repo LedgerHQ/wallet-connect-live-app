@@ -299,7 +299,7 @@ describe("useProposal", () => {
       }),
     );
     expect(window.open).toHaveBeenCalledWith(
-      "https://react-app.walletconnect.com",
+      "https://react-app.walletconnect.com/",
     );
   });
 
@@ -392,6 +392,33 @@ describe("useProposal", () => {
     expect(navigateMock).toHaveBeenCalledWith(
       expect.objectContaining({ to: "/" }),
     );
+    expect(store.get(showBackToBrowserModalAtom as never)).toBe(true);
+  });
+
+  it("does not open a Ledger Wallet deeplink provided as dApp redirect", async () => {
+    const proposal = {
+      ...sessionProposal,
+      proposer: {
+        ...sessionProposal.proposer,
+        metadata: {
+          ...sessionProposal.proposer.metadata,
+          redirect: {
+            native: "ledgerwallet://discover/foo",
+            universal: "ledgerlive://swap",
+          },
+        },
+      },
+    };
+
+    const { result } = renderHook(() => useProposal(proposal), {
+      wrapper: createHookWrapper(store),
+    });
+
+    await act(async () => {
+      await result.current.rejectSession();
+    });
+
+    expect(window.open).not.toHaveBeenCalled();
     expect(store.get(showBackToBrowserModalAtom as never)).toBe(true);
   });
 

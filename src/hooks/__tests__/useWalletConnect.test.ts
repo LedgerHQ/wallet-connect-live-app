@@ -604,9 +604,39 @@ describe("useWalletConnect", () => {
         Errors.txDeclined,
       );
       expect(window.open).toHaveBeenCalledWith(
-        "https://react-app.walletconnect.com",
+        "https://react-app.walletconnect.com/",
       );
     });
+  });
+
+  it("does not open a Ledger Wallet deeplink provided as dApp redirect", async () => {
+    mockedHandleEIP155Request.mockRejectedValue(new ZodError([]));
+    walletKitMock.engine.signClient.session.get.mockReturnValue({
+      ...sessionRecord,
+      peer: {
+        metadata: {
+          redirect: { universal: "ledgerwallet://discover/foo" },
+        },
+      },
+    });
+
+    mountHook();
+
+    walletKitListeners.get("session_request")?.({
+      topic: "topic-1",
+      id: 10,
+      params: {
+        chainId: "eip155:1",
+        request: { method: "personal_sign", params: [] },
+      },
+      verifyContext: {},
+    });
+
+    await waitFor(() => {
+      expect(mockedRejectRequest).toHaveBeenCalled();
+      expect(store.get(showBackToBrowserModalAtom as never)).toBe(true);
+    });
+    expect(window.open).not.toHaveBeenCalled();
   });
 
   it("stores the one-click auth payload and navigates to the auth screen", async () => {
