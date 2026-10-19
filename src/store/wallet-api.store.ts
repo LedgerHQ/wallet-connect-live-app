@@ -8,6 +8,11 @@ import { getSimulatorTransport } from "@ledgerhq/wallet-api-simulator/lib-es/tra
 import { atom } from "jotai";
 
 function getIsSimulator() {
+  // The simulator is a dev only tool, it must never be reachable in production
+  if (!import.meta.env.DEV) {
+    return false;
+  }
+
   if (
     import.meta.env.VITEST === "true" ||
     import.meta.env.VITE_TEST === "playwright"
@@ -19,10 +24,18 @@ function getIsSimulator() {
     return false;
   }
 
-  return new URLSearchParams(window.location.search).get("simulator");
+  return Boolean(new URLSearchParams(window.location.search).get("simulator"));
 }
 
 const isSimulator = getIsSimulator();
+
+// Ledger Wallet injects these bridges before the app scripts run:
+// - desktop: `ElectronWebview` exposed by the webview preloader
+// - mobile: `ReactNativeWebView` injected by react-native-webview
+export const isInLedgerWallet =
+  isSimulator ||
+  (typeof window !== "undefined" &&
+    Boolean(window.ElectronWebview ?? window.ReactNativeWebView));
 
 export const transportAtom = atom(() => {
   if (typeof window === "undefined") {
@@ -34,7 +47,8 @@ export const transportAtom = atom(() => {
     };
   }
 
-  if (isSimulator) {
+  // `import.meta.env.DEV` is statically replaced so the simulator is stripped from prod bundles
+  if (import.meta.env.DEV && isSimulator) {
     return getSimulatorTransport(standardProfile);
   }
 

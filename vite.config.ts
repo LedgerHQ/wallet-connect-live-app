@@ -12,6 +12,13 @@ export default defineConfig({
   },
   build: {
     sourcemap: true, // Source map generation must be turned on
+    rollupOptions: {
+      treeshake: {
+        // The simulator is dev only (see wallet-api.store.ts) but its package doesn't declare
+        // `sideEffects: false`, so tell rollup it is safe to drop it from prod bundles
+        moduleSideEffects: (id) => !id.includes("wallet-api-simulator"),
+      },
+    },
   },
   // TODO: separate config for playwright (or update wallet-api-simulator)
   // define: {

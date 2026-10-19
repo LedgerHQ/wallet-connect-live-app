@@ -19,7 +19,6 @@
     "@ledgerhq/hw-transport": "^6.31.4",
     "@ledgerhq/react-ui": "^0.16.4",
     "@ledgerhq/wallet-api-client": "^1.15.0",
-    "@ledgerhq/wallet-api-simulator": "^2.3.0",
     "@reown/walletkit": "^1.5.5",
     "@segment/analytics-next": "^1.76.0",
     "@segment/snippet": "^5.2.1",
@@ -53,6 +52,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.14.0",
+    "@ledgerhq/wallet-api-simulator": "^2.3.0",
     "@playwright/test": "^1.48.2",
     "@sentry/vite-plugin": "^2.22.6",
     "@tanstack/eslint-plugin-query": "^5.59.20",

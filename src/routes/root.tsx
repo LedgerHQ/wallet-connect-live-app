@@ -6,6 +6,8 @@ import { SnackbarProvider } from "notistack";
 import { Flex, ProgressLoader, StyleProvider } from "@ledgerhq/react-ui";
 import GlobalStyle from "@/styles/globalStyle";
 import { ApplicationDisabled } from "@/components/ApplicationDisabled";
+import { NotInLedgerWallet } from "@/components/NotInLedgerWallet";
+import { isInLedgerWallet } from "@/store/wallet-api.store";
 import { Container } from "@/styles/styles";
 import { ErrorFallback } from "@/components/screens/ErrorFallback";
 import { ErrorBoundary } from "@sentry/react";
@@ -117,6 +119,8 @@ export const rootRoute = createRootRoute({
               <ErrorBoundary fallback={<ErrorFallback />}>
                 {isApplicationDisabled ? (
                   <ApplicationDisabled />
+                ) : !isInLedgerWallet ? (
+                  <NotInLedgerWallet />
                 ) : (
                   <SnackbarProvider
                     Components={{
