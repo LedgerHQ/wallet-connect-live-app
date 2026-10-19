@@ -9,7 +9,8 @@ import {
   loadingAtom,
   oneClickAuthPayloadAtom,
   showBackToBrowserModalAtom,
-  verifyContextByTopicAtom,
+  addVerifyContextAtom,
+  getVerifyContextKey,
   walletKitAtom,
 } from "@/store/walletKit.store";
 import { OneClickAuthPayload } from "@/types/types";
@@ -118,7 +119,18 @@ export default function useWalletConnect() {
   const client = useAtomValue(walletAPIClientAtom);
   const walletInfo = useAtomValue(walletInfoAtom);
   const walletCapabilities = useAtomValue(walletCapabilitiesAtom);
-  const setVerifyContextByTopic = useSetAtom(verifyContextByTopicAtom);
+  const addVerifyContext = useSetAtom(addVerifyContextAtom);
+  const getPendingKeys = useCallback(
+    () => [
+      ...walletKit.engine.signClient.proposal.keys.map((id) =>
+        getVerifyContextKey("proposal", id),
+      ),
+      ...walletKit.engine.signClient.auth.requests.keys.map((id) =>
+        getVerifyContextKey("auth", id),
+      ),
+    ],
+    [walletKit],
+  );
 
   const accounts = useAccounts(client);
 
@@ -132,9 +144,10 @@ export default function useWalletConnect() {
 
   const onSessionProposal = useCallback(
     (proposal: WalletKitTypes.SessionProposal) => {
-      setVerifyContextByTopic((verifyByTopic) => {
-        verifyByTopic[proposal.params.pairingTopic] = proposal.verifyContext;
-        return verifyByTopic;
+      addVerifyContext({
+        key: getVerifyContextKey("proposal", proposal.id),
+        context: proposal.verifyContext,
+        pendingKeys: getPendingKeys(),
       });
 
       void queryClient
@@ -156,7 +169,13 @@ export default function useWalletConnect() {
           });
         });
     },
-    [navigate, pendingProposalsQueryFn, queryClient, setVerifyContextByTopic],
+    [
+      navigate,
+      pendingProposalsQueryFn,
+      queryClient,
+      addVerifyContext,
+      getPendingKeys,
+    ],
   );
 
   const setShowModal = useSetAtom(showBackToBrowserModalAtom);
@@ -184,13 +203,7 @@ export default function useWalletConnect() {
         topic,
         params: { request, chainId },
         id,
-        verifyContext,
       } = requestEvent;
-
-      setVerifyContextByTopic((verifyByTopic) => {
-        verifyByTopic[topic] = verifyContext;
-        return verifyByTopic;
-      });
 
       void (async () => {
         try {
@@ -351,7 +364,6 @@ export default function useWalletConnect() {
       });
     },
     [
-      setVerifyContextByTopic,
       walletCapabilities,
       walletInfo,
       accounts.data,
@@ -371,9 +383,10 @@ export default function useWalletConnect() {
   const setOneClickAuthPayload = useSetAtom(oneClickAuthPayloadAtom);
   const onSessionAuthenticate = useCallback(
     (payload: OneClickAuthPayload) => {
-      setVerifyContextByTopic((verifyByTopic) => {
-        verifyByTopic[payload.topic] = payload.verifyContext!;
-        return verifyByTopic;
+      addVerifyContext({
+        key: getVerifyContextKey("auth", payload.id),
+        context: payload.verifyContext,
+        pendingKeys: getPendingKeys(),
       });
 
       setOneClickAuthPayload(payload);
@@ -382,7 +395,7 @@ export default function useWalletConnect() {
         search: (search) => search,
       });
     },
-    [navigate, setOneClickAuthPayload, setVerifyContextByTopic],
+    [navigate, setOneClickAuthPayload, addVerifyContext, getPendingKeys],
   );
 
   useEffect(() => {

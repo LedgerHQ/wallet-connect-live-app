@@ -15,15 +15,22 @@ import { Errors, rejectRequest } from "../requestHandlers/utils";
 import useAccounts from "../useAccounts";
 import useWalletConnect from "../useWalletConnect";
 
-vi.mock("@/store/walletKit.store", async () => {
+vi.mock("@/store/walletKit.store", async (importOriginal) => {
   const { atom } = await import("jotai");
+  const {
+    verifyContextByRequestAtom,
+    addVerifyContextAtom,
+    getVerifyContextKey,
+  } = await importOriginal<typeof import("@/store/walletKit.store")>();
   return {
     coreAtom: atom(null),
     walletKitAtom: atom(null),
     connectionStatusAtom: atom("disconnected"),
     loadingAtom: atom(false),
     showBackToBrowserModalAtom: atom(false),
-    verifyContextByTopicAtom: atom<Record<string, unknown>>({}),
+    verifyContextByRequestAtom,
+    addVerifyContextAtom,
+    getVerifyContextKey,
     oneClickAuthPayloadAtom: atom(undefined),
   };
 });
@@ -109,7 +116,7 @@ vi.mock("@tanstack/react-router", async () => {
 
 const mockedTranslation = vi.fn<() => string>();
 vi.mock("react-i18next", () => ({
-  useTranslation: vi.fn().mockReturnValue({ t: vi.fn().mockImplementation(() => mockedTranslation()) }) 
+  useTranslation: vi.fn().mockReturnValue({ t: vi.fn().mockImplementation(() => mockedTranslation()) })
 }));
 
 import {
@@ -123,7 +130,7 @@ import {
   loadingAtom,
   oneClickAuthPayloadAtom,
   showBackToBrowserModalAtom,
-  verifyContextByTopicAtom,
+  verifyContextByRequestAtom,
   walletKitAtom,
 } from "@/store/walletKit.store";
 
@@ -189,6 +196,10 @@ describe("useWalletConnect", () => {
         },
         proposal: {
           getAll: vi.fn(() => []),
+          keys: [12],
+        },
+        auth: {
+          requests: { keys: [] as number[] },
         },
       },
     },
@@ -204,6 +215,7 @@ describe("useWalletConnect", () => {
     walletKitListeners.clear();
     relayerListeners.clear();
     coreMock.relayer.connected = false;
+    walletKitMock.engine.signClient.auth.requests.keys = [];
     walletKitMock.engine.signClient.session.get.mockReturnValue(sessionRecord);
     window.open = vi.fn();
 
@@ -216,7 +228,7 @@ describe("useWalletConnect", () => {
     store.set(connectionStatusAtom as never, "disconnected");
     store.set(loadingAtom as never, false);
     store.set(showBackToBrowserModalAtom as never, false);
-    store.set(verifyContextByTopicAtom as never, {});
+    store.set(verifyContextByRequestAtom, {});
     store.set(oneClickAuthPayloadAtom as never, undefined);
 
     mockedUseNavigate.mockReturnValue(navigateMock);
@@ -253,12 +265,22 @@ describe("useWalletConnect", () => {
   });
 
   it("handles session proposals by navigating to the proposal page", async () => {
+    // Entries WalletKit no longer holds, to be pruned, including an auth
+    // request sharing the incoming proposal's id
+    store.set(verifyContextByRequestAtom, {
+      "proposal:5": { verified: { origin: "https://stale.example" } } as never,
+      "auth:12": { verified: { origin: "https://stale.example" } } as never,
+    });
     mountHook();
 
     walletKitListeners.get("session_proposal")?.({
       id: 12,
       params: { pairingTopic: "pairing-topic" },
       verifyContext: { verified: { origin: "https://app.example" } },
+    });
+
+    expect(store.get(verifyContextByRequestAtom)).toEqual({
+      "proposal:12": { verified: { origin: "https://app.example" } },
     });
 
     await waitFor(() => {
@@ -612,5 +634,22 @@ describe("useWalletConnect", () => {
         expect.objectContaining({ to: "/oneclickauth" }),
       );
     });
+  });
+
+  it("clears the verdict of a completed auth request whose id is reused without verify context", () => {
+    // Verdict left by a completed SCAM auth request with the same id
+    store.set(verifyContextByRequestAtom, {
+      "auth:7": { verified: { isScam: true } } as never,
+    });
+    walletKitMock.engine.signClient.auth.requests.keys = [7];
+    mountHook();
+
+    walletKitListeners.get("session_authenticate")?.({
+      id: 7,
+      topic: "topic-1",
+      params: { authPayload: { chains: ["eip155:1"], methods: [] } },
+    });
+
+    expect(store.get(verifyContextByRequestAtom)).toEqual({});
   });
 });
