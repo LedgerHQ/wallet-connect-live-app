@@ -3,6 +3,12 @@
     "title": "We are currently experiencing a temporary issue with WalletConnect v2 integration.",
     "desc": "We are actively working to identify and implement a solution to restore the functionality as soon as possible. Thank you for your understanding."
   },
+  "notInLedgerWallet": {
+    "title": "Open WalletConnect in Ledger Wallet",
+    "desc": "WalletConnect only works inside the Ledger Wallet app. Open it in Ledger Wallet, or download the app if you don't have it yet.",
+    "open": "Open in Ledger Wallet",
+    "download": "Download Ledger Wallet"
+  },
   "errorBoundary": {
     "title": "Oops, something went wrong!",
     "desc": "We have been notified of this error. Please try again by refreshing the page."

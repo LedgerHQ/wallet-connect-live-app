@@ -15,3 +15,8 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+interface Window {
+  readonly ElectronWebview?: unknown;
+  readonly ReactNativeWebView?: unknown;
+}
