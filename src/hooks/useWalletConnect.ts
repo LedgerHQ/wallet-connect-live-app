@@ -9,7 +9,7 @@ import {
   loadingAtom,
   oneClickAuthPayloadAtom,
   showBackToBrowserModalAtom,
-  verifyContextByTopicAtom,
+  addVerifyContextAtom,
   walletKitAtom,
 } from "@/store/walletKit.store";
 import { OneClickAuthPayload } from "@/types/types";
@@ -118,7 +118,7 @@ export default function useWalletConnect() {
   const client = useAtomValue(walletAPIClientAtom);
   const walletInfo = useAtomValue(walletInfoAtom);
   const walletCapabilities = useAtomValue(walletCapabilitiesAtom);
-  const setVerifyContextByTopic = useSetAtom(verifyContextByTopicAtom);
+  const addVerifyContext = useSetAtom(addVerifyContextAtom);
 
   const accounts = useAccounts(client);
 
@@ -132,10 +132,11 @@ export default function useWalletConnect() {
 
   const onSessionProposal = useCallback(
     (proposal: WalletKitTypes.SessionProposal) => {
-      setVerifyContextByTopic((verifyByTopic) => ({
-        ...verifyByTopic,
-        [proposal.params.pairingTopic]: proposal.verifyContext,
-      }));
+      addVerifyContext({
+        id: proposal.id,
+        context: proposal.verifyContext,
+        expiryTimestamp: proposal.params.expiryTimestamp,
+      });
 
       void queryClient
         .invalidateQueries({
@@ -156,7 +157,7 @@ export default function useWalletConnect() {
           });
         });
     },
-    [navigate, pendingProposalsQueryFn, queryClient, setVerifyContextByTopic],
+    [navigate, pendingProposalsQueryFn, queryClient, addVerifyContext],
   );
 
   const setShowModal = useSetAtom(showBackToBrowserModalAtom);
@@ -184,13 +185,7 @@ export default function useWalletConnect() {
         topic,
         params: { request, chainId },
         id,
-        verifyContext,
       } = requestEvent;
-
-      setVerifyContextByTopic((verifyByTopic) => ({
-        ...verifyByTopic,
-        [topic]: verifyContext,
-      }));
 
       void (async () => {
         try {
@@ -351,7 +346,6 @@ export default function useWalletConnect() {
       });
     },
     [
-      setVerifyContextByTopic,
       walletCapabilities,
       walletInfo,
       accounts.data,
@@ -371,10 +365,13 @@ export default function useWalletConnect() {
   const setOneClickAuthPayload = useSetAtom(oneClickAuthPayloadAtom);
   const onSessionAuthenticate = useCallback(
     (payload: OneClickAuthPayload) => {
-      setVerifyContextByTopic((verifyByTopic) => ({
-        ...verifyByTopic,
-        [payload.topic]: payload.verifyContext!,
-      }));
+      if (payload.verifyContext) {
+        addVerifyContext({
+          id: payload.id,
+          context: payload.verifyContext,
+          expiryTimestamp: payload.params.expiryTimestamp,
+        });
+      }
 
       setOneClickAuthPayload(payload);
       void navigate({
@@ -382,7 +379,7 @@ export default function useWalletConnect() {
         search: (search) => search,
       });
     },
-    [navigate, setOneClickAuthPayload, setVerifyContextByTopic],
+    [navigate, setOneClickAuthPayload, addVerifyContext],
   );
 
   useEffect(() => {

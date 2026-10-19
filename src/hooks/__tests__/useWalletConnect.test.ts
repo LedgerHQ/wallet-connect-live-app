@@ -15,15 +15,18 @@ import { Errors, rejectRequest } from "../requestHandlers/utils";
 import useAccounts from "../useAccounts";
 import useWalletConnect from "../useWalletConnect";
 
-vi.mock("@/store/walletKit.store", async () => {
+vi.mock("@/store/walletKit.store", async (importOriginal) => {
   const { atom } = await import("jotai");
+  const { verifyContextByProposalIdAtom, addVerifyContextAtom } =
+    await importOriginal<typeof import("@/store/walletKit.store")>();
   return {
     coreAtom: atom(null),
     walletKitAtom: atom(null),
     connectionStatusAtom: atom("disconnected"),
     loadingAtom: atom(false),
     showBackToBrowserModalAtom: atom(false),
-    verifyContextByTopicAtom: atom<Record<string, unknown>>({}),
+    verifyContextByProposalIdAtom,
+    addVerifyContextAtom,
     oneClickAuthPayloadAtom: atom(undefined),
   };
 });
@@ -109,7 +112,7 @@ vi.mock("@tanstack/react-router", async () => {
 
 const mockedTranslation = vi.fn<() => string>();
 vi.mock("react-i18next", () => ({
-  useTranslation: vi.fn().mockReturnValue({ t: vi.fn().mockImplementation(() => mockedTranslation()) }) 
+  useTranslation: vi.fn().mockReturnValue({ t: vi.fn().mockImplementation(() => mockedTranslation()) })
 }));
 
 import {
@@ -123,7 +126,7 @@ import {
   loadingAtom,
   oneClickAuthPayloadAtom,
   showBackToBrowserModalAtom,
-  verifyContextByTopicAtom,
+  verifyContextByProposalIdAtom,
   walletKitAtom,
 } from "@/store/walletKit.store";
 
@@ -216,7 +219,7 @@ describe("useWalletConnect", () => {
     store.set(connectionStatusAtom as never, "disconnected");
     store.set(loadingAtom as never, false);
     store.set(showBackToBrowserModalAtom as never, false);
-    store.set(verifyContextByTopicAtom as never, {});
+    store.set(verifyContextByProposalIdAtom, {});
     store.set(oneClickAuthPayloadAtom as never, undefined);
 
     mockedUseNavigate.mockReturnValue(navigateMock);
@@ -257,8 +260,15 @@ describe("useWalletConnect", () => {
 
     walletKitListeners.get("session_proposal")?.({
       id: 12,
-      params: { pairingTopic: "pairing-topic" },
+      params: { pairingTopic: "pairing-topic", expiryTimestamp: 1_900_000_000 },
       verifyContext: { verified: { origin: "https://app.example" } },
+    });
+
+    expect(store.get(verifyContextByProposalIdAtom)).toEqual({
+      12: {
+        context: { verified: { origin: "https://app.example" } },
+        expiresAt: 1_900_000_000,
+      },
     });
 
     await waitFor(() => {
