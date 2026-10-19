@@ -383,13 +383,11 @@ export default function useWalletConnect() {
   const setOneClickAuthPayload = useSetAtom(oneClickAuthPayloadAtom);
   const onSessionAuthenticate = useCallback(
     (payload: OneClickAuthPayload) => {
-      if (payload.verifyContext) {
-        addVerifyContext({
-          key: getVerifyContextKey("auth", payload.id),
-          context: payload.verifyContext,
-          pendingKeys: getPendingKeys(),
-        });
-      }
+      addVerifyContext({
+        key: getVerifyContextKey("auth", payload.id),
+        context: payload.verifyContext,
+        pendingKeys: getPendingKeys(),
+      });
 
       setOneClickAuthPayload(payload);
       void navigate({

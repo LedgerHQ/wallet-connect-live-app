@@ -58,7 +58,9 @@ export const verifyContextByRequestAtom =
   );
 
 // Stores a request's verify context and drops the entries of requests
-// WalletKit no longer holds (approved, rejected or expired). Relying on
+// WalletKit no longer holds (approved, rejected or expired). A request without
+// context clears its key, so it can't inherit the verdict of a completed
+// request that had the same id. Relying on
 // WalletKit rather than on the request's expiryTimestamp, which comes from the
 // dApp's clock, keeps an entry for exactly as long as its request is shown.
 export const addVerifyContextAtom = atom(
@@ -70,15 +72,15 @@ export const addVerifyContextAtom = atom(
       key,
       context,
       pendingKeys,
-    }: { key: string; context: Verify.Context; pendingKeys: string[] },
+    }: { key: string; context?: Verify.Context; pendingKeys: string[] },
   ) => {
     set(verifyContextByRequestAtom, (stored) => ({
       ...Object.fromEntries(
-        Object.entries(stored).filter(([storedKey]) =>
-          pendingKeys.includes(storedKey),
+        Object.entries(stored).filter(
+          ([storedKey]) => storedKey !== key && pendingKeys.includes(storedKey),
         ),
       ),
-      [key]: context,
+      ...(context && { [key]: context }),
     }));
   },
 );

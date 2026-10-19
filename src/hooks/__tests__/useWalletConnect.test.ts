@@ -199,7 +199,7 @@ describe("useWalletConnect", () => {
           keys: [12],
         },
         auth: {
-          requests: { keys: [] },
+          requests: { keys: [] as number[] },
         },
       },
     },
@@ -215,6 +215,7 @@ describe("useWalletConnect", () => {
     walletKitListeners.clear();
     relayerListeners.clear();
     coreMock.relayer.connected = false;
+    walletKitMock.engine.signClient.auth.requests.keys = [];
     walletKitMock.engine.signClient.session.get.mockReturnValue(sessionRecord);
     window.open = vi.fn();
 
@@ -633,5 +634,22 @@ describe("useWalletConnect", () => {
         expect.objectContaining({ to: "/oneclickauth" }),
       );
     });
+  });
+
+  it("clears the verdict of a completed auth request whose id is reused without verify context", () => {
+    // Verdict left by a completed SCAM auth request with the same id
+    store.set(verifyContextByRequestAtom, {
+      "auth:7": { verified: { isScam: true } } as never,
+    });
+    walletKitMock.engine.signClient.auth.requests.keys = [7];
+    mountHook();
+
+    walletKitListeners.get("session_authenticate")?.({
+      id: 7,
+      topic: "topic-1",
+      params: { authPayload: { chains: ["eip155:1"], methods: [] } },
+    });
+
+    expect(store.get(verifyContextByRequestAtom)).toEqual({});
   });
 });
