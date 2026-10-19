@@ -7,6 +7,7 @@ import {
   getDisplayName,
   getErrorMessage,
   getNamespace,
+  getSafeRedirectUrl,
   getTicker,
   isCosmosChain,
   isCosmosSupportEnabled,
@@ -384,5 +385,51 @@ describe("getErrorMessage", () => {
     circular.self = circular;
 
     expect(getErrorMessage(circular)).toBe("Could not stringify error");
+  });
+
+  describe("getSafeRedirectUrl", () => {
+    it("returns valid http and custom scheme urls", () => {
+      expect(
+        getSafeRedirectUrl({ universal: "https://app.uniswap.org/swap" }),
+      ).toBe("https://app.uniswap.org/swap");
+      expect(getSafeRedirectUrl({ native: "uniswap://" })).toBe("uniswap://");
+    });
+
+    it("prefers native over universal", () => {
+      expect(
+        getSafeRedirectUrl({
+          native: "uniswap://",
+          universal: "https://app.uniswap.org",
+        }),
+      ).toBe("uniswap://");
+    });
+
+    it.each([
+      "ledgerwallet://discover/foo",
+      "ledgerlive://swap",
+      "LedgerWallet://discover/foo",
+      "  ledgerlive://swap",
+      "javascript:alert(1)",
+      "data:text/html,<script>alert(1)</script>",
+      "file:///etc/passwd",
+      "not a url",
+    ])("rejects %s", (url) => {
+      expect(getSafeRedirectUrl({ native: url })).toBeUndefined();
+      expect(getSafeRedirectUrl({ universal: url })).toBeUndefined();
+    });
+
+    it("falls back to universal when native is not allowed", () => {
+      expect(
+        getSafeRedirectUrl({
+          native: "ledgerwallet://discover/foo",
+          universal: "https://app.uniswap.org/",
+        }),
+      ).toBe("https://app.uniswap.org/");
+    });
+
+    it("returns undefined when no redirect is provided", () => {
+      expect(getSafeRedirectUrl()).toBeUndefined();
+      expect(getSafeRedirectUrl({})).toBeUndefined();
+    });
   });
 });
