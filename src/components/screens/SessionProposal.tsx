@@ -88,6 +88,7 @@ export default function SessionProposal({
   }, [analytics, navigateToHome]);
 
   const onApprove = useCallback(() => {
+    if (verificationStatus === "SCAM") return;
     analytics.track("button_clicked", {
       button: "WC-Connect",
       page: "Wallet Connect Session Request",
@@ -111,6 +112,7 @@ export default function SessionProposal({
     dApp,
     dAppUrl,
     isOneClickAuth,
+    verificationStatus,
   ]);
 
   const onReject = useCallback(() => {
@@ -176,8 +178,14 @@ export default function SessionProposal({
   const disabled = useMemo(
     () =>
       approving ||
+      verificationStatus === "SCAM" ||
       !(everyRequiredChainsSelected && selectedAccounts.length > 0),
-    [approving, everyRequiredChainsSelected, selectedAccounts.length],
+    [
+      approving,
+      verificationStatus,
+      everyRequiredChainsSelected,
+      selectedAccounts.length,
+    ],
   );
 
   const iconProposer = useMemo(

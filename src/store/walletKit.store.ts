@@ -1,4 +1,5 @@
 import { atom } from "jotai";
+import { atomWithStorage } from "jotai/utils";
 import { Core } from "@walletconnect/core";
 import type { Verify } from "@walletconnect/types";
 import { WalletKit } from "@reown/walletkit";
@@ -36,6 +37,14 @@ export const showBackToBrowserModalAtom = atom(false);
 
 export type VerifyContextByTopic = Record<string, Verify.Context>;
 
-export const verifyContextByTopicAtom = atom<VerifyContextByTopic>({});
+// Persisted because pending proposals survive a reload (WalletKit stores them)
+// but their verify context can't be resolved again, which would downgrade a
+// SCAM proposal to UNKNOWN.
+export const verifyContextByTopicAtom = atomWithStorage<VerifyContextByTopic>(
+  "verifyContextByTopic",
+  {},
+  undefined,
+  { getOnInit: true },
+);
 
 export const oneClickAuthPayloadAtom = atom<OneClickAuthPayload>();

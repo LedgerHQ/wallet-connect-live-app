@@ -132,10 +132,10 @@ export default function useWalletConnect() {
 
   const onSessionProposal = useCallback(
     (proposal: WalletKitTypes.SessionProposal) => {
-      setVerifyContextByTopic((verifyByTopic) => {
-        verifyByTopic[proposal.params.pairingTopic] = proposal.verifyContext;
-        return verifyByTopic;
-      });
+      setVerifyContextByTopic((verifyByTopic) => ({
+        ...verifyByTopic,
+        [proposal.params.pairingTopic]: proposal.verifyContext,
+      }));
 
       void queryClient
         .invalidateQueries({
@@ -187,10 +187,10 @@ export default function useWalletConnect() {
         verifyContext,
       } = requestEvent;
 
-      setVerifyContextByTopic((verifyByTopic) => {
-        verifyByTopic[topic] = verifyContext;
-        return verifyByTopic;
-      });
+      setVerifyContextByTopic((verifyByTopic) => ({
+        ...verifyByTopic,
+        [topic]: verifyContext,
+      }));
 
       void (async () => {
         try {
@@ -371,10 +371,10 @@ export default function useWalletConnect() {
   const setOneClickAuthPayload = useSetAtom(oneClickAuthPayloadAtom);
   const onSessionAuthenticate = useCallback(
     (payload: OneClickAuthPayload) => {
-      setVerifyContextByTopic((verifyByTopic) => {
-        verifyByTopic[payload.topic] = payload.verifyContext!;
-        return verifyByTopic;
-      });
+      setVerifyContextByTopic((verifyByTopic) => ({
+        ...verifyByTopic,
+        [payload.topic]: payload.verifyContext!,
+      }));
 
       setOneClickAuthPayload(payload);
       void navigate({
