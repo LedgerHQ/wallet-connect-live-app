@@ -119,6 +119,13 @@ export default function useWalletConnect() {
   const walletInfo = useAtomValue(walletInfoAtom);
   const walletCapabilities = useAtomValue(walletCapabilitiesAtom);
   const addVerifyContext = useSetAtom(addVerifyContextAtom);
+  const getPendingIds = useCallback(
+    () => [
+      ...walletKit.engine.signClient.proposal.keys,
+      ...walletKit.engine.signClient.auth.requests.keys,
+    ],
+    [walletKit],
+  );
 
   const accounts = useAccounts(client);
 
@@ -135,7 +142,7 @@ export default function useWalletConnect() {
       addVerifyContext({
         id: proposal.id,
         context: proposal.verifyContext,
-        expiryTimestamp: proposal.params.expiryTimestamp,
+        pendingIds: getPendingIds(),
       });
 
       void queryClient
@@ -157,7 +164,13 @@ export default function useWalletConnect() {
           });
         });
     },
-    [navigate, pendingProposalsQueryFn, queryClient, addVerifyContext],
+    [
+      navigate,
+      pendingProposalsQueryFn,
+      queryClient,
+      addVerifyContext,
+      getPendingIds,
+    ],
   );
 
   const setShowModal = useSetAtom(showBackToBrowserModalAtom);
@@ -369,7 +382,7 @@ export default function useWalletConnect() {
         addVerifyContext({
           id: payload.id,
           context: payload.verifyContext,
-          expiryTimestamp: payload.params.expiryTimestamp,
+          pendingIds: getPendingIds(),
         });
       }
 
@@ -379,7 +392,7 @@ export default function useWalletConnect() {
         search: (search) => search,
       });
     },
-    [navigate, setOneClickAuthPayload, addVerifyContext],
+    [navigate, setOneClickAuthPayload, addVerifyContext, getPendingIds],
   );
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { renderHook } from "@testing-library/react";
 import { Provider, createStore } from "jotai";
 import { ReactNode } from "react";
@@ -10,6 +10,8 @@ import {
   verifyContextByProposalIdAtom,
 } from "@/store/walletKit.store";
 
+// The mock's expiryTimestamp is long past, standing in for a dApp whose clock
+// is behind ours: the verdict must still hold while the proposal is pending.
 const proposal = sessionProposal as ProposalTypes.Struct;
 
 const scamContext: Verify.Context = {
@@ -20,8 +22,6 @@ const scamContext: Verify.Context = {
     isScam: true,
   },
 };
-
-const NOW = 1_800_000_000;
 
 const renderVerification = (
   store: ReturnType<typeof createStore>,
@@ -35,19 +35,14 @@ const renderVerification = (
 
 describe("verify context persistence", () => {
   beforeEach(() => {
-    vi.useFakeTimers({ now: NOW * 1000 });
     localStorage.clear();
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
   });
 
   it("keeps a SCAM verdict for a pending proposal after a reload", () => {
     createStore().set(addVerifyContextAtom, {
       id: proposal.id,
       context: scamContext,
-      expiryTimestamp: NOW + 300,
+      pendingIds: [proposal.id],
     });
 
     // A fresh store stands in for the app after a reload
@@ -59,27 +54,34 @@ describe("verify context persistence", () => {
     store.set(addVerifyContextAtom, {
       id: proposal.id,
       context: scamContext,
-      expiryTimestamp: NOW + 300,
+      pendingIds: [proposal.id],
     });
 
     const otherProposal = { ...proposal, id: proposal.id + 1 };
     expect(renderVerification(store, otherProposal)).toBe("UNKNOWN");
   });
 
-  it("drops expired entries when a new one is stored", () => {
+  it("only drops the entries of proposals WalletKit no longer holds", () => {
     const store = createStore();
     store.set(addVerifyContextAtom, {
       id: 1,
       context: scamContext,
-      expiryTimestamp: NOW - 1,
+      pendingIds: [1],
     });
-    store.set(addVerifyContextAtom, { id: 2, context: scamContext });
+    store.set(addVerifyContextAtom, {
+      id: 2,
+      context: scamContext,
+      pendingIds: [1, 2],
+    });
+    store.set(addVerifyContextAtom, {
+      id: 3,
+      context: scamContext,
+      pendingIds: [2, 3],
+    });
 
     expect(Object.keys(store.get(verifyContextByProposalIdAtom))).toEqual([
       "2",
+      "3",
     ]);
-    expect(store.get(verifyContextByProposalIdAtom)[2].expiresAt).toBe(
-      NOW + 300,
-    );
   });
 });

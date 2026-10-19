@@ -10,7 +10,7 @@ const useVerification = (
   const verifyContextByProposalId = useAtomValue(verifyContextByProposalIdAtom);
 
   return useMemo<VerificationStatus>(() => {
-    const context = verifyContextByProposalId[proposal.id]?.context;
+    const context = verifyContextByProposalId[proposal.id];
     if (!context) {
       return "UNKNOWN";
     }

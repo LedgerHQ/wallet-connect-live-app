@@ -35,17 +35,7 @@ export const loadingAtom = atom(false);
 
 export const showBackToBrowserModalAtom = atom(false);
 
-type StoredVerifyContext = {
-  context: Verify.Context;
-  // Unix timestamp in seconds, same unit as WalletConnect expiries
-  expiresAt: number;
-};
-
-export type VerifyContextByProposalId = Record<string, StoredVerifyContext>;
-
-// Fallback when a request carries no expiry, matching WalletConnect's default
-// proposal TTL.
-const DEFAULT_VERIFY_CONTEXT_TTL = 5 * 60;
+export type VerifyContextByProposalId = Record<string, Verify.Context>;
 
 // Persisted because pending proposals survive a reload (WalletKit stores them)
 // but their verify context can't be resolved again, which would downgrade a
@@ -59,8 +49,10 @@ export const verifyContextByProposalIdAtom =
     { getOnInit: true },
   );
 
-// Stores a proposal's verify context and drops the entries of proposals that
-// have since expired, so the storage doesn't grow unbounded.
+// Stores a proposal's verify context and drops the entries of proposals
+// WalletKit no longer holds (approved, rejected or expired). Relying on
+// WalletKit rather than on the proposal's expiryTimestamp, which comes from the
+// dApp's clock, keeps an entry for exactly as long as its proposal is shown.
 export const addVerifyContextAtom = atom(
   null,
   (
@@ -69,18 +61,16 @@ export const addVerifyContextAtom = atom(
     {
       id,
       context,
-      expiryTimestamp,
-    }: { id: number; context: Verify.Context; expiryTimestamp?: number },
+      pendingIds,
+    }: { id: number; context: Verify.Context; pendingIds: number[] },
   ) => {
-    const now = Math.floor(Date.now() / 1000);
     set(verifyContextByProposalIdAtom, (stored) => ({
       ...Object.fromEntries(
-        Object.entries(stored).filter(([, entry]) => entry.expiresAt > now),
+        Object.entries(stored).filter(([key]) =>
+          pendingIds.includes(Number(key)),
+        ),
       ),
-      [id]: {
-        context,
-        expiresAt: expiryTimestamp ?? now + DEFAULT_VERIFY_CONTEXT_TTL,
-      },
+      [id]: context,
     }));
   },
 );

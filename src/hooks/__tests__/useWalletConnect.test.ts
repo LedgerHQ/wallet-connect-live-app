@@ -192,6 +192,10 @@ describe("useWalletConnect", () => {
         },
         proposal: {
           getAll: vi.fn(() => []),
+          keys: [12],
+        },
+        auth: {
+          requests: { keys: [] },
         },
       },
     },
@@ -256,19 +260,20 @@ describe("useWalletConnect", () => {
   });
 
   it("handles session proposals by navigating to the proposal page", async () => {
+    // Entry of a proposal WalletKit no longer holds, to be pruned
+    store.set(verifyContextByProposalIdAtom, {
+      5: { verified: { origin: "https://stale.example" } } as never,
+    });
     mountHook();
 
     walletKitListeners.get("session_proposal")?.({
       id: 12,
-      params: { pairingTopic: "pairing-topic", expiryTimestamp: 1_900_000_000 },
+      params: { pairingTopic: "pairing-topic" },
       verifyContext: { verified: { origin: "https://app.example" } },
     });
 
     expect(store.get(verifyContextByProposalIdAtom)).toEqual({
-      12: {
-        context: { verified: { origin: "https://app.example" } },
-        expiresAt: 1_900_000_000,
-      },
+      12: { verified: { origin: "https://app.example" } },
     });
 
     await waitFor(() => {
