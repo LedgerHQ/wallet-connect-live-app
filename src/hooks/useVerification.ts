@@ -1,4 +1,8 @@
-import { verifyContextByProposalIdAtom } from "@/store/walletKit.store";
+import {
+  VerifyRequestType,
+  getVerifyContextKey,
+  verifyContextByRequestAtom,
+} from "@/store/walletKit.store";
 import { VerificationStatus } from "@/types/types";
 import { ProposalTypes } from "@walletconnect/types";
 import { useAtomValue } from "jotai";
@@ -6,11 +10,13 @@ import { useMemo } from "react";
 
 const useVerification = (
   proposal: ProposalTypes.Struct,
+  type: VerifyRequestType = "proposal",
 ): VerificationStatus => {
-  const verifyContextByProposalId = useAtomValue(verifyContextByProposalIdAtom);
+  const verifyContextByRequest = useAtomValue(verifyContextByRequestAtom);
 
   return useMemo<VerificationStatus>(() => {
-    const context = verifyContextByProposalId[proposal.id];
+    const context =
+      verifyContextByRequest[getVerifyContextKey(type, proposal.id)];
     if (!context) {
       return "UNKNOWN";
     }
@@ -20,6 +26,6 @@ const useVerification = (
     }
 
     return context.verified.validation;
-  }, [proposal.id, verifyContextByProposalId]);
+  }, [proposal.id, type, verifyContextByRequest]);
 };
 export default useVerification;

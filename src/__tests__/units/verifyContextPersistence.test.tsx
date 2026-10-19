@@ -6,13 +6,16 @@ import sessionProposal from "@/data/mocks/sessionProposal.example.json";
 import { ProposalTypes, Verify } from "@walletconnect/types";
 import useVerification from "@/hooks/useVerification";
 import {
+  VerifyRequestType,
   addVerifyContextAtom,
-  verifyContextByProposalIdAtom,
+  getVerifyContextKey,
+  verifyContextByRequestAtom,
 } from "@/store/walletKit.store";
 
 // The mock's expiryTimestamp is long past, standing in for a dApp whose clock
 // is behind ours: the verdict must still hold while the proposal is pending.
 const proposal = sessionProposal as ProposalTypes.Struct;
+const proposalKey = getVerifyContextKey("proposal", proposal.id);
 
 const scamContext: Verify.Context = {
   verified: {
@@ -23,11 +26,20 @@ const scamContext: Verify.Context = {
   },
 };
 
+const validContext: Verify.Context = {
+  verified: {
+    verifyUrl: "https://verify.walletconnect.org",
+    validation: "VALID",
+    origin: "https://legit.example",
+  },
+};
+
 const renderVerification = (
   store: ReturnType<typeof createStore>,
   target: ProposalTypes.Struct,
+  type?: VerifyRequestType,
 ) =>
-  renderHook(() => useVerification(target), {
+  renderHook(() => useVerification(target, type), {
     wrapper: ({ children }: { children: ReactNode }) => (
       <Provider store={store}>{children}</Provider>
     ),
@@ -40,9 +52,9 @@ describe("verify context persistence", () => {
 
   it("keeps a SCAM verdict for a pending proposal after a reload", () => {
     createStore().set(addVerifyContextAtom, {
-      id: proposal.id,
+      key: proposalKey,
       context: scamContext,
-      pendingIds: [proposal.id],
+      pendingKeys: [proposalKey],
     });
 
     // A fresh store stands in for the app after a reload
@@ -52,36 +64,57 @@ describe("verify context persistence", () => {
   it("does not reuse the verdict of another proposal on the same pairing", () => {
     const store = createStore();
     store.set(addVerifyContextAtom, {
-      id: proposal.id,
+      key: proposalKey,
       context: scamContext,
-      pendingIds: [proposal.id],
+      pendingKeys: [proposalKey],
     });
 
     const otherProposal = { ...proposal, id: proposal.id + 1 };
     expect(renderVerification(store, otherProposal)).toBe("UNKNOWN");
   });
 
-  it("only drops the entries of proposals WalletKit no longer holds", () => {
+  it("does not let an auth request with the same id overwrite a proposal's verdict", () => {
     const store = createStore();
+    const authKey = getVerifyContextKey("auth", proposal.id);
     store.set(addVerifyContextAtom, {
-      id: 1,
+      key: proposalKey,
       context: scamContext,
-      pendingIds: [1],
+      pendingKeys: [proposalKey],
     });
     store.set(addVerifyContextAtom, {
-      id: 2,
-      context: scamContext,
-      pendingIds: [1, 2],
-    });
-    store.set(addVerifyContextAtom, {
-      id: 3,
-      context: scamContext,
-      pendingIds: [2, 3],
+      key: authKey,
+      context: validContext,
+      pendingKeys: [proposalKey, authKey],
     });
 
-    expect(Object.keys(store.get(verifyContextByProposalIdAtom))).toEqual([
-      "2",
-      "3",
+    expect(renderVerification(store, proposal)).toBe("SCAM");
+    expect(renderVerification(store, proposal, "auth")).toBe("VALID");
+  });
+
+  it("only drops the entries of requests WalletKit no longer holds", () => {
+    const store = createStore();
+    const [first, second, third] = [1, 2, 3].map((id) =>
+      getVerifyContextKey("proposal", id),
+    );
+    store.set(addVerifyContextAtom, {
+      key: first,
+      context: scamContext,
+      pendingKeys: [first],
+    });
+    store.set(addVerifyContextAtom, {
+      key: second,
+      context: scamContext,
+      pendingKeys: [first, second],
+    });
+    store.set(addVerifyContextAtom, {
+      key: third,
+      context: scamContext,
+      pendingKeys: [second, third],
+    });
+
+    expect(Object.keys(store.get(verifyContextByRequestAtom))).toEqual([
+      second,
+      third,
     ]);
   });
 });

@@ -35,42 +35,50 @@ export const loadingAtom = atom(false);
 
 export const showBackToBrowserModalAtom = atom(false);
 
-export type VerifyContextByProposalId = Record<string, Verify.Context>;
+export type VerifyRequestType = "proposal" | "auth";
+
+export type VerifyContextByRequest = Record<string, Verify.Context>;
+
+// Proposals and one-click auth requests live in separate WalletKit stores and
+// their ids are picked by the dApp, so the same id can exist in both. The type
+// is part of the key so an auth verdict can't overwrite a proposal's.
+export const getVerifyContextKey = (type: VerifyRequestType, id: number) =>
+  `${type}:${id}`;
 
 // Persisted because pending proposals survive a reload (WalletKit stores them)
 // but their verify context can't be resolved again, which would downgrade a
-// SCAM proposal to UNKNOWN. Keyed by proposal id rather than pairing topic, as
-// a pairing can carry several proposals.
-export const verifyContextByProposalIdAtom =
-  atomWithStorage<VerifyContextByProposalId>(
-    "verifyContextByProposalId",
+// SCAM proposal to UNKNOWN. Keyed by request rather than pairing topic, as a
+// pairing can carry several proposals.
+export const verifyContextByRequestAtom =
+  atomWithStorage<VerifyContextByRequest>(
+    "verifyContextByRequest",
     {},
     undefined,
     { getOnInit: true },
   );
 
-// Stores a proposal's verify context and drops the entries of proposals
+// Stores a request's verify context and drops the entries of requests
 // WalletKit no longer holds (approved, rejected or expired). Relying on
-// WalletKit rather than on the proposal's expiryTimestamp, which comes from the
-// dApp's clock, keeps an entry for exactly as long as its proposal is shown.
+// WalletKit rather than on the request's expiryTimestamp, which comes from the
+// dApp's clock, keeps an entry for exactly as long as its request is shown.
 export const addVerifyContextAtom = atom(
   null,
   (
     _get,
     set,
     {
-      id,
+      key,
       context,
-      pendingIds,
-    }: { id: number; context: Verify.Context; pendingIds: number[] },
+      pendingKeys,
+    }: { key: string; context: Verify.Context; pendingKeys: string[] },
   ) => {
-    set(verifyContextByProposalIdAtom, (stored) => ({
+    set(verifyContextByRequestAtom, (stored) => ({
       ...Object.fromEntries(
-        Object.entries(stored).filter(([key]) =>
-          pendingIds.includes(Number(key)),
+        Object.entries(stored).filter(([storedKey]) =>
+          pendingKeys.includes(storedKey),
         ),
       ),
-      [id]: context,
+      [key]: context,
     }));
   },
 );

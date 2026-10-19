@@ -69,7 +69,10 @@ export default function SessionProposal({
   const [approving, setApproving] = useState(false);
   const [rejecting, setRejecting] = useState(false);
 
-  const verificationStatus = useVerification(proposal);
+  const verificationStatus = useVerification(
+    proposal,
+    isOneClickAuth ? "auth" : "proposal",
+  );
 
   useEffect(() => {
     analytics.page("Wallet Connect Session Request", {

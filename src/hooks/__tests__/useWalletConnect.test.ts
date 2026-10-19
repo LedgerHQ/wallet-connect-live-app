@@ -17,16 +17,20 @@ import useWalletConnect from "../useWalletConnect";
 
 vi.mock("@/store/walletKit.store", async (importOriginal) => {
   const { atom } = await import("jotai");
-  const { verifyContextByProposalIdAtom, addVerifyContextAtom } =
-    await importOriginal<typeof import("@/store/walletKit.store")>();
+  const {
+    verifyContextByRequestAtom,
+    addVerifyContextAtom,
+    getVerifyContextKey,
+  } = await importOriginal<typeof import("@/store/walletKit.store")>();
   return {
     coreAtom: atom(null),
     walletKitAtom: atom(null),
     connectionStatusAtom: atom("disconnected"),
     loadingAtom: atom(false),
     showBackToBrowserModalAtom: atom(false),
-    verifyContextByProposalIdAtom,
+    verifyContextByRequestAtom,
     addVerifyContextAtom,
+    getVerifyContextKey,
     oneClickAuthPayloadAtom: atom(undefined),
   };
 });
@@ -126,7 +130,7 @@ import {
   loadingAtom,
   oneClickAuthPayloadAtom,
   showBackToBrowserModalAtom,
-  verifyContextByProposalIdAtom,
+  verifyContextByRequestAtom,
   walletKitAtom,
 } from "@/store/walletKit.store";
 
@@ -223,7 +227,7 @@ describe("useWalletConnect", () => {
     store.set(connectionStatusAtom as never, "disconnected");
     store.set(loadingAtom as never, false);
     store.set(showBackToBrowserModalAtom as never, false);
-    store.set(verifyContextByProposalIdAtom, {});
+    store.set(verifyContextByRequestAtom, {});
     store.set(oneClickAuthPayloadAtom as never, undefined);
 
     mockedUseNavigate.mockReturnValue(navigateMock);
@@ -260,9 +264,11 @@ describe("useWalletConnect", () => {
   });
 
   it("handles session proposals by navigating to the proposal page", async () => {
-    // Entry of a proposal WalletKit no longer holds, to be pruned
-    store.set(verifyContextByProposalIdAtom, {
-      5: { verified: { origin: "https://stale.example" } } as never,
+    // Entries WalletKit no longer holds, to be pruned, including an auth
+    // request sharing the incoming proposal's id
+    store.set(verifyContextByRequestAtom, {
+      "proposal:5": { verified: { origin: "https://stale.example" } } as never,
+      "auth:12": { verified: { origin: "https://stale.example" } } as never,
     });
     mountHook();
 
@@ -272,8 +278,8 @@ describe("useWalletConnect", () => {
       verifyContext: { verified: { origin: "https://app.example" } },
     });
 
-    expect(store.get(verifyContextByProposalIdAtom)).toEqual({
-      12: { verified: { origin: "https://app.example" } },
+    expect(store.get(verifyContextByRequestAtom)).toEqual({
+      "proposal:12": { verified: { origin: "https://app.example" } },
     });
 
     await waitFor(() => {

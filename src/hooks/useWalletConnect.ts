@@ -10,6 +10,7 @@ import {
   oneClickAuthPayloadAtom,
   showBackToBrowserModalAtom,
   addVerifyContextAtom,
+  getVerifyContextKey,
   walletKitAtom,
 } from "@/store/walletKit.store";
 import { OneClickAuthPayload } from "@/types/types";
@@ -119,10 +120,14 @@ export default function useWalletConnect() {
   const walletInfo = useAtomValue(walletInfoAtom);
   const walletCapabilities = useAtomValue(walletCapabilitiesAtom);
   const addVerifyContext = useSetAtom(addVerifyContextAtom);
-  const getPendingIds = useCallback(
+  const getPendingKeys = useCallback(
     () => [
-      ...walletKit.engine.signClient.proposal.keys,
-      ...walletKit.engine.signClient.auth.requests.keys,
+      ...walletKit.engine.signClient.proposal.keys.map((id) =>
+        getVerifyContextKey("proposal", id),
+      ),
+      ...walletKit.engine.signClient.auth.requests.keys.map((id) =>
+        getVerifyContextKey("auth", id),
+      ),
     ],
     [walletKit],
   );
@@ -140,9 +145,9 @@ export default function useWalletConnect() {
   const onSessionProposal = useCallback(
     (proposal: WalletKitTypes.SessionProposal) => {
       addVerifyContext({
-        id: proposal.id,
+        key: getVerifyContextKey("proposal", proposal.id),
         context: proposal.verifyContext,
-        pendingIds: getPendingIds(),
+        pendingKeys: getPendingKeys(),
       });
 
       void queryClient
@@ -169,7 +174,7 @@ export default function useWalletConnect() {
       pendingProposalsQueryFn,
       queryClient,
       addVerifyContext,
-      getPendingIds,
+      getPendingKeys,
     ],
   );
 
@@ -380,9 +385,9 @@ export default function useWalletConnect() {
     (payload: OneClickAuthPayload) => {
       if (payload.verifyContext) {
         addVerifyContext({
-          id: payload.id,
+          key: getVerifyContextKey("auth", payload.id),
           context: payload.verifyContext,
-          pendingIds: getPendingIds(),
+          pendingKeys: getPendingKeys(),
         });
       }
 
@@ -392,7 +397,7 @@ export default function useWalletConnect() {
         search: (search) => search,
       });
     },
-    [navigate, setOneClickAuthPayload, addVerifyContext, getPendingIds],
+    [navigate, setOneClickAuthPayload, addVerifyContext, getPendingKeys],
   );
 
   useEffect(() => {
