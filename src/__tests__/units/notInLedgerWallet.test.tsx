@@ -53,4 +53,16 @@ describe("getOpenInLedgerWalletUrl", () => {
 
     expect(url.searchParams.get("uri")).toEqual(uri);
   });
+
+  it("should forward the existing session request params", () => {
+    const url = new URL(
+      getOpenInLedgerWalletUrl(
+        "?theme=dark&requestId=42&sessionTopic=topic123",
+      ),
+    );
+
+    expect(url.searchParams.get("requestId")).toEqual("42");
+    expect(url.searchParams.get("sessionTopic")).toEqual("topic123");
+    expect(url.searchParams.has("theme")).toBe(false);
+  });
 });
