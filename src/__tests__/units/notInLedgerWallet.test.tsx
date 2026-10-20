@@ -3,6 +3,7 @@ import { NotInLedgerWallet } from "@/components/NotInLedgerWallet";
 import { DOWNLOAD_URL, getOpenInLedgerWalletUrl } from "@/utils/ledgerWallet";
 import { render, screen } from "@/tests/test.utils";
 import { fireEvent } from "@testing-library/react";
+import { detectLedgerWalletHost } from "@/store/wallet-api.store";
 
 describe("Not In Ledger Wallet Screen", () => {
   afterEach(() => {
@@ -64,5 +65,46 @@ describe("getOpenInLedgerWalletUrl", () => {
     expect(url.searchParams.get("requestId")).toEqual("42");
     expect(url.searchParams.get("sessionTopic")).toEqual("topic123");
     expect(url.searchParams.has("theme")).toBe(false);
+  });
+});
+
+describe("detectLedgerWalletHost", () => {
+  function fakeWindow(props: Record<string, unknown> = {}) {
+    const win = { ...props } as Record<string, unknown>;
+    win.self = win;
+    if (!("top" in props)) {
+      Object.defineProperty(win, "top", { value: win });
+    }
+    return win as unknown as Window;
+  }
+
+  it("should detect the desktop Electron webview", () => {
+    expect(detectLedgerWalletHost(fakeWindow({ ElectronWebview: {} }))).toBe(
+      true,
+    );
+  });
+
+  it("should detect the mobile React Native webview", () => {
+    expect(detectLedgerWalletHost(fakeWindow({ ReactNativeWebView: {} }))).toBe(
+      true,
+    );
+  });
+
+  it("should detect an iframe embed (Ledger Enterprise)", () => {
+    expect(detectLedgerWalletHost(fakeWindow({ top: {} }))).toBe(true);
+  });
+
+  it("should detect an iframe when accessing top throws", () => {
+    const win = fakeWindow({ top: undefined });
+    Object.defineProperty(win, "top", {
+      get() {
+        throw new Error("SecurityError");
+      },
+    });
+    expect(detectLedgerWalletHost(win)).toBe(true);
+  });
+
+  it("should not detect a top level browser tab", () => {
+    expect(detectLedgerWalletHost(fakeWindow())).toBe(false);
   });
 });
