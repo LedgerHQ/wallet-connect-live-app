@@ -42,7 +42,7 @@ Behavior of the live app can be influenced by navigating to it with the followin
 - `mode`: Used to define the initial mode: `scan` to scan a QR Code or `text` to fill the field with a uri.
 - `simulator`: Dev only (`pnpm dev`). Any value runs the app against the `@ledgerhq/wallet-api-simulator` instead of Ledger Wallet. It is ignored in production builds.
 
-Outside of Ledger Wallet (desktop Electron webview or mobile React Native webview), the app shows a screen inviting the user to open it in Ledger Wallet or to download the app.
+Outside of Ledger Wallet (desktop Electron webview, mobile React Native webview, or an iframe embed such as Ledger Enterprise), the app shows a screen inviting the user to open it in Ledger Wallet or to download the app.
 
 ## Architecture
 

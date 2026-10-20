@@ -29,13 +29,28 @@ function getIsSimulator() {
 
 const isSimulator = getIsSimulator();
 
+function isInIframe(win: Window) {
+  try {
+    return win.self !== win.top;
+  } catch {
+    // Accessing `top` can throw when the parent is cross-origin, which means we are framed
+    return true;
+  }
+}
+
 // Ledger Wallet injects these bridges before the app scripts run:
 // - desktop: `ElectronWebview` exposed by the webview preloader
 // - mobile: `ReactNativeWebView` injected by react-native-webview
+// - iframe (e.g. Ledger Enterprise): no bridge, the transport posts to `window.top`
+export function detectLedgerWalletHost(win: Window) {
+  return (
+    Boolean(win.ElectronWebview ?? win.ReactNativeWebView) || isInIframe(win)
+  );
+}
+
 export const isInLedgerWallet =
   isSimulator ||
-  (typeof window !== "undefined" &&
-    Boolean(window.ElectronWebview ?? window.ReactNativeWebView));
+  (typeof window !== "undefined" && detectLedgerWalletHost(window));
 
 export const transportAtom = atom(() => {
   if (typeof window === "undefined") {
