@@ -11,6 +11,7 @@ import {
   TEZOS_CHAINS,
 } from "@/data/network.config";
 import type { WalletInfo } from "@ledgerhq/wallet-api-client";
+import type { Verify } from "@walletconnect/types";
 import semver from "semver";
 
 const TEZOS_NAMESPACES = new Set(
@@ -128,24 +129,59 @@ const FORBIDDEN_REDIRECT_PROTOCOLS = new Set([
   "blob:",
 ]);
 
+function parseAllowedRedirectUrl(candidate?: string) {
+  if (!candidate) return undefined;
+  try {
+    const url = new URL(candidate);
+    return FORBIDDEN_REDIRECT_PROTOCOLS.has(url.protocol) ? undefined : url;
+  } catch {
+    return undefined;
+  }
+}
+
+function getVerifiedOrigin(verifyContext?: Verify.Context) {
+  const verified = verifyContext?.verified;
+  if (verified?.validation !== "VALID" || verified.isScam) return undefined;
+  try {
+    return new URL(verified.origin).origin;
+  } catch {
+    return undefined;
+  }
+}
+
 /**
  * Returns the first valid and allowed redirect url provided by the dApp metadata
  * (native first, then universal), or undefined if none is safe to open
+ *
+ * A native url can't be checked against an origin, WalletConnect has no way to
+ * verify a native app, so it only goes through the protocol checks. A universal
+ * link must also match the origin verified by WalletConnect Verify, otherwise a
+ * dApp could send the user to any website in the name of Ledger.
  */
-export function getSafeRedirectUrl(redirect?: {
-  native?: string;
-  universal?: string;
-}): string | undefined {
-  for (const candidate of [redirect?.native, redirect?.universal]) {
-    if (!candidate) continue;
-    try {
-      const url = new URL(candidate);
-      if (!FORBIDDEN_REDIRECT_PROTOCOLS.has(url.protocol)) return url.href;
-    } catch {
-      // Invalid url, try the next candidate
-    }
+export function getSafeRedirectUrl(
+  redirect?: {
+    native?: string;
+    universal?: string;
+  },
+  verifyContext?: Verify.Context,
+): string | undefined {
+  const native = parseAllowedRedirectUrl(redirect?.native);
+  if (native) return native.href;
+
+  const universal = parseAllowedRedirectUrl(redirect?.universal);
+  const verifiedOrigin = getVerifiedOrigin(verifyContext);
+  if (universal && verifiedOrigin && universal.origin === verifiedOrigin) {
+    return universal.href;
   }
   return undefined;
+}
+
+/**
+ * Opens the dApp redirect url without giving it access to the live app,
+ * neither through `window.opener` nor through the referrer
+ */
+export function openRedirectUrl(url: string) {
+  window.open(url, "_blank", "noopener,noreferrer");
 }
 
 export const getTicker = (chain: string) => SUPPORTED_NETWORK[chain].ticker;

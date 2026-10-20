@@ -1,5 +1,6 @@
 import { SUPPORTED_NETWORK } from "@/data/network.config";
-import { describe, expect, it } from "vitest";
+import type { Verify } from "@walletconnect/types";
+import { describe, expect, it, vi } from "vitest";
 import {
   formatUrl,
   getColor,
@@ -16,6 +17,7 @@ import {
   isTezosChain,
   isTezosSupportEnabled,
   isXRPLSupportEnabled,
+  openRedirectUrl,
   truncate,
 } from "../helper.util";
 
@@ -388,19 +390,36 @@ describe("getErrorMessage", () => {
   });
 
   describe("getSafeRedirectUrl", () => {
-    it("returns valid http and custom scheme urls", () => {
-      expect(
-        getSafeRedirectUrl({ universal: "https://app.uniswap.org/swap" }),
-      ).toBe("https://app.uniswap.org/swap");
+    const verifiedAs = (
+      origin: string,
+      validation: Verify.Context["verified"]["validation"] = "VALID",
+      isScam?: boolean,
+    ): Verify.Context => ({
+      verified: { origin, validation, verifyUrl: "", isScam },
+    });
+
+    it("returns valid custom scheme urls without verification", () => {
       expect(getSafeRedirectUrl({ native: "uniswap://" })).toBe("uniswap://");
+    });
+
+    it("returns a universal link matching the verified origin", () => {
+      expect(
+        getSafeRedirectUrl(
+          { universal: "https://app.uniswap.org/swap" },
+          verifiedAs("https://app.uniswap.org"),
+        ),
+      ).toBe("https://app.uniswap.org/swap");
     });
 
     it("prefers native over universal", () => {
       expect(
-        getSafeRedirectUrl({
-          native: "uniswap://",
-          universal: "https://app.uniswap.org",
-        }),
+        getSafeRedirectUrl(
+          {
+            native: "uniswap://",
+            universal: "https://app.uniswap.org",
+          },
+          verifiedAs("https://app.uniswap.org"),
+        ),
       ).toBe("uniswap://");
     });
 
@@ -411,25 +430,62 @@ describe("getErrorMessage", () => {
       "  ledgerlive://swap",
       "javascript:alert(1)",
       "data:text/html,<script>alert(1)</script>",
+      "vbscript:msgbox(1)",
       "file:///etc/passwd",
+      "blob:https://app.uniswap.org/0f1e2d3c",
       "not a url",
     ])("rejects %s", (url) => {
-      expect(getSafeRedirectUrl({ native: url })).toBeUndefined();
-      expect(getSafeRedirectUrl({ universal: url })).toBeUndefined();
+      const context = verifiedAs("https://app.uniswap.org");
+      expect(getSafeRedirectUrl({ native: url }, context)).toBeUndefined();
+      expect(getSafeRedirectUrl({ universal: url }, context)).toBeUndefined();
     });
 
-    it("falls back to universal when native is not allowed", () => {
+    it("falls back to a verified universal link when native is not allowed", () => {
       expect(
-        getSafeRedirectUrl({
-          native: "ledgerwallet://discover/foo",
-          universal: "https://app.uniswap.org/",
-        }),
+        getSafeRedirectUrl(
+          {
+            native: "ledgerwallet://discover/foo",
+            universal: "https://app.uniswap.org/",
+          },
+          verifiedAs("https://app.uniswap.org"),
+        ),
       ).toBe("https://app.uniswap.org/");
+    });
+
+    it.each([
+      ["no verify context", undefined],
+      ["an unknown origin", verifiedAs("https://app.uniswap.org", "UNKNOWN")],
+      ["an invalid origin", verifiedAs("https://app.uniswap.org", "INVALID")],
+      ["a scam origin", verifiedAs("https://app.uniswap.org", "VALID", true)],
+      ["another verified origin", verifiedAs("https://evil.example")],
+      ["a lookalike subdomain", verifiedAs("https://uniswap.org")],
+      ["another scheme", verifiedAs("http://app.uniswap.org")],
+      ["an unparsable origin", verifiedAs("app.uniswap.org")],
+    ])("rejects a universal link with %s", (_, context) => {
+      expect(
+        getSafeRedirectUrl(
+          { universal: "https://app.uniswap.org/swap" },
+          context,
+        ),
+      ).toBeUndefined();
     });
 
     it("returns undefined when no redirect is provided", () => {
       expect(getSafeRedirectUrl()).toBeUndefined();
       expect(getSafeRedirectUrl({})).toBeUndefined();
+    });
+  });
+
+  describe("openRedirectUrl", () => {
+    it("opens the url without opener nor referrer", () => {
+      const open = vi.spyOn(window, "open").mockReturnValue(null);
+      openRedirectUrl("uniswap://");
+      expect(open).toHaveBeenCalledWith(
+        "uniswap://",
+        "_blank",
+        "noopener,noreferrer",
+      );
+      open.mockRestore();
     });
   });
 });

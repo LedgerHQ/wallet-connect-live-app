@@ -2,13 +2,19 @@ import useAccounts, { queryKey as accountsQueryKey } from "@/hooks/useAccounts";
 import useAnalytics from "@/hooks/useAnalytics";
 import { walletAPIClientAtom } from "@/store/wallet-api.store";
 import {
+  getVerifyContextKey,
   showBackToBrowserModalAtom,
+  verifyContextByRequestAtom,
   walletKitAtom,
 } from "@/store/walletKit.store";
 import { OneClickAuthPayload } from "@/types/types";
 import { fetchBip122Addresses } from "@/utils/bip122";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
-import { getErrorMessage, getSafeRedirectUrl } from "@/utils/helper.util";
+import {
+  getErrorMessage,
+  getSafeRedirectUrl,
+  openRedirectUrl,
+} from "@/utils/helper.util";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { ProposalTypes } from "@walletconnect/types";
@@ -65,10 +71,19 @@ export function useProposal(
   const sessionsQueryFn = useSessionsQueryFn(walletKit);
 
   const setShowModal = useSetAtom(showBackToBrowserModalAtom);
-  const url = getSafeRedirectUrl(proposal.proposer.metadata.redirect);
+  const verifyContextByRequest = useAtomValue(verifyContextByRequestAtom);
+  const url = getSafeRedirectUrl(
+    proposal.proposer.metadata.redirect,
+    verifyContextByRequest[
+      getVerifyContextKey(
+        oneClickAuthPayload ? "auth" : "proposal",
+        oneClickAuthPayload?.id ?? proposal.id,
+      )
+    ],
+  );
   const redirectToDapp = useCallback(() => {
     if (url) {
-      window.open(url);
+      openRedirectUrl(url);
     } else {
       setShowModal(true);
     }
