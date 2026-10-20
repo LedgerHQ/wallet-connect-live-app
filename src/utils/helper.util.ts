@@ -121,6 +121,8 @@ const FORBIDDEN_REDIRECT_PROTOCOLS = new Set([
   // Never needed to go back to a dApp, and could trigger Ledger Wallet deeplinks
   "ledgerwallet:",
   "ledgerlive:",
+  // Opens a WalletConnect pairing, handled by Ledger Wallet on Android
+  "wc:",
   // Can run script or read local content when passed to window.open
   "javascript:",
   "data:",
@@ -129,14 +131,40 @@ const FORBIDDEN_REDIRECT_PROTOCOLS = new Set([
   "blob:",
 ]);
 
-function parseAllowedRedirectUrl(candidate?: string) {
+// Universal links opening Ledger Wallet on iOS (associated domains)
+const FORBIDDEN_REDIRECT_HOSTS = new Set([
+  "ledger.go.link",
+  "ledger-debug.go.link",
+  "ledger-staging.go.link",
+  "r354.adj.st",
+  "a4wc.adj.st",
+  "fvsc.adj.st",
+]);
+
+const WEB_PROTOCOLS = new Set(["http:", "https:"]);
+
+function parseRedirectUrl(candidate?: string) {
   if (!candidate) return undefined;
   try {
-    const url = new URL(candidate);
-    return FORBIDDEN_REDIRECT_PROTOCOLS.has(url.protocol) ? undefined : url;
+    return new URL(candidate);
   } catch {
     return undefined;
   }
+}
+
+function isAllowedRedirectUrl(url: URL, verifiedOrigin?: string) {
+  if (
+    FORBIDDEN_REDIRECT_PROTOCOLS.has(url.protocol) ||
+    FORBIDDEN_REDIRECT_HOSTS.has(url.hostname)
+  ) {
+    return false;
+  }
+  // A web url can be checked against the origin verified by WalletConnect Verify
+  if (WEB_PROTOCOLS.has(url.protocol)) {
+    return url.origin === verifiedOrigin;
+  }
+  // A native app can't be verified, so it only goes through the denylists
+  return true;
 }
 
 function getVerifiedOrigin(verifyContext?: Verify.Context) {
@@ -153,10 +181,11 @@ function getVerifiedOrigin(verifyContext?: Verify.Context) {
  * Returns the first valid and allowed redirect url provided by the dApp metadata
  * (native first, then universal), or undefined if none is safe to open
  *
- * A native url can't be checked against an origin, WalletConnect has no way to
- * verify a native app, so it only goes through the protocol checks. A universal
- * link must also match the origin verified by WalletConnect Verify, otherwise a
- * dApp could send the user to any website in the name of Ledger.
+ * A custom scheme url can't be checked against an origin, WalletConnect has no
+ * way to verify a native app, so it only goes through the denylists. A web url,
+ * whether given as native or universal, must also match the origin verified by
+ * WalletConnect Verify, otherwise a dApp could send the user to any website in
+ * the name of Ledger.
  */
 export function getSafeRedirectUrl(
   redirect?: {
@@ -165,13 +194,10 @@ export function getSafeRedirectUrl(
   },
   verifyContext?: Verify.Context,
 ): string | undefined {
-  const native = parseAllowedRedirectUrl(redirect?.native);
-  if (native) return native.href;
-
-  const universal = parseAllowedRedirectUrl(redirect?.universal);
   const verifiedOrigin = getVerifiedOrigin(verifyContext);
-  if (universal && verifiedOrigin && universal.origin === verifiedOrigin) {
-    return universal.href;
+  for (const candidate of [redirect?.native, redirect?.universal]) {
+    const url = parseRedirectUrl(candidate);
+    if (url && isAllowedRedirectUrl(url, verifiedOrigin)) return url.href;
   }
   return undefined;
 }

@@ -433,6 +433,13 @@ describe("getErrorMessage", () => {
       "vbscript:msgbox(1)",
       "file:///etc/passwd",
       "blob:https://app.uniswap.org/0f1e2d3c",
+      "wc:7f6e504bfad60b485450578e05678ed3e8e8c4751d3c6160be17160d63ec90f9@2",
+      "https://ledger.go.link/discover",
+      "https://LEDGER-DEBUG.go.link/discover",
+      "https://ledger-staging.go.link/discover",
+      "https://r354.adj.st/discover",
+      "https://a4wc.adj.st/discover",
+      "https://fvsc.adj.st/discover",
       "not a url",
     ])("rejects %s", (url) => {
       const context = verifiedAs("https://app.uniswap.org");
@@ -468,6 +475,24 @@ describe("getErrorMessage", () => {
           context,
         ),
       ).toBeUndefined();
+    });
+
+    it("checks a web url given as native against the verified origin", () => {
+      expect(
+        getSafeRedirectUrl({ native: "https://evil.example" }),
+      ).toBeUndefined();
+      expect(
+        getSafeRedirectUrl(
+          { native: "https://evil.example" },
+          verifiedAs("https://app.uniswap.org"),
+        ),
+      ).toBeUndefined();
+      expect(
+        getSafeRedirectUrl(
+          { native: "https://app.uniswap.org/swap" },
+          verifiedAs("https://app.uniswap.org"),
+        ),
+      ).toBe("https://app.uniswap.org/swap");
     });
 
     it("returns undefined when no redirect is provided", () => {
