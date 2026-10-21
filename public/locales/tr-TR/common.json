@@ -3,6 +3,12 @@
     "title" : "Şu anda WalletConnect v2 entegrasyonuyla ilgili geçici bir sorun yaşıyoruz.",
     "desc" : "İşlevi mümkün olan en kısa sürede yeniden kullanıma açacak bir çözümün belirlenmesi ve uygulanması için aktif olarak çalışıyoruz. Anlayışınız için teşekkür ederiz."
   },
+  "notInLedgerWallet" : {
+    "title" : "Ledger Wallet’ta WalletConnect’i açın",
+    "desc" : "WalletConnect yalnızca Ledger Wallet uygulaması içinde çalışır. Ledger Wallet’ta açın veya henüz indirmediyseniz uygulamayı indirin.",
+    "open" : "Ledger Wallet'ta aç",
+    "download" : "Ledger Wallet'ı indirin"
+  },
   "errorBoundary" : {
     "title" : "Hay aksi, bir hata oluştu!",
     "desc" : "Bu hatanın farkındayız. Lütfen sayfayı yenileyip tekrar deneyin."
