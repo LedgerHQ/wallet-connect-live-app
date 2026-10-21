@@ -3,6 +3,12 @@
     "title" : "WalletConnect v2 集成暂时存在问题。",
     "desc" : "我们正在积极寻找和实施解决方案，将尽快恢复此功能。感谢您的理解。"
   },
+  "notInLedgerWallet" : {
+    "title" : "在 Ledger Wallet 中打开 WalletConnect",
+    "desc" : "WalletConnect 仅可在 Ledger Wallet 钱包应用程序内使用。在 Ledger Wallet 中将其打开，或者如果您尚未拥有，请下载该应用程序。",
+    "open" : "在 Ledger Wallet 中打开",
+    "download" : "下载 Ledger Wallet"
+  },
   "errorBoundary" : {
     "title" : "哎呀，出错了！",
     "desc" : "我们已知晓此错误。请刷新页面重试。"

@@ -3,6 +3,12 @@
     "title" : "ขณะนี้เรากำลังประสบปัญหา WalletConnect v2 Integration ชั่วคราว",
     "desc" : "เรากำลังพยายามระบุและปรับใช้โซลูชันเพื่อกู้คืนการทำงานโดยเร็วที่สุด ขอบคุณที่เข้าใจ"
   },
+  "notInLedgerWallet" : {
+    "title" : "เปิด WalletConnect ในแอป Ledger Wallet",
+    "desc" : "WalletConnect ใช้งานได้เฉพาะในแอป Ledger Wallet เท่านั้น เปิดในแอป Ledger Wallet หรือดาวน์โหลดแอปเพิ่มหากยังไม่ได้ติดตั้ง",
+    "open" : "เปิดในแอป Ledger Wallet",
+    "download" : "ดาวน์โหลดแอป Ledger Wallet™"
+  },
   "errorBoundary" : {
     "title" : "อ๊ะ มีบางอย่างผิดปกติ!",
     "desc" : "เราได้รับแจ้งถึงข้อผิดพลาดนี้แล้ว โปรดลองอีกครั้งโดยรีเฟรชหน้านี้"

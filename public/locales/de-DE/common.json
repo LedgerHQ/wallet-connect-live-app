@@ -3,6 +3,12 @@
     "title" : "Aktuell gibt es ein vorübergehendes Problem mit der WalletConnect v2-Integration.",
     "desc" : "Wir sind intensiv damit beschäftigt, eine Lösung zu erarbeiten, um die Funktionalität so schnell wie möglich wiederherzustellen. Wir bitten Sie vielmals um Verständnis."
   },
+  "notInLedgerWallet" : {
+    "title" : "WalletConnect in Ledger Wallet öffnen",
+    "desc" : "WalletConnect funktioniert nur innerhalb der Ledger Wallet-App. Öffne es in Ledger Wallet oder lade die App herunter, wenn du sie noch nicht hast.",
+    "open" : "In Ledger Wallet öffnen",
+    "download" : "Ledger Wallet herunterladen"
+  },
   "errorBoundary" : {
     "title" : "Ein Problem ist aufgetreten",
     "desc" : "Wir wurden über diesen Fehler informiert. Bitte laden Sie die Seite versuchsweise neu."
