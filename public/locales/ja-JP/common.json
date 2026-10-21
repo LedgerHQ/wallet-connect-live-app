@@ -3,6 +3,12 @@
     "title" : "現在、WalletConnect v2の統合で一時的な問題が発生しています。",
     "desc" : "当社はできるだけ早く機能を復元するため、解決策の特定と実装に取り組んでおります。ご不便をおかけして申し訳ありません。"
   },
+  "notInLedgerWallet" : {
+    "title" : "Ledger WalletでWalletConnectを開く",
+    "desc" : "WalletConnectは、Ledger Walletアプリ内でのみ動作します。Ledger Walletで開くか、まだアプリをお持ちでない場合はダウンロードしてください。",
+    "open" : "Ledger Walletで開く",
+    "download" : "Ledger Walletをダウンロードする"
+  },
   "errorBoundary" : {
     "title" : "問題が発生しました。",
     "desc" : "当社はこのエラーについて通知を受け取りました。ページを更新してもう一度お試しください。"
