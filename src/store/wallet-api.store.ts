@@ -6,6 +6,8 @@ import {
 import { standardProfile } from "@ledgerhq/wallet-api-simulator/lib-es/profiles/standard";
 import { getSimulatorTransport } from "@ledgerhq/wallet-api-simulator/lib-es/transport";
 import { atom } from "jotai";
+import { getAllowedTopOrigin } from "@/utils/ledgerEnterprise";
+import { TopWindowTransport } from "@/utils/topWindowTransport";
 
 function getIsSimulator() {
   // The simulator is a dev only tool, it must never be reachable in production
@@ -41,12 +43,25 @@ function isInIframe(win: Window) {
 // Ledger Wallet injects these bridges before the app scripts run:
 // - desktop: `ElectronWebview` exposed by the webview preloader
 // - mobile: `ReactNativeWebView` injected by react-native-webview
-// - iframe (e.g. Ledger Enterprise): no bridge, the transport posts to `window.top`
-export function detectLedgerWalletHost(win: Window) {
-  return (
-    Boolean(win.ElectronWebview ?? win.ReactNativeWebView) || isInIframe(win)
-  );
+function hasWebviewBridge(win: Window) {
+  return Boolean(win.ElectronWebview ?? win.ReactNativeWebView);
 }
+
+// iframe (e.g. Ledger Enterprise): no bridge, the transport posts to `window.top`,
+// only when every embedding origin is allowed
+export function getIframeHostOrigin(win: Window) {
+  if (hasWebviewBridge(win) || !isInIframe(win)) {
+    return undefined;
+  }
+  return getAllowedTopOrigin(win);
+}
+
+export function detectLedgerWalletHost(win: Window) {
+  return hasWebviewBridge(win) || getIframeHostOrigin(win) !== undefined;
+}
+
+const iframeHostOrigin =
+  typeof window !== "undefined" ? getIframeHostOrigin(window) : undefined;
 
 export const isInLedgerWallet =
   isSimulator ||
@@ -65,6 +80,12 @@ export const transportAtom = atom(() => {
   // `import.meta.env.DEV` is statically replaced so the simulator is stripped from prod bundles
   if (import.meta.env.DEV && isSimulator) {
     return getSimulatorTransport(standardProfile);
+  }
+
+  if (iframeHostOrigin) {
+    const transport = new TopWindowTransport(window, iframeHostOrigin);
+    transport.connect();
+    return transport;
   }
 
   const transport = new WindowMessageTransport();
