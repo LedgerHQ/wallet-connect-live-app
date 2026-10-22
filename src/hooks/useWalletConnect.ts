@@ -27,12 +27,13 @@ import {
   isTezosChain,
   isTezosSupportEnabled,
   isXRPLSupportEnabled,
+  openRedirectUrl,
 } from "@/utils/helper.util";
 import { reportZodError } from "@/utils/sentryZod";
 import { WalletKitTypes } from "@reown/walletkit";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { SignClientTypes } from "@walletconnect/types";
+import { SignClientTypes, Verify } from "@walletconnect/types";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { enqueueSnackbar } from "notistack";
 import { useCallback, useEffect } from "react";
@@ -181,12 +182,15 @@ export default function useWalletConnect() {
 
   const setShowModal = useSetAtom(showBackToBrowserModalAtom);
   const redirectToDapp = useCallback(
-    (topic: string) => {
+    (topic: string, verifyContext?: Verify.Context) => {
       const session = walletKit.engine.signClient.session.get(topic);
       if (session) {
-        const url = getSafeRedirectUrl(session.peer.metadata.redirect);
+        const url = getSafeRedirectUrl(
+          session.peer.metadata.redirect,
+          verifyContext,
+        );
         if (url) {
-          window.open(url);
+          openRedirectUrl(url);
         } else {
           setShowModal(true);
         }
@@ -202,6 +206,7 @@ export default function useWalletConnect() {
         topic,
         params: { request, chainId },
         id,
+        verifyContext,
       } = requestEvent;
 
       void (async () => {
@@ -358,7 +363,7 @@ export default function useWalletConnect() {
         }
       })().finally(() => {
         setLoading(false);
-        redirectToDapp(topic);
+        redirectToDapp(topic, verifyContext);
         void queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
       });
     },
