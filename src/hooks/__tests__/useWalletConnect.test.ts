@@ -592,7 +592,13 @@ describe("useWalletConnect", () => {
         chainId: "eip155:1",
         request: { method: "personal_sign", params: [] },
       },
-      verifyContext: {},
+      verifyContext: {
+        verified: {
+          origin: "https://react-app.walletconnect.com",
+          validation: "VALID",
+          verifyUrl: "",
+        },
+      },
     });
 
     await waitFor(() => {
@@ -605,8 +611,38 @@ describe("useWalletConnect", () => {
       );
       expect(window.open).toHaveBeenCalledWith(
         "https://react-app.walletconnect.com/",
+        "_blank",
+        "noopener,noreferrer",
       );
     });
+  });
+
+  it("does not open a universal link that does not match the request verified origin", async () => {
+    mockedHandleEIP155Request.mockRejectedValue(new ZodError([]));
+
+    mountHook();
+
+    walletKitListeners.get("session_request")?.({
+      topic: "topic-1",
+      id: 10,
+      params: {
+        chainId: "eip155:1",
+        request: { method: "personal_sign", params: [] },
+      },
+      verifyContext: {
+        verified: {
+          origin: "https://evil.example",
+          validation: "VALID",
+          verifyUrl: "",
+        },
+      },
+    });
+
+    await waitFor(() => {
+      expect(mockedRejectRequest).toHaveBeenCalled();
+      expect(store.get(showBackToBrowserModalAtom as never)).toBe(true);
+    });
+    expect(window.open).not.toHaveBeenCalled();
   });
 
   it("does not open a Ledger Wallet deeplink provided as dApp redirect", async () => {
