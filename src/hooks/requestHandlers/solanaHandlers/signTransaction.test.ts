@@ -434,4 +434,67 @@ describe("Testing sign transaction on Solana", () => {
 
     acceptRequestSpy.mockReset();
   });
+
+  it("should return the account's own signature when another signer pays the fees", async () => {
+    const account: Account = {
+      id: "2fa370fd-2210-5487-b9c9-bc36971ebc72",
+      address: "Hj69wRzkrFuf1Nby4yzPEFHdsmQdMoVYjvDKZSLjZFEp",
+      name: "Solana Account",
+      currency: "solana",
+      blockHeight: 0,
+      balance: BigNumber(0),
+      spendableBalance: BigNumber(0),
+      lastSyncDate: new Date(),
+    };
+
+    // Two required signers: the fee payer at index 0 signs after the account, at index 1.
+    const signedTransaction =
+      "AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICgAIAAQNl4eWU9W+LbzHkYy5erq32+K0Kp0kwgKUELcMBr/mwIfiDNmtUDWDmpzydKi6FZkBCTfFwa2ZhTTdUevVi3unZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADQTnnUUNH2zCWM8swEA2e0uXJKktlk06RO9Nx0LFNLWAECAgEADAIAAAABAAAAAAAAAAA=";
+    const walletAPIClient = {
+      transaction: {
+        sign: vi.fn(() =>
+          Promise.resolve(Buffer.from(signedTransaction, "base64")),
+        ),
+      },
+    } as unknown as WalletAPIClient;
+
+    const walletKit = {} as IWalletKit;
+    const topic = "topic";
+    const id = 0;
+    const request: SOLANA_REQUESTS = {
+      method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_TRANSACTION,
+      params: {
+        transaction:
+          "AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAIAAQNl4eWU9W+LbzHkYy5erq32+K0Kp0kwgKUELcMBr/mwIfiDNmtUDWDmpzydKi6FZkBCTfFwa2ZhTTdUevVi3unZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADQTnnUUNH2zCWM8swEA2e0uXJKktlk06RO9Nx0LFNLWAECAgEADAIAAAABAAAAAAAAAAA=",
+        pubkey: account.address,
+      },
+    };
+
+    const acceptRequestSpy = vi.spyOn(utils, "acceptRequest");
+    acceptRequestSpy.mockImplementationOnce(() => Promise.resolve());
+
+    await signTransaction(
+      request,
+      topic,
+      id,
+      "any random value",
+      [account],
+      walletAPIClient,
+      walletKit,
+    );
+
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    const { sign } = walletAPIClient.transaction;
+    expect(sign).toHaveBeenCalledWith(
+      account.id,
+      expect.objectContaining({ raw: request.params.transaction }),
+    );
+    expect(acceptRequestSpy).toHaveBeenCalledTimes(1);
+    expect(acceptRequestSpy).toHaveBeenCalledWith(walletKit, topic, id, {
+      signature: base58.encode(new Uint8Array(64).fill(2)),
+      transaction: signedTransaction,
+    });
+
+    acceptRequestSpy.mockReset();
+  });
 });
