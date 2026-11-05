@@ -3,7 +3,10 @@ import { NotInLedgerWallet } from "@/components/NotInLedgerWallet";
 import { DOWNLOAD_URL, getOpenInLedgerWalletUrl } from "@/utils/ledgerWallet";
 import { render, screen } from "@/tests/test.utils";
 import { fireEvent } from "@testing-library/react";
-import { detectLedgerWalletHost } from "@/store/wallet-api.store";
+import {
+  detectLedgerWalletHost,
+  getIframeHostOrigin,
+} from "@/store/wallet-api.store";
 
 describe("Not In Ledger Wallet Screen", () => {
   afterEach(() => {
@@ -70,12 +73,23 @@ describe("getOpenInLedgerWalletUrl", () => {
 
 describe("detectLedgerWalletHost", () => {
   function fakeWindow(props: Record<string, unknown> = {}) {
-    const win = { ...props } as Record<string, unknown>;
+    const win = {
+      location: {},
+      document: { referrer: "" },
+      ...props,
+    } as Record<string, unknown>;
     win.self = win;
     if (!("top" in props)) {
       Object.defineProperty(win, "top", { value: win });
     }
+    if (!("parent" in props)) {
+      win.parent = win.top;
+    }
     return win as unknown as Window;
+  }
+
+  function framedWindow(props: Record<string, unknown> = {}) {
+    return fakeWindow({ top: {}, ...props });
   }
 
   it("should detect the desktop Electron webview", () => {
@@ -90,12 +104,72 @@ describe("detectLedgerWalletHost", () => {
     );
   });
 
-  it("should detect an iframe embed (Ledger Enterprise)", () => {
-    expect(detectLedgerWalletHost(fakeWindow({ top: {} }))).toBe(true);
+  it("should detect an iframe embed from allowed origins (Ledger Enterprise)", () => {
+    const win = framedWindow({
+      location: {
+        ancestorOrigins: [
+          "https://web.vault-main.ledger-test.com",
+          "https://app.enterprise.ledger.com",
+        ],
+      },
+    });
+    expect(detectLedgerWalletHost(win)).toBe(true);
+    expect(getIframeHostOrigin(win)).toBe("https://app.enterprise.ledger.com");
   });
 
-  it("should detect an iframe when accessing top throws", () => {
-    const win = fakeWindow({ top: undefined });
+  it("should not detect an iframe embed with a disallowed ancestor", () => {
+    const win = framedWindow({
+      location: {
+        ancestorOrigins: [
+          "https://evil.com",
+          "https://app.enterprise.ledger.com",
+        ],
+      },
+    });
+    expect(detectLedgerWalletHost(win)).toBe(false);
+  });
+
+  it("should not detect an iframe embed from any origin", () => {
+    expect(
+      detectLedgerWalletHost(
+        framedWindow({ location: { ancestorOrigins: ["https://evil.com"] } }),
+      ),
+    ).toBe(false);
+  });
+
+  it("should use the referrer without ancestorOrigins (Firefox)", () => {
+    expect(
+      detectLedgerWalletHost(
+        framedWindow({
+          document: { referrer: "https://app.enterprise.ledger.com/" },
+        }),
+      ),
+    ).toBe(true);
+    expect(
+      detectLedgerWalletHost(
+        framedWindow({ document: { referrer: "https://evil.com/" } }),
+      ),
+    ).toBe(false);
+    expect(detectLedgerWalletHost(framedWindow())).toBe(false);
+  });
+
+  it("should not detect a nested iframe without ancestorOrigins (Firefox)", () => {
+    expect(
+      detectLedgerWalletHost(
+        framedWindow({
+          parent: {},
+          document: { referrer: "https://app.enterprise.ledger.com/" },
+        }),
+      ),
+    ).toBe(false);
+  });
+
+  it("should check the embedding origins when accessing top throws", () => {
+    const win = fakeWindow({
+      top: undefined,
+      parent: undefined,
+      location: { ancestorOrigins: ["https://app.enterprise.ledger.com"] },
+    });
     Object.defineProperty(win, "top", {
       get() {
         throw new Error("SecurityError");
@@ -106,5 +180,17 @@ describe("detectLedgerWalletHost", () => {
 
   it("should not detect a top level browser tab", () => {
     expect(detectLedgerWalletHost(fakeWindow())).toBe(false);
+    expect(getIframeHostOrigin(fakeWindow())).toBeUndefined();
+  });
+
+  it("should not use the iframe origin with a webview bridge", () => {
+    expect(
+      getIframeHostOrigin(
+        framedWindow({
+          ElectronWebview: {},
+          location: { ancestorOrigins: ["https://app.enterprise.ledger.com"] },
+        }),
+      ),
+    ).toBeUndefined();
   });
 });

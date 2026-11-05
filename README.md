@@ -44,6 +44,8 @@ Behavior of the live app can be influenced by navigating to it with the followin
 
 Outside of Ledger Wallet (desktop Electron webview, mobile React Native webview, or an iframe embed such as Ledger Enterprise), the app shows a screen inviting the user to open it in Ledger Wallet or to download the app.
 
+Iframe embeds are only accepted from the Ledger Enterprise origins listed in `src/utils/ledgerEnterprise.ts`, which must be kept in sync with the `frame-ancestors` CSP in `vercel.json` (a unit test checks it). When the embedding origins can't be verified (no `location.ancestorOrigins` and a nested frame or missing referrer, e.g. on Firefox), the app treats it as being outside of Ledger Wallet.
+
 ## Architecture
 
 - Pages 📝 (All the main screens)

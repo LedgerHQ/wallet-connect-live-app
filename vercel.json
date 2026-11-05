@@ -5,6 +5,17 @@
       "destination": "/index.html"
     }
   ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "frame-ancestors 'self' https://*.enterprise.ledger.com https://web.vault-main.ledger-test.com https://vault-main.ledger-test.com https://web.vault-next.ledger-test.com https://vault-next.ledger-test.com https://web.vault-ppr.ledger-test.com https://vault-ppr.ledger-test.com https://custody.bit2me.com https://vault.b2broker.com https://vault.cryptogarage.co.jp https://vault.daucustody.com https://vault.komainu.com https://vault.tetratrust.com https://web.enterprise.testwldaily69.aws.prd.ldg-tech.com https://*.minivault.ledger-sbx.com https://*.minivault.ledger-stg.com https://*.minivault.demo.ledger-test.com"
+        }
+      ]
+    }
+  ],
   "github": {
     "enabled": true,
     "silent": true
