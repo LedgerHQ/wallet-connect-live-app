@@ -49,9 +49,14 @@ export async function signTransaction(
     );
 
     const transaction = VersionedTransaction.deserialize(signature);
+    // The account is not always the fee payer at index 0: in a Jupiter gasless swap, the market
+    // maker pays the fees and signs after it. Return the signature in the account's own slot.
+    const signerIndex = transaction.message.staticAccountKeys.findIndex(
+      (key) => key.toBase58() === account.address,
+    );
 
     const result: SOLANA_RESPONSES[typeof request.method] = {
-      signature: base58.encode(transaction.signatures[0]),
+      signature: base58.encode(transaction.signatures[signerIndex]),
       transaction: signature.toString("base64"),
     };
 
