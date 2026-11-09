@@ -1,6 +1,7 @@
 import { SUPPORTED_NETWORK } from "@/data/network.config";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import {
+  DERIVED_APP_PSBT_MIN_VERSIONS,
   formatUrl,
   getColor,
   getCurrencyByChainId,
@@ -11,6 +12,7 @@ import {
   getTicker,
   isCosmosChain,
   isCosmosSupportEnabled,
+  isDerivedAppPsbtSupportEnabled,
   isEIP155Chain,
   isSolanaSupportEnabled,
   isTezosChain,
@@ -249,6 +251,46 @@ describe("isSolanaSupportEnabled", () => {
       "2.125.0-beta.1",
     );
     expect(isSolanaSupportEnabled(walletInfoBelowMin)).toBe(false);
+  });
+});
+
+describe("isDerivedAppPsbtSupportEnabled", () => {
+  afterEach(() => {
+    for (const name of Object.keys(DERIVED_APP_PSBT_MIN_VERSIONS)) {
+      delete DERIVED_APP_PSBT_MIN_VERSIONS[name];
+    }
+  });
+
+  it("should return false for a wallet with no minimum version", () => {
+    expect(
+      isDerivedAppPsbtSupportEnabled(createWalletInfo("unknown-wallet", "9.0.0")),
+    ).toBe(false);
+  });
+
+  it("should return true from the minimum version of each wallet", () => {
+    DERIVED_APP_PSBT_MIN_VERSIONS["ledger-live-desktop"] = "4.28.0";
+    DERIVED_APP_PSBT_MIN_VERSIONS["ledger-live-mobile"] = "4.29.0";
+
+    expect(
+      isDerivedAppPsbtSupportEnabled(
+        createWalletInfo("ledger-live-desktop", "4.28.0"),
+      ),
+    ).toBe(true);
+    expect(
+      isDerivedAppPsbtSupportEnabled(
+        createWalletInfo("ledger-live-mobile", "4.29.1"),
+      ),
+    ).toBe(true);
+  });
+
+  it("should return false below the minimum version", () => {
+    DERIVED_APP_PSBT_MIN_VERSIONS["ledger-live-desktop"] = "4.28.0";
+
+    expect(
+      isDerivedAppPsbtSupportEnabled(
+        createWalletInfo("ledger-live-desktop", "4.27.1"),
+      ),
+    ).toBe(false);
   });
 });
 
