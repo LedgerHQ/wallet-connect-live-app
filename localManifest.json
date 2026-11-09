@@ -45,7 +45,9 @@
     "arc_testnet",
     "ethereum_holesky",
     "tezos",
-    "babylon"
+    "babylon",
+    "sui",
+    "sui_testnet"
   ],
   "content": {
     "shortDescription": {

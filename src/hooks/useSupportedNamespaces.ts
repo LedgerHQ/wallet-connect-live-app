@@ -6,6 +6,7 @@ import { COSMOS_SIGNING_METHODS } from "@/data/methods/Cosmos.methods";
 import { EIP155_SIGNING_METHODS } from "@/data/methods/EIP155Data.methods";
 import { RIPPLE_SIGNING_METHODS } from "@/data/methods/Ripple.methods";
 import { SOLANA_SIGNING_METHODS } from "@/data/methods/Solana.methods";
+import { SUI_SIGNING_METHODS } from "@/data/methods/Sui.methods";
 import { TEZOS_SIGNING_METHODS } from "@/data/methods/Tezos.methods";
 import { WALLET_METHODS } from "@/data/methods/Wallet.methods";
 import {
@@ -14,6 +15,7 @@ import {
   EIP155_CHAINS,
   RIPPLE_CHAINS,
   SOLANA_CHAINS,
+  SUI_CHAINS,
   SupportedNamespace,
   TEZOS_CHAINS,
 } from "@/data/network.config";
@@ -28,6 +30,7 @@ import {
   getNamespace,
   isCosmosSupportEnabled,
   isSolanaSupportEnabled,
+  isSuiSupportEnabled,
   isTezosSupportEnabled,
   isXRPLSupportEnabled,
 } from "@/utils/helper.util";
@@ -468,6 +471,82 @@ export function useSupportedNamespaces(
     [session, accounts.data, walletInfo, walletCapabilities, selectedAccounts],
   );
 
+  const buildSuiNamespace = useCallback(
+    (
+      requiredNamespaces: ProposalTypes.RequiredNamespaces,
+      optionalNamespaces: ProposalTypes.OptionalNamespaces,
+    ) => {
+      const accountsByChain = formatAccountsByChain(
+        session,
+        accounts.data,
+        walletInfo,
+        walletCapabilities,
+      ).filter(
+        (a) =>
+          a.accounts.length > 0 &&
+          a.isSupported &&
+          Object.keys(SUI_CHAINS).includes(a.chain),
+      );
+
+      const supportedMethods = new Set<string>([
+        ...Object.values(WALLET_METHODS),
+        ...Object.values(SUI_SIGNING_METHODS),
+      ]);
+
+      const registeredNamespaces = new Set(
+        Object.values(SUI_CHAINS).map((network) => network.namespace),
+      );
+      const requestedChains = [
+        ...new Set([
+          ...(requiredNamespaces[SupportedNamespace.SUI]?.chains ?? []),
+          ...(optionalNamespaces[SupportedNamespace.SUI]?.chains ?? []),
+        ]),
+      ].filter((chain) => registeredNamespaces.has(chain));
+
+      const selectedSuiAccounts = Array.from(
+        new Map(
+          accountsByChain
+            .flatMap((elem) => elem.accounts)
+            .filter((acc) => selectedAccounts.includes(acc.id))
+            .map((acc) => [acc.id, acc] as const),
+        ).values(),
+      );
+
+      const dataToSend = requestedChains.flatMap((chain) =>
+        selectedSuiAccounts.map((a) => ({
+          account: `${chain}:${a.address}`,
+          chain,
+        })),
+      );
+
+      const methods = [
+        ...new Set([
+          ...(requiredNamespaces[SupportedNamespace.SUI]?.methods.filter(
+            (method) => supportedMethods.has(method),
+          ) ?? []),
+          ...(optionalNamespaces[SupportedNamespace.SUI]?.methods.filter(
+            (method) => supportedMethods.has(method),
+          ) ?? []),
+        ]),
+      ];
+
+      const events = [
+        ...new Set([
+          ...(requiredNamespaces[SupportedNamespace.SUI]?.events ?? []),
+          ...(optionalNamespaces[SupportedNamespace.SUI]?.events ?? []),
+        ]),
+      ];
+
+      return {
+        chains: [...new Set(dataToSend.map((e) => e.chain))],
+        methods,
+        events,
+        accounts: dataToSend.map((e) => e.account),
+      };
+    },
+    [session, accounts.data, walletInfo, walletCapabilities, selectedAccounts],
+  );
+
   const buildSupportedNamespaces = useCallback(
     (session: SessionTypes.Struct | ProposalTypes.Struct) => {
       const { requiredNamespaces, optionalNamespaces } = session;
@@ -523,6 +602,15 @@ export function useSupportedNamespaces(
           optionalNamespaces,
         );
       }
+      if (
+        ("sui" in requiredNamespaces || "sui" in optionalNamespaces) &&
+        isSuiSupportEnabled(walletCapabilities)
+      ) {
+        supportedNamespaces[SupportedNamespace.SUI] = buildSuiNamespace(
+          requiredNamespaces,
+          optionalNamespaces,
+        );
+      }
       return supportedNamespaces;
     },
     [
@@ -534,6 +622,7 @@ export function useSupportedNamespaces(
       buildSolanaNamespace,
       buildTezosNamespace,
       buildCosmosNamespace,
+      buildSuiNamespace,
     ],
   );
 

@@ -320,6 +320,31 @@ export const COSMOS_CHAINS: Record<string, Network> = {
   },
 };
 
+export const SUI_MAINNET_CHAINS: Record<string, Network> = {
+  sui: {
+    chainId: "mainnet",
+    namespace: "sui:mainnet",
+    ticker: "SUI",
+    displayName: "Sui",
+    color: "#4DA2FF",
+  },
+};
+
+export const SUI_TEST_CHAINS: Record<string, Network> = {
+  sui_testnet: {
+    chainId: "testnet",
+    namespace: "sui:testnet",
+    ticker: "SUI",
+    displayName: "Sui Testnet",
+    color: "#4DA2FF",
+  },
+};
+
+export const SUI_CHAINS = {
+  ...SUI_MAINNET_CHAINS,
+  ...SUI_TEST_CHAINS,
+};
+
 export const EIP155_CHAINS = {
   ...EIP155_CHAINS_MAINNET,
   ...EIP155_SEPOLIA_CHAINS,
@@ -336,12 +361,14 @@ export const SUPPORTED_NETWORK: Record<string, Network> = {
   ...SOLANA_CHAINS,
   ...TEZOS_CHAINS,
   ...COSMOS_CHAINS,
+  ...SUI_CHAINS,
 };
 
 /**
  * Networks named in the "we currently support" copy of the unsupported-chain
  * screen. Advertising is opt-in per map: testnets stay out, and Babylon stays
  * out while LIVE-27227 is On Hold even though its cosmos handlers are wired.
+ * Sui stays out until the production manifest lists it.
  * A new mainnet map has to be added here or it will never be advertised.
  */
 const ADVERTISED_NETWORKS: Record<string, Network> = {
@@ -368,4 +395,5 @@ export enum SupportedNamespace {
   SOLANA = "solana",
   TEZOS = "tezos",
   COSMOS = "cosmos",
+  SUI = "sui",
 }

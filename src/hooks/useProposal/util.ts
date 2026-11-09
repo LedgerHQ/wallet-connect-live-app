@@ -6,6 +6,8 @@ import {
   isRippleChain,
   isSolanaChain,
   isSolanaSupportEnabled,
+  isSuiChain,
+  isSuiSupportEnabled,
   isTezosChain,
   isTezosSupportEnabled,
   isXRPLSupportEnabled,
@@ -97,6 +99,10 @@ export const formatAccountsByChain = (
       }
 
       if (isTezosChain(chain) && !isTezosSupportEnabled(walletCapabilities)) {
+        return acc;
+      }
+
+      if (isSuiChain(chain) && !isSuiSupportEnabled(walletCapabilities)) {
         return acc;
       }
 

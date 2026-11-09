@@ -9,6 +9,7 @@ import { handleCosmosRequest } from "../requestHandlers/Cosmos";
 import { handleEIP155Request } from "../requestHandlers/EIP155";
 import { handleXrpRequest } from "../requestHandlers/Ripple";
 import { handleSolanaRequest } from "../requestHandlers/Solana";
+import { handleSuiRequest } from "../requestHandlers/Sui";
 import { handleTezosRequest } from "../requestHandlers/Tezos";
 import { handleWalletRequest } from "../requestHandlers/Wallet";
 import { Errors, rejectRequest } from "../requestHandlers/utils";
@@ -58,6 +59,10 @@ vi.mock("../requestHandlers/BIP122", () => ({
 
 vi.mock("../requestHandlers/Cosmos", () => ({
   handleCosmosRequest: vi.fn(),
+}));
+
+vi.mock("../requestHandlers/Sui", () => ({
+  handleSuiRequest: vi.fn(),
 }));
 
 vi.mock("../requestHandlers/EIP155", () => ({
@@ -141,6 +146,7 @@ const mockedHandleWalletRequest = vi.mocked(handleWalletRequest);
 const mockedHandleEIP155Request = vi.mocked(handleEIP155Request);
 const mockedHandleBIP122Request = vi.mocked(handleBIP122Request);
 const mockedHandleCosmosRequest = vi.mocked(handleCosmosRequest);
+const mockedHandleSuiRequest = vi.mocked(handleSuiRequest);
 const mockedHandleXrpRequest = vi.mocked(handleXrpRequest);
 const mockedHandleSolanaRequest = vi.mocked(handleSolanaRequest);
 const mockedHandleTezosRequest = vi.mocked(handleTezosRequest);
@@ -240,6 +246,7 @@ describe("useWalletConnect", () => {
     mockedHandleEIP155Request.mockResolvedValue(undefined);
     mockedHandleBIP122Request.mockResolvedValue(undefined);
     mockedHandleCosmosRequest.mockResolvedValue(undefined);
+    mockedHandleSuiRequest.mockResolvedValue(undefined);
     mockedHandleXrpRequest.mockResolvedValue(undefined);
     mockedHandleSolanaRequest.mockResolvedValue(undefined);
     mockedHandleTezosRequest.mockResolvedValue(undefined);
@@ -574,6 +581,92 @@ describe("useWalletConnect", () => {
         walletKitMock,
         "topic-1",
         13,
+        Errors.unsupportedChains,
+        5100,
+      );
+    });
+  });
+
+  it("dispatches sui requests to the sui handler when the capability gate is on", async () => {
+    store.set(walletCapabilitiesAtom as never, [
+      "transaction.signRaw",
+      "account.getPublicKey",
+    ]);
+
+    mountHook();
+
+    walletKitListeners.get("session_request")?.({
+      topic: "topic-1",
+      id: 21,
+      params: {
+        chainId: "sui:mainnet",
+        request: { method: "sui_signTransaction", params: {} },
+      },
+      verifyContext: {},
+    });
+
+    await waitFor(() => {
+      expect(mockedHandleSuiRequest).toHaveBeenCalled();
+    });
+  });
+
+  it("scopes sui requests to the session-approved accounts", async () => {
+    store.set(walletCapabilitiesAtom as never, [
+      "transaction.signRaw",
+      "account.getPublicKey",
+    ]);
+
+    const approved = { id: "sui-1", address: "0xapproved", currency: "sui" };
+    const unapproved = { id: "sui-2", address: "0xother", currency: "sui" };
+    mockedUseAccounts.mockReturnValue({
+      data: [approved, unapproved],
+    } as ReturnType<typeof useAccounts>);
+    walletKitMock.engine.signClient.session.get.mockReturnValue({
+      ...sessionRecord,
+      namespaces: {
+        ...sessionRecord.namespaces,
+        sui: { accounts: ["sui:mainnet:0xapproved"] },
+      },
+    } as typeof sessionRecord);
+
+    mountHook();
+
+    walletKitListeners.get("session_request")?.({
+      topic: "topic-1",
+      id: 22,
+      params: {
+        chainId: "sui:mainnet",
+        request: { method: "sui_getAccounts", params: {} },
+      },
+      verifyContext: {},
+    });
+
+    await waitFor(() => {
+      expect(mockedHandleSuiRequest).toHaveBeenCalled();
+    });
+    expect(mockedHandleSuiRequest.mock.calls[0][4]).toEqual([approved]);
+  });
+
+  it("rejects sui requests when the capability gate is disabled", async () => {
+    // Default walletCapabilities has no account.getPublicKey, so sui support is off.
+    mountHook();
+
+    walletKitListeners.get("session_request")?.({
+      topic: "topic-1",
+      id: 23,
+      params: {
+        chainId: "sui:mainnet",
+        request: { method: "sui_signTransaction", params: {} },
+      },
+      verifyContext: {},
+    });
+
+    await waitFor(() => {
+      expect(mockedHandleSuiRequest).not.toHaveBeenCalled();
+      expect(mockedRejectRequest).toHaveBeenCalledWith(
+        walletKitMock,
+        "topic-1",
+        23,
         Errors.unsupportedChains,
         5100,
       );

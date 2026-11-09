@@ -24,6 +24,8 @@ import {
   isRippleChain,
   isSolanaChain,
   isSolanaSupportEnabled,
+  isSuiChain,
+  isSuiSupportEnabled,
   isTezosChain,
   isTezosSupportEnabled,
   isXRPLSupportEnabled,
@@ -44,6 +46,7 @@ import { handleCosmosRequest } from "./requestHandlers/Cosmos";
 import { handleEIP155Request } from "./requestHandlers/EIP155";
 import { handleXrpRequest } from "./requestHandlers/Ripple";
 import { handleSolanaRequest } from "./requestHandlers/Solana";
+import { handleSuiRequest } from "./requestHandlers/Sui";
 import { handleTezosRequest } from "./requestHandlers/Tezos";
 import { Errors, rejectRequest } from "./requestHandlers/utils";
 import { handleWalletRequest } from "./requestHandlers/Wallet";
@@ -315,6 +318,27 @@ export default function useWalletConnect() {
               chainId,
               accounts.data.filter((account) =>
                 sessionCosmosAddresses.has(account.address),
+              ),
+              client,
+              walletKit,
+            );
+          } else if (
+            isSuiChain(chainId, request) &&
+            isSuiSupportEnabled(walletCapabilities)
+          ) {
+            const session = walletKit.engine.signClient.session.get(topic);
+            const sessionSuiAddresses = new Set(
+              (session?.namespaces.sui?.accounts ?? []).map(
+                (account) => account.split(":")[2],
+              ),
+            );
+            await handleSuiRequest(
+              request,
+              topic,
+              id,
+              chainId,
+              accounts.data.filter((account) =>
+                sessionSuiAddresses.has(account.address),
               ),
               client,
               walletKit,
