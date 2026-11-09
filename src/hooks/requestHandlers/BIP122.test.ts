@@ -7,8 +7,16 @@ import type { IWalletKit } from "@reown/walletkit";
 import BigNumber from "bignumber.js";
 import { networks, payments, Psbt } from "bitcoinjs-lib";
 import { vi } from "vitest";
+import { toV2 } from "@/utils/__tests__/psbtV2.fixtures";
+import { isDerivedAppPsbtSupportEnabled } from "@/utils/helper.util";
+import { getBip122Network } from "@/utils/psbt";
 import { handleBIP122Request } from "./BIP122";
 import * as utils from "./utils";
+
+vi.mock("@/utils/helper.util", async (importOriginal) => ({
+  ...(await importOriginal()),
+  isDerivedAppPsbtSupportEnabled: vi.fn(() => true),
+}));
 
 vi.mock("./utils", async (importOriginal) => ({
   ...(await importOriginal()),
@@ -326,6 +334,235 @@ describe("handleBIP122Request — BIP122_SIGN_PSBT", () => {
         },
       ),
     ).rejects.toThrow("Network failure");
+  });
+});
+
+describe("handleBIP122Request — BIP122_SIGN_PSBT device app selection", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  const TESTNET_CHAIN_ID = "bip122:000000000933ea01ad0ee984209779ba";
+  const { address: testnetAddress } = payments.p2wpkh({
+    output: testScript,
+    network: networks.testnet,
+  });
+  const testnetAccount = makeAccount({
+    id: "bitcoin-testnet-account-id",
+    address: testnetAddress!,
+    currency: "bitcoin_testnet",
+  });
+  const hashiKey = new Uint8Array([
+    0xfc, 0x05, 0x68, 0x61, 0x73, 0x68, 0x69, 0x00,
+  ]);
+  const suiRecipient = new Uint8Array(32).fill(0x11);
+
+  function buildDepositPsbt(network: networks.Network, withField: boolean) {
+    const psbt = new Psbt({ network });
+    psbt.setVersion(2);
+    psbt.addInput({
+      hash: new Uint8Array(32).fill(0x01),
+      index: 0,
+      witnessUtxo: { script: testScript, value: 100_000n },
+    });
+    psbt.addOutput({
+      script: new Uint8Array([0x51, 0x20, ...new Uint8Array(32).fill(0x22)]),
+      value: 60_000n,
+    });
+    psbt.addOutput({ script: testScript, value: 39_000n });
+    if (withField) {
+      psbt.addUnknownKeyValToOutput(0, { key: hashiKey, value: suiRecipient });
+    }
+    return psbt;
+  }
+
+  const walletInfo = {
+    tracking: false,
+    wallet: { name: "ledger-live-desktop", version: "1.0.0" },
+  };
+
+  function signOn(
+    chainId: string,
+    account: Account,
+    psbt: string,
+    options: {
+      broadcast?: boolean;
+      txHash?: string;
+      withWalletInfo?: boolean;
+    } = {},
+  ) {
+    const signPsbt = vi.fn(() =>
+      Promise.resolve({ psbtSigned: "signed-base64", txHash: options.txHash }),
+    );
+    const client = {
+      bitcoin: {
+        signPsbt,
+        getAddresses: vi.fn(() =>
+          Promise.resolve([{ address: account.address }]),
+        ),
+      },
+    } as unknown as WalletAPIClient;
+    const run = handleBIP122Request(
+      {
+        method: BIP122_SIGNING_METHODS.BIP122_SIGN_PSBT,
+        params: {
+          account: account.address,
+          psbt,
+          ...(options.broadcast !== undefined && {
+            broadcast: options.broadcast,
+          }),
+        },
+      },
+      topic,
+      requestId,
+      chainId,
+      {
+        accounts: [account],
+        client,
+        walletkit,
+        walletCapabilities: ["bitcoin.signPsbt"],
+        ...(options.withWalletInfo !== false && { walletInfo }),
+      },
+    );
+    return { signPsbt, run };
+  }
+
+  it("asks for the derived app when a PSBTv0 carries the Hashi deposit field", async () => {
+    const psbt = buildDepositPsbt(networks.testnet, true).toBase64();
+    const { signPsbt, run } = signOn(TESTNET_CHAIN_ID, testnetAccount, psbt);
+    await run;
+
+    expect(signPsbt).toHaveBeenCalledWith(testnetAccount.id, psbt, false, {
+      hwAppId: "Hashi Test",
+    });
+  });
+
+  it("asks for the derived app and forwards the PSBTv2 string unchanged", async () => {
+    const psbt = toV2(buildDepositPsbt(networks.testnet, true));
+    const { signPsbt, run } = signOn(TESTNET_CHAIN_ID, testnetAccount, psbt);
+    await run;
+
+    expect(signPsbt).toHaveBeenCalledWith(testnetAccount.id, psbt, false, {
+      hwAppId: "Hashi Test",
+    });
+    expect(utils.acceptRequest).toHaveBeenCalledWith(
+      walletkit,
+      topic,
+      requestId,
+      { psbt: "signed-base64" },
+    );
+  });
+
+  it("keeps the default app when the PSBT has no Hashi deposit field", async () => {
+    const psbt = buildDepositPsbt(networks.testnet, false).toBase64();
+    const { signPsbt, run } = signOn(TESTNET_CHAIN_ID, testnetAccount, psbt);
+    await run;
+
+    expect(signPsbt).toHaveBeenCalledWith(
+      testnetAccount.id,
+      psbt,
+      false,
+      undefined,
+    );
+  });
+
+  it("asks for the mainnet derived app for a Hashi deposit on Bitcoin mainnet", async () => {
+    const account = makeAccount();
+    const psbt = buildDepositPsbt(networks.bitcoin, true).toBase64();
+    const { signPsbt, run } = signOn(BTC_CHAIN_ID, account, psbt);
+    await run;
+
+    expect(signPsbt).toHaveBeenCalledWith(account.id, psbt, false, {
+      hwAppId: "Hashi",
+    });
+  });
+
+  it("declines a Hashi deposit on a chain with no derived app instead of using the default app", async () => {
+    const LITECOIN_CHAIN_ID = "bip122:12a765e31ffd4059bada1e25190f6e98";
+    const litecoin = getBip122Network(LITECOIN_CHAIN_ID);
+    const { address } = payments.p2wpkh({
+      output: testScript,
+      network: litecoin,
+    });
+    const account = makeAccount({ address: address!, currency: "litecoin" });
+    const psbt = buildDepositPsbt(litecoin, true).toBase64();
+    const { signPsbt, run } = signOn(LITECOIN_CHAIN_ID, account, psbt);
+    await run;
+
+    expect(signPsbt).not.toHaveBeenCalled();
+    expect(utils.rejectRequest).toHaveBeenCalledWith(
+      walletkit,
+      topic,
+      requestId,
+      utils.Errors.txDeclined,
+    );
+  });
+  it("returns the signed PSBT and the txid when the dApp asks to broadcast", async () => {
+    const psbt = buildDepositPsbt(networks.testnet, true).toBase64();
+    const { signPsbt, run } = signOn(TESTNET_CHAIN_ID, testnetAccount, psbt, {
+      broadcast: true,
+      txHash: "txid",
+    });
+    await run;
+
+    expect(signPsbt).toHaveBeenCalledWith(testnetAccount.id, psbt, true, {
+      hwAppId: "Hashi Test",
+    });
+    expect(utils.acceptRequest).toHaveBeenCalledWith(
+      walletkit,
+      topic,
+      requestId,
+      { psbt: "signed-base64", txid: "txid" },
+    );
+  });
+
+  it("declines a Hashi deposit when the wallet cannot open the derived app", async () => {
+    vi.mocked(isDerivedAppPsbtSupportEnabled).mockReturnValueOnce(false);
+    const psbt = buildDepositPsbt(networks.testnet, true).toBase64();
+    const { signPsbt, run } = signOn(TESTNET_CHAIN_ID, testnetAccount, psbt);
+    await run;
+
+    expect(isDerivedAppPsbtSupportEnabled).toHaveBeenCalledWith(walletInfo);
+    expect(signPsbt).not.toHaveBeenCalled();
+    expect(utils.rejectRequest).toHaveBeenCalledWith(
+      walletkit,
+      topic,
+      requestId,
+      utils.Errors.unsupportedMethods,
+      5101,
+    );
+  });
+
+  it("declines a Hashi deposit when the wallet info is unknown", async () => {
+    const psbt = buildDepositPsbt(networks.testnet, true).toBase64();
+    const { signPsbt, run } = signOn(TESTNET_CHAIN_ID, testnetAccount, psbt, {
+      withWalletInfo: false,
+    });
+    await run;
+
+    expect(signPsbt).not.toHaveBeenCalled();
+    expect(utils.rejectRequest).toHaveBeenCalledWith(
+      walletkit,
+      topic,
+      requestId,
+      utils.Errors.unsupportedMethods,
+      5101,
+    );
+  });
+
+  it("signs a PSBT without the Hashi field on a wallet that cannot open the derived app", async () => {
+    vi.mocked(isDerivedAppPsbtSupportEnabled).mockReturnValue(false);
+    const psbt = buildDepositPsbt(networks.testnet, false).toBase64();
+    const { signPsbt, run } = signOn(TESTNET_CHAIN_ID, testnetAccount, psbt, {
+      withWalletInfo: false,
+    });
+    await run;
+    vi.mocked(isDerivedAppPsbtSupportEnabled).mockReturnValue(true);
+
+    expect(signPsbt).toHaveBeenCalledWith(
+      testnetAccount.id,
+      psbt,
+      false,
+      undefined,
+    );
   });
 });
 

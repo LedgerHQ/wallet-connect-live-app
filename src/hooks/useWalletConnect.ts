@@ -251,6 +251,7 @@ export default function useWalletConnect() {
                 client,
                 walletkit: walletKit,
                 walletCapabilities,
+                walletInfo,
                 sessionAddress,
               },
             );
