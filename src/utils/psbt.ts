@@ -1,6 +1,7 @@
 import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import { initEccLib, networks, payments, Psbt, Transaction } from "bitcoinjs-lib";
 import * as ecc from "@bitcoinerlab/secp256k1";
+import { getPsbtVersion, psbtV2ToValidationPsbt } from "./psbtV2";
 
 let eccInitialized = false;
 function ensureEccLib(): void {
@@ -83,7 +84,9 @@ export type SignInputsValidationResult =
  */
 export function decodePsbt(psbtBase64: string): Psbt {
   try {
-    return Psbt.fromBase64(psbtBase64);
+    return getPsbtVersion(psbtBase64) === 2
+      ? psbtV2ToValidationPsbt(psbtBase64)
+      : Psbt.fromBase64(psbtBase64);
   } catch (error) {
     throw new Error(
       `Invalid PSBT format: ${error instanceof Error ? error.message : String(error)}`,
