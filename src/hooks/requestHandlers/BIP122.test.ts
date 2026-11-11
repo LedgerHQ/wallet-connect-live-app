@@ -526,7 +526,7 @@ describe("handleBIP122Request — BIP122_SIGN_PSBT device app selection", () => 
       walletkit,
       topic,
       requestId,
-      utils.Errors.unsupportedMethods,
+      utils.Errors.walletUpdateRequired,
       5101,
     );
   });
@@ -543,7 +543,7 @@ describe("handleBIP122Request — BIP122_SIGN_PSBT device app selection", () => 
       walletkit,
       topic,
       requestId,
-      utils.Errors.unsupportedMethods,
+      utils.Errors.walletUpdateRequired,
       5101,
     );
   });
