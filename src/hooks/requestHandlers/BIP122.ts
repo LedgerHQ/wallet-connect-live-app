@@ -40,15 +40,10 @@ export async function handleBIP122Request(
     walletkit: IWalletKit;
     walletCapabilities?: string[];
     sessionAddress?: string;
+    isSignMessagePathSupported?: boolean;
   },
 ) {
-  const {
-    accounts,
-    client,
-    walletkit,
-    walletCapabilities = [],
-    sessionAddress,
-  } = context;
+  const { accounts, client, walletkit, walletCapabilities = [], sessionAddress } = context;
 
   switch (request.method) {
     case BIP122_SIGNING_METHODS.BIP122_SIGN_MESSAGE_LEGACY: {
@@ -78,13 +73,7 @@ export async function handleBIP122Request(
           }
         }
       } else {
-        await rejectRequest(
-          walletkit,
-          topic,
-          id,
-          Errors.unsupportedAccounts,
-          5103,
-        );
+        await rejectRequest(walletkit, topic, id, Errors.unsupportedAccounts, 5103);
       }
       break;
     }
@@ -96,6 +85,7 @@ export async function handleBIP122Request(
         params.address ?? params.account,
         params.account,
         chainId,
+        context.isSignMessagePathSupported ?? false,
       );
       if (signer) {
         try {
@@ -119,13 +109,7 @@ export async function handleBIP122Request(
           }
         }
       } else {
-        await rejectRequest(
-          walletkit,
-          topic,
-          id,
-          Errors.unsupportedAccounts,
-          5103,
-        );
+        await rejectRequest(walletkit, topic, id, Errors.unsupportedAccounts, 5103);
       }
       break;
     }
@@ -244,10 +228,9 @@ export async function handleBIP122Request(
     case BIP122_QUERY_METHODS.BIP122_GET_ACCOUNT_ADDRESSES: {
       // Some adapters (e.g. AppKit bitcoin adapter) send getAccountAddresses
       // without params. Fall back to the selected account for the session.
-      const params =
-        request.params != null
-          ? bip122GetAccountAddressesSchema.parse(request.params)
-          : undefined;
+      const params = request.params != null
+        ? bip122GetAccountAddressesSchema.parse(request.params)
+        : undefined;
 
       const selectedAddress = params?.account ?? sessionAddress;
 

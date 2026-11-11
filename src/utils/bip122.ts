@@ -8,10 +8,14 @@ export async function findBip122MessageSigner(
   address: string,
   sessionAccountAddress: string,
   chainId: string,
+  isPathSupported: boolean,
 ): Promise<{ account: Account; address: string; path?: string } | undefined> {
   const account = getAccountWithAddressAndChainId(accounts, address, chainId);
   if (account) {
     return { account, address: account.address };
+  }
+  if (!isPathSupported) {
+    return undefined;
   }
 
   const sessionAccount = getAccountWithAddressAndChainId(

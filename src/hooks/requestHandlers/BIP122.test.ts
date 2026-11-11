@@ -80,18 +80,17 @@ describe("handleBIP122Request — BIP122_SIGN_MESSAGE", () => {
   const olderAddress = "bc1qolderaddress";
   const olderPath = "m/84'/0'/0'/0/3";
 
-  function callSignMessage(address: string) {
+  function callSignMessage(address: string, isSignMessagePathSupported = true) {
     const sign = vi.fn(() => Promise.resolve(Buffer.from("signature")));
+    const getAddresses = vi.fn(() =>
+      Promise.resolve([
+        { address: testAddress!, path: "m/84'/0'/0'/0/0" },
+        { address: olderAddress, path: olderPath },
+      ]),
+    );
     const client = {
       message: { sign },
-      bitcoin: {
-        getAddresses: vi.fn(() =>
-          Promise.resolve([
-            { address: testAddress!, path: "m/84'/0'/0'/0/0" },
-            { address: olderAddress, path: olderPath },
-          ]),
-        ),
-      },
+      bitcoin: { getAddresses },
     } as unknown as WalletAPIClient;
     const call = handleBIP122Request(
       {
@@ -101,9 +100,14 @@ describe("handleBIP122Request — BIP122_SIGN_MESSAGE", () => {
       topic,
       requestId,
       BTC_CHAIN_ID,
-      { accounts: [makeAccount()], client, walletkit },
+      {
+        accounts: [makeAccount()],
+        client,
+        walletkit,
+        isSignMessagePathSupported,
+      },
     );
-    return { sign, call };
+    return { sign, getAddresses, call };
   }
 
   it("signs with the current receive address without a path", async () => {
@@ -157,6 +161,35 @@ describe("handleBIP122Request — BIP122_SIGN_MESSAGE", () => {
       requestId,
       utils.Errors.unsupportedAccounts,
       5103,
+    );
+  });
+
+  it("rejects another address with unsupportedAccounts when the wallet can't sign with a path", async () => {
+    const rejectSpy = vi.spyOn(utils, "rejectRequest");
+    const { sign, getAddresses, call } = callSignMessage(olderAddress, false);
+
+    await call;
+
+    expect(getAddresses).not.toHaveBeenCalled();
+    expect(sign).not.toHaveBeenCalled();
+    expect(rejectSpy).toHaveBeenCalledWith(
+      walletkit,
+      topic,
+      requestId,
+      utils.Errors.unsupportedAccounts,
+      5103,
+    );
+  });
+
+  it("still signs with the current receive address when the wallet can't sign with a path", async () => {
+    const { sign, call } = callSignMessage(testAddress!, false);
+
+    await call;
+
+    expect(sign).toHaveBeenCalledWith(
+      "bitcoin-account-id",
+      Buffer.from("hello"),
+      undefined,
     );
   });
 });
@@ -571,8 +604,8 @@ describe("handleBIP122Request — BIP122_GET_ACCOUNT_ADDRESSES", () => {
 
   it("rejects with userDecline when params are undefined and no session account matches", async () => {
     const rejectSpy = vi.spyOn(utils, "rejectRequest");
-    const client = makeClient(() =>
-      Promise.resolve({ psbtSigned: "irrelevant" }),
+    const client = makeClient(
+      () => Promise.resolve({ psbtSigned: "irrelevant" }),
     );
 
     await handleBIP122Request(
