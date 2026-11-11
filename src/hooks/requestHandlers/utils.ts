@@ -7,6 +7,7 @@ export enum Errors {
   msgDecline = "Message signed declined",
   unsupportedChains = "unsupportedChains",
   unsupportedMethods = "unsupportedMethods",
+  walletUpdateRequired = "Ledger Wallet update required to sign this PSBT",
 }
 
 const hexReg = /^ *(0x)?([a-fA-F0-9]+) *$/;
