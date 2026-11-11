@@ -33,16 +33,28 @@ describe("hasHashiDepositField", () => {
     );
   });
 
-  it("ignores other proprietary keys and other subtypes", () => {
-    const otherIdentifier = new Uint8Array([
-      0xfc, 0x05, 0x68, 0x61, 0x73, 0x68, 0x6a, 0x00,
-    ]);
+  it("finds any key with the Hashi prefix, whatever its subtype or key data", () => {
     const otherSubtype = new Uint8Array([
       0xfc, 0x05, 0x68, 0x61, 0x73, 0x68, 0x69, 0x01,
     ]);
+    const withKeyData = new Uint8Array([...hashiKey, 0xaa]);
+    const prefixOnly = hashiKey.slice(0, 7);
+    for (const key of [otherSubtype, withKeyData, prefixOnly]) {
+      expect(hasHashiDepositField(psbtWithOutputKeys([[key]]))).toBe(true);
+    }
+  });
+
+  it("ignores other proprietary identifiers and shorter keys", () => {
+    const otherIdentifier = new Uint8Array([
+      0xfc, 0x05, 0x68, 0x61, 0x73, 0x68, 0x6a, 0x00,
+    ]);
+    const otherLength = new Uint8Array([
+      0xfc, 0x06, 0x68, 0x61, 0x73, 0x68, 0x69, 0x00,
+    ]);
+    const truncated = hashiKey.slice(0, 6);
     expect(
       hasHashiDepositField(
-        psbtWithOutputKeys([[otherIdentifier, otherSubtype]]),
+        psbtWithOutputKeys([[otherIdentifier, otherLength, truncated]]),
       ),
     ).toBe(false);
   });
