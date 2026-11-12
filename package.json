@@ -19,6 +19,7 @@
     "@ledgerhq/hw-transport": "^6.31.4",
     "@ledgerhq/react-ui": "^0.16.4",
     "@ledgerhq/wallet-api-client": "^1.15.0",
+    "@mysten/sui": "2.23.1",
     "@reown/walletkit": "^1.5.5",
     "@segment/analytics-next": "^1.76.0",
     "@segment/snippet": "^5.2.1",

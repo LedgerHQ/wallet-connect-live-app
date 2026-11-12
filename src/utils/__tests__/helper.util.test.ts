@@ -13,6 +13,8 @@ import {
   isCosmosSupportEnabled,
   isEIP155Chain,
   isSolanaSupportEnabled,
+  isSuiChain,
+  isSuiSupportEnabled,
   isTezosChain,
   isTezosSupportEnabled,
   isXRPLSupportEnabled,
@@ -365,6 +367,37 @@ describe("isCosmosSupportEnabled", () => {
     expect(isCosmosSupportEnabled(["transaction.signRaw"])).toBe(false);
     expect(isCosmosSupportEnabled(["account.getPublicKey"])).toBe(false);
     expect(isCosmosSupportEnabled([])).toBe(false);
+  });
+});
+
+describe("isSuiChain", () => {
+  it("matches the registered Sui chain ids", () => {
+    expect(isSuiChain("sui:mainnet")).toBe(true);
+    expect(isSuiChain("sui:testnet")).toBe(true);
+  });
+
+  it("does not match unregistered Sui networks", () => {
+    expect(isSuiChain("sui:devnet")).toBe(false);
+    expect(isSuiChain("sui:localnet")).toBe(false);
+  });
+
+  it("does not match other namespaces", () => {
+    expect(isSuiChain("tezos:mainnet")).toBe(false);
+    expect(isSuiChain("eip155:1")).toBe(false);
+  });
+});
+
+describe("isSuiSupportEnabled", () => {
+  it("requires transaction.signRaw and account.getPublicKey", () => {
+    expect(
+      isSuiSupportEnabled(["transaction.signRaw", "account.getPublicKey"]),
+    ).toBe(true);
+  });
+
+  it("returns false when any capability is missing", () => {
+    expect(isSuiSupportEnabled(["transaction.signRaw"])).toBe(false);
+    expect(isSuiSupportEnabled(["account.getPublicKey"])).toBe(false);
+    expect(isSuiSupportEnabled([])).toBe(false);
   });
 });
 

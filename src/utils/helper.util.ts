@@ -3,10 +3,12 @@ import { COSMOS_REQUESTS } from "@/data/methods/Cosmos.methods";
 import { EIP155_REQUESTS } from "@/data/methods/EIP155Data.methods";
 import { RIPPLE_REQUESTS } from "@/data/methods/Ripple.methods";
 import { SOLANA_REQUESTS } from "@/data/methods/Solana.methods";
+import { SUI_REQUESTS } from "@/data/methods/Sui.methods";
 import { TEZOS_REQUESTS } from "@/data/methods/Tezos.methods";
 import { WALLET_REQUESTS } from "@/data/methods/Wallet.methods";
 import {
   COSMOS_CHAINS,
+  SUI_CHAINS,
   SUPPORTED_NETWORK,
   TEZOS_CHAINS,
 } from "@/data/network.config";
@@ -19,6 +21,10 @@ const TEZOS_NAMESPACES = new Set(
 
 const COSMOS_NAMESPACES = new Set(
   Object.values(COSMOS_CHAINS).map((network) => network.namespace),
+);
+
+const SUI_NAMESPACES = new Set(
+  Object.values(SUI_CHAINS).map((network) => network.namespace),
 );
 
 /**
@@ -107,6 +113,16 @@ export function isCosmosChain(
 ): _request is COSMOS_REQUESTS {
   // Exact match only: an unregistered `cosmos:*` (e.g. osmosis) must not reach the babylon handler.
   return COSMOS_NAMESPACES.has(chain);
+}
+
+export function isSuiChain(
+  chain: string,
+  // request is passed and used here only for type narrowing
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  _request?: { method: string; params: any },
+): _request is SUI_REQUESTS {
+  // Exact match only: `sui:devnet` and `sui:localnet` are not Ledger Live currencies.
+  return SUI_NAMESPACES.has(chain);
 }
 
 /**
@@ -217,6 +233,23 @@ export const isSolanaSupportEnabled = createSupportChecker(SOLANA_MIN_VERSIONS);
  * (Deliberately chosen over the previous min-LL-version gate for LIVE-27227.)
  */
 export const isCosmosSupportEnabled = (walletCapabilities: string[]): boolean => {
+  return (
+    walletCapabilities.includes("transaction.signRaw") &&
+    walletCapabilities.includes("account.getPublicKey")
+  );
+};
+
+/**
+ * Check if Sui support should be enabled based on wallet capabilities.
+ * The sui handler calls `transaction.signRaw` (sui_signTransaction, sui_signAndExecuteTransaction)
+ * and `account.getPublicKey` (sui_getAccounts), so the host must advertise both.
+ *
+ * KNOWN, ACCEPTED FALSE POSITIVE, same as `isCosmosSupportEnabled`: both capabilities are
+ * advertised for other families, so this is true on a Ledger Live build that has not wired Sui
+ * raw signing. There the session opens with no accounts and signing requests are declined.
+ * A per-family capability would close the window entirely.
+ */
+export const isSuiSupportEnabled = (walletCapabilities: string[]): boolean => {
   return (
     walletCapabilities.includes("transaction.signRaw") &&
     walletCapabilities.includes("account.getPublicKey")

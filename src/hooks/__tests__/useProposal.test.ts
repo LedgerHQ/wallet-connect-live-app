@@ -455,6 +455,49 @@ describe("formatAccountsByChain", () => {
       },
     ]);
   });
+
+  it("should filter out Sui chains unless the wallet signs raw transactions and returns public keys", () => {
+    const proposalWithSui: Proposal = {
+      ...dataFromJSON,
+      requiredNamespaces: {
+        sui: {
+          methods: ["sui_signTransaction"],
+          chains: ["sui:mainnet"],
+          events: [],
+        },
+      },
+      optionalNamespaces: {},
+    };
+    const suiAccount = {
+      ...ACCOUNT_MOCK,
+      accountName: "SUI Account",
+      currency: "sui",
+    };
+
+    expect(
+      formatAccountsByChain(
+        proposalWithSui,
+        [suiAccount],
+        mockWalletInfo,
+        walletCapabilitiesMock,
+      ),
+    ).toEqual([]);
+
+    expect(
+      formatAccountsByChain(proposalWithSui, [suiAccount], mockWalletInfo, [
+        "transaction.signRaw",
+        "account.getPublicKey",
+      ]),
+    ).toEqual([
+      {
+        chain: "sui",
+        displayName: "Sui",
+        isSupported: true,
+        isRequired: true,
+        accounts: [suiAccount],
+      },
+    ]);
+  });
 });
 
 describe("sortChains", () => {
