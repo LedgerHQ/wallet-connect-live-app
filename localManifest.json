@@ -43,6 +43,7 @@
     "robinhood",
     "arc",
     "arc_testnet",
+    "alpen",
     "ethereum_holesky",
     "tezos",
     "babylon"
