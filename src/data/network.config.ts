@@ -135,6 +135,13 @@ export const EIP155_CHAINS_MAINNET: Record<string, Network> = {
     displayName: "Arc",
     color: "#1A2B5F",
   },
+  alpen: {
+    chainId: 29032,
+    namespace: "eip155:29032",
+    ticker: "BTC",
+    displayName: "Alpen",
+    color: "#F68B1F",
+  },
 };
 
 export const EIP155_SEPOLIA_CHAINS: Record<string, Network> = {

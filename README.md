@@ -28,6 +28,7 @@ and is intended to be integrated within ledger products, enabling users to seaml
 | 0G                | ✅          | -                  | -                  |
 | Robinhood Chain   | ✅          | -                  | -                  |
 | Arc               | ✅          | ✅                 | -                  |
+| Alpen             | ✅          | -                  | -                  |
 | Tezos             | ✅          | -                  | -                  |
 
 ## Hosting
