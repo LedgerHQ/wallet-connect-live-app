@@ -198,6 +198,10 @@ const SOLANA_MIN_VERSIONS: Record<string, string> = {
 /** Check if Solana support should be enabled based on wallet version */
 export const isSolanaSupportEnabled = createSupportChecker(SOLANA_MIN_VERSIONS);
 
+const BIP122_SIGN_MESSAGE_PATH_MIN_VERSIONS: Record<string, string> = {};
+
+export const isBip122SignMessagePathSupported = createSupportChecker(BIP122_SIGN_MESSAGE_PATH_MIN_VERSIONS);
+
 /**
  * Check if Cosmos (Babylon) support should be enabled based on wallet capabilities.
  * The cosmos handler calls `transaction.signRaw` (cosmos_signAmino) and
