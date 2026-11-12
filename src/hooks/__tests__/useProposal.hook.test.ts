@@ -16,15 +16,18 @@ import {
   populateAuthPayload,
 } from "@walletconnect/utils";
 
-vi.mock("@/store/walletKit.store", async () => {
+vi.mock("@/store/walletKit.store", async (importOriginal) => {
   const { atom } = await import("jotai");
+  const { verifyContextByRequestAtom, getVerifyContextKey } =
+    await importOriginal<typeof import("@/store/walletKit.store")>();
   return {
     coreAtom: atom(null),
     walletKitAtom: atom(null),
     connectionStatusAtom: atom("disconnected"),
     loadingAtom: atom(false),
     showBackToBrowserModalAtom: atom(false),
-    verifyContextByTopicAtom: atom({}),
+    verifyContextByRequestAtom,
+    getVerifyContextKey,
     oneClickAuthPayloadAtom: atom(undefined),
   };
 });
@@ -103,6 +106,7 @@ vi.mock("@tanstack/react-router", async () => {
 import {
   walletKitAtom,
   showBackToBrowserModalAtom,
+  verifyContextByRequestAtom,
 } from "@/store/walletKit.store";
 import { walletAPIClientAtom } from "@/store/wallet-api.store";
 
@@ -172,6 +176,7 @@ describe("useProposal", () => {
     store.set(walletKitAtom as never, walletKitMock);
     store.set(walletAPIClientAtom as never, clientMock);
     store.set(showBackToBrowserModalAtom as never, false);
+    store.set(verifyContextByRequestAtom, {});
 
     mockedUseNavigate.mockReturnValue(navigateMock);
     mockedUseAnalytics.mockReturnValue({ track: analyticsTrackMock } as never);
@@ -271,6 +276,15 @@ describe("useProposal", () => {
         },
       },
     };
+    store.set(verifyContextByRequestAtom, {
+      [`proposal:${proposal.id}`]: {
+        verified: {
+          origin: "https://react-app.walletconnect.com",
+          validation: "VALID",
+          verifyUrl: "",
+        },
+      },
+    });
 
     const { result } = renderHook(() => useProposal(proposal), {
       wrapper: createHookWrapper(store),
@@ -300,6 +314,8 @@ describe("useProposal", () => {
     );
     expect(window.open).toHaveBeenCalledWith(
       "https://react-app.walletconnect.com/",
+      "_blank",
+      "noopener,noreferrer",
     );
   });
 
@@ -395,6 +411,47 @@ describe("useProposal", () => {
     expect(store.get(showBackToBrowserModalAtom as never)).toBe(true);
   });
 
+  it.each([
+    ["is not verified", undefined],
+    ["does not match the verified origin", "https://evil.example"],
+  ])(
+    "does not open a universal link that %s",
+    async (_, verifiedOrigin?: string) => {
+      const proposal = {
+        ...sessionProposal,
+        proposer: {
+          ...sessionProposal.proposer,
+          metadata: {
+            ...sessionProposal.proposer.metadata,
+            redirect: { universal: "https://react-app.walletconnect.com" },
+          },
+        },
+      };
+      if (verifiedOrigin) {
+        store.set(verifyContextByRequestAtom, {
+          [`proposal:${proposal.id}`]: {
+            verified: {
+              origin: verifiedOrigin,
+              validation: "VALID",
+              verifyUrl: "",
+            },
+          },
+        });
+      }
+
+      const { result } = renderHook(() => useProposal(proposal), {
+        wrapper: createHookWrapper(store),
+      });
+
+      await act(async () => {
+        await result.current.rejectSession();
+      });
+
+      expect(window.open).not.toHaveBeenCalled();
+      expect(store.get(showBackToBrowserModalAtom as never)).toBe(true);
+    },
+  );
+
   it("does not open a Ledger Wallet deeplink provided as dApp redirect", async () => {
     const proposal = {
       ...sessionProposal,
@@ -449,6 +506,53 @@ describe("useProposal", () => {
     });
     expect(navigateMock).toHaveBeenCalledWith(
       expect.objectContaining({ to: "/" }),
+    );
+  });
+
+  it("checks the redirect of a one-click auth request against its own verify context", async () => {
+    const oneClickAuthPayload = {
+      id: 77,
+      topic: "auth-topic",
+      params: {
+        authPayload: {
+          chains: ["eip155:1"],
+          methods: ["personal_sign"],
+        },
+      },
+    } as never;
+    const proposal = {
+      ...sessionProposal,
+      proposer: {
+        ...sessionProposal.proposer,
+        metadata: {
+          ...sessionProposal.proposer.metadata,
+          redirect: { universal: "https://react-app.walletconnect.com" },
+        },
+      },
+    };
+    store.set(verifyContextByRequestAtom, {
+      "auth:77": {
+        verified: {
+          origin: "https://react-app.walletconnect.com",
+          validation: "VALID",
+          verifyUrl: "",
+        },
+      },
+    });
+
+    const { result } = renderHook(
+      () => useProposal(proposal, oneClickAuthPayload),
+      { wrapper: createHookWrapper(store) },
+    );
+
+    await act(async () => {
+      await result.current.rejectSessionAuthenticate();
+    });
+
+    expect(window.open).toHaveBeenCalledWith(
+      "https://react-app.walletconnect.com/",
+      "_blank",
+      "noopener,noreferrer",
     );
   });
 
