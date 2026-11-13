@@ -199,6 +199,18 @@ const SOLANA_MIN_VERSIONS: Record<string, string> = {
 export const isSolanaSupportEnabled = createSupportChecker(SOLANA_MIN_VERSIONS);
 
 /**
+ * Minimum versions of Ledger Wallet that open the device app named in `bitcoin.signPsbt` options.
+ * An older host ignores the option and signs with the Bitcoin app, so a PSBT meant for a derived
+ * app is declined there. A wallet without an entry is treated as too old.
+ */
+export const DERIVED_APP_PSBT_MIN_VERSIONS: Record<string, string> = {};
+
+/** Check if the wallet signs a PSBT with the device app named in `bitcoin.signPsbt` options */
+export const isDerivedAppPsbtSupportEnabled = createSupportChecker(
+  DERIVED_APP_PSBT_MIN_VERSIONS,
+);
+
+/**
  * Check if Cosmos (Babylon) support should be enabled based on wallet capabilities.
  * The cosmos handler calls `transaction.signRaw` (cosmos_signAmino) and
  * `account.getPublicKey` (cosmos_getAccounts), so the host must advertise both.

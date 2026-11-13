@@ -10,8 +10,12 @@ import {
 } from "@/data/methods/BIP122.methods";
 import { fetchBip122Addresses } from "@/utils/bip122";
 import { btcTransactionSchema, convertBtcToLiveTX } from "@/utils/converters";
+import { selectDeviceApp } from "@/utils/derivedApps";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
-import { isPSBTSupportEnabled } from "@/utils/helper.util";
+import {
+  isDerivedAppPsbtSupportEnabled,
+  isPSBTSupportEnabled,
+} from "@/utils/helper.util";
 import {
   decodePsbt,
   getAccountAddresses,
@@ -19,7 +23,11 @@ import {
   validatePsbtAccount,
   validateSignInputs,
 } from "@/utils/psbt";
-import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
+import type {
+  Account,
+  WalletAPIClient,
+  WalletInfo,
+} from "@ledgerhq/wallet-api-client";
 import type { IWalletKit } from "@reown/walletkit";
 import {
   acceptRequest,
@@ -39,10 +47,18 @@ export async function handleBIP122Request(
     client: WalletAPIClient;
     walletkit: IWalletKit;
     walletCapabilities?: string[];
+    walletInfo?: WalletInfo["result"];
     sessionAddress?: string;
   },
 ) {
-  const { accounts, client, walletkit, walletCapabilities = [], sessionAddress } = context;
+  const {
+    accounts,
+    client,
+    walletkit,
+    walletCapabilities = [],
+    walletInfo,
+    sessionAddress,
+  } = context;
 
   switch (request.method) {
     case BIP122_SIGNING_METHODS.BIP122_SIGN_MESSAGE_LEGACY: {
@@ -198,11 +214,33 @@ export async function handleBIP122Request(
           }
         }
 
+        // A PSBT meant for a derived app is never signed by the Bitcoin app instead
+        const deviceApp = selectDeviceApp(psbt, chainId);
+        if (deviceApp.kind === "unsupported") {
+          return rejectRequest(walletkit, topic, id, Errors.txDeclined);
+        }
+        // Same code as an unsupported method, so dApps keep their handling; the message names the cause
+        if (
+          deviceApp.kind === "derived" &&
+          !(walletInfo && isDerivedAppPsbtSupportEnabled(walletInfo))
+        ) {
+          return rejectRequest(
+            walletkit,
+            topic,
+            id,
+            Errors.walletUpdateRequired,
+            5101,
+          );
+        }
+
         // Sign PSBT using wallet-api
         const signedPsbtResult = await client.bitcoin.signPsbt(
           account.id,
           params.psbt,
           params.broadcast ?? false,
+          deviceApp.kind === "derived"
+            ? { hwAppId: deviceApp.hwAppId }
+            : undefined,
         );
 
         const result: BIP122_RESPONSES[typeof request.method] = {
