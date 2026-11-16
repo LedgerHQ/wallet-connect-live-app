@@ -4,7 +4,6 @@ import {
   SUI_SERIALIZED_SIGNATURE,
   SUI_TRANSACTION_BYTES_B64,
 } from "@/tests/mocks/sui.mock";
-import { hexToBase64 } from "@/utils/cosmos";
 import { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import type { IWalletKit } from "@reown/walletkit";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -20,7 +19,6 @@ vi.mock("./utils", async (importOriginal) => ({
 const ADDRESS = `0x${"11".repeat(32)}`;
 const TESTNET_ADDRESS = `0x${"22".repeat(32)}`;
 const OTHER_ADDRESS = `0x${"33".repeat(32)}`;
-const PUBKEY_HEX = "01".repeat(32); // raw 32-byte Ed25519 public key
 const TRANSACTION_JSON = JSON.stringify({ version: 2, commands: [] });
 const SIGNED_HEX = buildSignedSuiTransactionHex(1);
 
@@ -56,10 +54,8 @@ describe("handleSuiRequest", () => {
   beforeEach(() => vi.clearAllMocks());
 
   describe("sui_getAccounts", () => {
-    it("returns the Sui accounts with the public key as base64", async () => {
-      const client = clientWith({
-        getPublicKey: vi.fn().mockResolvedValue(PUBKEY_HEX),
-      });
+    it("returns every Sui account with an empty public key, without asking the wallet", async () => {
+      const client = clientWith({});
 
       await handleSuiRequest(
         request(SUI_SIGNING_METHODS.SUI_GET_ACCOUNTS, undefined),
@@ -71,79 +67,11 @@ describe("handleSuiRequest", () => {
         walletKit,
       );
 
-      expect(client.account.getPublicKey).toHaveBeenCalledTimes(2);
-      expect(client.account.getPublicKey).not.toHaveBeenCalledWith("eth-1");
+      expect(client.account.getPublicKey).not.toHaveBeenCalled();
       expect(utils.acceptRequest).toHaveBeenCalledWith(walletKit, topic, id, [
-        { address: ADDRESS, pubkey: hexToBase64(PUBKEY_HEX) },
-        { address: TESTNET_ADDRESS, pubkey: hexToBase64(PUBKEY_HEX) },
+        { address: ADDRESS, pubkey: "" },
+        { address: TESTNET_ADDRESS, pubkey: "" },
       ]);
-    });
-
-    it("returns a 32-byte public key", async () => {
-      const client = clientWith({
-        getPublicKey: vi.fn().mockResolvedValue(PUBKEY_HEX),
-      });
-
-      await handleSuiRequest(
-        request(SUI_SIGNING_METHODS.SUI_GET_ACCOUNTS, {}),
-        topic,
-        id,
-        chainId,
-        accounts,
-        client,
-        walletKit,
-      );
-
-      const [, , , result] = vi.mocked(utils.acceptRequest).mock.calls[0];
-      expect(
-        Buffer.from((result as { pubkey: string }[])[0].pubkey, "base64"),
-      ).toHaveLength(32);
-    });
-
-    it("skips an account whose public key cannot be fetched", async () => {
-      const client = clientWith({
-        getPublicKey: vi
-          .fn()
-          .mockRejectedValueOnce(new Error("AccountPublicKeyUnavailable"))
-          .mockResolvedValueOnce(PUBKEY_HEX),
-      });
-
-      await handleSuiRequest(
-        request(SUI_SIGNING_METHODS.SUI_GET_ACCOUNTS, undefined),
-        topic,
-        id,
-        chainId,
-        accounts,
-        client,
-        walletKit,
-      );
-
-      expect(utils.acceptRequest).toHaveBeenCalledWith(walletKit, topic, id, [
-        { address: TESTNET_ADDRESS, pubkey: hexToBase64(PUBKEY_HEX) },
-      ]);
-    });
-
-    it("skips an account whose public key is empty", async () => {
-      const client = clientWith({
-        getPublicKey: vi.fn().mockResolvedValue(""),
-      });
-
-      await handleSuiRequest(
-        request(SUI_SIGNING_METHODS.SUI_GET_ACCOUNTS, undefined),
-        topic,
-        id,
-        chainId,
-        accounts,
-        client,
-        walletKit,
-      );
-
-      expect(utils.acceptRequest).toHaveBeenCalledWith(
-        walletKit,
-        topic,
-        id,
-        [],
-      );
     });
   });
 

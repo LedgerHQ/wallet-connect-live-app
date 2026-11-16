@@ -9,6 +9,7 @@ import {
 import { describe, expect, it, vi } from "vitest";
 
 import { ACCOUNT_MOCK } from "@/tests/mocks/account.mock";
+import { SUI_MIN_VERSIONS } from "@/utils/helper.util";
 import { WalletInfo } from "@ledgerhq/wallet-api-client";
 import { ProposalTypes } from "@walletconnect/types";
 
@@ -456,7 +457,7 @@ describe("formatAccountsByChain", () => {
     ]);
   });
 
-  it("should filter out Sui chains unless the wallet signs raw transactions and returns public keys", () => {
+  it("should filter out Sui chains below the minimum wallet version", () => {
     const proposalWithSui: Proposal = {
       ...dataFromJSON,
       requiredNamespaces: {
@@ -484,10 +485,18 @@ describe("formatAccountsByChain", () => {
     ).toEqual([]);
 
     expect(
-      formatAccountsByChain(proposalWithSui, [suiAccount], mockWalletInfo, [
-        "transaction.signRaw",
-        "account.getPublicKey",
-      ]),
+      formatAccountsByChain(
+        proposalWithSui,
+        [suiAccount],
+        {
+          ...mockWalletInfo,
+          wallet: {
+            name: "ledger-live-desktop",
+            version: SUI_MIN_VERSIONS["ledger-live-desktop"],
+          },
+        },
+        walletCapabilitiesMock,
+      ),
     ).toEqual([
       {
         chain: "sui",

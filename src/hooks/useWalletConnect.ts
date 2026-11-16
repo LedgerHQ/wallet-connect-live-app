@@ -324,7 +324,7 @@ export default function useWalletConnect() {
             );
           } else if (
             isSuiChain(chainId, request) &&
-            isSuiSupportEnabled(walletCapabilities)
+            isSuiSupportEnabled(walletInfo)
           ) {
             const session = walletKit.engine.signClient.session.get(topic);
             const sessionSuiAddresses = new Set(

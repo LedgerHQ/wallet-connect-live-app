@@ -604,7 +604,7 @@ export function useSupportedNamespaces(
       }
       if (
         ("sui" in requiredNamespaces || "sui" in optionalNamespaces) &&
-        isSuiSupportEnabled(walletCapabilities)
+        isSuiSupportEnabled(walletInfo)
       ) {
         supportedNamespaces[SupportedNamespace.SUI] = buildSuiNamespace(
           requiredNamespaces,

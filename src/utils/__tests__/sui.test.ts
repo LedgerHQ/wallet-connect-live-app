@@ -50,14 +50,10 @@ describe("decodeSignedSuiTransaction", () => {
     ).toThrow("Expected one signature");
   });
 
-  it("throws when there are two signatures", () => {
+  it("throws when the signature is not Ed25519", () => {
+    const secp256k1 = new Uint8Array([1, ...new Uint8Array(97).fill(0x42)]);
     expect(() =>
-      decodeSignedSuiTransaction(
-        buildSignedSuiTransactionHex(1, [
-          SUI_SERIALIZED_SIGNATURE,
-          SUI_SERIALIZED_SIGNATURE,
-        ]),
-      ),
+      decodeSignedSuiTransaction(buildSignedSuiTransactionHex(1, [secp256k1])),
     ).toThrow("Expected one signature");
   });
 

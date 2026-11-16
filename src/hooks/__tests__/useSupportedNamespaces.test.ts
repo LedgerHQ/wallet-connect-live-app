@@ -1,5 +1,6 @@
 import { renderHook } from "@/tests/test.utils";
 import { createHookWrapper, type TestStore } from "@/tests/hook-test.utils";
+import { SUI_MIN_VERSIONS } from "@/utils/helper.util";
 import { Account, WalletInfo } from "@ledgerhq/wallet-api-client";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import sessionProposal from "@/data/mocks/sessionProposal.example.json";
@@ -62,6 +63,14 @@ function makeAccount(
     lastSyncDate: new Date("2024-01-01T00:00:00.000Z"),
   };
 }
+
+const suiWalletInfo = {
+  wallet: {
+    name: "ledger-live-desktop",
+    version: SUI_MIN_VERSIONS["ledger-live-desktop"],
+  },
+  tracking: false,
+};
 
 describe("useSupportedNamespaces", () => {
   let store: TestStore;
@@ -633,17 +642,14 @@ describe("useSupportedNamespaces", () => {
     expect(result.current.buildSupportedNamespaces(proposal)).toEqual({});
   });
 
-  it("builds the sui namespace with all four methods when the capability gate is on", () => {
+  it("builds the sui namespace with all four methods when the version gate is on", () => {
     const sui = makeAccount("sui-1", "sui", "0xabc");
 
     mockedUseAccounts.mockReturnValue({
       data: [sui],
     } as ReturnType<typeof useAccounts>);
 
-    store.set(walletCapabilitiesAtom as never, [
-      "transaction.signRaw",
-      "account.getPublicKey",
-    ]);
+    store.set(walletInfoAtom as never, suiWalletInfo);
 
     mockedFormatAccountsByChain.mockReturnValue([
       {
@@ -701,10 +707,7 @@ describe("useSupportedNamespaces", () => {
       data: [sui],
     } as ReturnType<typeof useAccounts>);
 
-    store.set(walletCapabilitiesAtom as never, [
-      "transaction.signRaw",
-      "account.getPublicKey",
-    ]);
+    store.set(walletInfoAtom as never, suiWalletInfo);
 
     mockedFormatAccountsByChain.mockReturnValue([
       {
@@ -738,14 +741,14 @@ describe("useSupportedNamespaces", () => {
     expect(namespaces.sui?.chains).toEqual([]);
   });
 
-  it("omits the sui namespace when the capability gate is disabled", () => {
+  it("omits the sui namespace when the version gate is disabled", () => {
     const sui = makeAccount("sui-1", "sui", "0xabc");
 
     mockedUseAccounts.mockReturnValue({
       data: [sui],
     } as ReturnType<typeof useAccounts>);
 
-    // walletCapabilities is empty (beforeEach), so sui support is off.
+    // The base wallet version is below the Sui minimum, so sui support is off.
     mockedFormatAccountsByChain.mockReturnValue([
       {
         chain: "sui",

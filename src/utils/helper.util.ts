@@ -240,21 +240,17 @@ export const isCosmosSupportEnabled = (walletCapabilities: string[]): boolean =>
 };
 
 /**
- * Check if Sui support should be enabled based on wallet capabilities.
- * The sui handler calls `transaction.signRaw` (sui_signTransaction, sui_signAndExecuteTransaction)
- * and `account.getPublicKey` (sui_getAccounts), so the host must advertise both.
- *
- * KNOWN, ACCEPTED FALSE POSITIVE, same as `isCosmosSupportEnabled`: both capabilities are
- * advertised for other families, so this is true on a Ledger Live build that has not wired Sui
- * raw signing. There the session opens with no accounts and signing requests are declined.
- * A per-family capability would close the window entirely.
+ * Minimum versions of Ledger Wallet that sign raw Sui transactions through the Wallet API.
+ * Capabilities can't gate Sui: `transaction.signRaw` is advertised for every coin, including
+ * on builds that can't sign Sui.
  */
-export const isSuiSupportEnabled = (walletCapabilities: string[]): boolean => {
-  return (
-    walletCapabilities.includes("transaction.signRaw") &&
-    walletCapabilities.includes("account.getPublicKey")
-  );
+export const SUI_MIN_VERSIONS: Record<string, string> = {
+  "ledger-live-desktop": "4.30.0",
+  "ledger-live-mobile": "4.30.0",
 };
+
+/** Check if Sui support should be enabled based on wallet version */
+export const isSuiSupportEnabled = createSupportChecker(SUI_MIN_VERSIONS);
 
 /** Check if XRPL support should be enabled based on wallet capabilities */
 export const isXRPLSupportEnabled = (walletCapabilities: string[]): boolean => {
@@ -262,7 +258,9 @@ export const isXRPLSupportEnabled = (walletCapabilities: string[]): boolean => {
 };
 
 /** Check if Tezos support should be enabled based on wallet capabilities */
-export const isTezosSupportEnabled = (walletCapabilities: string[]): boolean => {
+export const isTezosSupportEnabled = (
+  walletCapabilities: string[],
+): boolean => {
   return (
     walletCapabilities.includes("transaction.signRaw") &&
     walletCapabilities.includes("message.sign") &&

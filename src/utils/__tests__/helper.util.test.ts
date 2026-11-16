@@ -18,6 +18,7 @@ import {
   isTezosChain,
   isTezosSupportEnabled,
   isXRPLSupportEnabled,
+  SUI_MIN_VERSIONS,
   truncate,
 } from "../helper.util";
 
@@ -388,16 +389,34 @@ describe("isSuiChain", () => {
 });
 
 describe("isSuiSupportEnabled", () => {
-  it("requires transaction.signRaw and account.getPublicKey", () => {
+  const desktopMin = SUI_MIN_VERSIONS["ledger-live-desktop"];
+  const mobileMin = SUI_MIN_VERSIONS["ledger-live-mobile"];
+
+  it("returns true from the minimum desktop and mobile versions", () => {
     expect(
-      isSuiSupportEnabled(["transaction.signRaw", "account.getPublicKey"]),
+      isSuiSupportEnabled(createWalletInfo("ledger-live-desktop", desktopMin)),
+    ).toBe(true);
+    expect(
+      isSuiSupportEnabled(createWalletInfo("ledger-live-mobile", mobileMin)),
     ).toBe(true);
   });
 
-  it("returns false when any capability is missing", () => {
-    expect(isSuiSupportEnabled(["transaction.signRaw"])).toBe(false);
-    expect(isSuiSupportEnabled(["account.getPublicKey"])).toBe(false);
-    expect(isSuiSupportEnabled([])).toBe(false);
+  it("returns false below the minimum version", () => {
+    expect(
+      isSuiSupportEnabled(createWalletInfo("ledger-live-desktop", "4.27.1")),
+    ).toBe(false);
+    expect(
+      isSuiSupportEnabled(createWalletInfo("ledger-live-mobile", "4.26.1")),
+    ).toBe(false);
+  });
+
+  it("returns false for an unknown wallet or a missing version", () => {
+    expect(
+      isSuiSupportEnabled(createWalletInfo("other-wallet", "999.0.0")),
+    ).toBe(false);
+    expect(isSuiSupportEnabled(createWalletInfo("ledger-live-desktop"))).toBe(
+      false,
+    );
   });
 });
 

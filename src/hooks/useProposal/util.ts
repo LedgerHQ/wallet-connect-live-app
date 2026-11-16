@@ -102,7 +102,7 @@ export const formatAccountsByChain = (
         return acc;
       }
 
-      if (isSuiChain(chain) && !isSuiSupportEnabled(walletCapabilities)) {
+      if (isSuiChain(chain) && !isSuiSupportEnabled(walletInfo)) {
         return acc;
       }
 

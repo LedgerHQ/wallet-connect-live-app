@@ -1,5 +1,6 @@
 import { createHookWrapper, type TestStore } from "@/tests/hook-test.utils";
 import { renderHook, waitFor } from "@/tests/test.utils";
+import { SUI_MIN_VERSIONS } from "@/utils/helper.util";
 import { createStore } from "jotai";
 import { enqueueSnackbar } from "notistack";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -152,6 +153,14 @@ const mockedHandleSolanaRequest = vi.mocked(handleSolanaRequest);
 const mockedHandleTezosRequest = vi.mocked(handleTezosRequest);
 const mockedRejectRequest = vi.mocked(rejectRequest);
 const mockedUseNavigate = vi.mocked(useNavigate);
+
+const suiWalletInfo = {
+  wallet: {
+    name: "ledger-live-desktop",
+    version: SUI_MIN_VERSIONS["ledger-live-desktop"],
+  },
+  tracking: false,
+};
 
 describe("useWalletConnect", () => {
   let store: TestStore;
@@ -587,11 +596,8 @@ describe("useWalletConnect", () => {
     });
   });
 
-  it("dispatches sui requests to the sui handler when the capability gate is on", async () => {
-    store.set(walletCapabilitiesAtom as never, [
-      "transaction.signRaw",
-      "account.getPublicKey",
-    ]);
+  it("dispatches sui requests to the sui handler when the version gate is on", async () => {
+    store.set(walletInfoAtom as never, suiWalletInfo);
 
     mountHook();
 
@@ -611,10 +617,7 @@ describe("useWalletConnect", () => {
   });
 
   it("scopes sui requests to the session-approved accounts", async () => {
-    store.set(walletCapabilitiesAtom as never, [
-      "transaction.signRaw",
-      "account.getPublicKey",
-    ]);
+    store.set(walletInfoAtom as never, suiWalletInfo);
 
     const approved = { id: "sui-1", address: "0xapproved", currency: "sui" };
     const unapproved = { id: "sui-2", address: "0xother", currency: "sui" };
@@ -647,8 +650,8 @@ describe("useWalletConnect", () => {
     expect(mockedHandleSuiRequest.mock.calls[0][4]).toEqual([approved]);
   });
 
-  it("rejects sui requests when the capability gate is disabled", async () => {
-    // Default walletCapabilities has no account.getPublicKey, so sui support is off.
+  it("rejects sui requests when the version gate is disabled", async () => {
+    // The default wallet version is below the Sui minimum, so sui support is off.
     mountHook();
 
     walletKitListeners.get("session_request")?.({
