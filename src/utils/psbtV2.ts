@@ -121,6 +121,17 @@ function compactSizeValue(bytes: Uint8Array): number {
 }
 
 /**
+ * Read `count` maps one at a time. The count comes from the request, so nothing is allocated from
+ * it: each map takes at least one byte, and a count larger than the payload ends in
+ * "Unexpected end of PSBT".
+ */
+function readMaps(reader: Reader, count: number): KeyValue[][] {
+  const maps: KeyValue[][] = [];
+  for (let i = 0; i < count; i++) maps.push(reader.map());
+  return maps;
+}
+
+/**
  * The PSBT version declared in the global map (`PSBT_GLOBAL_VERSION`), 0 when absent.
  * @throws {Error} If the bytes are not a PSBT
  */
@@ -146,8 +157,8 @@ export function psbtV2ToValidationPsbt(psbtBase64: string): Psbt {
   const outputCount = compactSizeValue(
     requireValue(globals, PSBT_GLOBAL_OUTPUT_COUNT, "the output count"),
   );
-  const inputs = Array.from({ length: inputCount }, () => reader.map());
-  const outputs = Array.from({ length: outputCount }, () => reader.map());
+  const inputs = readMaps(reader, inputCount);
+  const outputs = readMaps(reader, outputCount);
   if (!reader.atEnd()) throw new Error("Trailing bytes after the PSBT maps");
 
   const psbt = new Psbt();

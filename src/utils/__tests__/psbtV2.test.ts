@@ -178,6 +178,29 @@ describe("decodePsbt with a PSBTv2", () => {
     );
   });
 
+  it("rejects a truncated PSBTv2 that declares a huge input count", () => {
+    const declaringInputs = (count: number[]) =>
+      btoa(
+        String.fromCharCode(
+          ...[0x70, 0x73, 0x62, 0x74, 0xff],
+          ...[1, 0xfb, 4, 2, 0, 0, 0], // PSBT_GLOBAL_VERSION 2
+          ...[1, 0x02, 4, 2, 0, 0, 0], // PSBT_GLOBAL_TX_VERSION 2
+          ...[1, 0x04, count.length, ...count], // PSBT_GLOBAL_INPUT_COUNT
+          ...[1, 0x05, 1, 0], // PSBT_GLOBAL_OUTPUT_COUNT 0
+          0x00, // end of the global map, then no input map
+        ),
+      );
+    // 2^32 - 1, then 2^40: above the maximum array length
+    for (const count of [
+      [0xfe, 0xff, 0xff, 0xff, 0xff],
+      [0xff, 0, 0, 0, 0, 1, 0, 0, 0],
+    ]) {
+      expect(() => psbtV2ToValidationPsbt(declaringInputs(count))).toThrow(
+        "Unexpected end of PSBT",
+      );
+    }
+  });
+
   it("still decodes a PSBTv0 through bitcoinjs-lib", () => {
     const v0 = buildV0();
     expect(decodePsbt(v0.toBase64()).toBase64()).toBe(v0.toBase64());
