@@ -219,7 +219,7 @@ export async function handleBIP122Request(
         if (deviceApp.kind === "unsupported") {
           return rejectRequest(walletkit, topic, id, Errors.txDeclined);
         }
-        // Same code as an unsupported method, so dApps keep their handling; the message names the cause
+        // 5101 = unsupported method, so dApps keep their handling; the message names the cause
         if (
           deviceApp.kind === "derived" &&
           !(walletInfo && isDerivedAppPsbtSupportEnabled(walletInfo))

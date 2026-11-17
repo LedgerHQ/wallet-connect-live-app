@@ -1,6 +1,14 @@
+/**
+ * @vitest-environment node
+ * PSBTs are decoded with `@ledgerhq/psbtv2`, whose `fromV0` hands a `Buffer` to bitcoinjs-lib.
+ * Under jsdom, Node's `Buffer` and the global `Uint8Array` come from different realms, so
+ * bitcoinjs-lib's Uint8Array check fails; in the browser the polyfilled `Buffer` shares the realm.
+ */
+import type { PsbtV2 } from "@ledgerhq/psbtv2";
 import { networks, Psbt } from "bitcoinjs-lib";
 import { describe, expect, it } from "vitest";
 import { hasHashiDepositField, selectDeviceApp } from "../derivedApps";
+import { decodePsbt } from "../psbt";
 
 const TESTNET_CHAIN_ID = "bip122:000000000933ea01ad0ee984209779ba";
 const MAINNET_CHAIN_ID = "bip122:000000000019d6689c085ae165831e93";
@@ -10,7 +18,7 @@ const hashiKey = new Uint8Array([
   0xfc, 0x05, 0x68, 0x61, 0x73, 0x68, 0x69, 0x00,
 ]);
 
-function psbtWithOutputKeys(keysPerOutput: Uint8Array[][]): Psbt {
+function v0WithOutputKeys(keysPerOutput: Uint8Array[][]): Psbt {
   const psbt = new Psbt({ network: networks.testnet });
   psbt.addInput({
     hash: new Uint8Array(32).fill(0x01),
@@ -24,6 +32,11 @@ function psbtWithOutputKeys(keysPerOutput: Uint8Array[][]): Psbt {
     }
   });
   return psbt;
+}
+
+// Decoded as the live app decodes a dApp's PSBTv0: through `PsbtV2.fromV0`.
+function psbtWithOutputKeys(keysPerOutput: Uint8Array[][]): PsbtV2 {
+  return decodePsbt(v0WithOutputKeys(keysPerOutput).toBase64());
 }
 
 describe("hasHashiDepositField", () => {
@@ -64,12 +77,12 @@ describe("hasHashiDepositField", () => {
   });
 
   it("ignores the field on an input", () => {
-    const psbt = psbtWithOutputKeys([[]]);
+    const psbt = v0WithOutputKeys([[]]);
     psbt.addUnknownKeyValToInput(0, {
       key: hashiKey,
       value: new Uint8Array(32),
     });
-    expect(hasHashiDepositField(psbt)).toBe(false);
+    expect(hasHashiDepositField(decodePsbt(psbt.toBase64()))).toBe(false);
   });
 });
 

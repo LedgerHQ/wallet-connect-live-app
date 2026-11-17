@@ -1,3 +1,10 @@
+/**
+ * @vitest-environment node
+ * PSBTs are decoded with `@ledgerhq/psbtv2`, whose `fromV0` hands a `Buffer` to bitcoinjs-lib.
+ * Under jsdom, Node's `Buffer` and the global `Uint8Array` come from different realms, so
+ * bitcoinjs-lib's Uint8Array check fails; in the browser the polyfilled `Buffer` shares the realm.
+ */
+import { PsbtV2 } from "@ledgerhq/psbtv2";
 import { Account } from "@ledgerhq/wallet-api-client";
 import BigNumber from "bignumber.js";
 import {
@@ -10,8 +17,6 @@ import {
 import * as ecc from "@bitcoinerlab/secp256k1";
 import { describe, expect, it } from "vitest";
 import { decodePsbt, validatePsbtAccount, validateSignInputs } from "../psbt";
-import { getPsbtVersion, psbtV2ToValidationPsbt } from "../psbtV2";
-import { toV2 } from "./psbtV2.fixtures";
 
 initEccLib(ecc);
 
@@ -89,6 +94,7 @@ function buildNonWitnessV0(): Psbt {
   prevTx.addInput(new Uint8Array(32).fill(0xfe), 0);
   prevTx.addOutput(p2pkhScript, 100_000n);
   const psbt = new Psbt({ network: networks.bitcoin });
+  psbt.setVersion(2);
   psbt.addInput({
     hash: prevTx.getId(),
     index: 0,
@@ -98,112 +104,165 @@ function buildNonWitnessV0(): Psbt {
   return psbt;
 }
 
+/** The same PSBT serialized as BIP-370, as Ledger Wallet converts it. */
+function toV2(v0: Psbt): string {
+  return PsbtV2.fromV0(Buffer.from(v0.toBuffer()), true)
+    .serialize()
+    .toString("base64");
+}
+
+// Hand-written BIP-370 bytes, for maps the library would never produce.
+function kv(key: number[], value: number[]): number[] {
+  return [key.length, ...key, value.length, ...value];
+}
+function witnessUtxo(script: Uint8Array): number[] {
+  return [0xa0, 0x86, 0x01, 0, 0, 0, 0, 0, script.length, ...script]; // 100 000 sat
+}
+function rawV2(inputMap: number[], outputMap: number[]): string {
+  return Buffer.from([
+    ...[0x70, 0x73, 0x62, 0x74, 0xff],
+    ...kv([0x02], [2, 0, 0, 0]), // PSBT_GLOBAL_TX_VERSION
+    ...kv([0x04], [1]), // PSBT_GLOBAL_INPUT_COUNT
+    ...kv([0x05], [1]), // PSBT_GLOBAL_OUTPUT_COUNT
+    ...kv([0xfb], [2, 0, 0, 0]), // PSBT_GLOBAL_VERSION
+    0x00,
+    ...inputMap,
+    0x00,
+    ...outputMap,
+    0x00,
+  ]).toString("base64");
+}
+const PREVOUT = [
+  ...kv([0x0e], new Array<number>(32).fill(0x01)), // PSBT_IN_PREVIOUS_TXID
+  ...kv([0x0f], [0, 0, 0, 0]), // PSBT_IN_OUTPUT_INDEX
+];
+const AMOUNT = kv([0x03], [0x50, 0xc3, 0, 0, 0, 0, 0, 0]); // PSBT_OUT_AMOUNT 50 000
+const SCRIPT = kv([0x04], [...p2wpkhScript]); // PSBT_OUT_SCRIPT
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Tests
 // ─────────────────────────────────────────────────────────────────────────────
-
-describe("getPsbtVersion", () => {
-  it("returns 0 for a PSBTv0 and 2 for a PSBTv2", () => {
-    const v0 = buildV0();
-    expect(getPsbtVersion(v0.toBase64())).toBe(0);
-    expect(getPsbtVersion(toV2(v0))).toBe(2);
-  });
-
-  it("throws on bytes that are not a PSBT", () => {
-    expect(() => getPsbtVersion(btoa("not a psbt"))).toThrow(/magic/);
-  });
-});
 
 describe("decodePsbt with a PSBTv2", () => {
   it("is rejected by bitcoinjs-lib on its own, which is what this support works around", () => {
     expect(() => Psbt.fromBase64(toV2(buildV0()))).toThrow(/UNSIGNED_TX/);
   });
 
-  it("rebuilds the same inputs, outputs, version and locktime as the v0 encoding", () => {
+  it("reads the same inputs and outputs as the v0 encoding", () => {
     const v0 = buildV0();
-    const decoded = decodePsbt(toV2(v0));
+    const fromV0 = decodePsbt(v0.toBase64());
+    const fromV2 = decodePsbt(toV2(v0));
 
-    expect(decoded.version).toBe(v0.version);
-    expect(decoded.locktime).toBe(v0.locktime);
-    expect(decoded.inputCount).toBe(1);
-    expect(decoded.txInputs[0].hash).toEqual(v0.txInputs[0].hash);
-    expect(decoded.txInputs[0].index).toBe(3);
-    expect(decoded.txInputs[0].sequence).toBe(0xfffffffd);
-    expect(decoded.data.inputs[0].witnessUtxo).toEqual(
-      v0.data.inputs[0].witnessUtxo,
-    );
-    expect(
-      decoded.txOutputs.map(({ script, value }) => ({ script, value })),
-    ).toEqual(v0.txOutputs.map(({ script, value }) => ({ script, value })));
+    for (const psbt of [fromV0, fromV2]) {
+      expect(psbt.getGlobalInputCount()).toBe(1);
+      expect(psbt.getInputPreviousTxid(0)).toEqual(
+        Buffer.from(v0.txInputs[0].hash),
+      );
+      expect(psbt.getInputOutputIndex(0)).toBe(3);
+      expect(psbt.getInputWitnessUtxo(0)?.scriptPubKey).toEqual(
+        Buffer.from(p2wpkhScript),
+      );
+      expect(psbt.getGlobalOutputCount()).toBe(2);
+      expect(psbt.getOutputAmount(0)).toBe(60_000);
+      expect(psbt.getOutputScript(0)).toEqual(Buffer.from(p2trScript));
+    }
   });
 
-  it("keeps a proprietary (0xFC) output field byte for byte", () => {
-    const decoded = decodePsbt(toV2(buildV0()));
-    expect(decoded.data.outputs[0].unknownKeyVals).toEqual([
-      { key: PROPRIETARY_KEY, value: PROPRIETARY_VALUE },
-    ]);
-    expect(decoded.data.outputs[1].unknownKeyVals ?? []).toEqual([]);
-  });
-
-  it("does not copy non-proprietary unknown output keys into the validation view", () => {
-    const decoded = psbtV2ToValidationPsbt(
-      toV2(buildV0(), {
-        extraOutputKeys: [
-          { key: new Uint8Array([0x42]), value: new Uint8Array([0x01]) },
-        ],
-      }),
-    );
-    expect(decoded.data.outputs[0].unknownKeyVals).toEqual([
-      { key: PROPRIETARY_KEY, value: PROPRIETARY_VALUE },
-    ]);
+  it("keeps a proprietary (0xFC) output field from a PSBTv0 and a PSBTv2", () => {
+    const v0 = buildV0();
+    for (const psbt of [decodePsbt(v0.toBase64()), decodePsbt(toV2(v0))]) {
+      expect(psbt.getOutputKeyDatas(0, 0xfc)).toEqual([
+        Buffer.from(PROPRIETARY_KEY.subarray(1)),
+      ]);
+      expect(psbt.getOutputKeyDatas(1, 0xfc)).toEqual([]);
+    }
   });
 
   it("supports an input given as a non-witness UTXO", () => {
     const v0 = buildNonWitnessV0();
-    const decoded = decodePsbt(toV2(v0));
-    expect(decoded.data.inputs[0].nonWitnessUtxo).toEqual(
-      v0.data.inputs[0].nonWitnessUtxo,
+    const psbt = decodePsbt(toV2(v0));
+    expect(psbt.getInputNonWitnessUtxo(0)).toEqual(
+      Buffer.from(v0.data.inputs[0].nonWitnessUtxo!),
     );
-    expect(decoded.txInputs[0].hash).toEqual(v0.txInputs[0].hash);
   });
 
   it("wraps a malformed PSBTv2 in the usual invalid-format error", () => {
-    const truncated = btoa(atob(toV2(buildV0())).slice(0, -5));
+    const truncated = Buffer.from(toV2(buildV0()), "base64")
+      .subarray(0, -5)
+      .toString("base64");
     expect(() => decodePsbt(truncated)).toThrow(/^Invalid PSBT format: /);
-    expect(() =>
-      decodePsbt(toV2(buildV0(), { dropOutputAmount: true })),
-    ).toThrow(/missing the amount of output 0/);
-    expect(() => decodePsbt(btoa(atob(toV2(buildV0())) + "\x00"))).toThrow(
-      /Trailing bytes/,
+    // Each field every input and output needs is checked at decode time
+    expect(() => decodePsbt(rawV2(PREVOUT, SCRIPT))).toThrow(
+      /^Invalid PSBT format: /,
     );
+    expect(() => decodePsbt(rawV2(PREVOUT, AMOUNT))).toThrow(
+      /^Invalid PSBT format: /,
+    );
+    expect(() =>
+      decodePsbt(rawV2(kv([0x0f], [0, 0, 0, 0]), [...AMOUNT, ...SCRIPT])),
+    ).toThrow(/^Invalid PSBT format: /);
+    expect(() =>
+      decodePsbt(
+        rawV2(
+          [...PREVOUT, ...kv([0x01], [0x01, 0x02])],
+          [...AMOUNT, ...SCRIPT],
+        ),
+      ),
+    ).toThrow(/^Invalid PSBT format: /);
   });
 
   it("rejects a truncated PSBTv2 that declares a huge input count", () => {
     const declaringInputs = (count: number[]) =>
-      btoa(
-        String.fromCharCode(
-          ...[0x70, 0x73, 0x62, 0x74, 0xff],
-          ...[1, 0xfb, 4, 2, 0, 0, 0], // PSBT_GLOBAL_VERSION 2
-          ...[1, 0x02, 4, 2, 0, 0, 0], // PSBT_GLOBAL_TX_VERSION 2
-          ...[1, 0x04, count.length, ...count], // PSBT_GLOBAL_INPUT_COUNT
-          ...[1, 0x05, 1, 0], // PSBT_GLOBAL_OUTPUT_COUNT 0
-          0x00, // end of the global map, then no input map
-        ),
-      );
+      Buffer.from([
+        ...[0x70, 0x73, 0x62, 0x74, 0xff],
+        ...kv([0xfb], [2, 0, 0, 0]),
+        ...kv([0x02], [2, 0, 0, 0]),
+        ...kv([0x04], count),
+        ...kv([0x05], [0]),
+        0x00, // end of the global map, then no input map
+      ]).toString("base64");
     // 2^32 - 1, then 2^40: above the maximum array length
     for (const count of [
       [0xfe, 0xff, 0xff, 0xff, 0xff],
       [0xff, 0, 0, 0, 0, 1, 0, 0, 0],
     ]) {
-      expect(() => psbtV2ToValidationPsbt(declaringInputs(count))).toThrow(
-        "Unexpected end of PSBT",
+      expect(() => decodePsbt(declaringInputs(count))).toThrow(
+        /^Invalid PSBT format: /,
       );
     }
   });
 
-  it("still decodes a PSBTv0 through bitcoinjs-lib", () => {
-    const v0 = buildV0();
-    expect(decodePsbt(v0.toBase64()).toBase64()).toBe(v0.toBase64());
+  it("reads the last value of a duplicated key, as Ledger Wallet signs it", () => {
+    const account = makeAccount(P2WPKH_ADDRESS!);
+    const addresses = [P2WPKH_ADDRESS!.toLowerCase()];
+    const withUtxos = (first: Uint8Array, last: Uint8Array) =>
+      decodePsbt(
+        rawV2(
+          [
+            ...kv([0x01], witnessUtxo(first)),
+            ...kv([0x01], witnessUtxo(last)),
+            ...PREVOUT,
+          ],
+          [...AMOUNT, ...SCRIPT],
+        ),
+      );
+
+    expect(
+      validatePsbtAccount(
+        withUtxos(p2wpkhScript, p2pkhScript),
+        account,
+        addresses,
+        networks.bitcoin,
+      ).isValid,
+    ).toBe(false);
+    expect(
+      validatePsbtAccount(
+        withUtxos(p2pkhScript, p2wpkhScript),
+        account,
+        addresses,
+        networks.bitcoin,
+      ),
+    ).toMatchObject({ isValid: true, validated: true });
   });
 });
 

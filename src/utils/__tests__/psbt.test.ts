@@ -1,6 +1,19 @@
+/**
+ * @vitest-environment node
+ * PSBTs are decoded with `@ledgerhq/psbtv2`, whose `fromV0` hands a `Buffer` to bitcoinjs-lib.
+ * Under jsdom, Node's `Buffer` and the global `Uint8Array` come from different realms, so
+ * bitcoinjs-lib's Uint8Array check fails; in the browser the polyfilled `Buffer` shares the realm.
+ */
+import { PsbtV2 } from "@ledgerhq/psbtv2";
 import { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import BigNumber from "bignumber.js";
-import { initEccLib, networks, payments, Psbt, Transaction } from "bitcoinjs-lib";
+import {
+  initEccLib,
+  networks,
+  payments,
+  Psbt,
+  Transaction,
+} from "bitcoinjs-lib";
 import * as ecc from "@bitcoinerlab/secp256k1";
 import { describe, expect, it, vi } from "vitest";
 
@@ -49,7 +62,12 @@ const { address: P2TR_ADDRESS } = payments.p2tr({
 // P2PKH: OP_DUP OP_HASH160 PUSH20 <hash> OP_EQUALVERIFY OP_CHECKSIG  (25 bytes)
 const p2pkhHash = new Uint8Array(20).fill(0xcc);
 const p2pkhScript = new Uint8Array([
-  0x76, 0xa9, 0x14, ...p2pkhHash, 0x88, 0xac,
+  0x76,
+  0xa9,
+  0x14,
+  ...p2pkhHash,
+  0x88,
+  0xac,
 ]);
 const { address: P2PKH_ADDRESS } = payments.p2pkh({
   output: p2pkhScript,
@@ -174,6 +192,11 @@ function buildUnrecognizedScriptPsbt(network = networks.bitcoin): Psbt {
   return psbt;
 }
 
+/** The checks read a decoded PSBT, as the handler passes them. */
+function decoded(psbt: Psbt): PsbtV2 {
+  return decodePsbt(psbt.toBase64());
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Account factory helper
 // ─────────────────────────────────────────────────────────────────────────────
@@ -198,16 +221,12 @@ function makeAccount(overrides: Partial<Account> = {}): Account {
 
 describe("getBip122Network", () => {
   it("returns Bitcoin mainnet for the mainnet chain ID", () => {
-    const network = getBip122Network(
-      "bip122:000000000019d6689c085ae165831e93",
-    );
+    const network = getBip122Network("bip122:000000000019d6689c085ae165831e93");
     expect(network).toBe(networks.bitcoin);
   });
 
   it("returns Bitcoin testnet for the testnet chain ID", () => {
-    const network = getBip122Network(
-      "bip122:000000000933ea01ad0ee984209779ba",
-    );
+    const network = getBip122Network("bip122:000000000933ea01ad0ee984209779ba");
     expect(network).toBe(networks.testnet);
   });
 
@@ -219,18 +238,14 @@ describe("getBip122Network", () => {
   });
 
   it("returns the Litecoin network for the Litecoin chain ID", () => {
-    const network = getBip122Network(
-      "bip122:12a765e31ffd4059bada1e25190f6e98",
-    );
+    const network = getBip122Network("bip122:12a765e31ffd4059bada1e25190f6e98");
     expect(network.bech32).toBe("ltc");
     expect(network.pubKeyHash).toBe(0x30);
     expect(network.scriptHash).toBe(0x32);
   });
 
   it("returns the Dogecoin network for the Dogecoin chain ID", () => {
-    const network = getBip122Network(
-      "bip122:82bc68038f6034c0596b6e313729793a",
-    );
+    const network = getBip122Network("bip122:82bc68038f6034c0596b6e313729793a");
     expect(network.pubKeyHash).toBe(0x1e);
     expect(network.scriptHash).toBe(0x16);
   });
@@ -249,8 +264,8 @@ describe("decodePsbt", () => {
   it("successfully decodes a valid base64-encoded PSBT", () => {
     const base64 = buildP2wpkhPsbt().toBase64();
     const psbt = decodePsbt(base64);
-    expect(psbt).toBeInstanceOf(Psbt);
-    expect(psbt.inputCount).toBe(1);
+    expect(psbt).toBeInstanceOf(PsbtV2);
+    expect(psbt.getGlobalInputCount()).toBe(1);
   });
 
   it("throws with 'Invalid PSBT format' for malformed base64 input", () => {
@@ -275,37 +290,37 @@ describe("decodePsbt", () => {
 
 describe("extractInputAddresses", () => {
   it("extracts a P2WPKH address via witnessUtxo", () => {
-    const psbt = buildP2wpkhPsbt();
+    const psbt = decoded(buildP2wpkhPsbt());
     const addresses = extractInputAddresses(psbt, networks.bitcoin);
     expect(addresses).toEqual([P2WPKH_ADDRESS]);
   });
 
   it("extracts a P2WSH address via witnessUtxo", () => {
-    const psbt = buildP2wshPsbt();
+    const psbt = decoded(buildP2wshPsbt());
     const addresses = extractInputAddresses(psbt, networks.bitcoin);
     expect(addresses).toEqual([P2WSH_ADDRESS]);
   });
 
   it("extracts a P2TR (Taproot) address via witnessUtxo", () => {
-    const psbt = buildP2trPsbt();
+    const psbt = decoded(buildP2trPsbt());
     const addresses = extractInputAddresses(psbt, networks.bitcoin);
     expect(addresses).toEqual([P2TR_ADDRESS]);
   });
 
   it("extracts a P2PKH address via witnessUtxo", () => {
-    const psbt = buildP2pkhWitnessUtxoPsbt();
+    const psbt = decoded(buildP2pkhWitnessUtxoPsbt());
     const addresses = extractInputAddresses(psbt, networks.bitcoin);
     expect(addresses).toEqual([P2PKH_ADDRESS]);
   });
 
   it("extracts a P2PKH address from a nonWitnessUtxo (full previous tx)", () => {
-    const psbt = buildP2pkhNonWitnessPsbt();
+    const psbt = decoded(buildP2pkhNonWitnessPsbt());
     const addresses = extractInputAddresses(psbt, networks.bitcoin);
     expect(addresses).toEqual([P2PKH_ADDRESS]);
   });
 
   it("extracts all addresses from a PSBT with mixed script types", () => {
-    const psbt = buildMixedPsbt();
+    const psbt = decoded(buildMixedPsbt());
     const addresses = extractInputAddresses(psbt, networks.bitcoin);
     expect(addresses).toHaveLength(3);
     expect(addresses).toContain(P2WPKH_ADDRESS);
@@ -315,7 +330,10 @@ describe("extractInputAddresses", () => {
 
   it("returns an empty array for a PSBT that has no inputs", () => {
     const emptyPsbt = new Psbt({ network: networks.bitcoin });
-    const addresses = extractInputAddresses(emptyPsbt, networks.bitcoin);
+    const addresses = extractInputAddresses(
+      decoded(emptyPsbt),
+      networks.bitcoin,
+    );
     expect(addresses).toEqual([]);
   });
 
@@ -328,14 +346,14 @@ describe("extractInputAddresses", () => {
     });
     psbt.addOutput({ address: TESTNET_P2WPKH_ADDRESS!, value: 50_000n });
 
-    const addresses = extractInputAddresses(psbt, networks.testnet);
+    const addresses = extractInputAddresses(decoded(psbt), networks.testnet);
     expect(addresses).toHaveLength(1);
     expect(addresses[0]).toBe(TESTNET_P2WPKH_ADDRESS);
     expect(addresses[0]).toMatch(/^tb1/);
   });
 
   it("skips inputs whose scripts cannot be decoded", () => {
-    const psbt = buildUnrecognizedScriptPsbt();
+    const psbt = decoded(buildUnrecognizedScriptPsbt());
     const addresses = extractInputAddresses(psbt, networks.bitcoin);
     expect(addresses).toEqual([]);
   });
@@ -347,33 +365,33 @@ describe("extractInputAddresses", () => {
 
 describe("extractInputAddressesByIndices", () => {
   it("returns an address for each valid index", () => {
-    const psbt = buildP2wpkhPsbt(); // 1 input at index 0
+    const psbt = decoded(buildP2wpkhPsbt()); // 1 input at index 0
     const map = extractInputAddressesByIndices(psbt, [0], networks.bitcoin);
     expect(map.size).toBe(1);
     expect(map.get(0)).toBe(P2WPKH_ADDRESS);
   });
 
   it("returns null for an index that is beyond inputCount", () => {
-    const psbt = buildP2wpkhPsbt(); // 1 input — index 5 is out of range
+    const psbt = decoded(buildP2wpkhPsbt()); // 1 input — index 5 is out of range
     const map = extractInputAddressesByIndices(psbt, [0, 5], networks.bitcoin);
     expect(map.get(0)).toBe(P2WPKH_ADDRESS);
     expect(map.get(5)).toBeNull();
   });
 
   it("returns null for a negative index", () => {
-    const psbt = buildP2wpkhPsbt();
+    const psbt = decoded(buildP2wpkhPsbt());
     const map = extractInputAddressesByIndices(psbt, [-1], networks.bitcoin);
     expect(map.get(-1)).toBeNull();
   });
 
   it("returns an empty map for an empty indices array", () => {
-    const psbt = buildMixedPsbt();
+    const psbt = decoded(buildMixedPsbt());
     const map = extractInputAddressesByIndices(psbt, [], networks.bitcoin);
     expect(map.size).toBe(0);
   });
 
   it("handles non-contiguous indices, skipping unrequested ones", () => {
-    const psbt = buildMixedPsbt(); // inputs at 0, 1, 2
+    const psbt = decoded(buildMixedPsbt()); // inputs at 0, 1, 2
     const map = extractInputAddressesByIndices(psbt, [0, 2], networks.bitcoin);
     expect(map.size).toBe(2);
     expect(map.get(0)).toBe(P2WPKH_ADDRESS);
@@ -388,7 +406,7 @@ describe("extractInputAddressesByIndices", () => {
 
 describe("validatePsbtAccount", () => {
   it("returns isValid:true / validated:false when no addresses can be extracted (optimistic pass-through)", () => {
-    const psbt = buildUnrecognizedScriptPsbt();
+    const psbt = decoded(buildUnrecognizedScriptPsbt());
     const account = makeAccount();
     const result = validatePsbtAccount(
       psbt,
@@ -405,7 +423,7 @@ describe("validatePsbtAccount", () => {
   });
 
   it("returns isValid:true / validated:true when an input address belongs to the account", () => {
-    const psbt = buildP2wpkhPsbt();
+    const psbt = decoded(buildP2wpkhPsbt());
     const account = makeAccount({ address: P2WPKH_ADDRESS! });
     const result = validatePsbtAccount(
       psbt,
@@ -422,7 +440,7 @@ describe("validatePsbtAccount", () => {
   });
 
   it("returns isValid:false / validated:true when no input address belongs to the account", () => {
-    const psbt = buildP2wpkhPsbt(); // inputs spend from P2WPKH_ADDRESS
+    const psbt = decoded(buildP2wpkhPsbt()); // inputs spend from P2WPKH_ADDRESS
     const differentAddress = P2PKH_ADDRESS!;
     const account = makeAccount({ address: differentAddress });
     const result = validatePsbtAccount(
@@ -436,7 +454,7 @@ describe("validatePsbtAccount", () => {
   });
 
   it("matches Bech32 input addresses case-insensitively", () => {
-    const psbt = buildP2wpkhPsbt(); // input → P2WPKH_ADDRESS (bc1…)
+    const psbt = decoded(buildP2wpkhPsbt()); // input → P2WPKH_ADDRESS (bc1…)
     const account = makeAccount({ address: P2WPKH_ADDRESS! });
     const result = validatePsbtAccount(
       psbt,
@@ -449,7 +467,7 @@ describe("validatePsbtAccount", () => {
   });
 
   it("matches Base58Check (P2PKH) input addresses case-sensitively", () => {
-    const psbt = buildP2pkhWitnessUtxoPsbt(); // input → P2PKH_ADDRESS
+    const psbt = decoded(buildP2pkhWitnessUtxoPsbt()); // input → P2PKH_ADDRESS
     const account = makeAccount({ address: P2PKH_ADDRESS! });
 
     const validResult = validatePsbtAccount(
@@ -479,7 +497,7 @@ describe("validateSignInputs", () => {
   const accountAddresses = [P2WPKH_ADDRESS!.toLowerCase()];
 
   it("returns an error when a signInput index is out of bounds", () => {
-    const psbt = buildP2wpkhPsbt(); // 1 input at index 0
+    const psbt = decoded(buildP2wpkhPsbt()); // 1 input at index 0
     const result = validateSignInputs(
       psbt,
       [{ address: P2WPKH_ADDRESS!, index: 1 }], // index 1 does not exist
@@ -494,7 +512,7 @@ describe("validateSignInputs", () => {
   });
 
   it("returns an error when the address cannot be extracted for a given input", () => {
-    const psbt = buildUnrecognizedScriptPsbt(); // index 0 exists but script is unrecognizable
+    const psbt = decoded(buildUnrecognizedScriptPsbt()); // index 0 exists but script is unrecognizable
     const result = validateSignInputs(
       psbt,
       [{ address: P2WPKH_ADDRESS!, index: 0 }],
@@ -504,12 +522,14 @@ describe("validateSignInputs", () => {
     );
     expect(result.isValid).toBe(false);
     if (!result.isValid) {
-      expect(result.error).toMatch(/Could not extract address for input index 0/);
+      expect(result.error).toMatch(
+        /Could not extract address for input index 0/,
+      );
     }
   });
 
   it("returns an error when signInput.address does not match the input address and is not in the account", () => {
-    const psbt = buildP2wpkhPsbt(); // input 0 → P2WPKH_ADDRESS
+    const psbt = decoded(buildP2wpkhPsbt()); // input 0 → P2WPKH_ADDRESS
     const foreignAddress = P2PKH_ADDRESS!; // different address, not in accountAddresses
     const result = validateSignInputs(
       psbt,
@@ -525,7 +545,7 @@ describe("validateSignInputs", () => {
   });
 
   it("returns an error when the extracted input address does not belong to the account", () => {
-    const psbt = buildP2wpkhPsbt(); // input 0 → P2WPKH_ADDRESS
+    const psbt = decoded(buildP2wpkhPsbt()); // input 0 → P2WPKH_ADDRESS
     const unrelatedAccountAddresses = [P2PKH_ADDRESS!];
     const result = validateSignInputs(
       psbt,
@@ -541,7 +561,7 @@ describe("validateSignInputs", () => {
   });
 
   it("returns isValid:true when signInput.address matches the input address and is in the account", () => {
-    const psbt = buildP2wpkhPsbt();
+    const psbt = decoded(buildP2wpkhPsbt());
     const result = validateSignInputs(
       psbt,
       [{ address: P2WPKH_ADDRESS!, index: 0 }],
@@ -559,7 +579,7 @@ describe("validateSignInputs", () => {
       P2WPKH_ADDRESS!.toLowerCase(),
       P2PKH_ADDRESS!,
     ];
-    const psbt = buildP2wpkhPsbt(); // input 0 → P2WPKH_ADDRESS
+    const psbt = decoded(buildP2wpkhPsbt()); // input 0 → P2WPKH_ADDRESS
 
     // signInput provides P2PKH_ADDRESS — different from the actual input address,
     // but both belong to the same account, so it should be accepted.
@@ -574,7 +594,7 @@ describe("validateSignInputs", () => {
   });
 
   it("returns an error for the first invalid index when multiple sign inputs are provided", () => {
-    const psbt = buildP2wpkhPsbt(); // 1 input (index 0 only)
+    const psbt = decoded(buildP2wpkhPsbt()); // 1 input (index 0 only)
     const result = validateSignInputs(
       psbt,
       [
@@ -601,10 +621,12 @@ describe("getAccountAddresses", () => {
     const account = makeAccount({ address: "BC1QABCDE" });
     const mockClient = {
       bitcoin: {
-        getAddresses: vi.fn().mockResolvedValue([
-          { address: "BC1QADDR1" },
-          { address: "BC1QADDR2" },
-        ]),
+        getAddresses: vi
+          .fn()
+          .mockResolvedValue([
+            { address: "BC1QADDR1" },
+            { address: "BC1QADDR2" },
+          ]),
       },
     } as unknown as WalletAPIClient;
 
@@ -641,9 +663,7 @@ describe("getAccountAddresses", () => {
     const account = makeAccount({ address: base58Address });
     const mockClient = {
       bitcoin: {
-        getAddresses: vi.fn().mockResolvedValue([
-          { address: base58Address },
-        ]),
+        getAddresses: vi.fn().mockResolvedValue([{ address: base58Address }]),
       },
     } as unknown as WalletAPIClient;
 

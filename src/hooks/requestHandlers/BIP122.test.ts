@@ -1,13 +1,19 @@
+/**
+ * @vitest-environment node
+ * PSBTs are decoded with `@ledgerhq/psbtv2`, whose `fromV0` hands a `Buffer` to bitcoinjs-lib.
+ * Under jsdom, Node's `Buffer` and the global `Uint8Array` come from different realms, so
+ * bitcoinjs-lib's Uint8Array check fails; in the browser the polyfilled `Buffer` shares the realm.
+ */
 import {
   BIP122_QUERY_METHODS,
   BIP122_SIGNING_METHODS,
 } from "@/data/methods/BIP122.methods";
 import { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import type { IWalletKit } from "@reown/walletkit";
+import { PsbtV2 } from "@ledgerhq/psbtv2";
 import BigNumber from "bignumber.js";
 import { networks, payments, Psbt } from "bitcoinjs-lib";
 import { vi } from "vitest";
-import { toV2 } from "@/utils/__tests__/psbtV2.fixtures";
 import { isDerivedAppPsbtSupportEnabled } from "@/utils/helper.util";
 import { getBip122Network } from "@/utils/psbt";
 import { handleBIP122Request } from "./BIP122";
@@ -436,7 +442,12 @@ describe("handleBIP122Request — BIP122_SIGN_PSBT device app selection", () => 
   });
 
   it("asks for the derived app and forwards the PSBTv2 string unchanged", async () => {
-    const psbt = toV2(buildDepositPsbt(networks.testnet, true));
+    const psbt = PsbtV2.fromV0(
+      Buffer.from(buildDepositPsbt(networks.testnet, true).toBuffer()),
+      true,
+    )
+      .serialize()
+      .toString("base64");
     const { signPsbt, run } = signOn(TESTNET_CHAIN_ID, testnetAccount, psbt);
     await run;
 
