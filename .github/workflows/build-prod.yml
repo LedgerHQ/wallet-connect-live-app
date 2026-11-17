@@ -1,0 +1,75 @@
+name: build-prod
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: build-prod-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write # create the git tag
+  id-token: write # GitHub OIDC -> JFrog
+
+env:
+  REGISTRY: ${{ secrets.REGISTRY }}
+  IMAGE: infra-oci-web-apps-prod-green/wallet-connect-live-app/prod
+
+jobs:
+  build:
+    runs-on: public-ledgerhq-shared-medium
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # tag history for version calculation
+
+      - name: Compute next version
+        id: ver
+        uses: mathieudutour/github-tag-action@a22cf08638b34d5badda920f9daf6e72c477b07b # v6.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          default_bump: patch
+          dry_run: true
+
+      - name: JFrog OIDC login
+        id: jfrog
+        uses: jfrog/setup-jfrog-cli@5a4fbe1e30dbb570cc62d2513421c4b9bc3c9959 # v4
+        env:
+          JF_URL: https://${{ env.REGISTRY }}
+        with:
+          oidc-provider-name: github-oidc
+          oidc-audience: jfrog-github
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ steps.jfrog.outputs.oidc-user }}
+          password: ${{ steps.jfrog.outputs.oidc-token }}
+
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+      - uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64
+          build-args: |
+            VITE_WALLETCONNECT_PROJECT_ID=${{ secrets.VITE_WALLETCONNECT_PROJECT_ID }}
+            VITE_APP_VERSION=${{ vars.VITE_APP_VERSION }}
+            VITE_PUBLIC_SEGMENT_API_KEY_MOBILE=${{ secrets.VITE_PUBLIC_SEGMENT_API_KEY_MOBILE }}
+            VITE_PUBLIC_SEGMENT_API_KEY_DESKTOP=${{ secrets.VITE_PUBLIC_SEGMENT_API_KEY_DESKTOP }}
+            VITE_APPLICATION_DISABLED=${{ vars.VITE_APPLICATION_DISABLED }}
+            VITE_PUBLIC_SENTRY_DSN=${{ secrets.VITE_PUBLIC_SENTRY_DSN }}
+          secrets: |
+            sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }}
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE }}:${{ steps.ver.outputs.new_version }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE }}:${{ steps.ver.outputs.new_version }}-${{ github.sha }}
+
+      - name: Create git tag
+        uses: mathieudutour/github-tag-action@a22cf08638b34d5badda920f9daf6e72c477b07b # v6.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          default_bump: patch
+          custom_tag: ${{ steps.ver.outputs.new_version }}
