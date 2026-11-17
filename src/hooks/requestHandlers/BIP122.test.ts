@@ -74,6 +74,157 @@ const walletkit = {} as IWalletKit;
 const topic = "topic";
 const requestId = 0;
 
+describe("handleBIP122Request — BIP122_SIGN_MESSAGE", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  const olderAddress = "bc1qolderaddress";
+  const olderPath = "m/84'/0'/0'/0/3";
+
+  function callSignMessage(address: string, isSignMessagePathSupported = true) {
+    const sign = vi.fn(() => Promise.resolve(Buffer.from("signature")));
+    const getAddresses = vi.fn(() =>
+      Promise.resolve([
+        { address: testAddress!, path: "m/84'/0'/0'/0/0" },
+        { address: olderAddress, path: olderPath },
+      ]),
+    );
+    const client = {
+      message: { sign },
+      bitcoin: { getAddresses },
+    } as unknown as WalletAPIClient;
+    const call = handleBIP122Request(
+      {
+        method: BIP122_SIGNING_METHODS.BIP122_SIGN_MESSAGE,
+        params: { message: "hello", account: testAddress!, address },
+      },
+      topic,
+      requestId,
+      BTC_CHAIN_ID,
+      {
+        accounts: [makeAccount()],
+        client,
+        walletkit,
+        isSignMessagePathSupported,
+      },
+    );
+    return { sign, getAddresses, call };
+  }
+
+  it("signs with the current receive address without a path", async () => {
+    const acceptSpy = vi.spyOn(utils, "acceptRequest");
+    const { sign, call } = callSignMessage(testAddress!);
+
+    await call;
+
+    expect(sign).toHaveBeenCalledWith(
+      "bitcoin-account-id",
+      Buffer.from("hello"),
+      undefined,
+    );
+    expect(acceptSpy).toHaveBeenCalledWith(
+      walletkit,
+      topic,
+      requestId,
+      expect.objectContaining({ address: testAddress }),
+    );
+  });
+
+  it("signs with another address of the session account using its path", async () => {
+    const acceptSpy = vi.spyOn(utils, "acceptRequest");
+    const { sign, call } = callSignMessage(olderAddress);
+
+    await call;
+
+    expect(sign).toHaveBeenCalledWith(
+      "bitcoin-account-id",
+      Buffer.from("hello"),
+      { path: olderPath },
+    );
+    expect(acceptSpy).toHaveBeenCalledWith(
+      walletkit,
+      topic,
+      requestId,
+      expect.objectContaining({ address: olderAddress }),
+    );
+  });
+
+  it("rejects with unsupportedAccounts when the address is not in the session account", async () => {
+    const rejectSpy = vi.spyOn(utils, "rejectRequest");
+    const { sign, call } = callSignMessage("bc1qunknownaddress");
+
+    await call;
+
+    expect(sign).not.toHaveBeenCalled();
+    expect(rejectSpy).toHaveBeenCalledWith(
+      walletkit,
+      topic,
+      requestId,
+      utils.Errors.unsupportedAccounts,
+      5103,
+    );
+  });
+
+  it("rejects another address with unsupportedAccounts when the wallet can't sign with a path", async () => {
+    const rejectSpy = vi.spyOn(utils, "rejectRequest");
+    const { sign, getAddresses, call } = callSignMessage(olderAddress, false);
+
+    await call;
+
+    expect(getAddresses).not.toHaveBeenCalled();
+    expect(sign).not.toHaveBeenCalled();
+    expect(rejectSpy).toHaveBeenCalledWith(
+      walletkit,
+      topic,
+      requestId,
+      utils.Errors.unsupportedAccounts,
+      5103,
+    );
+  });
+
+  it("still signs with the current receive address when the wallet can't sign with a path", async () => {
+    const { sign, call } = callSignMessage(testAddress!, false);
+
+    await call;
+
+    expect(sign).toHaveBeenCalledWith(
+      "bitcoin-account-id",
+      Buffer.from("hello"),
+      undefined,
+    );
+  });
+});
+
+describe("handleBIP122Request — BIP122_SIGN_MESSAGE_LEGACY", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("rejects with unsupportedAccounts when no account matches the address", async () => {
+    const rejectSpy = vi.spyOn(utils, "rejectRequest");
+
+    await handleBIP122Request(
+      {
+        method: BIP122_SIGNING_METHODS.BIP122_SIGN_MESSAGE_LEGACY,
+        params: { message: "hello", address: "bc1qunknownaddress" },
+      },
+      topic,
+      requestId,
+      BTC_CHAIN_ID,
+      {
+        accounts: [makeAccount()],
+        client: makeClient(() => Promise.resolve({ psbtSigned: "irrelevant" })),
+        walletkit,
+      },
+    );
+
+    expect(rejectSpy).toHaveBeenCalledWith(
+      walletkit,
+      topic,
+      requestId,
+      utils.Errors.unsupportedAccounts,
+      5103,
+    );
+  });
+});
+
 describe("handleBIP122Request — BIP122_SIGN_PSBT", () => {
   beforeEach(() => vi.clearAllMocks());
 

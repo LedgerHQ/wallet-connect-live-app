@@ -17,6 +17,7 @@ import { OneClickAuthPayload } from "@/types/types";
 import {
   getErrorMessage,
   getSafeRedirectUrl,
+  isBip122SignMessagePathSupported,
   isBIP122Chain,
   isCosmosChain,
   isCosmosSupportEnabled,
@@ -252,6 +253,8 @@ export default function useWalletConnect() {
                 walletkit: walletKit,
                 walletCapabilities,
                 sessionAddress,
+                isSignMessagePathSupported:
+                  isBip122SignMessagePathSupported(walletInfo),
               },
             );
           } else if (

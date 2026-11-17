@@ -7,6 +7,7 @@ export enum Errors {
   msgDecline = "Message signed declined",
   unsupportedChains = "unsupportedChains",
   unsupportedMethods = "unsupportedMethods",
+  unsupportedAccounts = "unsupportedAccounts",
 }
 
 const hexReg = /^ *(0x)?([a-fA-F0-9]+) *$/;
