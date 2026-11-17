@@ -211,6 +211,13 @@ describe("getBip122Network", () => {
     expect(network).toBe(networks.testnet);
   });
 
+  it("returns Bitcoin testnet params for the Signet chain ID", () => {
+    const network = getBip122Network(
+      "bip122:00000008819873e925422c1ff0f99f7c",
+    );
+    expect(network).toBe(networks.testnet);
+  });
+
   it("returns the Litecoin network for the Litecoin chain ID", () => {
     const network = getBip122Network(
       "bip122:12a765e31ffd4059bada1e25190f6e98",

@@ -32,6 +32,7 @@ const DOGECOIN_NETWORK: networks.Network = {
 const BIP122_CHAIN_ID_TO_NETWORK: Record<string, networks.Network> = {
   "bip122:000000000019d6689c085ae165831e93": networks.bitcoin,
   "bip122:000000000933ea01ad0ee984209779ba": networks.testnet,
+  "bip122:00000008819873e925422c1ff0f99f7c": networks.testnet,
   "bip122:12a765e31ffd4059bada1e25190f6e98": LITECOIN_NETWORK,
   "bip122:82bc68038f6034c0596b6e313729793a": DOGECOIN_NETWORK,
 };
