@@ -10,6 +10,7 @@ and is intended to be integrated within ledger products, enabling users to seaml
 | Currency          | Supported ? | Sepolia Supported? | Holesky Supported? |
 | ----------------- | ----------- | ------------------ | ------------------ |
 | Bitcoin           | ❌          | -                  | -                  |
+| Bitcoin Signet    | ✅          | -                  | -                  |
 | Ethereum          | ✅          | ✅                 | ✅                 |
 | Polygon           | ✅          | ❌                 |                    |
 | Arbitrum          | ✅          | ✅                 |                    |
