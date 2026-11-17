@@ -114,6 +114,15 @@ describe("SUPPORTED_NETWORK", () => {
     expect(zeroGravity?.ticker).toBe("0G");
   });
 
+  it("contains Alpen", () => {
+    const alpen: Network | undefined = SUPPORTED_NETWORK.alpen;
+
+    expect(alpen?.displayName).toBe("Alpen");
+    expect(alpen?.chainId).toBe(29032);
+    expect(alpen?.namespace).toBe("eip155:29032");
+    expect(alpen?.ticker).toBe("BTC");
+  });
+
   it("contains Tezos", () => {
     const tezos: Network | undefined = SUPPORTED_NETWORK.tezos;
 
