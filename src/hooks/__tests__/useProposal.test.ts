@@ -9,6 +9,7 @@ import {
 import { describe, expect, it, vi } from "vitest";
 
 import { ACCOUNT_MOCK } from "@/tests/mocks/account.mock";
+import { SUI_MIN_VERSIONS } from "@/utils/helper.util";
 import { WalletInfo } from "@ledgerhq/wallet-api-client";
 import { ProposalTypes } from "@walletconnect/types";
 
@@ -452,6 +453,57 @@ describe("formatAccountsByChain", () => {
             currency: "ripple",
           },
         ],
+      },
+    ]);
+  });
+
+  it("should filter out Sui chains below the minimum wallet version", () => {
+    const proposalWithSui: Proposal = {
+      ...dataFromJSON,
+      requiredNamespaces: {
+        sui: {
+          methods: ["sui_signTransaction"],
+          chains: ["sui:mainnet"],
+          events: [],
+        },
+      },
+      optionalNamespaces: {},
+    };
+    const suiAccount = {
+      ...ACCOUNT_MOCK,
+      accountName: "SUI Account",
+      currency: "sui",
+    };
+
+    expect(
+      formatAccountsByChain(
+        proposalWithSui,
+        [suiAccount],
+        mockWalletInfo,
+        walletCapabilitiesMock,
+      ),
+    ).toEqual([]);
+
+    expect(
+      formatAccountsByChain(
+        proposalWithSui,
+        [suiAccount],
+        {
+          ...mockWalletInfo,
+          wallet: {
+            name: "ledger-live-desktop",
+            version: SUI_MIN_VERSIONS["ledger-live-desktop"],
+          },
+        },
+        walletCapabilitiesMock,
+      ),
+    ).toEqual([
+      {
+        chain: "sui",
+        displayName: "Sui",
+        isSupported: true,
+        isRequired: true,
+        accounts: [suiAccount],
       },
     ]);
   });

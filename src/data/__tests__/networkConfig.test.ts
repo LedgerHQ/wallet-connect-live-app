@@ -141,6 +141,24 @@ describe("SUPPORTED_NETWORK", () => {
     expect(babylon?.ticker).toBe("BABY");
   });
 
+  it("contains Sui mainnet and testnet under their CAIP-2 chain ids", () => {
+    expect(SUPPORTED_NETWORK.sui?.namespace).toBe("sui:mainnet");
+    expect(SUPPORTED_NETWORK.sui?.displayName).toBe("Sui");
+    expect(SUPPORTED_NETWORK.sui?.ticker).toBe("SUI");
+    expect(SUPPORTED_NETWORK.sui_testnet?.namespace).toBe("sui:testnet");
+    expect(getCurrencyByChainId("sui:mainnet")).toBe("sui");
+    expect(getCurrencyByChainId("sui:testnet")).toBe("sui_testnet");
+    expect(getNamespace("sui")).toBe("sui:mainnet");
+  });
+
+  it("does not register Sui devnet or localnet", () => {
+    const namespaces = Object.values(SUPPORTED_NETWORK).map(
+      (network: Network) => network.namespace,
+    );
+    expect(namespaces).not.toContain("sui:devnet");
+    expect(namespaces).not.toContain("sui:localnet");
+  });
+
   it("resolves Babylon from its CAIP-2 chain id", () => {
     // Acceptance criterion (LIVE-33214): Babylon resolves as a supported cosmos
     // chain under CAIP-2 cosmos:bbn-1. Assert both directions of the resolvers so
@@ -210,6 +228,12 @@ describe("SUPPORTED_NETWORK_NAMES", () => {
     // cosmos handlers are wired and SUPPORTED_NETWORK still resolves it.
     expect(SUPPORTED_NETWORK.babylon).toBeDefined();
     expect(SUPPORTED_NETWORK_NAMES).not.toContain("Babylon");
+  });
+
+  it("does not advertise Sui before the production manifest lists it", () => {
+    expect(SUPPORTED_NETWORK.sui).toBeDefined();
+    expect(SUPPORTED_NETWORK_NAMES).not.toContain("Sui");
+    expect(SUPPORTED_NETWORK_NAMES).not.toContain("Sui Testnet");
   });
 
   it("does not advertise testnets", () => {
