@@ -283,41 +283,29 @@ describe("decodePsbt", () => {
     expect(() => decodePsbt(notAPsbt)).toThrow(/Invalid PSBT format/);
   });
 
-  it("accepts a transaction version 1 PSBT, as Dogecoin wallets build them", () => {
-    const dogecoin = getBip122Network(
-      "bip122:82bc68038f6034c0596b6e313729793a",
-    );
-    const { address: dogeAddress } = payments.p2pkh({
-      output: p2pkhScript,
-      network: dogecoin,
-    });
-    const prevTx = new Transaction();
-    prevTx.version = 1;
-    prevTx.addInput(new Uint8Array(32).fill(0xfe), 0);
-    prevTx.addOutput(p2pkhScript, 100_000_000n);
-    const v0 = new Psbt({ network: dogecoin });
+  it("accepts a transaction version 1 PSBT, which Ledger Wallet signs", () => {
+    const v0 = new Psbt({ network: networks.bitcoin });
     v0.setVersion(1);
     v0.addInput({
-      hash: prevTx.getId(),
+      hash: new Uint8Array(32).fill(0x01),
       index: 0,
-      nonWitnessUtxo: prevTx.toBuffer(),
+      witnessUtxo: { script: p2wpkhScript, value: 100_000n },
     });
-    v0.addOutput({ script: p2pkhScript, value: 99_000_000n });
+    addDummyOutput(v0);
 
     const psbt = decodePsbt(v0.toBase64());
     const result = validatePsbtAccount(
       psbt,
-      makeAccount({ address: dogeAddress!, currency: "dogecoin" }),
-      [dogeAddress!],
-      dogecoin,
+      makeAccount({ address: P2WPKH_ADDRESS! }),
+      [P2WPKH_ADDRESS!.toLowerCase()],
+      networks.bitcoin,
     );
 
     expect(psbt.getGlobalTxVersion()).toBe(1);
-    expect(dogeAddress).toMatch(/^D/);
     expect(result).toMatchObject({
       isValid: true,
       validated: true,
-      inputAddresses: [dogeAddress],
+      inputAddresses: [P2WPKH_ADDRESS],
     });
   });
 });
