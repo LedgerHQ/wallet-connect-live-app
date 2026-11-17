@@ -241,12 +241,14 @@ export const isCosmosSupportEnabled = (walletCapabilities: string[]): boolean =>
 
 /**
  * Minimum versions of Ledger Wallet that sign raw Sui transactions through the Wallet API.
+ * The `-0` suffix also admits that version's release candidates (`4.30.0-next.x`), which
+ * semver ranks below `4.30.0`.
  * Capabilities can't gate Sui: `transaction.signRaw` is advertised for every coin, including
  * on builds that can't sign Sui.
  */
 export const SUI_MIN_VERSIONS: Record<string, string> = {
-  "ledger-live-desktop": "4.30.0",
-  "ledger-live-mobile": "4.30.0",
+  "ledger-live-desktop": "4.30.0-0",
+  "ledger-live-mobile": "4.30.0-0",
 };
 
 /** Check if Sui support should be enabled based on wallet version */

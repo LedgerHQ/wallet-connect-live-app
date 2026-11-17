@@ -410,6 +410,24 @@ describe("isSuiSupportEnabled", () => {
     ).toBe(false);
   });
 
+  it("includes the release candidates of the first Sui release, not earlier ones", () => {
+    expect(
+      isSuiSupportEnabled(
+        createWalletInfo("ledger-live-desktop", "4.30.0-next.0"),
+      ),
+    ).toBe(true);
+    expect(
+      isSuiSupportEnabled(
+        createWalletInfo("ledger-live-mobile", "4.30.0-next.3"),
+      ),
+    ).toBe(true);
+    expect(
+      isSuiSupportEnabled(
+        createWalletInfo("ledger-live-desktop", "4.29.0-next.0"),
+      ),
+    ).toBe(false);
+  });
+
   it("returns false for an unknown wallet or a missing version", () => {
     expect(
       isSuiSupportEnabled(createWalletInfo("other-wallet", "999.0.0")),
