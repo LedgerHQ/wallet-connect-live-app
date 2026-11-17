@@ -234,6 +234,13 @@ export const BIP122_TEST_CHAINS: Record<string, Network> = {
     ticker: "TBTC",
     color: "#F7931A",
   },
+  bitcoin_signet: {
+    chainId: "00000008819873e925422c1ff0f99f7c",
+    namespace: "bip122:00000008819873e925422c1ff0f99f7c",
+    displayName: "Bitcoin (Signet)",
+    ticker: "sBTC",
+    color: "#F7931A",
+  },
 };
 
 export const BIP122_CHAINS = {

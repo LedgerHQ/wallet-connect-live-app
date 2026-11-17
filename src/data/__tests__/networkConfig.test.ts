@@ -151,6 +151,17 @@ describe("SUPPORTED_NETWORK", () => {
     expect(getNamespace("sui")).toBe("sui:mainnet");
   });
 
+  it("contains Bitcoin Signet under its BIP122 chain id", () => {
+    const signet: Network | undefined = SUPPORTED_NETWORK.bitcoin_signet;
+
+    expect(signet?.displayName).toBe("Bitcoin (Signet)");
+    expect(signet?.namespace).toBe("bip122:00000008819873e925422c1ff0f99f7c");
+    expect(BIP122_TEST_CHAINS.bitcoin_signet).toBe(signet);
+    expect(
+      getCurrencyByChainId("bip122:00000008819873e925422c1ff0f99f7c"),
+    ).toBe("bitcoin_signet");
+  });
+
   it("does not register Sui devnet or localnet", () => {
     const namespaces = Object.values(SUPPORTED_NETWORK).map(
       (network: Network) => network.namespace,
