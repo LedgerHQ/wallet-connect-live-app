@@ -1,5 +1,6 @@
 import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
-import { initEccLib, networks, payments, Psbt, Transaction } from "bitcoinjs-lib";
+import { PsbtV2 } from "@ledgerhq/psbtv2";
+import { initEccLib, networks, payments, Transaction } from "bitcoinjs-lib";
 import * as ecc from "@bitcoinerlab/secp256k1";
 
 let eccInitialized = false;
@@ -79,12 +80,30 @@ export type SignInputsValidationResult =
   | InvalidSignInputsResult;
 
 /**
- * Decode a base64 encoded PSBT
- * @throws {Error} If the PSBT format is invalid
+ * Decode a base64 encoded PSBT, v0 or v2, the way Ledger Wallet does before signing: a PSBTv2 is
+ * deserialized, a PSBTv0 is converted with `PsbtV2.fromV0`. The checks then read the same values
+ * that are signed, and the original string is still what is forwarded to Ledger Wallet.
+ * @throws {Error} If the PSBT format is invalid or lacks a field every input or output needs
  */
-export function decodePsbt(psbtBase64: string): Psbt {
+export function decodePsbt(psbtBase64: string): PsbtV2 {
   try {
-    return Psbt.fromBase64(psbtBase64);
+    const buffer = Buffer.from(psbtBase64, "base64");
+    if (PsbtV2.getPsbtVersionNumber(buffer) !== 2) {
+      return PsbtV2.fromV0(buffer, true);
+    }
+    const psbt = new PsbtV2();
+    psbt.deserialize(buffer);
+    // `deserialize` reads the maps without checking them; each getter throws on a missing field.
+    for (let i = 0; i < psbt.getGlobalInputCount(); i++) {
+      psbt.getInputPreviousTxid(i);
+      psbt.getInputOutputIndex(i);
+      psbt.getInputWitnessUtxo(i);
+    }
+    for (let i = 0; i < psbt.getGlobalOutputCount(); i++) {
+      psbt.getOutputAmount(i);
+      psbt.getOutputScript(i);
+    }
+    return psbt;
   } catch (error) {
     throw new Error(
       `Invalid PSBT format: ${error instanceof Error ? error.message : String(error)}`,
@@ -209,43 +228,42 @@ function extractAddressFromScript(
  * Extract address from a specific PSBT input
  */
 function extractAddressFromInput(
-  psbt: Psbt,
+  psbt: PsbtV2,
   index: number,
   network: networks.Network = networks.bitcoin,
 ): string | null {
-  if (index < 0 || index >= psbt.inputCount) {
+  if (index < 0 || index >= psbt.getGlobalInputCount()) {
     return null;
   }
 
-  const input = psbt.data.inputs[index];
-
-  // Try to extract address from witnessUtxo (SegWit)
-  if (input.witnessUtxo?.script) {
-    // Use new Uint8Array() to guarantee a plain Uint8Array, which bitcoinjs-lib v7
-    // requires for its valibot v.instance(Uint8Array) payment function validation.
-    const script = new Uint8Array(input.witnessUtxo.script);
-    const address = extractAddressFromScript(script, network);
-    if (address) return address;
-  }
-
-  // Try to extract address from nonWitnessUtxo (non-SegWit)
-  if (input.nonWitnessUtxo) {
-    try {
-      const prevTx = Transaction.fromBuffer(
-        new Uint8Array(input.nonWitnessUtxo),
+  try {
+    // Try to extract address from witnessUtxo (SegWit)
+    const witnessUtxo = psbt.getInputWitnessUtxo(index);
+    if (witnessUtxo) {
+      // Use new Uint8Array() to guarantee a plain Uint8Array, which bitcoinjs-lib v7
+      // requires for its valibot v.instance(Uint8Array) payment function validation.
+      const address = extractAddressFromScript(
+        new Uint8Array(witnessUtxo.scriptPubKey),
+        network,
       );
-      const prevOutIndex = psbt.txInputs[index]?.index;
-      if (prevOutIndex !== undefined && prevOutIndex < prevTx.outs.length) {
-        const prevOutput = prevTx.outs[prevOutIndex];
+      if (address) return address;
+    }
+
+    // Try to extract address from nonWitnessUtxo (non-SegWit)
+    const nonWitnessUtxo = psbt.getInputNonWitnessUtxo(index);
+    if (nonWitnessUtxo) {
+      const prevTx = Transaction.fromBuffer(new Uint8Array(nonWitnessUtxo));
+      const prevOutIndex = psbt.getInputOutputIndex(index);
+      if (prevOutIndex < prevTx.outs.length) {
         const address = extractAddressFromScript(
-          new Uint8Array(prevOutput.script),
+          new Uint8Array(prevTx.outs[prevOutIndex].script),
           network,
         );
         if (address) return address;
       }
-    } catch {
-      return null;
     }
+  } catch {
+    return null;
   }
 
   return null;
@@ -258,12 +276,12 @@ function extractAddressFromInput(
  * @returns Array of successfully extracted addresses; inputs whose address couldn't be extracted are omitted
  */
 export function extractInputAddresses(
-  psbt: Psbt,
+  psbt: PsbtV2,
   network: networks.Network = networks.bitcoin,
 ): string[] {
   const addresses: string[] = [];
 
-  for (let i = 0; i < psbt.inputCount; i++) {
+  for (let i = 0; i < psbt.getGlobalInputCount(); i++) {
     const address = extractAddressFromInput(psbt, i, network);
     if (address) {
       addresses.push(address);
@@ -282,7 +300,7 @@ export function extractInputAddresses(
  * @returns Map of index to address (or null if address couldn't be extracted)
  */
 export function extractInputAddressesByIndices(
-  psbt: Psbt,
+  psbt: PsbtV2,
   indices: number[],
   network: networks.Network = networks.bitcoin,
 ): Map<number, string | null> {
@@ -341,7 +359,7 @@ export async function getAccountAddresses(
  * - validated: true, isValid: false = Validation failed (addresses don't match)
  */
 export function validatePsbtAccount(
-  psbt: Psbt,
+  psbt: PsbtV2,
   account: Account,
   accountAddresses: string[],
   network: networks.Network = networks.bitcoin,
@@ -396,18 +414,19 @@ export function validatePsbtAccount(
  * @returns Validation result indicating if all inputs are valid
  */
 export function validateSignInputs(
-  psbt: Psbt,
+  psbt: PsbtV2,
   signInputs: { address: string; index: number; sighashTypes?: number[] }[],
   account: Account,
   accountAddresses: string[],
   network: networks.Network = networks.bitcoin,
 ): SignInputsValidationResult {
   // Validate that all indices are within bounds
+  const inputCount = psbt.getGlobalInputCount();
   for (const signInput of signInputs) {
-    if (signInput.index < 0 || signInput.index >= psbt.inputCount) {
+    if (signInput.index < 0 || signInput.index >= inputCount) {
       return {
         isValid: false,
-        error: `Input index ${signInput.index} is out of bounds (PSBT has ${psbt.inputCount} inputs)`,
+        error: `Input index ${signInput.index} is out of bounds (PSBT has ${inputCount} inputs)`,
       };
     }
   }
@@ -437,10 +456,7 @@ export function validateSignInputs(
       signInput.address,
       addressSet,
     );
-    const inputAddressInAccount = isAddressInAccount(
-      inputAddress,
-      addressSet,
-    );
+    const inputAddressInAccount = isAddressInAccount(inputAddress, addressSet);
 
     if (!addressMatches && !signInputInAccount) {
       return {
