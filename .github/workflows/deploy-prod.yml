@@ -1,0 +1,54 @@
+name: deploy-prod
+
+on:
+  workflow_dispatch:
+    inputs:
+      app_version:
+        description: "Image tag to deploy (semver pushed by build-prod, e.g. 0.1.0)"
+        required: true
+      chart_version:
+        description: "web-app chart version (targetRevision)"
+        required: true
+        default: "0.1.4"
+
+permissions:
+  contents: read
+
+env:
+  ARGOCD_APP: wallet-connect-live-app
+
+jobs:
+  deploy:
+    runs-on: public-ledgerhq-shared-medium
+    timeout-minutes: 15
+    steps:
+      - name: Install ArgoCD CLI
+        env:
+          ARGOCD_VERSION: v3.5.7
+          ARGOCD_SHA256: e9b7c3f5316b8546bdd499dfb8d874e413a5e3605899a55ec2ce0b668a3e2801
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          curl -fsSL --proto '=https' --tlsv1.2 -o "$HOME/.local/bin/argocd" \
+            "https://github.com/argoproj/argo-cd/releases/download/${ARGOCD_VERSION}/argocd-linux-amd64"
+          echo "${ARGOCD_SHA256}  $HOME/.local/bin/argocd" | sha256sum --check --strict
+          chmod +x "$HOME/.local/bin/argocd"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Deploy
+        env:
+          ARGOCD_SERVER: ${{ vars.ARGOCD_SERVER }}
+          ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_TOKEN }}
+          APP_VERSION: ${{ inputs.app_version }}
+          CHART_VERSION: ${{ inputs.chart_version }}
+        run: |
+          # --source-position 1: the OCI chart is source #1 on a multi-source app
+          # (chart + `ref: values` [+ manifests]) — without it, `argocd app set`
+          # fails with "Source position should be specified and must be greater
+          # than 0 for applications with multiple sources".
+          argocd app set "$ARGOCD_APP" \
+            --source-position 1 \
+            --revision "$CHART_VERSION" \
+            -p image.tag="$APP_VERSION" \
+            --grpc-web
+          argocd app sync "$ARGOCD_APP" --grpc-web
+          argocd app wait "$ARGOCD_APP" --health --timeout 300 --grpc-web
