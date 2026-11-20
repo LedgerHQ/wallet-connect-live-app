@@ -218,8 +218,13 @@ export const isSolanaSupportEnabled = createSupportChecker(SOLANA_MIN_VERSIONS);
  * Minimum versions of Ledger Wallet that open the device app named in `bitcoin.signPsbt` options.
  * An older host ignores the option and signs with the Bitcoin app, so a PSBT meant for a derived
  * app is declined there. A wallet without an entry is treated as too old.
+ * The `-0` suffix also admits that version's pre-releases (`4.30.0-nightly.x`, `4.30.0-next.x`),
+ * which semver ranks below `4.30.0`.
  */
-export const DERIVED_APP_PSBT_MIN_VERSIONS: Record<string, string> = {};
+export const DERIVED_APP_PSBT_MIN_VERSIONS: Record<string, string> = {
+  "ledger-live-desktop": "4.30.0-0",
+  "ledger-live-mobile": "4.30.0-0",
+};
 
 /** Check if the wallet signs a PSBT with the device app named in `bitcoin.signPsbt` options */
 export const isDerivedAppPsbtSupportEnabled = createSupportChecker(
