@@ -14,6 +14,7 @@ import {
 } from "@/utils/helper.util";
 import { Account, WalletInfo } from "@ledgerhq/wallet-api-client";
 import { ProposalTypes, SessionTypes } from "@walletconnect/types";
+import { isCaipNamespace } from "@walletconnect/utils";
 
 export type AccountsInChain = {
   chain: string;
@@ -140,3 +141,26 @@ export const formatAccountsByChain = (
 
   return mappedAccountsByChains;
 };
+
+type NamespacesWithChains = Record<string, { chains?: string[] }>;
+
+export const dedupeChains = (chains: string[]) => Array.from(new Set(chains));
+
+export const getNamespacesChains = (namespaces: NamespacesWithChains = {}) =>
+  dedupeChains(
+    Object.entries(namespaces).flatMap(
+      ([key, namespace]) =>
+        namespace.chains ?? (isCaipNamespace(key) ? [key] : []),
+    ),
+  );
+
+export const getRequestedChains = (
+  proposal: Pick<
+    ProposalTypes.Struct,
+    "requiredNamespaces" | "optionalNamespaces"
+  >,
+) =>
+  dedupeChains([
+    ...getNamespacesChains(proposal.requiredNamespaces),
+    ...getNamespacesChains(proposal.optionalNamespaces),
+  ]);

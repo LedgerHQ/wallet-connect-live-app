@@ -73,10 +73,9 @@ vi.mock("@/utils/bip122", () => ({
 }));
 
 vi.mock("@walletconnect/utils", async () => {
-  const actual =
-    await vi.importActual<typeof import("@walletconnect/utils")>(
-      "@walletconnect/utils",
-    );
+  const actual = await vi.importActual<typeof import("@walletconnect/utils")>(
+    "@walletconnect/utils",
+  );
   return {
     ...actual,
     buildApprovedNamespaces: vi.fn(),
@@ -90,10 +89,9 @@ vi.mock("notistack", () => ({
 }));
 
 vi.mock("@tanstack/react-router", async () => {
-  const actual =
-    await vi.importActual<typeof import("@tanstack/react-router")>(
-      "@tanstack/react-router",
-    );
+  const actual = await vi.importActual<typeof import("@tanstack/react-router")>(
+    "@tanstack/react-router",
+  );
   return {
     ...actual,
     useNavigate: vi.fn(),
@@ -117,11 +115,7 @@ const mockedBuildAuthObject = vi.mocked(buildAuthObject);
 const mockedPopulateAuthPayload = vi.mocked(populateAuthPayload);
 const mockedUseNavigate = vi.mocked(useNavigate);
 
-function makeAccount(
-  id: string,
-  currency: string,
-  address: string,
-): Account {
+function makeAccount(id: string, currency: string, address: string): Account {
   return {
     id,
     name: id,
@@ -219,9 +213,7 @@ describe("useProposal", () => {
     walletKitMock.formatAuthMessage.mockReturnValue("message-to-sign");
     clientMock.message.sign.mockResolvedValue(Buffer.from("signature"));
     clientMock.account.request.mockResolvedValue(account);
-    mockedFetchBip122Addresses.mockResolvedValue([
-      { address: "bc1qpayment" },
-    ]);
+    mockedFetchBip122Addresses.mockResolvedValue([{ address: "bc1qpayment" }]);
     mockedPopulateAuthPayload.mockReturnValue({ aud: "audience" } as never);
     mockedBuildAuthObject.mockReturnValue({ iss: "eip155:1:0x111" } as never);
   });
@@ -488,5 +480,101 @@ describe("useProposal", () => {
 
     expect(enqueueSnackbar).not.toHaveBeenCalled();
     expect(result.current.selectedAccounts).toEqual([]);
+  });
+
+  describe("getApprovedChains", () => {
+    const supportedNamespace = (chains: string[]) => ({
+      chains,
+      methods: [],
+      events: [],
+      accounts: [],
+    });
+
+    it("returns the EVM chains of the supported namespaces", () => {
+      buildSupportedNamespacesMock.mockReturnValue({
+        eip155: supportedNamespace(["eip155:1", "eip155:137"]),
+      });
+
+      const { result } = renderHook(() => useProposal(sessionProposal), {
+        wrapper: createHookWrapper(store),
+      });
+
+      expect(result.current.getApprovedChains()).toEqual([
+        "eip155:1",
+        "eip155:137",
+      ]);
+      expect(buildSupportedNamespacesMock).toHaveBeenCalledWith(
+        sessionProposal,
+      );
+      expect(buildEip155NamespaceMock).not.toHaveBeenCalled();
+    });
+
+    it("returns the Solana chain sent to WalletKit", () => {
+      buildSupportedNamespacesMock.mockReturnValue({
+        solana: supportedNamespace(["solana:4sGjMW1sUnHzSxGspuhpqLDx6wiyjNtZ"]),
+      });
+
+      const { result } = renderHook(() => useProposal(sessionProposal), {
+        wrapper: createHookWrapper(store),
+      });
+
+      expect(result.current.getApprovedChains()).toEqual([
+        "solana:4sGjMW1sUnHzSxGspuhpqLDx6wiyjNtZ",
+      ]);
+    });
+
+    it("returns the deduplicated chains of every approved namespace", () => {
+      buildSupportedNamespacesMock.mockReturnValue({
+        eip155: supportedNamespace(["eip155:1", "eip155:8453"]),
+        solana: supportedNamespace(["solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"]),
+        tezos: supportedNamespace(["tezos:mainnet"]),
+        "eip155:1": supportedNamespace(["eip155:1"]),
+      });
+
+      const { result } = renderHook(() => useProposal(sessionProposal), {
+        wrapper: createHookWrapper(store),
+      });
+
+      expect(result.current.getApprovedChains()).toEqual([
+        "eip155:1",
+        "eip155:8453",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+        "tezos:mainnet",
+      ]);
+    });
+
+    it("returns an empty array when no namespace is approved", () => {
+      buildSupportedNamespacesMock.mockReturnValue({});
+
+      const { result } = renderHook(() => useProposal(sessionProposal), {
+        wrapper: createHookWrapper(store),
+      });
+
+      expect(result.current.getApprovedChains()).toEqual([]);
+    });
+
+    it("returns the EIP-155 chains signed for one-click auth", () => {
+      buildEip155NamespaceMock.mockReturnValue({
+        chains: ["eip155:1", "eip155:10", "eip155:1"],
+        methods: ["personal_sign"],
+        accounts: ["eip155:1:0x111", "eip155:10:0x111"],
+      });
+      const oneClickAuthPayload = { id: 42 } as never;
+
+      const { result } = renderHook(
+        () => useProposal(sessionProposal, oneClickAuthPayload),
+        { wrapper: createHookWrapper(store) },
+      );
+
+      expect(result.current.getApprovedChains()).toEqual([
+        "eip155:1",
+        "eip155:10",
+      ]);
+      expect(buildEip155NamespaceMock).toHaveBeenCalledWith(
+        sessionProposal.requiredNamespaces,
+        sessionProposal.optionalNamespaces,
+      );
+      expect(buildSupportedNamespacesMock).not.toHaveBeenCalled();
+    });
   });
 });

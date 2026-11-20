@@ -4,7 +4,11 @@ import { ErrorBlockchainSupport } from "@/components/screens/sessionProposal/Err
 import { InfoSessionProposal } from "@/components/screens/sessionProposal/InfoSessionProposal";
 import useAnalytics from "@/hooks/useAnalytics";
 import { useProposal } from "@/hooks/useProposal/useProposal";
-import { formatAccountsByChain, sortChains } from "@/hooks/useProposal/util";
+import {
+  formatAccountsByChain,
+  getRequestedChains,
+  sortChains,
+} from "@/hooks/useProposal/util";
 import useVerification from "@/hooks/useVerification";
 import {
   walletCapabilitiesAtom,
@@ -58,6 +62,7 @@ export default function SessionProposal({
     selectedAccounts,
     addNewAccounts,
     navigateToHome,
+    getApprovedChains,
   } = useProposal(proposal, oneClickAuthPayload);
   const analytics = useAnalytics();
   const isOneClickAuth = !!oneClickAuthPayload;
@@ -74,10 +79,16 @@ export default function SessionProposal({
     isOneClickAuth ? "auth" : "proposal",
   );
 
+  const requestedChains = useMemo(
+    () => getRequestedChains(proposal),
+    [proposal],
+  );
+
   useEffect(() => {
     analytics.page("Wallet Connect Session Request", {
       dapp: dApp,
       url: dAppUrl,
+      network: requestedChains,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -90,6 +101,14 @@ export default function SessionProposal({
     });
   }, [analytics, navigateToHome]);
 
+  const getTrackedApprovedChains = useCallback(() => {
+    try {
+      return getApprovedChains();
+    } catch {
+      return [];
+    }
+  }, [getApprovedChains]);
+
   const onApprove = useCallback(() => {
     if (verificationStatus === "SCAM") return;
     analytics.track("button_clicked", {
@@ -97,6 +116,7 @@ export default function SessionProposal({
       page: "Wallet Connect Session Request",
       dapp: dApp,
       url: dAppUrl,
+      network: getTrackedApprovedChains(),
     });
     setApproving(true);
     if (isOneClickAuth) {
@@ -114,6 +134,7 @@ export default function SessionProposal({
     approveSessionAuthenticate,
     dApp,
     dAppUrl,
+    getTrackedApprovedChains,
     isOneClickAuth,
     verificationStatus,
   ]);
@@ -124,6 +145,7 @@ export default function SessionProposal({
       page: "Wallet Connect Session Request",
       dapp: dApp,
       url: dAppUrl,
+      network: requestedChains,
     });
     setRejecting(true);
     if (isOneClickAuth) {
@@ -142,6 +164,7 @@ export default function SessionProposal({
     isOneClickAuth,
     rejectSession,
     rejectSessionAuthenticate,
+    requestedChains,
   ]);
 
   const accountsByChain = useMemo(

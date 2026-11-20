@@ -28,6 +28,7 @@ import {
   useQueryFn as useSessionsQueryFn,
 } from "../useSessions";
 import { useSupportedNamespaces } from "../useSupportedNamespaces";
+import { dedupeChains, getNamespacesChains } from "./util";
 
 export function useProposal(
   proposal: ProposalTypes.Struct,
@@ -45,6 +46,24 @@ export function useProposal(
   const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
   const { buildEip155Namespace, buildSupportedNamespaces } =
     useSupportedNamespaces(proposal, selectedAccounts);
+
+  const getApprovedChains = useCallback(
+    () =>
+      oneClickAuthPayload
+        ? dedupeChains(
+            buildEip155Namespace(
+              proposal.requiredNamespaces,
+              proposal.optionalNamespaces,
+            ).chains,
+          )
+        : getNamespacesChains(buildSupportedNamespaces(proposal)),
+    [
+      buildEip155Namespace,
+      buildSupportedNamespaces,
+      oneClickAuthPayload,
+      proposal,
+    ],
+  );
 
   const handleClick = useCallback((account: string) => {
     setSelectedAccounts((value) => {
@@ -433,5 +452,6 @@ export function useProposal(
     addNewAccount,
     addNewAccounts,
     navigateToHome,
+    getApprovedChains,
   };
 }
