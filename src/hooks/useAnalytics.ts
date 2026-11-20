@@ -1,5 +1,6 @@
 import { walletInfoAtom, walletUserIdAtom } from "@/store/wallet-api.store";
 import { walletKitAtom } from "@/store/walletKit.store";
+import { getPlatformProperties } from "@/utils/platform.util";
 import { AnalyticsBrowser } from "@segment/analytics-next";
 import { atom, useAtomValue } from "jotai";
 import { useCallback, useEffect, useMemo } from "react";
@@ -39,9 +40,17 @@ const analyticsAtom = atom((get) => {
 export default function useAnalytics() {
   const [analytics] = useAtomValue(analyticsAtom);
   const userId = useAtomValue(walletUserIdAtom);
+  const walletInfo = useAtomValue(walletInfoAtom);
   const walletKit = useAtomValue(walletKitAtom);
   const sessions = useSessions(walletKit);
   const sessionsConnected = sessions.data.length;
+
+  const walletName = walletInfo.wallet.name;
+
+  const platformProperties = useMemo(
+    () => getPlatformProperties(walletName, navigator.userAgent),
+    [walletName],
+  );
 
   const userProperties = useMemo(() => {
     return {
@@ -49,8 +58,9 @@ export default function useAnalytics() {
       live_app: APP_NAME,
       live_app_version: version,
       userId,
+      ...platformProperties,
     };
-  }, [sessionsConnected, userId]);
+  }, [sessionsConnected, userId, platformProperties]);
 
   useEffect(() => {
     void analytics.identify(userId, userProperties, analyticsOptions);
