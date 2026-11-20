@@ -258,9 +258,29 @@ describe("isSolanaSupportEnabled", () => {
 });
 
 describe("isDerivedAppPsbtSupportEnabled", () => {
+  const shippedMinVersions = { ...DERIVED_APP_PSBT_MIN_VERSIONS };
+
   afterEach(() => {
     for (const name of Object.keys(DERIVED_APP_PSBT_MIN_VERSIONS)) {
       delete DERIVED_APP_PSBT_MIN_VERSIONS[name];
+    }
+  });
+
+  it("should accept Ledger Wallet 4.30 pre-releases and reject 4.29", () => {
+    Object.assign(DERIVED_APP_PSBT_MIN_VERSIONS, shippedMinVersions);
+
+    for (const name of ["ledger-live-desktop", "ledger-live-mobile"]) {
+      expect(
+        isDerivedAppPsbtSupportEnabled(
+          createWalletInfo(name, "4.30.0-nightly.20261120020222"),
+        ),
+      ).toBe(true);
+      expect(
+        isDerivedAppPsbtSupportEnabled(createWalletInfo(name, "4.30.0")),
+      ).toBe(true);
+      expect(
+        isDerivedAppPsbtSupportEnabled(createWalletInfo(name, "4.29.0")),
+      ).toBe(false);
     }
   });
 
