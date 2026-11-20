@@ -77,7 +77,7 @@ export function Connect({ mode }: Props) {
         setConnecting(false);
       });
       analytics.track("button_clicked", {
-        button: "WC-Connect",
+        button: "WC-Connect URI",
         page: "Connect",
       });
     } catch {
@@ -148,7 +148,7 @@ export function Connect({ mode }: Props) {
     void navigateToHome();
     analytics.track("button_clicked", {
       button: "WC-Back",
-      page: "Wallet Connect Session Detail",
+      page: "Connect",
     });
   }, [analytics, navigateToHome]);
 
