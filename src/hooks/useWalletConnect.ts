@@ -34,10 +34,10 @@ import { reportZodError } from "@/utils/sentryZod";
 import { WalletKitTypes } from "@reown/walletkit";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { SignClientTypes } from "@walletconnect/types";
+import { ProposalTypes, SignClientTypes } from "@walletconnect/types";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { enqueueSnackbar } from "notistack";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { ZodError } from "zod";
 import { isWalletRequest } from "../utils/helper.util";
@@ -51,6 +51,7 @@ import { handleTezosRequest } from "./requestHandlers/Tezos";
 import { Errors, rejectRequest } from "./requestHandlers/utils";
 import { handleWalletRequest } from "./requestHandlers/Wallet";
 import useAccounts from "./useAccounts";
+import useAnalytics from "./useAnalytics";
 import {
   queryKey as pendingProposalsQueryKey,
   useQueryFn as usePendingProposalsQueryFn,
@@ -137,12 +138,29 @@ export default function useWalletConnect() {
   );
 
   const accounts = useAccounts(client);
+  const { track } = useAnalytics();
+  const trackRef = useRef(track);
 
-  const onProposalExpire = useCallback(() => {
-    void queryClient.invalidateQueries({
-      queryKey: pendingProposalsQueryKey,
-    });
-  }, [queryClient]);
+  useEffect(() => {
+    trackRef.current = track;
+  }, [track]);
+
+  const onProposalExpire = useCallback(
+    ({ id }: WalletKitTypes.ProposalExpire) => {
+      const metadata = queryClient
+        .getQueryData<ProposalTypes.Struct[]>(pendingProposalsQueryKey)
+        ?.find((proposal) => proposal.id === id)?.proposer.metadata;
+      trackRef.current("session_proposal_expired", {
+        proposal_id: id,
+        dapp: metadata?.name,
+        url: metadata?.url,
+      });
+      void queryClient.invalidateQueries({
+        queryKey: pendingProposalsQueryKey,
+      });
+    },
+    [queryClient],
+  );
 
   const pendingProposalsQueryFn = usePendingProposalsQueryFn(walletKit);
 
@@ -233,28 +251,20 @@ export default function useWalletConnect() {
               walletKit,
             );
           } else if (isBIP122Chain(chainId, request)) {
-            const session =
-              walletKit.engine.signClient.session.get(topic);
-            const bip122Accounts =
-              session?.namespaces.bip122?.accounts ?? [];
+            const session = walletKit.engine.signClient.session.get(topic);
+            const bip122Accounts = session?.namespaces.bip122?.accounts ?? [];
             const sessionAddress = bip122Accounts
               .find((a) => a.startsWith(chainId + ":"))
               ?.split(":")[2];
 
-            await handleBIP122Request(
-              request,
-              topic,
-              id,
-              chainId,
-              {
-                accounts: accounts.data,
-                client,
-                walletkit: walletKit,
-                walletCapabilities,
-                walletInfo,
-                sessionAddress,
-              },
-            );
+            await handleBIP122Request(request, topic, id, chainId, {
+              accounts: accounts.data,
+              client,
+              walletkit: walletKit,
+              walletCapabilities,
+              walletInfo,
+              sessionAddress,
+            });
           } else if (
             isRippleChain(chainId, request) &&
             isXRPLSupportEnabled(walletCapabilities)

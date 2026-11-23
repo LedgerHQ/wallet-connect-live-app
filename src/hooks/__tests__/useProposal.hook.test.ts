@@ -482,6 +482,205 @@ describe("useProposal", () => {
     expect(result.current.selectedAccounts).toEqual([]);
   });
 
+  describe("connect outcome analytics", () => {
+    const dappProperties = {
+      dapp: "React App",
+      url: "https://react-app.walletconnect.com",
+    };
+
+    const oneClickAuthPayload = {
+      id: 42,
+      topic: "auth-topic",
+      params: {
+        authPayload: {
+          chains: ["eip155:1"],
+          methods: ["personal_sign"],
+        },
+      },
+    } as never;
+
+    it("tracks session_established once approveSession resolves", async () => {
+      const { result } = renderHook(() => useProposal(sessionProposal), {
+        wrapper: createHookWrapper(store),
+      });
+
+      await act(async () => {
+        await result.current.approveSession();
+      });
+
+      expect(analyticsTrackMock).toHaveBeenCalledTimes(1);
+      expect(analyticsTrackMock).toHaveBeenCalledWith("session_established", {
+        ...dappProperties,
+        session_topic: "topic-1",
+      });
+    });
+
+    it("tracks session_approve_failed when approveSession rejects", async () => {
+      walletKitMock.approveSession.mockRejectedValue(
+        new Error("Proposal expired"),
+      );
+
+      const { result } = renderHook(() => useProposal(sessionProposal), {
+        wrapper: createHookWrapper(store),
+      });
+
+      await act(async () => {
+        await result.current.approveSession();
+      });
+
+      expect(analyticsTrackMock).toHaveBeenCalledTimes(1);
+      expect(analyticsTrackMock).toHaveBeenCalledWith(
+        "session_approve_failed",
+        {
+          ...dappProperties,
+          reason: "Proposal expired",
+        },
+      );
+    });
+
+    it("tracks only session_established when a post-approval step fails", async () => {
+      walletKitMock.approveSession.mockResolvedValue({
+        topic: "topic-1",
+        namespaces: {
+          bip122: {
+            events: ["bip122_addressesChanged"],
+            accounts: ["bip122:000000000019d6689c085ae165831e93:bc1qbtc"],
+          },
+        },
+        peer: { metadata: { name: "React App" } },
+      });
+      walletKitMock.emitSessionEvent.mockRejectedValue(
+        new Error("Emit failed"),
+      );
+
+      const { result } = renderHook(() => useProposal(sessionProposal), {
+        wrapper: createHookWrapper(store),
+      });
+
+      await act(async () => {
+        await result.current.approveSession();
+      });
+
+      expect(walletKitMock.emitSessionEvent).toHaveBeenCalled();
+      expect(enqueueSnackbar).toHaveBeenCalledWith(
+        "Emit failed",
+        expect.anything(),
+      );
+      expect(analyticsTrackMock.mock.calls).toEqual([
+        [
+          "session_established",
+          { ...dappProperties, session_topic: "topic-1" },
+        ],
+      ]);
+    });
+
+    it("tracks session_established once approveSessionAuthenticate returns a session", async () => {
+      const { result } = renderHook(
+        () => useProposal(sessionProposal, oneClickAuthPayload),
+        { wrapper: createHookWrapper(store) },
+      );
+
+      await act(async () => {
+        await result.current.approveSessionAuthenticate();
+      });
+
+      expect(analyticsTrackMock).toHaveBeenCalledTimes(1);
+      expect(analyticsTrackMock).toHaveBeenCalledWith("session_established", {
+        ...dappProperties,
+        session_topic: "topic-1",
+      });
+    });
+
+    it("tracks only session_established when a step after approveSessionAuthenticate fails", async () => {
+      navigateMock.mockRejectedValueOnce(new Error("Navigation failed"));
+
+      const { result } = renderHook(
+        () => useProposal(sessionProposal, oneClickAuthPayload),
+        { wrapper: createHookWrapper(store) },
+      );
+
+      await act(async () => {
+        await result.current.approveSessionAuthenticate();
+      });
+
+      expect(enqueueSnackbar).toHaveBeenCalledWith(
+        "Navigation failed",
+        expect.anything(),
+      );
+      expect(analyticsTrackMock.mock.calls).toEqual([
+        [
+          "session_established",
+          { ...dappProperties, session_topic: "topic-1" },
+        ],
+      ]);
+    });
+
+    it("tracks nothing when approveSessionAuthenticate returns no session", async () => {
+      walletKitMock.approveSessionAuthenticate.mockResolvedValue({
+        session: undefined,
+      });
+
+      const { result } = renderHook(
+        () => useProposal(sessionProposal, oneClickAuthPayload),
+        { wrapper: createHookWrapper(store) },
+      );
+
+      await act(async () => {
+        await result.current.approveSessionAuthenticate();
+      });
+
+      expect(navigateMock).toHaveBeenCalledWith(
+        expect.objectContaining({ to: "/" }),
+      );
+      expect(analyticsTrackMock).not.toHaveBeenCalled();
+    });
+
+    it("tracks session_approve_failed when approveSessionAuthenticate fails", async () => {
+      clientMock.message.sign.mockRejectedValue(new Error("Signature refused"));
+
+      const { result } = renderHook(
+        () => useProposal(sessionProposal, oneClickAuthPayload),
+        { wrapper: createHookWrapper(store) },
+      );
+
+      await act(async () => {
+        await result.current.approveSessionAuthenticate();
+      });
+
+      expect(analyticsTrackMock).toHaveBeenCalledTimes(1);
+      expect(analyticsTrackMock).toHaveBeenCalledWith(
+        "session_approve_failed",
+        {
+          ...dappProperties,
+          reason: "Signature refused",
+        },
+      );
+    });
+
+    it("rejects the proposal and tracks the Close click with the given page", async () => {
+      const { result } = renderHook(() => useProposal(sessionProposal), {
+        wrapper: createHookWrapper(store),
+      });
+
+      act(() => {
+        result.current.handleClose(
+          "Wallet Connect Error Missing Required Account",
+        );
+      });
+
+      expect(analyticsTrackMock).toHaveBeenCalledWith("button_clicked", {
+        button: "Close",
+        page: "Wallet Connect Error Missing Required Account",
+      });
+      await waitFor(() => {
+        expect(walletKitMock.rejectSession).toHaveBeenCalledWith({
+          id: sessionProposal.id,
+          reason: { code: 5000, message: "USER_REJECTED_METHODS" },
+        });
+      });
+    });
+  });
+
   describe("getApprovedChains", () => {
     const supportedNamespace = (chains: string[]) => ({
       chains,

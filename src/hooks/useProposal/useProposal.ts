@@ -19,7 +19,7 @@ import {
 } from "@walletconnect/utils";
 import { useAtomValue, useSetAtom } from "jotai";
 import { enqueueSnackbar } from "notistack";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { sortedRecentConnectionAppsAtom } from "../../store/recentConnectionAppsAtom";
 import { formatMessage } from "../requestHandlers/utils";
 import { queryKey as pendingProposalsQueryKey } from "../usePendingProposals";
@@ -93,7 +93,36 @@ export function useProposal(
     }
   }, [setShowModal, url]);
 
+  const dappProperties = useMemo(
+    () => ({
+      dapp: proposal.proposer.metadata.name,
+      url: proposal.proposer.metadata.url,
+    }),
+    [proposal.proposer.metadata.name, proposal.proposer.metadata.url],
+  );
+
+  const trackSessionEstablished = useCallback(
+    (sessionTopic: string) => {
+      analytics.track("session_established", {
+        ...dappProperties,
+        session_topic: sessionTopic,
+      });
+    },
+    [analytics, dappProperties],
+  );
+
+  const trackSessionApproveFailed = useCallback(
+    (error: unknown) => {
+      analytics.track("session_approve_failed", {
+        ...dappProperties,
+        reason: getErrorMessage(error),
+      });
+    },
+    [analytics, dappProperties],
+  );
+
   const approveSession = useCallback(async () => {
+    let isSessionEstablished = false;
     try {
       const supportedNs = buildSupportedNamespaces(proposal);
       const approvedNs = buildApprovedNamespaces({
@@ -104,6 +133,8 @@ export function useProposal(
         id: proposal.id,
         namespaces: approvedNs,
       });
+      trackSessionEstablished(session.topic);
+      isSessionEstablished = true;
       await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
       await queryClient.invalidateQueries({
         queryKey: pendingProposalsQueryKey,
@@ -150,6 +181,9 @@ export function useProposal(
 
       redirectToDapp();
     } catch (error) {
+      if (!isSessionEstablished) {
+        trackSessionApproveFailed(error);
+      }
       enqueueSnackbar(getErrorMessage(error), {
         errorType: "Approve session error",
         variant: "errorNotification",
@@ -175,9 +209,12 @@ export function useProposal(
     navigate,
     accounts.data,
     client,
+    trackSessionEstablished,
+    trackSessionApproveFailed,
   ]);
 
   const approveSessionAuthenticate = useCallback(async () => {
+    let isSessionEstablished = false;
     try {
       const {
         chains,
@@ -245,6 +282,8 @@ export function useProposal(
         return;
       }
 
+      trackSessionEstablished(session.topic);
+      isSessionEstablished = true;
       await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
       await queryClient.prefetchQuery({
         queryKey: sessionsQueryKey,
@@ -260,6 +299,9 @@ export function useProposal(
 
       redirectToDapp();
     } catch (error) {
+      if (!isSessionEstablished) {
+        trackSessionApproveFailed(error);
+      }
       enqueueSnackbar(getErrorMessage(error), {
         errorType: "Approve session error",
         variant: "errorNotification",
@@ -287,6 +329,8 @@ export function useProposal(
     redirectToDapp,
     accounts.data,
     client.message,
+    trackSessionEstablished,
+    trackSessionApproveFailed,
   ]);
 
   const rejectSession = useCallback(async () => {
@@ -367,13 +411,16 @@ export function useProposal(
     }
   }, [navigate, oneClickAuthPayload, queryClient, redirectToDapp, walletKit]);
 
-  const handleClose = useCallback(() => {
-    void rejectSession();
-    analytics.track("button_clicked", {
-      button: "Close",
-      page: "Wallet Connect Error Unsupported Blockchains",
-    });
-  }, [analytics, rejectSession]);
+  const handleClose = useCallback(
+    (page: string) => {
+      void rejectSession();
+      analytics.track("button_clicked", {
+        button: "Close",
+        page,
+      });
+    },
+    [analytics, rejectSession],
+  );
 
   const addNewAccount = useCallback(
     async (currency: string) => {
