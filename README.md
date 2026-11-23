@@ -133,6 +133,71 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
 
+## Debugging on mobile platform with Ledger Wallet
+
+### Android device
+
+1. Connect your device to your Mac
+2. Change port forwarding to allow the device access localhost on your Mac
+
+```
+adb reverse tcp:3000 tcp:3000
+```
+
+3. Install scrcpy and run it to window your device into the Mac
+
+```
+brew install scrcpy
+scrcpy
+```
+
+4. Run the project
+
+```
+pnpm dev
+```
+
+5. Copy ./localManifest.json content into your Mac clipboard
+6. Go through Settings > Developer > Load Platform Manifest
+7. Paste it into "Paste your manifest json" then click on "+" on top right
+8. Launch the app through "Loaded Manifest" at the bottom of the same page
+9. Enjoy !
+
+#### Open the devtools
+
+1. On your mac, open chrome and type chrome://inspect/#devices
+   You should see a line with your device model, with a line
+
+```
+WebView in com.ledger.live.debug (build version)
+```
+
+2. Click on Inspect
+
+### iOS simulator
+
+1. Run the project through an up to date simulator. These instructions came from using Xcode 26.0.0 and iOS simulator 17 Pro (iOS 26.5)
+
+2. Run the project
+
+```
+pnpm dev
+```
+
+3. Same instructions as Android for the manifest
+
+#### Open the devtools
+
+**Pre-requisites** Enable developer mode for Safari:
+
+- Open Safari > Settings > Advanced
+- Check "Show features for web developers"
+
+1. On your mac, open safari
+2. Open Ledger Wallet and go the live app. Wait for the live app to be fully loaded
+3. In safari, open Develop menu > IOS Simulator > Ledger Wallet application
+   You should see localhost under the item, which point to the webview
+
 ## Manifest
 
 All Live apps are defined with a manifest. Here is one that can be used for local development:
