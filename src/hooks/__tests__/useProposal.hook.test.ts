@@ -615,7 +615,7 @@ describe("useProposal", () => {
       ]);
     });
 
-    it("tracks nothing when approveSessionAuthenticate returns no session", async () => {
+    it("tracks session_authenticated when approveSessionAuthenticate returns no session", async () => {
       walletKitMock.approveSessionAuthenticate.mockResolvedValue({
         session: undefined,
       });
@@ -632,7 +632,84 @@ describe("useProposal", () => {
       expect(navigateMock).toHaveBeenCalledWith(
         expect.objectContaining({ to: "/" }),
       );
-      expect(analyticsTrackMock).not.toHaveBeenCalled();
+      expect(analyticsTrackMock.mock.calls).toEqual([
+        ["session_authenticated", dappProperties],
+      ]);
+    });
+
+    it("tracks only session_authenticated when navigating home fails after approveSessionAuthenticate returns no session", async () => {
+      walletKitMock.approveSessionAuthenticate.mockResolvedValue({
+        session: undefined,
+      });
+      navigateMock.mockRejectedValueOnce(new Error("Navigation failed"));
+
+      const { result } = renderHook(
+        () => useProposal(sessionProposal, oneClickAuthPayload),
+        { wrapper: createHookWrapper(store) },
+      );
+
+      await act(async () => {
+        await result.current.approveSessionAuthenticate();
+      });
+
+      expect(enqueueSnackbar).toHaveBeenCalledWith(
+        "Navigation failed",
+        expect.anything(),
+      );
+      expect(analyticsTrackMock.mock.calls).toEqual([
+        ["session_authenticated", dappProperties],
+      ]);
+    });
+
+    it("does not track session_approve_failed when tracking session_established throws after approveSession", async () => {
+      analyticsTrackMock.mockImplementationOnce(() => {
+        throw new Error("Tracking failed");
+      });
+
+      const { result } = renderHook(() => useProposal(sessionProposal), {
+        wrapper: createHookWrapper(store),
+      });
+
+      await act(async () => {
+        await result.current.approveSession();
+      });
+
+      expect(enqueueSnackbar).toHaveBeenCalledWith(
+        "Tracking failed",
+        expect.anything(),
+      );
+      expect(analyticsTrackMock.mock.calls).toEqual([
+        [
+          "session_established",
+          { ...dappProperties, session_topic: "topic-1" },
+        ],
+      ]);
+    });
+
+    it("does not track session_approve_failed when tracking session_established throws after approveSessionAuthenticate", async () => {
+      analyticsTrackMock.mockImplementationOnce(() => {
+        throw new Error("Tracking failed");
+      });
+
+      const { result } = renderHook(
+        () => useProposal(sessionProposal, oneClickAuthPayload),
+        { wrapper: createHookWrapper(store) },
+      );
+
+      await act(async () => {
+        await result.current.approveSessionAuthenticate();
+      });
+
+      expect(enqueueSnackbar).toHaveBeenCalledWith(
+        "Tracking failed",
+        expect.anything(),
+      );
+      expect(analyticsTrackMock.mock.calls).toEqual([
+        [
+          "session_established",
+          { ...dappProperties, session_topic: "topic-1" },
+        ],
+      ]);
     });
 
     it("tracks session_approve_failed when approveSessionAuthenticate fails", async () => {

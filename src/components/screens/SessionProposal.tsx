@@ -200,6 +200,14 @@ export default function SessionProposal({
   const isBlockchainUnsupported =
     noChainsSupported || !everyRequiredChainsSupported;
 
+  const onClose = useCallback(() => {
+    handleClose(
+      isBlockchainUnsupported
+        ? UNSUPPORTED_BLOCKCHAINS_PAGE
+        : MISSING_REQUIRED_ACCOUNT_PAGE,
+    );
+  }, [handleClose, isBlockchainUnsupported]);
+
   const everyRequiredChainsSelected = useMemo(
     () =>
       requiredChains.every((entry) =>
@@ -275,18 +283,7 @@ export default function SessionProposal({
             )}
 
             <ButtonsContainer>
-              <Button
-                variant="main"
-                size="large"
-                flex={1}
-                onClick={() =>
-                  handleClose(
-                    isBlockchainUnsupported
-                      ? UNSUPPORTED_BLOCKCHAINS_PAGE
-                      : MISSING_REQUIRED_ACCOUNT_PAGE,
-                  )
-                }
-              >
+              <Button variant="main" size="large" flex={1} onClick={onClose}>
                 <Text variant="body" fontWeight="semiBold" color="neutral.c00">
                   {t("sessionProposal.close")}
                 </Text>

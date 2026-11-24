@@ -5,6 +5,7 @@ import {
   showBackToBrowserModalAtom,
   walletKitAtom,
 } from "@/store/walletKit.store";
+import { AnalyticsPage } from "@/components/screens/sessionProposal/analyticsPages";
 import { OneClickAuthPayload } from "@/types/types";
 import { fetchBip122Addresses } from "@/utils/bip122";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
@@ -111,6 +112,10 @@ export function useProposal(
     [analytics, dappProperties],
   );
 
+  const trackSessionAuthenticated = useCallback(() => {
+    analytics.track("session_authenticated", dappProperties);
+  }, [analytics, dappProperties]);
+
   const trackSessionApproveFailed = useCallback(
     (error: unknown) => {
       analytics.track("session_approve_failed", {
@@ -122,7 +127,7 @@ export function useProposal(
   );
 
   const approveSession = useCallback(async () => {
-    let isSessionEstablished = false;
+    let stage: "approving" | "approved" = "approving";
     try {
       const supportedNs = buildSupportedNamespaces(proposal);
       const approvedNs = buildApprovedNamespaces({
@@ -133,8 +138,8 @@ export function useProposal(
         id: proposal.id,
         namespaces: approvedNs,
       });
+      stage = "approved";
       trackSessionEstablished(session.topic);
-      isSessionEstablished = true;
       await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
       await queryClient.invalidateQueries({
         queryKey: pendingProposalsQueryKey,
@@ -181,7 +186,7 @@ export function useProposal(
 
       redirectToDapp();
     } catch (error) {
-      if (!isSessionEstablished) {
+      if (stage === "approving") {
         trackSessionApproveFailed(error);
       }
       enqueueSnackbar(getErrorMessage(error), {
@@ -214,7 +219,7 @@ export function useProposal(
   ]);
 
   const approveSessionAuthenticate = useCallback(async () => {
-    let isSessionEstablished = false;
+    let stage: "approving" | "approved" = "approving";
     try {
       const {
         chains,
@@ -275,6 +280,8 @@ export function useProposal(
       });
 
       if (!session) {
+        stage = "approved";
+        trackSessionAuthenticated();
         await navigate({
           to: "/",
           search: ({ uri: _, ...search }) => search,
@@ -282,8 +289,8 @@ export function useProposal(
         return;
       }
 
+      stage = "approved";
       trackSessionEstablished(session.topic);
-      isSessionEstablished = true;
       await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
       await queryClient.prefetchQuery({
         queryKey: sessionsQueryKey,
@@ -299,7 +306,7 @@ export function useProposal(
 
       redirectToDapp();
     } catch (error) {
-      if (!isSessionEstablished) {
+      if (stage === "approving") {
         trackSessionApproveFailed(error);
       }
       enqueueSnackbar(getErrorMessage(error), {
@@ -330,6 +337,7 @@ export function useProposal(
     accounts.data,
     client.message,
     trackSessionEstablished,
+    trackSessionAuthenticated,
     trackSessionApproveFailed,
   ]);
 
@@ -412,7 +420,7 @@ export function useProposal(
   }, [navigate, oneClickAuthPayload, queryClient, redirectToDapp, walletKit]);
 
   const handleClose = useCallback(
-    (page: string) => {
+    (page: AnalyticsPage) => {
       void rejectSession();
       analytics.track("button_clicked", {
         button: "Close",
