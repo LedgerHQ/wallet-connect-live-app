@@ -1,8 +1,11 @@
 import sessionProposal from "@/data/mocks/sessionProposal.example.json";
 import sessionProposalNotSupported from "@/data/mocks/sessionProposalNotSupported.example.json";
 import {
+  dedupeChains,
   formatAccountsByChain,
   getChains,
+  getNamespacesChains,
+  getRequestedChains,
   sortAlphabetic,
   sortChains,
 } from "@/hooks/useProposal/util";
@@ -606,6 +609,101 @@ describe("sortChains", () => {
         accounts: [ACCOUNT_MOCK],
         displayName: "Polygon",
       },
+    ]);
+  });
+});
+
+const SOLANA_MAINNET = "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp";
+
+describe("dedupeChains", () => {
+  it("removes duplicated chains and keeps the first occurrence order", () => {
+    expect(dedupeChains(["eip155:1", "eip155:137", "eip155:1"])).toEqual([
+      "eip155:1",
+      "eip155:137",
+    ]);
+  });
+});
+
+describe("getNamespacesChains", () => {
+  it("returns the chains declared in each namespace", () => {
+    expect(
+      getNamespacesChains({
+        eip155: { chains: ["eip155:1", "eip155:10"] },
+        solana: { chains: [SOLANA_MAINNET] },
+      }),
+    ).toEqual(["eip155:1", "eip155:10", SOLANA_MAINNET]);
+  });
+
+  it("uses the namespace key when it is a chain id without chains", () => {
+    expect(
+      getNamespacesChains({
+        "eip155:1": {},
+        "eip155:42161": { chains: undefined },
+      }),
+    ).toEqual(["eip155:1", "eip155:42161"]);
+  });
+
+  it("ignores a namespace without chains whose key is not a chain id", () => {
+    expect(getNamespacesChains({ eip155: {} })).toEqual([]);
+  });
+
+  it("deduplicates chains declared by several namespaces", () => {
+    expect(
+      getNamespacesChains({
+        eip155: { chains: ["eip155:1"] },
+        "eip155:1": {},
+      }),
+    ).toEqual(["eip155:1"]);
+  });
+
+  it("returns an empty array when namespaces are missing", () => {
+    expect(getNamespacesChains()).toEqual([]);
+  });
+});
+
+describe("getRequestedChains", () => {
+  it("returns the union of required and optional chains without duplicates", () => {
+    expect(
+      getRequestedChains({
+        requiredNamespaces: {
+          eip155: { chains: ["eip155:1"], methods: [], events: [] },
+        },
+        optionalNamespaces: {
+          eip155: {
+            chains: ["eip155:1", "eip155:8453"],
+            methods: [],
+            events: [],
+          },
+          [SOLANA_MAINNET]: { methods: [], events: [] },
+        },
+      }),
+    ).toEqual(["eip155:1", "eip155:8453", SOLANA_MAINNET]);
+  });
+
+  it("supports chain ids used as required namespace keys", () => {
+    expect(
+      getRequestedChains({
+        requiredNamespaces: { "eip155:10": { methods: [], events: [] } },
+        optionalNamespaces: {},
+      }),
+    ).toEqual(["eip155:10"]);
+  });
+
+  it("supports proposals without optional namespaces", () => {
+    expect(
+      getRequestedChains({
+        requiredNamespaces: {
+          eip155: { chains: ["eip155:1"], methods: [], events: [] },
+        },
+        optionalNamespaces: undefined as never,
+      }),
+    ).toEqual(["eip155:1"]);
+  });
+
+  it("returns the chains of the example proposal", () => {
+    expect(getRequestedChains(sessionProposal as Proposal)).toEqual([
+      "eip155:1",
+      "optionalChain:1",
     ]);
   });
 });
