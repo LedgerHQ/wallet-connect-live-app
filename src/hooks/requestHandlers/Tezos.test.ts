@@ -6,6 +6,11 @@ import type { IWalletKit } from "@reown/walletkit";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { handleTezosRequest } from "./Tezos";
 import * as utils from "./utils";
+import { reportSessionError } from "./analytics/sessionErrorReporter";
+
+vi.mock("./analytics/sessionErrorReporter", () => ({
+  reportSessionError: vi.fn(),
+}));
 
 vi.mock("./utils", async (importOriginal) => ({
   ...(await importOriginal<typeof utils>()),
@@ -30,7 +35,9 @@ describe("handleTezosRequest", () => {
       ] as unknown as Account[];
 
       const getPublicKey = vi.fn().mockResolvedValue("edpkPubKey");
-      const client = { account: { getPublicKey } } as unknown as WalletAPIClient;
+      const client = {
+        account: { getPublicKey },
+      } as unknown as WalletAPIClient;
 
       const acceptRequestSpy = vi
         .spyOn(utils, "acceptRequest")
@@ -48,9 +55,12 @@ describe("handleTezosRequest", () => {
 
       expect(getPublicKey).toHaveBeenCalledTimes(1);
       expect(getPublicKey).toHaveBeenCalledWith("1");
-      expect(acceptRequestSpy).toHaveBeenCalledWith(expect.anything(), topic, id, [
-        { algo: "ed25519", address: TZ1, pubkey: "edpkPubKey" },
-      ]);
+      expect(acceptRequestSpy).toHaveBeenCalledWith(
+        expect.anything(),
+        topic,
+        id,
+        [{ algo: "ed25519", address: TZ1, pubkey: "edpkPubKey" }],
+      );
     });
 
     it("omits accounts whose public key cannot be fetched", async () => {
@@ -58,8 +68,12 @@ describe("handleTezosRequest", () => {
         { id: "1", address: TZ1, currency: "tezos" },
       ] as unknown as Account[];
 
-      const getPublicKey = vi.fn().mockRejectedValue(new Error("not implemented"));
-      const client = { account: { getPublicKey } } as unknown as WalletAPIClient;
+      const getPublicKey = vi
+        .fn()
+        .mockRejectedValue(new Error("not implemented"));
+      const client = {
+        account: { getPublicKey },
+      } as unknown as WalletAPIClient;
 
       const acceptRequestSpy = vi
         .spyOn(utils, "acceptRequest")
@@ -75,7 +89,12 @@ describe("handleTezosRequest", () => {
         {} as IWalletKit,
       );
 
-      expect(acceptRequestSpy).toHaveBeenCalledWith(expect.anything(), topic, id, []);
+      expect(acceptRequestSpy).toHaveBeenCalledWith(
+        expect.anything(),
+        topic,
+        id,
+        [],
+      );
     });
   });
 
@@ -85,12 +104,16 @@ describe("handleTezosRequest", () => {
     ];
 
     it("serializes operations, signs+broadcasts, and returns the operation hash", async () => {
-      vi.spyOn(utilsGeneric, "getAccountWithAddressAndChainId").mockReturnValueOnce(
-        { id: "acc-1", address: TZ1 } as Account,
-      );
+      vi.spyOn(
+        utilsGeneric,
+        "getAccountWithAddressAndChainId",
+      ).mockReturnValueOnce({ id: "acc-1", address: TZ1 } as Account);
       const signRaw = vi
         .fn()
-        .mockResolvedValueOnce({ transactionHash: "ooHASH", signedTransactionHex: "03ab" });
+        .mockResolvedValueOnce({
+          transactionHash: "ooHASH",
+          signedTransactionHex: "03ab",
+        });
       const client = { transaction: { signRaw } } as unknown as WalletAPIClient;
 
       const acceptRequestSpy = vi
@@ -98,7 +121,10 @@ describe("handleTezosRequest", () => {
         .mockResolvedValueOnce(undefined);
 
       await handleTezosRequest(
-        { method: TEZOS_SIGNING_METHODS.TEZOS_SEND, params: { account: TZ1, operations } },
+        {
+          method: TEZOS_SIGNING_METHODS.TEZOS_SEND,
+          params: { account: TZ1, operations },
+        },
         topic,
         id,
         chainId,
@@ -107,22 +133,35 @@ describe("handleTezosRequest", () => {
         {} as IWalletKit,
       );
 
-      expect(signRaw).toHaveBeenCalledWith("acc-1", JSON.stringify(operations), true);
-      expect(acceptRequestSpy).toHaveBeenCalledWith(expect.anything(), topic, id, {
-        operationHash: "ooHASH",
-      });
+      expect(signRaw).toHaveBeenCalledWith(
+        "acc-1",
+        JSON.stringify(operations),
+        true,
+      );
+      expect(acceptRequestSpy).toHaveBeenCalledWith(
+        expect.anything(),
+        topic,
+        id,
+        {
+          operationHash: "ooHASH",
+        },
+      );
     });
 
     it("rejects when no matching account is found", async () => {
-      vi.spyOn(utilsGeneric, "getAccountWithAddressAndChainId").mockReturnValueOnce(
-        undefined,
-      );
+      vi.spyOn(
+        utilsGeneric,
+        "getAccountWithAddressAndChainId",
+      ).mockReturnValueOnce(undefined);
       const rejectRequestSpy = vi
         .spyOn(utils, "rejectRequest")
         .mockResolvedValueOnce(undefined);
 
       await handleTezosRequest(
-        { method: TEZOS_SIGNING_METHODS.TEZOS_SEND, params: { account: TZ1, operations } },
+        {
+          method: TEZOS_SIGNING_METHODS.TEZOS_SEND,
+          params: { account: TZ1, operations },
+        },
         topic,
         id,
         chainId,
@@ -140,9 +179,10 @@ describe("handleTezosRequest", () => {
     });
 
     it("rejects when the requested account differs only by case", async () => {
-      vi.spyOn(utilsGeneric, "getAccountWithAddressAndChainId").mockReturnValueOnce(
-        { id: "acc-1", address: TZ1 } as Account,
-      );
+      vi.spyOn(
+        utilsGeneric,
+        "getAccountWithAddressAndChainId",
+      ).mockReturnValueOnce({ id: "acc-1", address: TZ1 } as Account);
       const signRaw = vi.fn();
       const rejectRequestSpy = vi
         .spyOn(utils, "rejectRequest")
@@ -171,9 +211,10 @@ describe("handleTezosRequest", () => {
     });
 
     it("rejects (does not throw) when the user cancels on device", async () => {
-      vi.spyOn(utilsGeneric, "getAccountWithAddressAndChainId").mockReturnValueOnce(
-        { id: "acc-1", address: TZ1 } as Account,
-      );
+      vi.spyOn(
+        utilsGeneric,
+        "getAccountWithAddressAndChainId",
+      ).mockReturnValueOnce({ id: "acc-1", address: TZ1 } as Account);
       const canceled = Object.assign(new Error("cancelled"), {
         name: "UserRefusedOnDevice",
       });
@@ -185,7 +226,10 @@ describe("handleTezosRequest", () => {
         .mockResolvedValueOnce(undefined);
 
       await handleTezosRequest(
-        { method: TEZOS_SIGNING_METHODS.TEZOS_SEND, params: { account: TZ1, operations } },
+        {
+          method: TEZOS_SIGNING_METHODS.TEZOS_SEND,
+          params: { account: TZ1, operations },
+        },
         topic,
         id,
         chainId,
@@ -200,6 +244,11 @@ describe("handleTezosRequest", () => {
         id,
         utils.Errors.txDeclined,
       );
+      expect(reportSessionError).toHaveBeenCalledTimes(1);
+      expect(reportSessionError).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ message: "cancelled" }),
+      );
     });
   });
 
@@ -208,9 +257,10 @@ describe("handleTezosRequest", () => {
     const payload = "0501020304";
 
     it("recovers the raw signature from the hex round-trip and base58-encodes it", async () => {
-      vi.spyOn(utilsGeneric, "getAccountWithAddressAndChainId").mockReturnValueOnce(
-        { id: "acc-1", address: TZ1 } as Account,
-      );
+      vi.spyOn(
+        utilsGeneric,
+        "getAccountWithAddressAndChainId",
+      ).mockReturnValueOnce({ id: "acc-1", address: TZ1 } as Account);
       // LL transports the non-0x hex signature as that string's bytes.
       const sign = vi.fn().mockResolvedValueOnce(Buffer.from(rawSigHex));
       const client = { message: { sign } } as unknown as WalletAPIClient;
@@ -220,7 +270,10 @@ describe("handleTezosRequest", () => {
         .mockResolvedValueOnce(undefined);
 
       await handleTezosRequest(
-        { method: TEZOS_SIGNING_METHODS.TEZOS_SIGN, params: { account: TZ1, payload } },
+        {
+          method: TEZOS_SIGNING_METHODS.TEZOS_SIGN,
+          params: { account: TZ1, payload },
+        },
         topic,
         id,
         chainId,
@@ -230,21 +283,30 @@ describe("handleTezosRequest", () => {
       );
 
       expect(sign).toHaveBeenCalledWith("acc-1", Buffer.from(payload, "utf8"));
-      expect(acceptRequestSpy).toHaveBeenCalledWith(expect.anything(), topic, id, {
-        signature: encodeTezosSignature(Buffer.from(rawSigHex, "hex"), TZ1),
-      });
+      expect(acceptRequestSpy).toHaveBeenCalledWith(
+        expect.anything(),
+        topic,
+        id,
+        {
+          signature: encodeTezosSignature(Buffer.from(rawSigHex, "hex"), TZ1),
+        },
+      );
     });
 
     it("rejects when no matching account is found", async () => {
-      vi.spyOn(utilsGeneric, "getAccountWithAddressAndChainId").mockReturnValueOnce(
-        undefined,
-      );
+      vi.spyOn(
+        utilsGeneric,
+        "getAccountWithAddressAndChainId",
+      ).mockReturnValueOnce(undefined);
       const rejectRequestSpy = vi
         .spyOn(utils, "rejectRequest")
         .mockResolvedValueOnce(undefined);
 
       await handleTezosRequest(
-        { method: TEZOS_SIGNING_METHODS.TEZOS_SIGN, params: { account: TZ1, payload } },
+        {
+          method: TEZOS_SIGNING_METHODS.TEZOS_SIGN,
+          params: { account: TZ1, payload },
+        },
         topic,
         id,
         chainId,
@@ -262,9 +324,10 @@ describe("handleTezosRequest", () => {
     });
 
     it("rejects when the signature is not 64 raw bytes", async () => {
-      vi.spyOn(utilsGeneric, "getAccountWithAddressAndChainId").mockReturnValueOnce(
-        { id: "acc-1", address: TZ1 } as Account,
-      );
+      vi.spyOn(
+        utilsGeneric,
+        "getAccountWithAddressAndChainId",
+      ).mockReturnValueOnce({ id: "acc-1", address: TZ1 } as Account);
       const sign = vi.fn().mockResolvedValueOnce(Buffer.from("abcd")); // 2 bytes, not 64
       const client = { message: { sign } } as unknown as WalletAPIClient;
       const acceptRequestSpy = vi
@@ -275,7 +338,10 @@ describe("handleTezosRequest", () => {
         .mockResolvedValueOnce(undefined);
 
       await handleTezosRequest(
-        { method: TEZOS_SIGNING_METHODS.TEZOS_SIGN, params: { account: TZ1, payload } },
+        {
+          method: TEZOS_SIGNING_METHODS.TEZOS_SIGN,
+          params: { account: TZ1, payload },
+        },
         topic,
         id,
         chainId,
@@ -294,9 +360,10 @@ describe("handleTezosRequest", () => {
     });
 
     it("rejects (does not throw) when the user cancels on device", async () => {
-      vi.spyOn(utilsGeneric, "getAccountWithAddressAndChainId").mockReturnValueOnce(
-        { id: "acc-1", address: TZ1 } as Account,
-      );
+      vi.spyOn(
+        utilsGeneric,
+        "getAccountWithAddressAndChainId",
+      ).mockReturnValueOnce({ id: "acc-1", address: TZ1 } as Account);
       const canceled = Object.assign(new Error("cancelled"), {
         name: "UserRefusedOnDevice",
       });
@@ -308,7 +375,10 @@ describe("handleTezosRequest", () => {
         .mockResolvedValueOnce(undefined);
 
       await handleTezosRequest(
-        { method: TEZOS_SIGNING_METHODS.TEZOS_SIGN, params: { account: TZ1, payload } },
+        {
+          method: TEZOS_SIGNING_METHODS.TEZOS_SIGN,
+          params: { account: TZ1, payload },
+        },
         topic,
         id,
         chainId,
@@ -322,6 +392,11 @@ describe("handleTezosRequest", () => {
         topic,
         id,
         utils.Errors.msgDecline,
+      );
+      expect(reportSessionError).toHaveBeenCalledTimes(1);
+      expect(reportSessionError).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ message: "cancelled" }),
       );
     });
   });

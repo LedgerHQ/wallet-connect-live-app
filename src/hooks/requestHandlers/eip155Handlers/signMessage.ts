@@ -4,6 +4,7 @@ import {
   ethSignSchema,
   type EIP155_REQUESTS,
 } from "@/data/methods/EIP155Data.methods";
+import { reportSessionError } from "@/hooks/requestHandlers/analytics/sessionErrorReporter";
 import {
   acceptRequest,
   Errors,
@@ -34,7 +35,8 @@ export async function signMessage(
     );
   }
 
-  const isPersonalSign = request.method === EIP155_SIGNING_METHODS.PERSONAL_SIGN;
+  const isPersonalSign =
+    request.method === EIP155_SIGNING_METHODS.PERSONAL_SIGN;
   const params = ethSignSchema.parse(request.params);
   const address = isPersonalSign ? params[1] : params[0];
   const message = isPersonalSign ? params[0] : params[1];
@@ -57,6 +59,7 @@ export async function signMessage(
     await acceptRequest(walletKit, topic, id, result);
   } catch (error) {
     if (isCanceledError(error)) {
+      reportSessionError(walletKit, error);
       await rejectRequest(walletKit, topic, id, Errors.userDecline);
     } else {
       throw error;

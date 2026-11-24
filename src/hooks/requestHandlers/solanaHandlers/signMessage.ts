@@ -3,6 +3,7 @@ import {
   SOLANA_SIGNING_METHODS,
   solanaSignMessageSchema,
 } from "@/data/methods/Solana.methods";
+import { reportSessionError } from "@/hooks/requestHandlers/analytics/sessionErrorReporter";
 import {
   acceptRequest,
   Errors,
@@ -46,7 +47,8 @@ export async function signMessage(
       await acceptRequest(walletKit, topic, id, {
         signature: base58.encode(signedMessage),
       });
-    } catch (_error) {
+    } catch (error) {
+      reportSessionError(walletKit, error);
       await rejectRequest(walletKit, topic, id, Errors.txDeclined);
     }
   } else {

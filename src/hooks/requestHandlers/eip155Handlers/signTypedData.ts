@@ -4,6 +4,7 @@ import {
   ethSignSchema,
   type EIP155_REQUESTS,
 } from "@/data/methods/EIP155Data.methods";
+import { reportSessionError } from "@/hooks/requestHandlers/analytics/sessionErrorReporter";
 import {
   acceptRequest,
   Errors,
@@ -57,6 +58,7 @@ export async function signTypedData(
     await acceptRequest(walletKit, topic, id, result);
   } catch (error) {
     if (isCanceledError(error)) {
+      reportSessionError(walletKit, error);
       await rejectRequest(walletKit, topic, id, Errors.msgDecline);
     } else {
       throw error;

@@ -9,6 +9,7 @@ import { hexToBase64 } from "@/utils/cosmos";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
 import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import type { IWalletKit } from "@reown/walletkit";
+import { reportSessionError } from "./analytics/sessionErrorReporter";
 import { acceptRequest, Errors, isCanceledError, rejectRequest } from "./utils";
 
 const LEDGER_LIVE_CURRENCY = "babylon";
@@ -105,6 +106,7 @@ async function signAmino(
     await acceptRequest(walletKit, topic, id, result);
   } catch (error) {
     if (isCanceledError(error)) {
+      reportSessionError(walletKit, error);
       await rejectRequest(walletKit, topic, id, Errors.txDeclined);
     } else {
       throw error;
@@ -130,6 +132,12 @@ export async function handleCosmosRequest(
       break;
     // cosmos_signDirect (protobuf) and anything else: coin-cosmos is amino-only.
     default:
-      await rejectRequest(walletKit, topic, id, Errors.unsupportedMethods, 5101);
+      await rejectRequest(
+        walletKit,
+        topic,
+        id,
+        Errors.unsupportedMethods,
+        5101,
+      );
   }
 }

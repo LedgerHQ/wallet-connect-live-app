@@ -16,12 +16,17 @@ import { networks, payments, Psbt } from "bitcoinjs-lib";
 import { vi } from "vitest";
 import { isDerivedAppPsbtSupportEnabled } from "@/utils/helper.util";
 import { getBip122Network } from "@/utils/psbt";
+import { reportSessionError } from "./analytics/sessionErrorReporter";
 import { handleBIP122Request } from "./BIP122";
 import * as utils from "./utils";
 
 vi.mock("@/utils/helper.util", async (importOriginal) => ({
   ...(await importOriginal()),
   isDerivedAppPsbtSupportEnabled: vi.fn(() => true),
+}));
+
+vi.mock("./analytics/sessionErrorReporter", () => ({
+  reportSessionError: vi.fn(),
 }));
 
 vi.mock("./utils", async (importOriginal) => ({
@@ -290,9 +295,8 @@ describe("handleBIP122Request — BIP122_SIGN_PSBT", () => {
 
   it("rejects with txDeclined when the user cancels during signing", async () => {
     const rejectSpy = vi.spyOn(utils, "rejectRequest");
-    const client = makeClient(() =>
-      Promise.reject(new Error("User cancelled")),
-    );
+    const cancel = new Error("User cancelled");
+    const client = makeClient(() => Promise.reject(cancel));
 
     await handleBIP122Request(
       {
@@ -316,6 +320,7 @@ describe("handleBIP122Request — BIP122_SIGN_PSBT", () => {
       requestId,
       utils.Errors.txDeclined,
     );
+    expect(reportSessionError).toHaveBeenCalledWith(walletkit, cancel);
   });
 
   it("re-throws non-cancellation errors from the signing call", async () => {
@@ -701,8 +706,8 @@ describe("handleBIP122Request — BIP122_GET_ACCOUNT_ADDRESSES", () => {
 
   it("rejects with userDecline when params are undefined and no session account matches", async () => {
     const rejectSpy = vi.spyOn(utils, "rejectRequest");
-    const client = makeClient(
-      () => Promise.resolve({ psbtSigned: "irrelevant" }),
+    const client = makeClient(() =>
+      Promise.resolve({ psbtSigned: "irrelevant" }),
     );
 
     await handleBIP122Request(
@@ -727,4 +732,58 @@ describe("handleBIP122Request — BIP122_GET_ACCOUNT_ADDRESSES", () => {
       utils.Errors.userDecline,
     );
   });
+});
+
+describe("handleBIP122Request — user cancellation", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it.each([
+    {
+      method: BIP122_SIGNING_METHODS.BIP122_SIGN_MESSAGE_LEGACY,
+      params: { address: testAddress!, message: "hello" },
+      expectedError: utils.Errors.userDecline,
+    },
+    {
+      method: BIP122_SIGNING_METHODS.BIP122_SIGN_MESSAGE,
+      params: { account: testAddress!, message: "hello" },
+      expectedError: utils.Errors.userDecline,
+    },
+    {
+      method: BIP122_SIGNING_METHODS.BIP122_SEND_TRANSFERT,
+      params: {
+        account: testAddress!,
+        recipientAddress: testAddress!,
+        amount: "1000",
+      },
+      expectedError: utils.Errors.txDeclined,
+    },
+  ])(
+    "reports the error and rejects $method when the user cancels",
+    async ({ method, params, expectedError }) => {
+      const cancel = new Error("User cancelled");
+      const client = {
+        message: { sign: vi.fn(() => Promise.reject(cancel)) },
+        transaction: {
+          signAndBroadcast: vi.fn(() => Promise.reject(cancel)),
+        },
+      } as unknown as WalletAPIClient;
+
+      await handleBIP122Request(
+        { method, params } as Parameters<typeof handleBIP122Request>[0],
+        topic,
+        requestId,
+        BTC_CHAIN_ID,
+        { accounts: [makeAccount()], client, walletkit },
+      );
+
+      expect(reportSessionError).toHaveBeenCalledTimes(1);
+      expect(reportSessionError).toHaveBeenCalledWith(walletkit, cancel);
+      expect(utils.rejectRequest).toHaveBeenCalledWith(
+        walletkit,
+        topic,
+        requestId,
+        expectedError,
+      );
+    },
+  );
 });

@@ -9,6 +9,11 @@ import type { IWalletKit } from "@reown/walletkit";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { handleSuiRequest } from "./Sui";
 import * as utils from "./utils";
+import { reportSessionError } from "./analytics/sessionErrorReporter";
+
+vi.mock("./analytics/sessionErrorReporter", () => ({
+  reportSessionError: vi.fn(),
+}));
 
 vi.mock("./utils", async (importOriginal) => ({
   ...(await importOriginal<typeof utils>()),
@@ -225,6 +230,11 @@ describe("handleSuiRequest", () => {
         id,
         utils.Errors.txDeclined,
       );
+      expect(reportSessionError).toHaveBeenCalledTimes(1);
+      expect(reportSessionError).toHaveBeenCalledWith(
+        walletKit,
+        expect.objectContaining({ message: "Canceled by user" }),
+      );
     });
 
     it("rethrows any other wallet error", async () => {
@@ -360,6 +370,11 @@ describe("handleSuiRequest", () => {
         topic,
         id,
         utils.Errors.txDeclined,
+      );
+      expect(reportSessionError).toHaveBeenCalledTimes(1);
+      expect(reportSessionError).toHaveBeenCalledWith(
+        walletKit,
+        expect.objectContaining({ message: "Canceled by user" }),
       );
     });
 
