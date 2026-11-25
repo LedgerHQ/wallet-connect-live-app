@@ -87,6 +87,34 @@ describe("withSignatureRequestGroup", () => {
 
     expect(bitcoin.getAddresses).toHaveBeenCalledWith("account", ["payment"]);
   });
+
+  it("rejects the sign requests sent once the session is cancelled, without reaching Ledger Wallet", async () => {
+    const { client, transaction, message, bitcoin } = createClient();
+    let cancelled = false;
+    const scoped = withSignatureRequestGroup(
+      client,
+      "topic-1",
+      () => cancelled,
+    );
+
+    await scoped.transaction.sign("account", {} as never);
+    cancelled = true;
+
+    const error = await scoped.message
+      .sign("account", Buffer.from("hello"))
+      .catch((e: unknown) => e);
+    expect(isSignatureRequestCancelledError(error)).toBe(true);
+    await expect(
+      scoped.transaction.signRaw("account", "raw"),
+    ).rejects.toSatisfy(isSignatureRequestCancelledError);
+
+    expect(transaction.sign).toHaveBeenCalledTimes(1);
+    expect(transaction.signRaw).not.toHaveBeenCalled();
+    expect(message.sign).not.toHaveBeenCalled();
+
+    void scoped.bitcoin.getAddresses("account", ["payment"]);
+    expect(bitcoin.getAddresses).toHaveBeenCalled();
+  });
 });
 
 describe("cancelSignatureRequests", () => {

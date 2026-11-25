@@ -174,6 +174,39 @@ describe("Testing sign message on Solana", () => {
     );
   });
 
+  it("should not answer a disconnected dApp whose sign request Ledger Wallet cancelled", async () => {
+    vi.spyOn(
+      utilsGeneric,
+      "getAccountWithAddressAndChainId",
+    ).mockImplementationOnce(() => ({ id: "0" }) as Account);
+    const cancelled = new Error("The Live App cancelled the sign request");
+    cancelled.name = "SignatureRequestCancelled";
+    const walletAPIClient = {
+      message: { sign: vi.fn(() => Promise.reject(cancelled)) },
+    } as unknown as WalletAPIClient;
+    const rejectRequestSpy = vi.spyOn(utils, "rejectRequest");
+
+    await expect(
+      signMessage(
+        {
+          method: SOLANA_SIGNING_METHODS.SOLANA_SIGN_MESSAGE,
+          params: {
+            message: "Hello from Wallet Connect",
+            pubkey: PublicKey.unique().toString(),
+          },
+        },
+        "topic",
+        0,
+        "any random value",
+        [],
+        walletAPIClient,
+        {} as IWalletKit,
+      ),
+    ).rejects.toBe(cancelled);
+
+    expect(rejectRequestSpy).not.toHaveBeenCalled();
+  });
+
   it("should accept the sign message request when sign message from Wallet API client succeed", async () => {
     const account = { id: "0" } as Account;
     const getAccountWithAddressAndChainIdSpy = vi

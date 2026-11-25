@@ -54,6 +54,12 @@ vi.mock("../useAccounts", () => ({
   default: vi.fn(),
 }));
 
+const analyticsTrackMock = vi.fn();
+const analyticsState = { track: analyticsTrackMock };
+vi.mock("../useAnalytics", () => ({
+  default: () => ({ track: analyticsState.track, page: vi.fn() }),
+}));
+
 vi.mock("../requestHandlers/BIP122", () => ({
   handleBIP122Request: vi.fn(),
 }));
@@ -122,11 +128,9 @@ vi.mock("@tanstack/react-router", async () => {
 
 const mockedTranslation = vi.fn<() => string>();
 vi.mock("react-i18next", () => ({
-  useTranslation: vi
-    .fn()
-    .mockReturnValue({
-      t: vi.fn().mockImplementation(() => mockedTranslation()),
-    }),
+  useTranslation: vi.fn().mockReturnValue({
+    t: vi.fn().mockImplementation(() => mockedTranslation()),
+  }),
 }));
 
 import {
@@ -214,11 +218,14 @@ describe("useWalletConnect", () => {
           getAll: vi.fn(() => []),
         },
         proposal: {
-          getAll: vi.fn(() => []),
+          getAll: vi.fn((): unknown[] => []),
           keys: [12],
         },
         auth: {
           requests: { keys: [] as number[] },
+        },
+        engine: {
+          processSessionRequestQueue: vi.fn(),
         },
       },
     },
@@ -236,6 +243,8 @@ describe("useWalletConnect", () => {
     coreMock.relayer.connected = false;
     walletKitMock.engine.signClient.auth.requests.keys = [];
     walletKitMock.engine.signClient.session.get.mockReturnValue(sessionRecord);
+    walletKitMock.engine.signClient.proposal.getAll.mockReturnValue([]);
+    analyticsState.track = analyticsTrackMock;
     window.open = vi.fn();
 
     store = createStore();
@@ -361,6 +370,42 @@ describe("useWalletConnect", () => {
 
       await waitFor(() => {
         expect(handler()).toHaveBeenCalled();
+      });
+    },
+  );
+
+  it.each([
+    { name: "no session", session: undefined },
+    {
+      name: "a session without bip122 namespace",
+      session: { ...sessionRecord, namespaces: {} },
+    },
+  ])(
+    "dispatches bip122 requests without a session address when there is $name",
+    async ({ session }) => {
+      walletKitMock.engine.signClient.session.get.mockReturnValue(
+        session as never,
+      );
+      mountHook();
+
+      walletKitListeners.get("session_request")?.({
+        topic: "topic-1",
+        id: 1,
+        params: {
+          chainId: "bip122:000000000019d6689c085ae165831e93",
+          request: { method: "btc_getAccountAddresses", params: {} },
+        },
+        verifyContext: {},
+      });
+
+      await waitFor(() => {
+        expect(mockedHandleBIP122Request).toHaveBeenCalledWith(
+          expect.anything(),
+          "topic-1",
+          1,
+          "bip122:000000000019d6689c085ae165831e93",
+          expect.objectContaining({ sessionAddress: undefined }),
+        );
       });
     },
   );
@@ -760,6 +805,126 @@ describe("useWalletConnect", () => {
     });
   });
 
+  it("handles the queued request of another dApp once the deleted session's requests are cancelled", async () => {
+    let cancelled!: () => void;
+    const request = vi.fn(
+      () =>
+        new Promise((resolve) => {
+          cancelled = () => resolve({ cancelled: 1 });
+        }),
+    );
+    store.set(walletAPIClientAtom as never, { request });
+    const { processSessionRequestQueue } =
+      walletKitMock.engine.signClient.engine;
+
+    mountHook();
+
+    walletKitListeners.get("session_delete")?.({ id: 1, topic: "topic-1" });
+
+    await waitFor(() => expect(request).toHaveBeenCalled());
+    expect(processSessionRequestQueue).not.toHaveBeenCalled();
+
+    cancelled();
+
+    await waitFor(() => {
+      expect(processSessionRequestQueue).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it("handles the queued request of another dApp when Ledger Wallet cannot cancel", async () => {
+    const request = vi.fn().mockRejectedValue(new Error("permission denied"));
+    store.set(walletAPIClientAtom as never, { request });
+
+    mountHook();
+
+    walletKitListeners.get("session_delete")?.({ id: 1, topic: "topic-1" });
+
+    await waitFor(() => {
+      expect(
+        walletKitMock.engine.signClient.engine.processSessionRequestQueue,
+      ).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it("does not send the sign request of a session deleted during its preparation", async () => {
+    const sign = vi.fn().mockResolvedValue(Buffer.from(""));
+    const request = vi.fn().mockResolvedValue({ cancelled: 0 });
+    store.set(walletAPIClientAtom as never, { transaction: { sign }, request });
+    let prepared!: () => void;
+    const preparation = new Promise<void>((resolve) => {
+      prepared = resolve;
+    });
+    mockedHandleEIP155Request.mockImplementation(
+      async (_request, _topic, _id, _chainId, _accounts, client) => {
+        await preparation;
+        await client.transaction.sign("eth-1", {} as never);
+      },
+    );
+
+    mountHook();
+
+    walletKitListeners.get("session_request")?.({
+      topic: "topic-1",
+      id: 10,
+      params: {
+        chainId: "eip155:1",
+        request: { method: "personal_sign", params: [] },
+      },
+      verifyContext: {},
+    });
+    await waitFor(() => {
+      expect(mockedHandleEIP155Request).toHaveBeenCalled();
+    });
+
+    walletKitListeners.get("session_delete")?.({ id: 1, topic: "topic-1" });
+    prepared();
+
+    await waitFor(() => {
+      expect(request).toHaveBeenCalledWith("custom.signature.cancel", {
+        requestGroupId: "topic-1",
+      });
+    });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(sign).not.toHaveBeenCalled();
+    expect(enqueueSnackbar).not.toHaveBeenCalled();
+    expect(mockedRejectRequest).not.toHaveBeenCalled();
+    expect(window.open).not.toHaveBeenCalled();
+  });
+
+  it("stays silent when the reply of a signature completed after the session deletion fails", async () => {
+    let signed!: () => void;
+    const signature = new Promise<void>((resolve) => {
+      signed = resolve;
+    });
+    mockedHandleEIP155Request.mockImplementation(async () => {
+      await signature;
+      throw new Error("No matching key. session topic doesn't exist");
+    });
+
+    mountHook();
+
+    walletKitListeners.get("session_request")?.({
+      topic: "topic-1",
+      id: 10,
+      params: {
+        chainId: "eip155:1",
+        request: { method: "personal_sign", params: [] },
+      },
+      verifyContext: {},
+    });
+    await waitFor(() => {
+      expect(mockedHandleEIP155Request).toHaveBeenCalled();
+    });
+
+    walletKitListeners.get("session_delete")?.({ id: 1, topic: "topic-1" });
+    signed();
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(enqueueSnackbar).not.toHaveBeenCalled();
+    expect(mockedRejectRequest).not.toHaveBeenCalled();
+    expect(window.open).not.toHaveBeenCalled();
+  });
+
   it("stays silent when Ledger Wallet cancelled the request of a disconnected dApp", async () => {
     const cancelled = new Error("The Live App cancelled the sign request");
     cancelled.name = "SignatureRequestCancelled";
@@ -858,5 +1023,83 @@ describe("useWalletConnect", () => {
     });
 
     expect(store.get(verifyContextByRequestAtom)).toEqual({});
+  });
+
+  describe("proposal_expire", () => {
+    const pendingProposal = {
+      id: 12,
+      proposer: {
+        metadata: {
+          name: "React App",
+          url: "https://react-app.walletconnect.com",
+        },
+      },
+    };
+
+    it("keeps walletKit listeners registered and uses the latest track after track changes", () => {
+      const { rerender } = mountHook();
+      const registrations = walletKitMock.on.mock.calls.length;
+      const latestTrackMock = vi.fn();
+      analyticsState.track = latestTrackMock;
+
+      rerender();
+      walletKitListeners.get("proposal_expire")?.({ id: 12 });
+
+      expect(walletKitMock.on).toHaveBeenCalledTimes(registrations);
+      expect(walletKitMock.off).not.toHaveBeenCalled();
+      expect(analyticsTrackMock).not.toHaveBeenCalled();
+      expect(latestTrackMock).toHaveBeenCalledWith("session_proposal_expired", {
+        proposal_id: 12,
+        dapp: undefined,
+        url: undefined,
+      });
+    });
+
+    it("tracks session_proposal_expired without dApp metadata when no pending proposals are cached", () => {
+      mountHook();
+
+      walletKitListeners.get("proposal_expire")?.({ id: 12 });
+
+      expect(analyticsTrackMock).toHaveBeenCalledWith(
+        "session_proposal_expired",
+        { proposal_id: 12, dapp: undefined, url: undefined },
+      );
+    });
+
+    it("tracks session_proposal_expired with the cached dApp metadata, and without it for an unknown id", async () => {
+      walletKitMock.engine.signClient.proposal.getAll.mockReturnValue([
+        pendingProposal,
+      ]);
+      mountHook();
+
+      walletKitListeners.get("session_proposal")?.({
+        id: 12,
+        params: { pairingTopic: "pairing-topic" },
+        verifyContext: {},
+      });
+      await waitFor(() => {
+        expect(navigateMock).toHaveBeenCalledWith(
+          expect.objectContaining({ to: "/proposal/$id" }),
+        );
+      });
+
+      walletKitListeners.get("proposal_expire")?.({ id: 12 });
+      walletKitListeners.get("proposal_expire")?.({ id: 99 });
+
+      expect(analyticsTrackMock.mock.calls).toEqual([
+        [
+          "session_proposal_expired",
+          {
+            proposal_id: 12,
+            dapp: "React App",
+            url: "https://react-app.walletconnect.com",
+          },
+        ],
+        [
+          "session_proposal_expired",
+          { proposal_id: 99, dapp: undefined, url: undefined },
+        ],
+      ]);
+    });
   });
 });

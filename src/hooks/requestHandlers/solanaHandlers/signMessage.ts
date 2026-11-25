@@ -9,6 +9,7 @@ import {
   rejectRequest,
 } from "@/hooks/requestHandlers/utils";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
+import { isSignatureRequestCancelledError } from "@/utils/signatureRequestGroup";
 import { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import { IWalletKit } from "@reown/walletkit";
 import base58 from "bs58";
@@ -46,7 +47,9 @@ export async function signMessage(
       await acceptRequest(walletKit, topic, id, {
         signature: base58.encode(signedMessage),
       });
-    } catch (_error) {
+    } catch (error) {
+      // The dApp disconnected: there is nobody left to answer.
+      if (isSignatureRequestCancelledError(error)) throw error;
       await rejectRequest(walletKit, topic, id, Errors.txDeclined);
     }
   } else {

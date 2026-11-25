@@ -34,10 +34,10 @@ import { reportZodError } from "@/utils/sentryZod";
 import { WalletKitTypes } from "@reown/walletkit";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { SignClientTypes } from "@walletconnect/types";
+import { ProposalTypes, SignClientTypes } from "@walletconnect/types";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { enqueueSnackbar } from "notistack";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { ZodError } from "zod";
 import { isWalletRequest } from "../utils/helper.util";
@@ -46,6 +46,7 @@ import {
   isSignatureRequestCancelledError,
   withSignatureRequestGroup,
 } from "../utils/signatureRequestGroup";
+import { resumeSessionRequestQueue } from "../utils/sessionRequestQueue";
 import { handleBIP122Request } from "./requestHandlers/BIP122";
 import { handleCosmosRequest } from "./requestHandlers/Cosmos";
 import { handleEIP155Request } from "./requestHandlers/EIP155";
@@ -56,6 +57,7 @@ import { handleTezosRequest } from "./requestHandlers/Tezos";
 import { Errors, rejectRequest } from "./requestHandlers/utils";
 import { handleWalletRequest } from "./requestHandlers/Wallet";
 import useAccounts from "./useAccounts";
+import useAnalytics from "./useAnalytics";
 import {
   queryKey as pendingProposalsQueryKey,
   useQueryFn as usePendingProposalsQueryFn,
@@ -142,12 +144,31 @@ export default function useWalletConnect() {
   );
 
   const accounts = useAccounts(client);
+  const { track } = useAnalytics();
+  // Topics of the sessions the dApp deleted, so their pending requests stop signing.
+  const deletedTopicsRef = useRef(new Set<string>());
+  const trackRef = useRef(track);
 
-  const onProposalExpire = useCallback(() => {
-    void queryClient.invalidateQueries({
-      queryKey: pendingProposalsQueryKey,
-    });
-  }, [queryClient]);
+  useEffect(() => {
+    trackRef.current = track;
+  }, [track]);
+
+  const onProposalExpire = useCallback(
+    ({ id }: WalletKitTypes.ProposalExpire) => {
+      const metadata = queryClient
+        .getQueryData<ProposalTypes.Struct[]>(pendingProposalsQueryKey)
+        ?.find((proposal) => proposal.id === id)?.proposer.metadata;
+      trackRef.current("session_proposal_expired", {
+        proposal_id: id,
+        dapp: metadata?.name,
+        url: metadata?.url,
+      });
+      void queryClient.invalidateQueries({
+        queryKey: pendingProposalsQueryKey,
+      });
+    },
+    [queryClient],
+  );
 
   const pendingProposalsQueryFn = usePendingProposalsQueryFn(walletKit);
 
@@ -213,7 +234,12 @@ export default function useWalletConnect() {
       } = requestEvent;
 
       // Ledger Wallet cancels the sign requests of this session if the dApp disconnects.
-      const requestClient = withSignatureRequestGroup(client, topic);
+      const isSessionDeleted = () => deletedTopicsRef.current.has(topic);
+      const requestClient = withSignatureRequestGroup(
+        client,
+        topic,
+        isSessionDeleted,
+      );
       let isCancelled = false;
 
       void (async () => {
@@ -356,8 +382,9 @@ export default function useWalletConnect() {
             );
           }
         } catch (error) {
-          // The dApp disconnected: there is nobody left to answer or to redirect to.
-          if (isSignatureRequestCancelledError(error)) {
+          // The dApp disconnected: there is nobody left to answer or to redirect to. A
+          // signature completed just before (or despite) the cancellation fails on its reply.
+          if (isSignatureRequestCancelledError(error) || isSessionDeleted()) {
             isCancelled = true;
             return;
           }
@@ -390,7 +417,7 @@ export default function useWalletConnect() {
         }
       })().finally(() => {
         setLoading(false);
-        if (!isCancelled) redirectToDapp(topic);
+        if (!isCancelled && !isSessionDeleted()) redirectToDapp(topic);
         void queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
       });
     },
@@ -409,11 +436,15 @@ export default function useWalletConnect() {
 
   const onSessionDeleted = useCallback(
     ({ topic }: SignClientTypes.EventArguments["session_delete"]) => {
-      // A sign request of the dApp may still wait for the user in Ledger Wallet.
-      void cancelSignatureRequests(client, topic);
+      deletedTopicsRef.current.add(topic);
+      // A sign request of the dApp may still wait for the user in Ledger Wallet. Once it is
+      // cancelled, the queued request of another dApp can be handled.
+      void cancelSignatureRequests(client, topic).finally(() =>
+        resumeSessionRequestQueue(walletKit),
+      );
       void queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
     },
-    [client, queryClient],
+    [client, queryClient, walletKit],
   );
 
   const setOneClickAuthPayload = useSetAtom(oneClickAuthPayloadAtom);

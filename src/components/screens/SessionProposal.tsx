@@ -31,6 +31,10 @@ import VerificationLabel from "../verification/VerificationLabel";
 import { AccountRow } from "./sessionProposal/AccountRow";
 import { ChainRow } from "./sessionProposal/ChainRow";
 import { ErrorMissingRequiredAccount } from "./sessionProposal/ErrorMissingRequiredAccount";
+import {
+  MISSING_REQUIRED_ACCOUNT_PAGE,
+  UNSUPPORTED_BLOCKCHAINS_PAGE,
+} from "./sessionProposal/analyticsPages";
 import LogoHeader from "./sessionProposal/LogoHeader";
 
 const BackButton = styled(Flex)`
@@ -193,6 +197,17 @@ export default function SessionProposal({
     [requiredChains],
   );
 
+  const isBlockchainUnsupported =
+    noChainsSupported || !everyRequiredChainsSupported;
+
+  const onClose = useCallback(() => {
+    handleClose(
+      isBlockchainUnsupported
+        ? UNSUPPORTED_BLOCKCHAINS_PAGE
+        : MISSING_REQUIRED_ACCOUNT_PAGE,
+    );
+  }, [handleClose, isBlockchainUnsupported]);
+
   const everyRequiredChainsSelected = useMemo(
     () =>
       requiredChains.every((entry) =>
@@ -244,9 +259,7 @@ export default function SessionProposal({
       alignItems="center"
       justifyContent="center"
       width="100%"
-      height={
-        noChainsSupported || !everyRequiredChainsSupported ? "100%" : "auto"
-      }
+      height={isBlockchainUnsupported ? "100%" : "auto"}
     >
       <ResponsiveContainer>
         <BackButton onClick={onGoBack} alignSelf="flex-start">
@@ -255,15 +268,14 @@ export default function SessionProposal({
           </Flex>
         </BackButton>
 
-        {noChainsSupported ||
-        !everyRequiredChainsSupported ||
-        requiredChainsWhereNoAccounts.length > 0 ? (
+        {isBlockchainUnsupported || requiredChainsWhereNoAccounts.length > 0 ? (
           <Flex flex={1} flexDirection="column" height="100%">
-            {noChainsSupported || !everyRequiredChainsSupported ? (
+            {isBlockchainUnsupported ? (
               <ErrorBlockchainSupport appName={dApp} chains={accountsByChain} />
             ) : (
               <ErrorMissingRequiredAccount
                 appName={dApp}
+                appUrl={dAppUrl}
                 addNewAccounts={addNewAccounts}
                 iconProposer={iconProposer}
                 chains={accountsByChain}
@@ -271,12 +283,7 @@ export default function SessionProposal({
             )}
 
             <ButtonsContainer>
-              <Button
-                variant="main"
-                size="large"
-                flex={1}
-                onClick={handleClose}
-              >
+              <Button variant="main" size="large" flex={1} onClick={onClose}>
                 <Text variant="body" fontWeight="semiBold" color="neutral.c00">
                   {t("sessionProposal.close")}
                 </Text>

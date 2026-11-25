@@ -35,10 +35,18 @@ function withMeta(args: unknown[], index: number, meta: Meta): unknown[] {
   return callArgs;
 }
 
+/** The error a sign request of a disconnected dApp rejects with. */
+function createSignatureRequestCancelledError(): Error {
+  const error = new Error("The dApp disconnected before the sign request");
+  error.name = SIGNATURE_REQUEST_CANCELLED_ERROR_NAME;
+  return error;
+}
+
 function scopeModule<T extends object>(
   module: T,
   indexes: Readonly<Record<string, number>>,
   meta: Meta,
+  isCancelled: () => boolean,
 ): T {
   return new Proxy(module, {
     get(target, property, receiver) {
@@ -46,19 +54,27 @@ function scopeModule<T extends object>(
       const index =
         typeof property === "string" ? indexes[property] : undefined;
       if (index === undefined || typeof value !== "function") return value;
-      return (...args: unknown[]): unknown =>
-        Reflect.apply(value, target, withMeta(args, index, meta));
+      return (...args: unknown[]): unknown => {
+        // Ledger Wallet only cancels the sign requests already pending: one sent later (after
+        // an async preparation, or the next of a batch) must not open a drawer for a gone dApp.
+        if (isCancelled()) {
+          return Promise.reject(createSignatureRequestCancelledError());
+        }
+        return Reflect.apply(value, target, withMeta(args, index, meta));
+      };
     },
   });
 }
 
 /**
  * The client a WalletConnect session request is handled with: its sign requests carry the
- * session topic, so Ledger Wallet can cancel them when the dApp disconnects.
+ * session topic, so Ledger Wallet can cancel them when the dApp disconnects, and once
+ * `isCancelled` returns true (the session was deleted) they reject without reaching it.
  */
 export function withSignatureRequestGroup(
   client: WalletAPIClient,
   topic: string,
+  isCancelled: () => boolean = () => false,
 ): WalletAPIClient {
   const meta = { [REQUEST_GROUP_META_KEY]: topic };
   return new Proxy(client, {
@@ -67,7 +83,12 @@ export function withSignatureRequestGroup(
       if (!isModule(property) || typeof value !== "object" || value === null) {
         return value;
       }
-      return scopeModule(value, META_ARGUMENT_INDEX[property], meta);
+      return scopeModule(
+        value,
+        META_ARGUMENT_INDEX[property],
+        meta,
+        isCancelled,
+      );
     },
   });
 }
@@ -75,7 +96,9 @@ export function withSignatureRequestGroup(
 /**
  * Cancels the sign requests of a WalletConnect session still pending in Ledger Wallet.
  * Resolves `false` when Ledger Wallet cannot cancel them (an older version, or a manifest
- * without the permission): they then wait for the user as before.
+ * without the permission): the ones already pending then wait for the user as before, while
+ * later ones are not sent at all (see `withSignatureRequestGroup`), since the deleted session
+ * cannot receive their result.
  */
 export async function cancelSignatureRequests(
   client: WalletAPIClient,
