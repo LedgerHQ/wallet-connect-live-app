@@ -1,6 +1,7 @@
 import type { IWalletKit } from "@reown/walletkit";
 import * as Sentry from "@sentry/react";
 import type { ZodError } from "zod";
+import { getDappInfo } from "./dappInfo";
 
 const MAX_ISSUES_IN_CONTEXT = 20;
 
@@ -11,23 +12,6 @@ export type ReportZodErrorParams = {
   chainId: string;
   walletKit: IWalletKit;
 };
-
-function getDappInfo(
-  walletKit: IWalletKit,
-  topic: string,
-): { name?: string; url?: string } {
-  try {
-    const metadata =
-      walletKit.engine.signClient.session.get(topic)?.peer?.metadata;
-    if (!metadata) return {};
-    return {
-      name: metadata.name,
-      url: metadata?.url,
-    };
-  } catch {
-    return {};
-  }
-}
 
 type SerializedIssue = {
   code: string;

@@ -35,9 +35,9 @@ import { WalletKitTypes } from "@reown/walletkit";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { ProposalTypes, SignClientTypes } from "@walletconnect/types";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom, useStore } from "jotai";
 import { enqueueSnackbar } from "notistack";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { ZodError } from "zod";
 import { isWalletRequest } from "../utils/helper.util";
@@ -47,6 +47,7 @@ import { handleEIP155Request } from "./requestHandlers/EIP155";
 import { handleXrpRequest } from "./requestHandlers/Ripple";
 import { handleSolanaRequest } from "./requestHandlers/Solana";
 import { handleSuiRequest } from "./requestHandlers/Sui";
+import { createSignRequestTracking } from "./requestHandlers/signRequestTracker";
 import { handleTezosRequest } from "./requestHandlers/Tezos";
 import { Errors, rejectRequest } from "./requestHandlers/utils";
 import { handleWalletRequest } from "./requestHandlers/Wallet";
@@ -57,6 +58,7 @@ import {
   useQueryFn as usePendingProposalsQueryFn,
 } from "./usePendingProposals";
 import { queryKey as sessionsQueryKey } from "./useSessions";
+import { connectionEntriesAtom } from "@/store/connectionEntry.store";
 
 function useWalletConnectStatus() {
   const core = useAtomValue(coreAtom);
@@ -216,6 +218,18 @@ export default function useWalletConnect() {
     [setShowModal, walletKit.engine.signClient.session],
   );
 
+  const store = useStore();
+  const signRequestTracking = useMemo(
+    () =>
+      createSignRequestTracking(
+        walletKit,
+        (eventName, eventProperties) =>
+          trackRef.current(eventName, eventProperties),
+        (pairingTopic) => store.get(connectionEntriesAtom)[pairingTopic],
+      ),
+    [walletKit, store],
+  );
+
   const setLoading = useSetAtom(loadingAtom);
   const onSessionRequest = useCallback(
     (requestEvent: SignClientTypes.EventArguments["session_request"]) => {
@@ -224,6 +238,14 @@ export default function useWalletConnect() {
         params: { request, chainId },
         id,
       } = requestEvent;
+
+      const tracker = signRequestTracking.start({
+        topic,
+        id,
+        chainId,
+        method: request.method,
+      });
+      const observedWalletKit = tracker.walletKit;
 
       void (async () => {
         try {
@@ -235,7 +257,7 @@ export default function useWalletConnect() {
               chainId,
               accounts.data,
               client,
-              walletKit,
+              observedWalletKit,
               queryClient,
               walletInfo,
               walletCapabilities,
@@ -248,7 +270,7 @@ export default function useWalletConnect() {
               chainId,
               accounts.data,
               client,
-              walletKit,
+              observedWalletKit,
             );
           } else if (isBIP122Chain(chainId, request)) {
             const session = walletKit.engine.signClient.session.get(topic);
@@ -260,7 +282,7 @@ export default function useWalletConnect() {
             await handleBIP122Request(request, topic, id, chainId, {
               accounts: accounts.data,
               client,
-              walletkit: walletKit,
+              walletkit: observedWalletKit,
               walletCapabilities,
               walletInfo,
               sessionAddress,
@@ -276,7 +298,7 @@ export default function useWalletConnect() {
               chainId,
               accounts.data,
               client,
-              walletKit,
+              observedWalletKit,
             );
           } else if (
             isSolanaChain(chainId, request) &&
@@ -289,7 +311,7 @@ export default function useWalletConnect() {
               chainId,
               accounts.data,
               client,
-              walletKit,
+              observedWalletKit,
             );
           } else if (
             isTezosChain(chainId, request) &&
@@ -310,7 +332,7 @@ export default function useWalletConnect() {
                 sessionTezosAddresses.has(account.address),
               ),
               client,
-              walletKit,
+              observedWalletKit,
             );
           } else if (
             isCosmosChain(chainId, request) &&
@@ -331,7 +353,7 @@ export default function useWalletConnect() {
                 sessionCosmosAddresses.has(account.address),
               ),
               client,
-              walletKit,
+              observedWalletKit,
             );
           } else if (
             isSuiChain(chainId, request) &&
@@ -352,12 +374,12 @@ export default function useWalletConnect() {
                 sessionSuiAddresses.has(account.address),
               ),
               client,
-              walletKit,
+              observedWalletKit,
             );
           } else {
             console.error("Not Supported Chain");
             await rejectRequest(
-              walletKit,
+              observedWalletKit,
               topic,
               id,
               Errors.unsupportedChains,
@@ -379,6 +401,7 @@ export default function useWalletConnect() {
             error instanceof ZodError
               ? t("error.zodRequestBlocked")
               : getErrorMessage(error);
+          tracker.setError(error);
 
           enqueueSnackbar(message, {
             errorType: "Session request error",
@@ -389,7 +412,7 @@ export default function useWalletConnect() {
             },
           });
 
-          await rejectRequest(walletKit, topic, id, Errors.txDeclined);
+          await rejectRequest(observedWalletKit, topic, id, Errors.txDeclined);
         }
       })().finally(() => {
         setLoading(false);
@@ -407,7 +430,15 @@ export default function useWalletConnect() {
       t,
       setLoading,
       redirectToDapp,
+      signRequestTracking,
     ],
+  );
+
+  const onSessionRequestExpire = useCallback(
+    ({ id }: WalletKitTypes.SessionRequestExpire) => {
+      signRequestTracking.expire(id);
+    },
+    [signRequestTracking],
   );
 
   const onSessionDeleted = useCallback(() => {
@@ -434,13 +465,11 @@ export default function useWalletConnect() {
 
   useEffect(() => {
     console.log("walletKit setup listeners");
-    // TODO: handle session_request_expire
-    // walletKit.on("session_request_expire", );
-
     // sign
     walletKit.on("proposal_expire", onProposalExpire);
     walletKit.on("session_proposal", onSessionProposal);
     walletKit.on("session_request", onSessionRequest);
+    walletKit.on("session_request_expire", onSessionRequestExpire);
     walletKit.on("session_delete", onSessionDeleted);
     walletKit.on("session_authenticate", onSessionAuthenticate);
 
@@ -452,6 +481,7 @@ export default function useWalletConnect() {
       walletKit.off("proposal_expire", onProposalExpire);
       walletKit.off("session_proposal", onSessionProposal);
       walletKit.off("session_request", onSessionRequest);
+      walletKit.off("session_request_expire", onSessionRequestExpire);
       walletKit.off("session_delete", onSessionDeleted);
       walletKit.off("session_authenticate", onSessionAuthenticate);
 
@@ -462,6 +492,7 @@ export default function useWalletConnect() {
     walletKit,
     onSessionProposal,
     onSessionRequest,
+    onSessionRequestExpire,
     onSessionDeleted,
     onProposalExpire,
     onSessionAuthenticate,

@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { Input, Button, Text, Flex, InfiniteLoader } from "@ledgerhq/react-ui";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import {
   ArrowLeftMedium,
   PasteMedium,
@@ -64,6 +64,7 @@ export function Connect({ mode }: Props) {
   const [scanner, setScanner] = useState(mode === "scan");
   const analytics = useAnalytics();
   const [connecting, setConnecting] = useState(false);
+  const lastScannedUriRef = useRef<string | undefined>(undefined);
 
   const { onConnect } = useConnect(navigate);
 
@@ -73,7 +74,7 @@ export function Connect({ mode }: Props) {
       setInputValue("");
 
       setConnecting(true);
-      void onConnect(uri).finally(() => {
+      void onConnect(uri, "paste").finally(() => {
         setConnecting(false);
       });
       analytics.track("button_clicked", {
@@ -112,7 +113,14 @@ export function Connect({ mode }: Props) {
         switch (url.protocol) {
           // handle usual wallet connect URIs
           case "wc:": {
-            void onConnect(url);
+            const scannedUri = url.toString();
+            if (scannedUri === lastScannedUriRef.current) break;
+            lastScannedUriRef.current = scannedUri;
+            analytics.track("button_clicked", {
+              button: "WC-Scan QR Code Success",
+              page: "Connect",
+            });
+            void onConnect(url, "scan");
             break;
           }
 
@@ -134,7 +142,7 @@ export function Connect({ mode }: Props) {
         throw error;
       }
     },
-    [onConnect],
+    [analytics, onConnect],
   );
 
   const navigateToHome = useCallback(() => {

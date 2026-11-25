@@ -1,17 +1,46 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Connect } from "@/components/screens/Connect";
-import { renderWithRouter, screen } from "@/tests/test.utils";
+import { act, renderWithRouter, screen } from "@/tests/test.utils";
 import userEvent from "@testing-library/user-event";
 
-const { trackMock } = vi.hoisted(() => ({ trackMock: vi.fn() }));
+const { mockTrack, mockOnConnect, scanner } = vi.hoisted(() => ({
+  mockTrack: vi.fn(),
+  mockOnConnect: vi.fn(),
+  scanner: { onQRScan: undefined as ((data: string) => void) | undefined },
+}));
 
 vi.mock("@/hooks/useAnalytics", () => ({
-  default: () => ({ page: vi.fn(), track: trackMock }),
+  default: () => ({ page: vi.fn(), track: mockTrack }),
 }));
+
+vi.mock("@/hooks/useConnect", () => ({
+  useConnect: () => ({ onConnect: mockOnConnect }),
+}));
+
+vi.mock("@/components/QRScanner", () => ({
+  QRScanner: ({ onQRScan }: { onQRScan: (data: string) => void }) => {
+    scanner.onQRScan = onQRScan;
+    return (
+      <input
+        data-testid="qr-scanner"
+        onChange={(e) => onQRScan(e.target.value)}
+      />
+    );
+  },
+}));
+
+const wcUri =
+  "wc:7f6e504bfad60b485450578e05678ed3e8e8c4751d3c6160be17160d63ec90f9@2?relay-protocol=irn&symKey=587d5484ce2a2a6ee3ba1962fdd7e8588e06200c46823bd18fbd67def96ad303";
+
+const scanSuccessEvent = {
+  button: "WC-Scan QR Code Success",
+  page: "Connect",
+};
 
 describe("Connect Screen", () => {
   beforeEach(() => {
-    trackMock.mockClear();
+    vi.clearAllMocks();
+    mockOnConnect.mockResolvedValue(undefined);
   });
 
   it("Page should appears", async () => {
@@ -54,8 +83,8 @@ describe("Connect Screen", () => {
     await user.type(input, "https://jestjs.io/docs/jest-object");
     await user.click(await screen.findByTestId("connect-button"));
 
-    expect(trackMock).toHaveBeenCalledTimes(1);
-    expect(trackMock).toHaveBeenCalledWith("button_clicked", {
+    expect(mockTrack).toHaveBeenCalledTimes(1);
+    expect(mockTrack).toHaveBeenCalledWith("button_clicked", {
       button: "WC-Connect URI",
       page: "Connect",
     });
@@ -69,7 +98,8 @@ describe("Connect Screen", () => {
     await user.click(await screen.findByTestId("connect-button"));
 
     expect(await screen.findByText("error.invalidUri")).toBeInTheDocument();
-    expect(trackMock).not.toHaveBeenCalled();
+    expect(mockTrack).not.toHaveBeenCalled();
+    expect(mockOnConnect).not.toHaveBeenCalled();
   });
 
   it("tracks the WC-Back button on the Connect page when going back", async () => {
@@ -79,10 +109,108 @@ describe("Connect Screen", () => {
     const backButton = title.previousElementSibling as HTMLElement;
     await user.click(backButton);
 
-    expect(trackMock).toHaveBeenCalledTimes(1);
-    expect(trackMock).toHaveBeenCalledWith("button_clicked", {
+    expect(mockTrack).toHaveBeenCalledTimes(1);
+    expect(mockTrack).toHaveBeenCalledWith("button_clicked", {
       button: "WC-Back",
       page: "Connect",
+    });
+  });
+
+  it("connects with the paste entry when the uri is submitted", async () => {
+    await renderWithRouter(() => <Connect />, "/connect");
+    const user = userEvent.setup();
+    await user.type(await screen.findByTestId("input-uri"), wcUri);
+
+    await user.click(await screen.findByTestId("connect-button"));
+
+    expect(mockOnConnect).toHaveBeenCalledWith(new URL(wcUri), "paste");
+    expect(mockTrack).toHaveBeenCalledWith("button_clicked", {
+      button: "WC-Connect URI",
+      page: "Connect",
+    });
+    expect(mockTrack).not.toHaveBeenCalledWith(
+      "button_clicked",
+      scanSuccessEvent,
+    );
+  });
+
+  describe("QR code scan", () => {
+    const scan = async (data: string) => {
+      await renderWithRouter(() => <Connect mode="scan" />, "/connect");
+      const user = userEvent.setup();
+      const scanner = await screen.findByTestId("qr-scanner");
+      await user.click(scanner);
+      await user.paste(data);
+    };
+
+    it.each([
+      ["a WalletConnect uri", wcUri],
+      [
+        "a Ledger Wallet wrapped uri",
+        `ledgerlive:////wc?uri=${encodeURIComponent(wcUri)}`,
+      ],
+    ])(
+      "tracks the scan success and connects with the scan entry for %s",
+      async (_, data) => {
+        await scan(data);
+
+        expect(mockTrack).toHaveBeenCalledWith(
+          "button_clicked",
+          scanSuccessEvent,
+        );
+        expect(mockOnConnect).toHaveBeenCalledWith(new URL(wcUri), "scan");
+      },
+    );
+
+    it("handles a QR code only once while it stays in front of the camera", async () => {
+      await renderWithRouter(() => <Connect mode="scan" />, "/connect");
+      await screen.findByTestId("qr-scanner");
+
+      act(() => {
+        scanner.onQRScan?.(wcUri);
+        scanner.onQRScan?.(wcUri);
+        scanner.onQRScan?.(wcUri);
+      });
+
+      expect(mockOnConnect).toHaveBeenCalledTimes(1);
+      expect(
+        mockTrack.mock.calls.filter(
+          ([, properties]) =>
+            JSON.stringify(properties) === JSON.stringify(scanSuccessEvent),
+        ),
+      ).toHaveLength(1);
+    });
+
+    it("handles another QR code scanned after the first one", async () => {
+      const otherWcUri = wcUri.replace("7f6e504b", "0a1b2c3d");
+      await renderWithRouter(() => <Connect mode="scan" />, "/connect");
+      await screen.findByTestId("qr-scanner");
+
+      act(() => {
+        scanner.onQRScan?.(wcUri);
+        scanner.onQRScan?.(otherWcUri);
+      });
+
+      expect(mockOnConnect).toHaveBeenNthCalledWith(1, new URL(wcUri), "scan");
+      expect(mockOnConnect).toHaveBeenNthCalledWith(
+        2,
+        new URL(otherWcUri),
+        "scan",
+      );
+    });
+
+    it.each([
+      ["an invalid url", "not a url"],
+      ["an unsupported protocol", "https://example.com"],
+      ["a Ledger Wallet uri without uri param", "ledgerlive:////wc"],
+    ])("ignores %s", async (_, data) => {
+      await scan(data);
+
+      expect(mockTrack).not.toHaveBeenCalledWith(
+        "button_clicked",
+        scanSuccessEvent,
+      );
+      expect(mockOnConnect).not.toHaveBeenCalled();
     });
   });
 });

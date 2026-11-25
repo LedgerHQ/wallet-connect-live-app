@@ -15,6 +15,7 @@ import {
   buildAuthObject,
   populateAuthPayload,
 } from "@walletconnect/utils";
+import { connectionEntriesAtom } from "@/store/connectionEntry.store";
 
 vi.mock("@/store/walletKit.store", async () => {
   const { atom } = await import("jotai");
@@ -486,7 +487,32 @@ describe("useProposal", () => {
     const dappProperties = {
       dapp: "React App",
       url: "https://react-app.walletconnect.com",
+      entry: "unknown",
+      flow_id: sessionProposal.pairingTopic,
     };
+
+    beforeEach(() => {
+      localStorage.clear();
+    });
+
+    it("tracks the entry recorded for the pairing topic of the proposal", async () => {
+      store.set(connectionEntriesAtom, {
+        [sessionProposal.pairingTopic]: "deeplink",
+      });
+      const { result } = renderHook(() => useProposal(sessionProposal), {
+        wrapper: createHookWrapper(store),
+      });
+
+      await act(async () => {
+        await result.current.approveSession();
+      });
+
+      expect(analyticsTrackMock).toHaveBeenCalledWith("session_established", {
+        ...dappProperties,
+        entry: "deeplink",
+        session_topic: "topic-1",
+      });
+    });
 
     const oneClickAuthPayload = {
       id: 42,

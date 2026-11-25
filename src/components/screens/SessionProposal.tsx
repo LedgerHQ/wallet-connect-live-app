@@ -3,6 +3,7 @@ import { AddAccountPlaceholder } from "@/components/screens/sessionProposal/AddA
 import { ErrorBlockchainSupport } from "@/components/screens/sessionProposal/ErrorBlockchainSupport";
 import { InfoSessionProposal } from "@/components/screens/sessionProposal/InfoSessionProposal";
 import useAnalytics from "@/hooks/useAnalytics";
+import { useFlowProperties } from "@/hooks/useFlowProperties";
 import { useProposal } from "@/hooks/useProposal/useProposal";
 import {
   formatAccountsByChain,
@@ -77,6 +78,7 @@ export default function SessionProposal({
   const walletCapabilites = useAtomValue(walletCapabilitiesAtom);
   const [approving, setApproving] = useState(false);
   const [rejecting, setRejecting] = useState(false);
+  const flowProperties = useFlowProperties(proposal.pairingTopic);
 
   const verificationStatus = useVerification(
     proposal,
@@ -93,6 +95,7 @@ export default function SessionProposal({
       dapp: dApp,
       url: dAppUrl,
       network: requestedChains,
+      ...flowProperties,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -121,6 +124,7 @@ export default function SessionProposal({
       dapp: dApp,
       url: dAppUrl,
       network: getTrackedApprovedChains(),
+      ...flowProperties,
     });
     setApproving(true);
     if (isOneClickAuth) {
@@ -139,6 +143,7 @@ export default function SessionProposal({
     dApp,
     dAppUrl,
     getTrackedApprovedChains,
+    flowProperties,
     isOneClickAuth,
     verificationStatus,
   ]);
@@ -150,6 +155,7 @@ export default function SessionProposal({
       dapp: dApp,
       url: dAppUrl,
       network: requestedChains,
+      ...flowProperties,
     });
     setRejecting(true);
     if (isOneClickAuth) {
@@ -165,6 +171,7 @@ export default function SessionProposal({
     analytics,
     dApp,
     dAppUrl,
+    flowProperties,
     isOneClickAuth,
     rejectSession,
     rejectSessionAuthenticate,
