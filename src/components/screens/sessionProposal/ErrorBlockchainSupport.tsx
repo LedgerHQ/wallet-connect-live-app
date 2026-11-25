@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import useAnalytics from "@/hooks/useAnalytics";
 import styled from "styled-components";
 import { SUPPORTED_NETWORK_NAMES } from "@/data/network.config";
+import { UNSUPPORTED_BLOCKCHAINS_PAGE } from "./analyticsPages";
 
 const LogoContainer = styled(Flex)`
   border-radius: 50%;
@@ -31,7 +32,7 @@ export function ErrorBlockchainSupport({ appName, chains }: Props) {
   const analytics = useAnalytics();
 
   useEffect(() => {
-    analytics.page("Wallet Connect Error Unsupported Blockchains", {
+    analytics.page(UNSUPPORTED_BLOCKCHAINS_PAGE, {
       dapp: appName,
       chains: chains.map((chain) => ({
         chain: chain.chain,
