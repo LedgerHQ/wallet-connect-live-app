@@ -30,6 +30,7 @@ import {
 } from "../useSessions";
 import { useSupportedNamespaces } from "../useSupportedNamespaces";
 import { dedupeChains, getNamespacesChains } from "./util";
+import { useFlowProperties } from "@/hooks/useFlowProperties";
 
 export function useProposal(
   proposal: ProposalTypes.Struct,
@@ -94,12 +95,18 @@ export function useProposal(
     }
   }, [setShowModal, url]);
 
+  const flowProperties = useFlowProperties(proposal.pairingTopic);
   const dappProperties = useMemo(
     () => ({
       dapp: proposal.proposer.metadata.name,
       url: proposal.proposer.metadata.url,
+      ...flowProperties,
     }),
-    [proposal.proposer.metadata.name, proposal.proposer.metadata.url],
+    [
+      proposal.proposer.metadata.name,
+      proposal.proposer.metadata.url,
+      flowProperties,
+    ],
   );
 
   const trackSessionEstablished = useCallback(

@@ -65,7 +65,7 @@ export const rejectRequest = (
 };
 
 const CANCELED_ERROR_MESSAGES = ["User cancelled", "Canceled by user"];
-const CANCELED_ERROR_NAMES = ["UserRefusedOnDevice"];
+export const CANCELED_ERROR_NAMES = ["UserRefusedOnDevice"];
 
 export const isCanceledError = (error: unknown) => {
   return (

@@ -3,6 +3,12 @@ import { render, screen } from "@/tests/test.utils";
 import sessionProposal from "@/data/mocks/sessionProposal.example.json";
 import { ProposalTypes } from "@walletconnect/types";
 import SessionProposal from "@/components/screens/SessionProposal";
+import {
+  ConnectionEntry,
+  connectionEntriesAtom,
+  TrackedConnectionEntry,
+} from "@/store/connectionEntry.store";
+import { createStore, Provider } from "jotai";
 
 const SOLANA_MAINNET = "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp";
 
@@ -25,9 +31,9 @@ vi.mock("@/hooks/useProposal/useProposal", () => ({
     handleClick: vi.fn(),
     handleClose: vi.fn(),
     approveSession: mocks.approveSession,
-    approveSessionAuthenticate: vi.fn(),
+    approveSessionAuthenticate: vi.fn().mockResolvedValue(undefined),
     rejectSession: mocks.rejectSession,
-    rejectSessionAuthenticate: vi.fn(),
+    rejectSessionAuthenticate: vi.fn().mockResolvedValue(undefined),
     accounts: [],
     selectedAccounts: ["eth-1"],
     addNewAccounts: vi.fn(),
@@ -93,29 +99,47 @@ const requestedChains = [
   SOLANA_MAINNET,
 ];
 
-const dapp = sessionProposal.proposer.metadata.name;
-const url = sessionProposal.proposer.metadata.url;
+const approvedChains = ["eip155:1", "eip155:137"];
+
+const flowId = proposal.pairingTopic;
+const dapp = proposal.proposer.metadata.name;
+const url = proposal.proposer.metadata.url;
+
+const renderProposal = (entry?: ConnectionEntry) => {
+  const store = createStore();
+  if (entry) {
+    store.set(connectionEntriesAtom, { [flowId]: entry });
+  }
+  return render(
+    <Provider store={store}>
+      <SessionProposal proposal={proposal} />
+    </Provider>,
+  );
+};
 
 describe("SessionProposal analytics", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    localStorage.clear();
     mocks.approveSession.mockResolvedValue(undefined);
     mocks.rejectSession.mockResolvedValue(undefined);
-    mocks.getApprovedChains.mockReturnValue(["eip155:1", "eip155:137"]);
+    mocks.getApprovedChains.mockReturnValue(approvedChains);
   });
 
   it("sends the requested networks with the page view", () => {
-    render(<SessionProposal proposal={proposal} />);
+    renderProposal();
 
     expect(mocks.page).toHaveBeenCalledWith("Wallet Connect Session Request", {
       dapp,
       url,
       network: requestedChains,
+      entry: "unknown",
+      flow_id: flowId,
     });
   });
 
   it("sends the approved networks when connecting", async () => {
-    const { user } = render(<SessionProposal proposal={proposal} />);
+    const { user } = renderProposal();
 
     await user.click(
       screen.getByRole("button", { name: /sessionProposal.connect/i }),
@@ -126,7 +150,9 @@ describe("SessionProposal analytics", () => {
       page: "Wallet Connect Session Request",
       dapp,
       url,
-      network: ["eip155:1", "eip155:137"],
+      network: approvedChains,
+      entry: "unknown",
+      flow_id: flowId,
     });
     expect(mocks.approveSession).toHaveBeenCalled();
   });
@@ -135,7 +161,7 @@ describe("SessionProposal analytics", () => {
     mocks.getApprovedChains.mockImplementation(() => {
       throw new Error("approved chains failure");
     });
-    const { user } = render(<SessionProposal proposal={proposal} />);
+    const { user } = renderProposal();
 
     await user.click(
       screen.getByRole("button", { name: /sessionProposal.connect/i }),
@@ -147,12 +173,14 @@ describe("SessionProposal analytics", () => {
       dapp,
       url,
       network: [],
+      entry: "unknown",
+      flow_id: flowId,
     });
     expect(mocks.approveSession).toHaveBeenCalled();
   });
 
   it("sends the requested networks when rejecting", async () => {
-    const { user } = render(<SessionProposal proposal={proposal} />);
+    const { user } = renderProposal();
 
     await user.click(
       screen.getByRole("button", { name: /sessionProposal.reject/i }),
@@ -164,7 +192,68 @@ describe("SessionProposal analytics", () => {
       dapp,
       url,
       network: requestedChains,
+      entry: "unknown",
+      flow_id: flowId,
     });
     expect(mocks.rejectSession).toHaveBeenCalled();
+  });
+
+  describe.each<[ConnectionEntry | undefined, TrackedConnectionEntry]>([
+    ["scan", "scan"],
+    ["paste", "paste"],
+    ["deeplink", "deeplink"],
+    [undefined, "unknown"],
+  ])("when the recorded entry is %s", (recordedEntry, entry) => {
+    it(`tracks the page view with the ${entry} entry and the flow id`, () => {
+      renderProposal(recordedEntry);
+
+      expect(mocks.page).toHaveBeenCalledWith(
+        "Wallet Connect Session Request",
+        {
+          dapp,
+          url,
+          network: requestedChains,
+          entry,
+          flow_id: flowId,
+        },
+      );
+    });
+
+    it.each([
+      ["WC-Connect", /sessionProposal.connect/i, approvedChains],
+      ["WC-Reject", /sessionProposal.reject/i, requestedChains],
+    ])(
+      `tracks %s with the ${entry} entry and the flow id`,
+      async (button, name, network) => {
+        const { user } = renderProposal(recordedEntry);
+
+        await user.click(screen.getByRole("button", { name }));
+
+        expect(mocks.track).toHaveBeenCalledWith("button_clicked", {
+          button,
+          page: "Wallet Connect Session Request",
+          dapp,
+          url,
+          network,
+          entry,
+          flow_id: flowId,
+        });
+      },
+    );
+  });
+
+  it("uses the entry of its own pairing topic", () => {
+    const store = createStore();
+    store.set(connectionEntriesAtom, { "another-topic": "scan" });
+    render(
+      <Provider store={store}>
+        <SessionProposal proposal={proposal} />
+      </Provider>,
+    );
+
+    expect(mocks.page).toHaveBeenCalledWith(
+      "Wallet Connect Session Request",
+      expect.objectContaining({ entry: "unknown", flow_id: flowId }),
+    );
   });
 });

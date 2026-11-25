@@ -62,7 +62,7 @@ export function WalletConnectInit({
         // The deep-link for requests is not containing requestId and/or sessionTopic
         // Like we usually see when connecting from the JS lib on the browser
         if (uri.pathname) {
-          void onConnect(uri).finally(() => {
+          void onConnect(uri, "deeplink").finally(() => {
             setLoading(false);
           });
         } else {

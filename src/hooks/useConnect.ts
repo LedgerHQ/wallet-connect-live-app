@@ -1,7 +1,12 @@
+import {
+  ConnectionEntry,
+  recordConnectionEntryAtom,
+} from "@/store/connectionEntry.store";
 import { coreAtom } from "@/store/walletKit.store";
 import { getErrorMessage } from "@/utils/helper.util";
 import { UseNavigateResult } from "@tanstack/react-router";
-import { useAtomValue } from "jotai";
+import { parseUri } from "@walletconnect/utils";
+import { useAtomValue, useSetAtom } from "jotai";
 import { enqueueSnackbar } from "notistack";
 import { useCallback, useMemo } from "react";
 
@@ -9,15 +14,23 @@ export function useConnect(
   navigate: UseNavigateResult<"/"> | UseNavigateResult<"/connect">,
 ) {
   const core = useAtomValue(coreAtom);
+  const recordConnectionEntry = useSetAtom(recordConnectionEntryAtom);
 
   const startProposal = useCallback(
-    (uri: string) => {
+    (uri: string, entry: ConnectionEntry) => {
       try {
         const url = new URL(uri);
 
         switch (url.protocol) {
           // handle usual wallet connect URIs
           case "wc:": {
+            recordConnectionEntry({
+              pairingTopic: parseUri(uri).topic,
+              entry,
+              activeTopics: core.pairing
+                .getPairings()
+                .map((pairing) => pairing.topic),
+            });
             return core.pairing.pair({ uri });
           }
 
@@ -26,7 +39,7 @@ export function useConnect(
             const uriParam = url.searchParams.get("uri");
 
             if (url.pathname === "//wc" && uriParam) {
-              return startProposal(uriParam);
+              return startProposal(uriParam, entry);
             }
             break;
           }
@@ -39,11 +52,11 @@ export function useConnect(
         throw error;
       }
     },
-    [core],
+    [core, recordConnectionEntry],
   );
 
   const onConnect = useCallback(
-    async (inputValue: URL) => {
+    async (inputValue: URL, entry: ConnectionEntry) => {
       const uri = inputValue.toString();
       if (uri.includes("@1")) {
         await navigate({
@@ -54,7 +67,7 @@ export function useConnect(
         });
       } else {
         try {
-          await startProposal(uri);
+          await startProposal(uri, entry);
         } catch (error: unknown) {
           enqueueSnackbar(getErrorMessage(error), {
             errorType: "Connection error",
