@@ -41,6 +41,11 @@ import { useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ZodError } from "zod";
 import { isWalletRequest } from "../utils/helper.util";
+import {
+  cancelSignatureRequests,
+  isSignatureRequestCancelledError,
+  withSignatureRequestGroup,
+} from "../utils/signatureRequestGroup";
 import { handleBIP122Request } from "./requestHandlers/BIP122";
 import { handleCosmosRequest } from "./requestHandlers/Cosmos";
 import { handleEIP155Request } from "./requestHandlers/EIP155";
@@ -207,6 +212,10 @@ export default function useWalletConnect() {
         id,
       } = requestEvent;
 
+      // Ledger Wallet cancels the sign requests of this session if the dApp disconnects.
+      const requestClient = withSignatureRequestGroup(client, topic);
+      let isCancelled = false;
+
       void (async () => {
         try {
           if (isWalletRequest(request)) {
@@ -216,7 +225,7 @@ export default function useWalletConnect() {
               id,
               chainId,
               accounts.data,
-              client,
+              requestClient,
               walletKit,
               queryClient,
               walletInfo,
@@ -229,32 +238,24 @@ export default function useWalletConnect() {
               id,
               chainId,
               accounts.data,
-              client,
+              requestClient,
               walletKit,
             );
           } else if (isBIP122Chain(chainId, request)) {
-            const session =
-              walletKit.engine.signClient.session.get(topic);
-            const bip122Accounts =
-              session?.namespaces.bip122?.accounts ?? [];
+            const session = walletKit.engine.signClient.session.get(topic);
+            const bip122Accounts = session?.namespaces.bip122?.accounts ?? [];
             const sessionAddress = bip122Accounts
               .find((a) => a.startsWith(chainId + ":"))
               ?.split(":")[2];
 
-            await handleBIP122Request(
-              request,
-              topic,
-              id,
-              chainId,
-              {
-                accounts: accounts.data,
-                client,
-                walletkit: walletKit,
-                walletCapabilities,
-                walletInfo,
-                sessionAddress,
-              },
-            );
+            await handleBIP122Request(request, topic, id, chainId, {
+              accounts: accounts.data,
+              client: requestClient,
+              walletkit: walletKit,
+              walletCapabilities,
+              walletInfo,
+              sessionAddress,
+            });
           } else if (
             isRippleChain(chainId, request) &&
             isXRPLSupportEnabled(walletCapabilities)
@@ -265,7 +266,7 @@ export default function useWalletConnect() {
               id,
               chainId,
               accounts.data,
-              client,
+              requestClient,
               walletKit,
             );
           } else if (
@@ -278,7 +279,7 @@ export default function useWalletConnect() {
               id,
               chainId,
               accounts.data,
-              client,
+              requestClient,
               walletKit,
             );
           } else if (
@@ -299,7 +300,7 @@ export default function useWalletConnect() {
               accounts.data.filter((account) =>
                 sessionTezosAddresses.has(account.address),
               ),
-              client,
+              requestClient,
               walletKit,
             );
           } else if (
@@ -320,7 +321,7 @@ export default function useWalletConnect() {
               accounts.data.filter((account) =>
                 sessionCosmosAddresses.has(account.address),
               ),
-              client,
+              requestClient,
               walletKit,
             );
           } else if (
@@ -341,7 +342,7 @@ export default function useWalletConnect() {
               accounts.data.filter((account) =>
                 sessionSuiAddresses.has(account.address),
               ),
-              client,
+              requestClient,
               walletKit,
             );
           } else {
@@ -355,6 +356,12 @@ export default function useWalletConnect() {
             );
           }
         } catch (error) {
+          // The dApp disconnected: there is nobody left to answer or to redirect to.
+          if (isSignatureRequestCancelledError(error)) {
+            isCancelled = true;
+            return;
+          }
+
           if (error instanceof ZodError) {
             reportZodError({
               error,
@@ -383,7 +390,7 @@ export default function useWalletConnect() {
         }
       })().finally(() => {
         setLoading(false);
-        redirectToDapp(topic);
+        if (!isCancelled) redirectToDapp(topic);
         void queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
       });
     },
@@ -400,9 +407,14 @@ export default function useWalletConnect() {
     ],
   );
 
-  const onSessionDeleted = useCallback(() => {
-    void queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
-  }, [queryClient]);
+  const onSessionDeleted = useCallback(
+    ({ topic }: SignClientTypes.EventArguments["session_delete"]) => {
+      // A sign request of the dApp may still wait for the user in Ledger Wallet.
+      void cancelSignatureRequests(client, topic);
+      void queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
+    },
+    [client, queryClient],
+  );
 
   const setOneClickAuthPayload = useSetAtom(oneClickAuthPayloadAtom);
   const onSessionAuthenticate = useCallback(
