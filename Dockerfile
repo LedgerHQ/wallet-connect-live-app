@@ -32,8 +32,9 @@ RUN --mount=type=secret,id=sentry_auth_token,required=false \
 # nginx-unprivileged runs as non-root (uid 101) and listens on 8080. Pinned by
 # digest so rebuilds are reproducible. When bumping, take the digest of the
 # multi-arch index for the tag below and update this comment with it.
-# Tag: nginxinc/nginx-unprivileged:1.31.7-alpine
-FROM jfrog.ledgerlabs.net/ossproxy-oci-proxy-dockerio/nginxinc/nginx-unprivileged@sha256:b5047b9b76845eac124358373c6852377c52e4b05834a47647e955dd91cb8f1e
+# The image moved from nginxinc/ (no longer maintained, stuck at 1.31.7) to nginx/.
+# Tag: nginx/nginx-unprivileged:1.31.10-alpine
+FROM jfrog.ledgerlabs.net/ossproxy-oci-proxy-dockerio/nginx/nginx-unprivileged@sha256:86628f2c9eaa5e84e3b98d25e26563c4a4f9b0ead9cf5656da4731d86e0621de
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist /usr/share/nginx/html
