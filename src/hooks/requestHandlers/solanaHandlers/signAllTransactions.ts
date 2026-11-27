@@ -4,6 +4,7 @@ import {
   SOLANA_SIGNING_METHODS,
   solanaSignAllTransactionsSchema,
 } from "@/data/methods/Solana.methods";
+import { reportSessionError } from "@/hooks/requestHandlers/analytics/sessionErrorReporter";
 import {
   acceptRequest,
   Errors,
@@ -45,6 +46,7 @@ export async function signAllTransactions(
       signatures.push(signature.toString("base64"));
     } catch (error) {
       if (isCanceledError(error)) {
+        reportSessionError(walletKit, error);
         await rejectRequest(walletKit, topic, id, Errors.userDecline);
         return;
       } else {

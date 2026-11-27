@@ -4,6 +4,11 @@ import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import type { IWalletKit } from "@reown/walletkit";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { signTypedData } from "./signTypedData";
+import { reportSessionError } from "@/hooks/requestHandlers/analytics/sessionErrorReporter";
+
+vi.mock("@/hooks/requestHandlers/analytics/sessionErrorReporter", () => ({
+  reportSessionError: vi.fn(),
+}));
 
 vi.mock("@/hooks/requestHandlers/utils", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/hooks/requestHandlers/utils")>()),
@@ -53,10 +58,7 @@ describe("Testing sign typed data on EIP155", () => {
     );
 
     expect(sign).toHaveBeenCalledTimes(1);
-    expect(sign).toHaveBeenCalledWith(
-      account.id,
-      Buffer.from(message),
-    );
+    expect(sign).toHaveBeenCalledWith(account.id, Buffer.from(message));
     expect(utils.acceptRequest).toHaveBeenCalledTimes(1);
     expect(utils.acceptRequest).toHaveBeenCalledWith(
       walletKit,
@@ -128,6 +130,11 @@ describe("Testing sign typed data on EIP155", () => {
       topic,
       id,
       utils.Errors.msgDecline,
+    );
+    expect(reportSessionError).toHaveBeenCalledTimes(1);
+    expect(reportSessionError).toHaveBeenCalledWith(
+      walletKit,
+      expect.objectContaining({ message: "Canceled by user" }),
     );
   });
 });

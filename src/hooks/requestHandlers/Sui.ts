@@ -10,6 +10,7 @@ import { getAccountWithAddressAndChainId } from "@/utils/generic";
 import { decodeSignedSuiTransaction } from "@/utils/sui";
 import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import type { IWalletKit } from "@reown/walletkit";
+import { reportSessionError } from "./analytics/sessionErrorReporter";
 import { acceptRequest, Errors, isCanceledError, rejectRequest } from "./utils";
 
 const LEDGER_LIVE_CURRENCIES = ["sui", "sui_testnet"];
@@ -78,6 +79,7 @@ async function signTransaction(
     await acceptRequest(walletKit, topic, id, result);
   } catch (error) {
     if (isCanceledError(error)) {
+      reportSessionError(walletKit, error);
       await rejectRequest(walletKit, topic, id, Errors.txDeclined);
     } else {
       throw error;
@@ -127,6 +129,7 @@ async function signAndExecuteTransaction(
     await acceptRequest(walletKit, topic, id, result);
   } catch (error) {
     if (isCanceledError(error)) {
+      reportSessionError(walletKit, error);
       await rejectRequest(walletKit, topic, id, Errors.txDeclined);
     } else {
       throw error;

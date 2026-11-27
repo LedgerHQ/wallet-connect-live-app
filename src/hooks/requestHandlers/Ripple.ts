@@ -7,6 +7,7 @@ import {
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
 import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import type { IWalletKit } from "@reown/walletkit";
+import { reportSessionError } from "./analytics/sessionErrorReporter";
 import { decode, encode } from "ripple-binary-codec";
 import { acceptRequest, Errors, isCanceledError, rejectRequest } from "./utils";
 
@@ -52,6 +53,7 @@ export async function handleXrpRequest(
           await acceptRequest(walletKit, topic, id, result);
         } catch (error) {
           if (isCanceledError(error)) {
+            reportSessionError(walletKit, error);
             await rejectRequest(walletKit, topic, id, Errors.txDeclined);
           } else {
             throw error;

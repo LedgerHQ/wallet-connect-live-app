@@ -9,6 +9,11 @@ import BigNumber from "bignumber.js";
 import { vi } from "vitest";
 import * as utils from "../utils";
 import { signAllTransactions } from "./signAllTransactions";
+import { reportSessionError } from "../analytics/sessionErrorReporter";
+
+vi.mock("../analytics/sessionErrorReporter", () => ({
+  reportSessionError: vi.fn(),
+}));
 
 vi.mock("../utils", async (importOriginal) => ({
   ...(await importOriginal()),
@@ -227,6 +232,11 @@ describe("Testing sign transaction on Solana", () => {
     );
 
     rejectRequestSpy.mockReset();
+    expect(reportSessionError).toHaveBeenCalledTimes(1);
+    expect(reportSessionError).toHaveBeenCalledWith(
+      walletKit,
+      expect.objectContaining({ message: "User cancelled" }),
+    );
   });
 
   it("should accept the sign transaction request when sign and broadcast from Wallet API client succeed", async () => {

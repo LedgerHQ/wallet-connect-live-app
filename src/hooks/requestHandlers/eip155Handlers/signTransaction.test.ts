@@ -4,6 +4,11 @@ import type { Account, WalletAPIClient } from "@ledgerhq/wallet-api-client";
 import type { IWalletKit } from "@reown/walletkit";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { signTransaction } from "./signTransaction";
+import { reportSessionError } from "@/hooks/requestHandlers/analytics/sessionErrorReporter";
+
+vi.mock("@/hooks/requestHandlers/analytics/sessionErrorReporter", () => ({
+  reportSessionError: vi.fn(),
+}));
 
 vi.mock("@/hooks/requestHandlers/utils", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/hooks/requestHandlers/utils")>()),
@@ -61,10 +66,7 @@ describe("Testing sign transaction on EIP155", () => {
     );
 
     expect(sign).toHaveBeenCalledTimes(1);
-    expect(sign).toHaveBeenCalledWith(
-      account.id,
-      expect.any(Object),
-    );
+    expect(sign).toHaveBeenCalledWith(account.id, expect.any(Object));
     expect(signAndBroadcast).not.toHaveBeenCalled();
     expect(utils.acceptRequest).toHaveBeenCalledTimes(1);
     expect(utils.acceptRequest).toHaveBeenCalledWith(
@@ -162,6 +164,11 @@ describe("Testing sign transaction on EIP155", () => {
       topic,
       id,
       utils.Errors.txDeclined,
+    );
+    expect(reportSessionError).toHaveBeenCalledTimes(1);
+    expect(reportSessionError).toHaveBeenCalledWith(
+      walletKit,
+      expect.objectContaining({ message: "User cancelled" }),
     );
   });
 });

@@ -29,6 +29,7 @@ import type {
   WalletInfo,
 } from "@ledgerhq/wallet-api-client";
 import type { IWalletKit } from "@reown/walletkit";
+import { reportSessionError } from "./analytics/sessionErrorReporter";
 import {
   acceptRequest,
   Errors,
@@ -82,6 +83,7 @@ export async function handleBIP122Request(
           await acceptRequest(walletkit, topic, id, result);
         } catch (error) {
           if (isCanceledError(error)) {
+            reportSessionError(walletkit, error);
             await rejectRequest(walletkit, topic, id, Errors.userDecline);
           } else {
             throw error;
@@ -114,6 +116,7 @@ export async function handleBIP122Request(
           await acceptRequest(walletkit, topic, id, result);
         } catch (error) {
           if (isCanceledError(error)) {
+            reportSessionError(walletkit, error);
             await rejectRequest(walletkit, topic, id, Errors.userDecline);
           } else {
             throw error;
@@ -146,6 +149,7 @@ export async function handleBIP122Request(
           await acceptRequest(walletkit, topic, id, result);
         } catch (error) {
           if (isCanceledError(error)) {
+            reportSessionError(walletkit, error);
             await rejectRequest(walletkit, topic, id, Errors.txDeclined);
           } else {
             throw error;
@@ -251,6 +255,7 @@ export async function handleBIP122Request(
         await acceptRequest(walletkit, topic, id, result);
       } catch (error) {
         if (isCanceledError(error)) {
+          reportSessionError(walletkit, error);
           await rejectRequest(walletkit, topic, id, Errors.txDeclined);
         } else {
           throw error;
@@ -261,9 +266,10 @@ export async function handleBIP122Request(
     case BIP122_QUERY_METHODS.BIP122_GET_ACCOUNT_ADDRESSES: {
       // Some adapters (e.g. AppKit bitcoin adapter) send getAccountAddresses
       // without params. Fall back to the selected account for the session.
-      const params = request.params != null
-        ? bip122GetAccountAddressesSchema.parse(request.params)
-        : undefined;
+      const params =
+        request.params != null
+          ? bip122GetAccountAddressesSchema.parse(request.params)
+          : undefined;
 
       const selectedAddress = params?.account ?? sessionAddress;
 

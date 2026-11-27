@@ -6,6 +6,11 @@ import type { IWalletKit } from "@reown/walletkit";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { handleCosmosRequest } from "./Cosmos";
 import * as utils from "./utils";
+import { reportSessionError } from "./analytics/sessionErrorReporter";
+
+vi.mock("./analytics/sessionErrorReporter", () => ({
+  reportSessionError: vi.fn(),
+}));
 
 vi.mock("./utils", async (importOriginal) => ({
   ...(await importOriginal<typeof utils>()),
@@ -41,7 +46,9 @@ describe("handleCosmosRequest", () => {
       ] as unknown as Account[];
 
       const getPublicKey = vi.fn().mockResolvedValue(PUBKEY_HEX);
-      const client = { account: { getPublicKey } } as unknown as WalletAPIClient;
+      const client = {
+        account: { getPublicKey },
+      } as unknown as WalletAPIClient;
 
       const acceptRequestSpy = vi
         .spyOn(utils, "acceptRequest")
@@ -59,9 +66,12 @@ describe("handleCosmosRequest", () => {
 
       expect(getPublicKey).toHaveBeenCalledTimes(1);
       expect(getPublicKey).toHaveBeenCalledWith("1");
-      expect(acceptRequestSpy).toHaveBeenCalledWith(expect.anything(), topic, id, [
-        { algo: "secp256k1", address: BBN, pubkey: hexToBase64(PUBKEY_HEX) },
-      ]);
+      expect(acceptRequestSpy).toHaveBeenCalledWith(
+        expect.anything(),
+        topic,
+        id,
+        [{ algo: "secp256k1", address: BBN, pubkey: hexToBase64(PUBKEY_HEX) }],
+      );
     });
 
     it("omits accounts whose public key cannot be fetched", async () => {
@@ -69,8 +79,12 @@ describe("handleCosmosRequest", () => {
         { id: "1", address: BBN, currency: "babylon" },
       ] as unknown as Account[];
 
-      const getPublicKey = vi.fn().mockRejectedValue(new Error("not implemented"));
-      const client = { account: { getPublicKey } } as unknown as WalletAPIClient;
+      const getPublicKey = vi
+        .fn()
+        .mockRejectedValue(new Error("not implemented"));
+      const client = {
+        account: { getPublicKey },
+      } as unknown as WalletAPIClient;
 
       const acceptRequestSpy = vi
         .spyOn(utils, "acceptRequest")
@@ -86,7 +100,12 @@ describe("handleCosmosRequest", () => {
         {} as IWalletKit,
       );
 
-      expect(acceptRequestSpy).toHaveBeenCalledWith(expect.anything(), topic, id, []);
+      expect(acceptRequestSpy).toHaveBeenCalledWith(
+        expect.anything(),
+        topic,
+        id,
+        [],
+      );
     });
 
     it("omits accounts whose public key is empty (synced before LIVE-33211)", async () => {
@@ -95,7 +114,9 @@ describe("handleCosmosRequest", () => {
       ] as unknown as Account[];
 
       const getPublicKey = vi.fn().mockResolvedValue("");
-      const client = { account: { getPublicKey } } as unknown as WalletAPIClient;
+      const client = {
+        account: { getPublicKey },
+      } as unknown as WalletAPIClient;
 
       const acceptRequestSpy = vi
         .spyOn(utils, "acceptRequest")
@@ -111,15 +132,21 @@ describe("handleCosmosRequest", () => {
         {} as IWalletKit,
       );
 
-      expect(acceptRequestSpy).toHaveBeenCalledWith(expect.anything(), topic, id, []);
+      expect(acceptRequestSpy).toHaveBeenCalledWith(
+        expect.anything(),
+        topic,
+        id,
+        [],
+      );
     });
   });
 
   describe("cosmos_signAmino", () => {
     it("signs the amino doc and returns pub_key + base64 signature + echoed signDoc", async () => {
-      vi.spyOn(utilsGeneric, "getAccountWithAddressAndChainId").mockReturnValueOnce(
-        { id: "acc-1", address: BBN } as Account,
-      );
+      vi.spyOn(
+        utilsGeneric,
+        "getAccountWithAddressAndChainId",
+      ).mockReturnValueOnce({ id: "acc-1", address: BBN } as Account);
       const getPublicKey = vi.fn().mockResolvedValue(PUBKEY_HEX);
       const signRaw = vi
         .fn()
@@ -147,23 +174,33 @@ describe("handleCosmosRequest", () => {
       );
 
       // broadcast=false: the dApp assembles and broadcasts the final tx.
-      expect(signRaw).toHaveBeenCalledWith("acc-1", JSON.stringify(signDoc), false);
-      expect(acceptRequestSpy).toHaveBeenCalledWith(expect.anything(), topic, id, {
-        signature: {
-          pub_key: {
-            type: "tendermint/PubKeySecp256k1",
-            value: hexToBase64(PUBKEY_HEX),
+      expect(signRaw).toHaveBeenCalledWith(
+        "acc-1",
+        JSON.stringify(signDoc),
+        false,
+      );
+      expect(acceptRequestSpy).toHaveBeenCalledWith(
+        expect.anything(),
+        topic,
+        id,
+        {
+          signature: {
+            pub_key: {
+              type: "tendermint/PubKeySecp256k1",
+              value: hexToBase64(PUBKEY_HEX),
+            },
+            signature: hexToBase64(SIG_HEX),
           },
-          signature: hexToBase64(SIG_HEX),
+          signed: signDoc,
         },
-        signed: signDoc,
-      });
+      );
     });
 
     it("rejects when no matching account is found", async () => {
-      vi.spyOn(utilsGeneric, "getAccountWithAddressAndChainId").mockReturnValueOnce(
-        undefined,
-      );
+      vi.spyOn(
+        utilsGeneric,
+        "getAccountWithAddressAndChainId",
+      ).mockReturnValueOnce(undefined);
       const rejectRequestSpy = vi
         .spyOn(utils, "rejectRequest")
         .mockResolvedValueOnce(undefined);
@@ -193,9 +230,10 @@ describe("handleCosmosRequest", () => {
     });
 
     it("rejects when the signer account has no persisted public key", async () => {
-      vi.spyOn(utilsGeneric, "getAccountWithAddressAndChainId").mockReturnValueOnce(
-        { id: "acc-1", address: BBN } as Account,
-      );
+      vi.spyOn(
+        utilsGeneric,
+        "getAccountWithAddressAndChainId",
+      ).mockReturnValueOnce({ id: "acc-1", address: BBN } as Account);
       const signRaw = vi.fn();
       const client = {
         account: { getPublicKey: vi.fn().mockResolvedValue("") },
@@ -228,9 +266,10 @@ describe("handleCosmosRequest", () => {
     });
 
     it("rejects (does not throw) when the user cancels on device", async () => {
-      vi.spyOn(utilsGeneric, "getAccountWithAddressAndChainId").mockReturnValueOnce(
-        { id: "acc-1", address: BBN } as Account,
-      );
+      vi.spyOn(
+        utilsGeneric,
+        "getAccountWithAddressAndChainId",
+      ).mockReturnValueOnce({ id: "acc-1", address: BBN } as Account);
       const canceled = Object.assign(new Error("cancelled"), {
         name: "UserRefusedOnDevice",
       });
@@ -260,6 +299,11 @@ describe("handleCosmosRequest", () => {
         topic,
         id,
         utils.Errors.txDeclined,
+      );
+      expect(reportSessionError).toHaveBeenCalledTimes(1);
+      expect(reportSessionError).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ message: "cancelled" }),
       );
     });
   });
