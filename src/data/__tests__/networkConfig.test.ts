@@ -114,6 +114,15 @@ describe("SUPPORTED_NETWORK", () => {
     expect(zeroGravity?.ticker).toBe("0G");
   });
 
+  it("contains Alpen", () => {
+    const alpen: Network | undefined = SUPPORTED_NETWORK.alpen;
+
+    expect(alpen?.displayName).toBe("Alpen");
+    expect(alpen?.chainId).toBe(29032);
+    expect(alpen?.namespace).toBe("eip155:29032");
+    expect(alpen?.ticker).toBe("BTC");
+  });
+
   it("contains Tezos", () => {
     const tezos: Network | undefined = SUPPORTED_NETWORK.tezos;
 
@@ -130,6 +139,35 @@ describe("SUPPORTED_NETWORK", () => {
     expect(babylon?.chainId).toBe("bbn-1");
     expect(babylon?.namespace).toBe("cosmos:bbn-1");
     expect(babylon?.ticker).toBe("BABY");
+  });
+
+  it("contains Sui mainnet and testnet under their CAIP-2 chain ids", () => {
+    expect(SUPPORTED_NETWORK.sui?.namespace).toBe("sui:mainnet");
+    expect(SUPPORTED_NETWORK.sui?.displayName).toBe("Sui");
+    expect(SUPPORTED_NETWORK.sui?.ticker).toBe("SUI");
+    expect(SUPPORTED_NETWORK.sui_testnet?.namespace).toBe("sui:testnet");
+    expect(getCurrencyByChainId("sui:mainnet")).toBe("sui");
+    expect(getCurrencyByChainId("sui:testnet")).toBe("sui_testnet");
+    expect(getNamespace("sui")).toBe("sui:mainnet");
+  });
+
+  it("contains Bitcoin Signet under its BIP122 chain id", () => {
+    const signet: Network | undefined = SUPPORTED_NETWORK.bitcoin_signet;
+
+    expect(signet?.displayName).toBe("Bitcoin (Signet)");
+    expect(signet?.namespace).toBe("bip122:00000008819873e925422c1ff0f99f7c");
+    expect(BIP122_TEST_CHAINS.bitcoin_signet).toBe(signet);
+    expect(
+      getCurrencyByChainId("bip122:00000008819873e925422c1ff0f99f7c"),
+    ).toBe("bitcoin_signet");
+  });
+
+  it("does not register Sui devnet or localnet", () => {
+    const namespaces = Object.values(SUPPORTED_NETWORK).map(
+      (network: Network) => network.namespace,
+    );
+    expect(namespaces).not.toContain("sui:devnet");
+    expect(namespaces).not.toContain("sui:localnet");
   });
 
   it("resolves Babylon from its CAIP-2 chain id", () => {
@@ -201,6 +239,12 @@ describe("SUPPORTED_NETWORK_NAMES", () => {
     // cosmos handlers are wired and SUPPORTED_NETWORK still resolves it.
     expect(SUPPORTED_NETWORK.babylon).toBeDefined();
     expect(SUPPORTED_NETWORK_NAMES).not.toContain("Babylon");
+  });
+
+  it("does not advertise Sui before the production manifest lists it", () => {
+    expect(SUPPORTED_NETWORK.sui).toBeDefined();
+    expect(SUPPORTED_NETWORK_NAMES).not.toContain("Sui");
+    expect(SUPPORTED_NETWORK_NAMES).not.toContain("Sui Testnet");
   });
 
   it("does not advertise testnets", () => {

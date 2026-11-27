@@ -3,10 +3,12 @@ import { COSMOS_REQUESTS } from "@/data/methods/Cosmos.methods";
 import { EIP155_REQUESTS } from "@/data/methods/EIP155Data.methods";
 import { RIPPLE_REQUESTS } from "@/data/methods/Ripple.methods";
 import { SOLANA_REQUESTS } from "@/data/methods/Solana.methods";
+import { SUI_REQUESTS } from "@/data/methods/Sui.methods";
 import { TEZOS_REQUESTS } from "@/data/methods/Tezos.methods";
 import { WALLET_REQUESTS } from "@/data/methods/Wallet.methods";
 import {
   COSMOS_CHAINS,
+  SUI_CHAINS,
   SUPPORTED_NETWORK,
   TEZOS_CHAINS,
 } from "@/data/network.config";
@@ -19,6 +21,10 @@ const TEZOS_NAMESPACES = new Set(
 
 const COSMOS_NAMESPACES = new Set(
   Object.values(COSMOS_CHAINS).map((network) => network.namespace),
+);
+
+const SUI_NAMESPACES = new Set(
+  Object.values(SUI_CHAINS).map((network) => network.namespace),
 );
 
 /**
@@ -107,6 +113,16 @@ export function isCosmosChain(
 ): _request is COSMOS_REQUESTS {
   // Exact match only: an unregistered `cosmos:*` (e.g. osmosis) must not reach the babylon handler.
   return COSMOS_NAMESPACES.has(chain);
+}
+
+export function isSuiChain(
+  chain: string,
+  // request is passed and used here only for type narrowing
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  _request?: { method: string; params: any },
+): _request is SUI_REQUESTS {
+  // Exact match only: `sui:devnet` and `sui:localnet` are not Ledger Live currencies.
+  return SUI_NAMESPACES.has(chain);
 }
 
 /**
@@ -203,6 +219,23 @@ const BIP122_SIGN_MESSAGE_PATH_MIN_VERSIONS: Record<string, string> = {};
 export const isBip122SignMessagePathSupported = createSupportChecker(BIP122_SIGN_MESSAGE_PATH_MIN_VERSIONS);
 
 /**
+ * Minimum versions of Ledger Wallet that open the device app named in `bitcoin.signPsbt` options.
+ * An older host ignores the option and signs with the Bitcoin app, so a PSBT meant for a derived
+ * app is declined there. A wallet without an entry is treated as too old.
+ * The `-0` suffix also admits that version's pre-releases (`4.30.0-nightly.x`, `4.30.0-next.x`),
+ * which semver ranks below `4.30.0`.
+ */
+export const DERIVED_APP_PSBT_MIN_VERSIONS: Record<string, string> = {
+  "ledger-live-desktop": "4.30.0-0",
+  "ledger-live-mobile": "4.30.0-0",
+};
+
+/** Check if the wallet signs a PSBT with the device app named in `bitcoin.signPsbt` options */
+export const isDerivedAppPsbtSupportEnabled = createSupportChecker(
+  DERIVED_APP_PSBT_MIN_VERSIONS,
+);
+
+/**
  * Check if Cosmos (Babylon) support should be enabled based on wallet capabilities.
  * The cosmos handler calls `transaction.signRaw` (cosmos_signAmino) and
  * `account.getPublicKey` (cosmos_getAccounts), so the host must advertise both.
@@ -227,13 +260,30 @@ export const isCosmosSupportEnabled = (walletCapabilities: string[]): boolean =>
   );
 };
 
+/**
+ * Minimum versions of Ledger Wallet that sign raw Sui transactions through the Wallet API.
+ * The `-0` suffix also admits that version's release candidates (`4.30.0-next.x`), which
+ * semver ranks below `4.30.0`.
+ * Capabilities can't gate Sui: `transaction.signRaw` is advertised for every coin, including
+ * on builds that can't sign Sui.
+ */
+export const SUI_MIN_VERSIONS: Record<string, string> = {
+  "ledger-live-desktop": "4.30.0-0",
+  "ledger-live-mobile": "4.30.0-0",
+};
+
+/** Check if Sui support should be enabled based on wallet version */
+export const isSuiSupportEnabled = createSupportChecker(SUI_MIN_VERSIONS);
+
 /** Check if XRPL support should be enabled based on wallet capabilities */
 export const isXRPLSupportEnabled = (walletCapabilities: string[]): boolean => {
   return walletCapabilities.includes("transaction.signRaw");
 };
 
 /** Check if Tezos support should be enabled based on wallet capabilities */
-export const isTezosSupportEnabled = (walletCapabilities: string[]): boolean => {
+export const isTezosSupportEnabled = (
+  walletCapabilities: string[],
+): boolean => {
   return (
     walletCapabilities.includes("transaction.signRaw") &&
     walletCapabilities.includes("message.sign") &&

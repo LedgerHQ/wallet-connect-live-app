@@ -8,6 +8,7 @@ export enum Errors {
   unsupportedChains = "unsupportedChains",
   unsupportedMethods = "unsupportedMethods",
   unsupportedAccounts = "unsupportedAccounts",
+  walletUpdateRequired = "Ledger Wallet update required to sign this PSBT",
 }
 
 const hexReg = /^ *(0x)?([a-fA-F0-9]+) *$/;

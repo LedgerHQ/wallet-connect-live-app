@@ -1,5 +1,6 @@
 import { renderHook } from "@/tests/test.utils";
 import { createHookWrapper, type TestStore } from "@/tests/hook-test.utils";
+import { SUI_MIN_VERSIONS } from "@/utils/helper.util";
 import { Account, WalletInfo } from "@ledgerhq/wallet-api-client";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import sessionProposal from "@/data/mocks/sessionProposal.example.json";
@@ -62,6 +63,14 @@ function makeAccount(
     lastSyncDate: new Date("2024-01-01T00:00:00.000Z"),
   };
 }
+
+const suiWalletInfo = {
+  wallet: {
+    name: "ledger-live-desktop",
+    version: SUI_MIN_VERSIONS["ledger-live-desktop"],
+  },
+  tracking: false,
+};
 
 describe("useSupportedNamespaces", () => {
   let store: TestStore;
@@ -627,6 +636,143 @@ describe("useSupportedNamespaces", () => {
 
     const { result } = renderHook(
       () => useSupportedNamespaces(proposal, ["bbn-1"]),
+      { wrapper: createHookWrapper(store) },
+    );
+
+    expect(result.current.buildSupportedNamespaces(proposal)).toEqual({});
+  });
+
+  it("builds the sui namespace with all four methods when the version gate is on", () => {
+    const sui = makeAccount("sui-1", "sui", "0xabc");
+
+    mockedUseAccounts.mockReturnValue({
+      data: [sui],
+    } as ReturnType<typeof useAccounts>);
+
+    store.set(walletInfoAtom as never, suiWalletInfo);
+
+    mockedFormatAccountsByChain.mockReturnValue([
+      {
+        chain: "sui",
+        displayName: "Sui",
+        isSupported: true,
+        isRequired: false,
+        accounts: [sui],
+      },
+    ]);
+
+    const proposal = {
+      ...sessionProposal,
+      requiredNamespaces: {},
+      optionalNamespaces: {
+        sui: {
+          methods: [
+            "sui_getAccounts",
+            "sui_signTransaction",
+            "sui_signAndExecuteTransaction",
+            "sui_signPersonalMessage",
+            "sui_unknownMethod",
+          ],
+          chains: ["sui:mainnet", "sui:devnet"],
+          events: ["chainChanged", "accountsChanged"],
+        },
+      },
+    };
+
+    const { result } = renderHook(
+      () => useSupportedNamespaces(proposal, ["sui-1"]),
+      { wrapper: createHookWrapper(store) },
+    );
+
+    // sui:devnet is not a registered chain and the unknown method is not supported.
+    expect(result.current.buildSupportedNamespaces(proposal)).toEqual({
+      sui: {
+        chains: ["sui:mainnet"],
+        methods: [
+          "sui_getAccounts",
+          "sui_signTransaction",
+          "sui_signAndExecuteTransaction",
+          "sui_signPersonalMessage",
+        ],
+        events: ["chainChanged", "accountsChanged"],
+        accounts: ["sui:mainnet:0xabc"],
+      },
+    });
+  });
+
+  it("does not approve a sui proposal that only asks for devnet", () => {
+    const sui = makeAccount("sui-1", "sui", "0xabc");
+
+    mockedUseAccounts.mockReturnValue({
+      data: [sui],
+    } as ReturnType<typeof useAccounts>);
+
+    store.set(walletInfoAtom as never, suiWalletInfo);
+
+    mockedFormatAccountsByChain.mockReturnValue([
+      {
+        chain: "sui",
+        displayName: "Sui",
+        isSupported: true,
+        isRequired: true,
+        accounts: [sui],
+      },
+    ]);
+
+    const proposal = {
+      ...sessionProposal,
+      requiredNamespaces: {
+        sui: {
+          methods: ["sui_signTransaction"],
+          chains: ["sui:devnet"],
+          events: [],
+        },
+      },
+      optionalNamespaces: {},
+    };
+
+    const { result } = renderHook(
+      () => useSupportedNamespaces(proposal, ["sui-1"]),
+      { wrapper: createHookWrapper(store) },
+    );
+
+    const namespaces = result.current.buildSupportedNamespaces(proposal);
+    expect(namespaces.sui?.accounts).toEqual([]);
+    expect(namespaces.sui?.chains).toEqual([]);
+  });
+
+  it("omits the sui namespace when the version gate is disabled", () => {
+    const sui = makeAccount("sui-1", "sui", "0xabc");
+
+    mockedUseAccounts.mockReturnValue({
+      data: [sui],
+    } as ReturnType<typeof useAccounts>);
+
+    // The base wallet version is below the Sui minimum, so sui support is off.
+    mockedFormatAccountsByChain.mockReturnValue([
+      {
+        chain: "sui",
+        displayName: "Sui",
+        isSupported: true,
+        isRequired: false,
+        accounts: [sui],
+      },
+    ]);
+
+    const proposal = {
+      ...sessionProposal,
+      requiredNamespaces: {},
+      optionalNamespaces: {
+        sui: {
+          methods: ["sui_signTransaction"],
+          chains: ["sui:mainnet"],
+          events: [],
+        },
+      },
+    };
+
+    const { result } = renderHook(
+      () => useSupportedNamespaces(proposal, ["sui-1"]),
       { wrapper: createHookWrapper(store) },
     );
 

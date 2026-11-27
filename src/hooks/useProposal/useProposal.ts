@@ -5,6 +5,7 @@ import {
   showBackToBrowserModalAtom,
   walletKitAtom,
 } from "@/store/walletKit.store";
+import { AnalyticsPage } from "@/components/screens/sessionProposal/analyticsPages";
 import { OneClickAuthPayload } from "@/types/types";
 import { fetchBip122Addresses } from "@/utils/bip122";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
@@ -19,7 +20,7 @@ import {
 } from "@walletconnect/utils";
 import { useAtomValue, useSetAtom } from "jotai";
 import { enqueueSnackbar } from "notistack";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { sortedRecentConnectionAppsAtom } from "../../store/recentConnectionAppsAtom";
 import { formatMessage } from "../requestHandlers/utils";
 import { queryKey as pendingProposalsQueryKey } from "../usePendingProposals";
@@ -28,6 +29,7 @@ import {
   useQueryFn as useSessionsQueryFn,
 } from "../useSessions";
 import { useSupportedNamespaces } from "../useSupportedNamespaces";
+import { dedupeChains, getNamespacesChains } from "./util";
 
 export function useProposal(
   proposal: ProposalTypes.Struct,
@@ -45,6 +47,24 @@ export function useProposal(
   const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
   const { buildEip155Namespace, buildSupportedNamespaces } =
     useSupportedNamespaces(proposal, selectedAccounts);
+
+  const getApprovedChains = useCallback(
+    () =>
+      oneClickAuthPayload
+        ? dedupeChains(
+            buildEip155Namespace(
+              proposal.requiredNamespaces,
+              proposal.optionalNamespaces,
+            ).chains,
+          )
+        : getNamespacesChains(buildSupportedNamespaces(proposal)),
+    [
+      buildEip155Namespace,
+      buildSupportedNamespaces,
+      oneClickAuthPayload,
+      proposal,
+    ],
+  );
 
   const handleClick = useCallback((account: string) => {
     setSelectedAccounts((value) => {
@@ -74,7 +94,40 @@ export function useProposal(
     }
   }, [setShowModal, url]);
 
+  const dappProperties = useMemo(
+    () => ({
+      dapp: proposal.proposer.metadata.name,
+      url: proposal.proposer.metadata.url,
+    }),
+    [proposal.proposer.metadata.name, proposal.proposer.metadata.url],
+  );
+
+  const trackSessionEstablished = useCallback(
+    (sessionTopic: string) => {
+      analytics.track("session_established", {
+        ...dappProperties,
+        session_topic: sessionTopic,
+      });
+    },
+    [analytics, dappProperties],
+  );
+
+  const trackSessionAuthenticated = useCallback(() => {
+    analytics.track("session_authenticated", dappProperties);
+  }, [analytics, dappProperties]);
+
+  const trackSessionApproveFailed = useCallback(
+    (error: unknown) => {
+      analytics.track("session_approve_failed", {
+        ...dappProperties,
+        reason: getErrorMessage(error),
+      });
+    },
+    [analytics, dappProperties],
+  );
+
   const approveSession = useCallback(async () => {
+    let stage: "approving" | "approved" = "approving";
     try {
       const supportedNs = buildSupportedNamespaces(proposal);
       const approvedNs = buildApprovedNamespaces({
@@ -85,6 +138,8 @@ export function useProposal(
         id: proposal.id,
         namespaces: approvedNs,
       });
+      stage = "approved";
+      trackSessionEstablished(session.topic);
       await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
       await queryClient.invalidateQueries({
         queryKey: pendingProposalsQueryKey,
@@ -131,6 +186,9 @@ export function useProposal(
 
       redirectToDapp();
     } catch (error) {
+      if (stage === "approving") {
+        trackSessionApproveFailed(error);
+      }
       enqueueSnackbar(getErrorMessage(error), {
         errorType: "Approve session error",
         variant: "errorNotification",
@@ -156,9 +214,12 @@ export function useProposal(
     navigate,
     accounts.data,
     client,
+    trackSessionEstablished,
+    trackSessionApproveFailed,
   ]);
 
   const approveSessionAuthenticate = useCallback(async () => {
+    let stage: "approving" | "approved" = "approving";
     try {
       const {
         chains,
@@ -219,6 +280,8 @@ export function useProposal(
       });
 
       if (!session) {
+        stage = "approved";
+        trackSessionAuthenticated();
         await navigate({
           to: "/",
           search: ({ uri: _, ...search }) => search,
@@ -226,6 +289,8 @@ export function useProposal(
         return;
       }
 
+      stage = "approved";
+      trackSessionEstablished(session.topic);
       await queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
       await queryClient.prefetchQuery({
         queryKey: sessionsQueryKey,
@@ -241,6 +306,9 @@ export function useProposal(
 
       redirectToDapp();
     } catch (error) {
+      if (stage === "approving") {
+        trackSessionApproveFailed(error);
+      }
       enqueueSnackbar(getErrorMessage(error), {
         errorType: "Approve session error",
         variant: "errorNotification",
@@ -268,6 +336,9 @@ export function useProposal(
     redirectToDapp,
     accounts.data,
     client.message,
+    trackSessionEstablished,
+    trackSessionAuthenticated,
+    trackSessionApproveFailed,
   ]);
 
   const rejectSession = useCallback(async () => {
@@ -348,13 +419,16 @@ export function useProposal(
     }
   }, [navigate, oneClickAuthPayload, queryClient, redirectToDapp, walletKit]);
 
-  const handleClose = useCallback(() => {
-    void rejectSession();
-    analytics.track("button_clicked", {
-      button: "Close",
-      page: "Wallet Connect Error Unsupported Blockchains",
-    });
-  }, [analytics, rejectSession]);
+  const handleClose = useCallback(
+    (page: AnalyticsPage) => {
+      void rejectSession();
+      analytics.track("button_clicked", {
+        button: "Close",
+        page,
+      });
+    },
+    [analytics, rejectSession],
+  );
 
   const addNewAccount = useCallback(
     async (currency: string) => {
@@ -433,5 +507,6 @@ export function useProposal(
     addNewAccount,
     addNewAccounts,
     navigateToHome,
+    getApprovedChains,
   };
 }

@@ -1,13 +1,16 @@
 import { Flex, Text } from "@ledgerhq/react-ui";
 import { useTranslation } from "react-i18next";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
+import useAnalytics from "@/hooks/useAnalytics";
 import LogoHeader from "./LogoHeader";
 import ChainBadge from "@/components/atoms/ChainBadge";
 import { AddAccountPlaceholder } from "./AddAccountPlaceholder";
 import { AccountsInChain } from "@/hooks/useProposal/util";
+import { MISSING_REQUIRED_ACCOUNT_PAGE } from "./analyticsPages";
 
 type Props = {
   appName: string;
+  appUrl: string;
   iconProposer: string | null;
   addNewAccounts: (currencies: string[]) => Promise<void>;
   chains: AccountsInChain[];
@@ -15,12 +18,26 @@ type Props = {
 
 export function ErrorMissingRequiredAccount({
   appName,
+  appUrl,
   addNewAccounts,
   iconProposer,
   chains,
 }: Props) {
   const { t } = useTranslation();
-  // NOTE: analytics
+  const analytics = useAnalytics();
+
+  useEffect(() => {
+    analytics.page(MISSING_REQUIRED_ACCOUNT_PAGE, {
+      dapp: appName,
+      url: appUrl,
+      chains: chains.map((chain) => ({
+        chain: chain.chain,
+        isSupported: chain.isSupported,
+        isRequired: chain.isRequired,
+      })),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const requiredChains = useMemo(
     () => chains.filter((entry) => entry.isRequired),

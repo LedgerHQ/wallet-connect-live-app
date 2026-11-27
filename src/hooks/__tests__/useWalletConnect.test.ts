@@ -1,5 +1,6 @@
 import { createHookWrapper, type TestStore } from "@/tests/hook-test.utils";
 import { renderHook, waitFor } from "@/tests/test.utils";
+import { SUI_MIN_VERSIONS } from "@/utils/helper.util";
 import { createStore } from "jotai";
 import { enqueueSnackbar } from "notistack";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -9,6 +10,7 @@ import { handleCosmosRequest } from "../requestHandlers/Cosmos";
 import { handleEIP155Request } from "../requestHandlers/EIP155";
 import { handleXrpRequest } from "../requestHandlers/Ripple";
 import { handleSolanaRequest } from "../requestHandlers/Solana";
+import { handleSuiRequest } from "../requestHandlers/Sui";
 import { handleTezosRequest } from "../requestHandlers/Tezos";
 import { handleWalletRequest } from "../requestHandlers/Wallet";
 import { Errors, rejectRequest } from "../requestHandlers/utils";
@@ -52,12 +54,22 @@ vi.mock("../useAccounts", () => ({
   default: vi.fn(),
 }));
 
+const analyticsTrackMock = vi.fn();
+const analyticsState = { track: analyticsTrackMock };
+vi.mock("../useAnalytics", () => ({
+  default: () => ({ track: analyticsState.track, page: vi.fn() }),
+}));
+
 vi.mock("../requestHandlers/BIP122", () => ({
   handleBIP122Request: vi.fn(),
 }));
 
 vi.mock("../requestHandlers/Cosmos", () => ({
   handleCosmosRequest: vi.fn(),
+}));
+
+vi.mock("../requestHandlers/Sui", () => ({
+  handleSuiRequest: vi.fn(),
 }));
 
 vi.mock("../requestHandlers/EIP155", () => ({
@@ -116,7 +128,9 @@ vi.mock("@tanstack/react-router", async () => {
 
 const mockedTranslation = vi.fn<() => string>();
 vi.mock("react-i18next", () => ({
-  useTranslation: vi.fn().mockReturnValue({ t: vi.fn().mockImplementation(() => mockedTranslation()) })
+  useTranslation: vi.fn().mockReturnValue({
+    t: vi.fn().mockImplementation(() => mockedTranslation()),
+  }),
 }));
 
 import {
@@ -141,11 +155,20 @@ const mockedHandleWalletRequest = vi.mocked(handleWalletRequest);
 const mockedHandleEIP155Request = vi.mocked(handleEIP155Request);
 const mockedHandleBIP122Request = vi.mocked(handleBIP122Request);
 const mockedHandleCosmosRequest = vi.mocked(handleCosmosRequest);
+const mockedHandleSuiRequest = vi.mocked(handleSuiRequest);
 const mockedHandleXrpRequest = vi.mocked(handleXrpRequest);
 const mockedHandleSolanaRequest = vi.mocked(handleSolanaRequest);
 const mockedHandleTezosRequest = vi.mocked(handleTezosRequest);
 const mockedRejectRequest = vi.mocked(rejectRequest);
 const mockedUseNavigate = vi.mocked(useNavigate);
+
+const suiWalletInfo = {
+  wallet: {
+    name: "ledger-live-desktop",
+    version: SUI_MIN_VERSIONS["ledger-live-desktop"],
+  },
+  tracking: false,
+};
 
 describe("useWalletConnect", () => {
   let store: TestStore;
@@ -195,7 +218,7 @@ describe("useWalletConnect", () => {
           getAll: vi.fn(() => []),
         },
         proposal: {
-          getAll: vi.fn(() => []),
+          getAll: vi.fn((): unknown[] => []),
           keys: [12],
         },
         auth: {
@@ -217,6 +240,8 @@ describe("useWalletConnect", () => {
     coreMock.relayer.connected = false;
     walletKitMock.engine.signClient.auth.requests.keys = [];
     walletKitMock.engine.signClient.session.get.mockReturnValue(sessionRecord);
+    walletKitMock.engine.signClient.proposal.getAll.mockReturnValue([]);
+    analyticsState.track = analyticsTrackMock;
     window.open = vi.fn();
 
     store = createStore();
@@ -240,6 +265,7 @@ describe("useWalletConnect", () => {
     mockedHandleEIP155Request.mockResolvedValue(undefined);
     mockedHandleBIP122Request.mockResolvedValue(undefined);
     mockedHandleCosmosRequest.mockResolvedValue(undefined);
+    mockedHandleSuiRequest.mockResolvedValue(undefined);
     mockedHandleXrpRequest.mockResolvedValue(undefined);
     mockedHandleSolanaRequest.mockResolvedValue(undefined);
     mockedHandleTezosRequest.mockResolvedValue(undefined);
@@ -341,6 +367,42 @@ describe("useWalletConnect", () => {
 
       await waitFor(() => {
         expect(handler()).toHaveBeenCalled();
+      });
+    },
+  );
+
+  it.each([
+    { name: "no session", session: undefined },
+    {
+      name: "a session without bip122 namespace",
+      session: { ...sessionRecord, namespaces: {} },
+    },
+  ])(
+    "dispatches bip122 requests without a session address when there is $name",
+    async ({ session }) => {
+      walletKitMock.engine.signClient.session.get.mockReturnValue(
+        session as never,
+      );
+      mountHook();
+
+      walletKitListeners.get("session_request")?.({
+        topic: "topic-1",
+        id: 1,
+        params: {
+          chainId: "bip122:000000000019d6689c085ae165831e93",
+          request: { method: "btc_getAccountAddresses", params: {} },
+        },
+        verifyContext: {},
+      });
+
+      await waitFor(() => {
+        expect(mockedHandleBIP122Request).toHaveBeenCalledWith(
+          expect.anything(),
+          "topic-1",
+          1,
+          "bip122:000000000019d6689c085ae165831e93",
+          expect.objectContaining({ sessionAddress: undefined }),
+        );
       });
     },
   );
@@ -522,8 +584,16 @@ describe("useWalletConnect", () => {
       "account.getPublicKey",
     ]);
 
-    const approved = { id: "bbn-1", address: "bbn1approved", currency: "babylon" };
-    const unapproved = { id: "bbn-2", address: "bbn1other", currency: "babylon" };
+    const approved = {
+      id: "bbn-1",
+      address: "bbn1approved",
+      currency: "babylon",
+    };
+    const unapproved = {
+      id: "bbn-2",
+      address: "bbn1other",
+      currency: "babylon",
+    };
     mockedUseAccounts.mockReturnValue({
       data: [approved, unapproved],
     } as ReturnType<typeof useAccounts>);
@@ -574,6 +644,86 @@ describe("useWalletConnect", () => {
         walletKitMock,
         "topic-1",
         13,
+        Errors.unsupportedChains,
+        5100,
+      );
+    });
+  });
+
+  it("dispatches sui requests to the sui handler when the version gate is on", async () => {
+    store.set(walletInfoAtom as never, suiWalletInfo);
+
+    mountHook();
+
+    walletKitListeners.get("session_request")?.({
+      topic: "topic-1",
+      id: 21,
+      params: {
+        chainId: "sui:mainnet",
+        request: { method: "sui_signTransaction", params: {} },
+      },
+      verifyContext: {},
+    });
+
+    await waitFor(() => {
+      expect(mockedHandleSuiRequest).toHaveBeenCalled();
+    });
+  });
+
+  it("scopes sui requests to the session-approved accounts", async () => {
+    store.set(walletInfoAtom as never, suiWalletInfo);
+
+    const approved = { id: "sui-1", address: "0xapproved", currency: "sui" };
+    const unapproved = { id: "sui-2", address: "0xother", currency: "sui" };
+    mockedUseAccounts.mockReturnValue({
+      data: [approved, unapproved],
+    } as ReturnType<typeof useAccounts>);
+    walletKitMock.engine.signClient.session.get.mockReturnValue({
+      ...sessionRecord,
+      namespaces: {
+        ...sessionRecord.namespaces,
+        sui: { accounts: ["sui:mainnet:0xapproved"] },
+      },
+    } as typeof sessionRecord);
+
+    mountHook();
+
+    walletKitListeners.get("session_request")?.({
+      topic: "topic-1",
+      id: 22,
+      params: {
+        chainId: "sui:mainnet",
+        request: { method: "sui_getAccounts", params: {} },
+      },
+      verifyContext: {},
+    });
+
+    await waitFor(() => {
+      expect(mockedHandleSuiRequest).toHaveBeenCalled();
+    });
+    expect(mockedHandleSuiRequest.mock.calls[0][4]).toEqual([approved]);
+  });
+
+  it("rejects sui requests when the version gate is disabled", async () => {
+    // The default wallet version is below the Sui minimum, so sui support is off.
+    mountHook();
+
+    walletKitListeners.get("session_request")?.({
+      topic: "topic-1",
+      id: 23,
+      params: {
+        chainId: "sui:mainnet",
+        request: { method: "sui_signTransaction", params: {} },
+      },
+      verifyContext: {},
+    });
+
+    await waitFor(() => {
+      expect(mockedHandleSuiRequest).not.toHaveBeenCalled();
+      expect(mockedRejectRequest).toHaveBeenCalledWith(
+        walletKitMock,
+        "topic-1",
+        23,
         Errors.unsupportedChains,
         5100,
       );
@@ -681,5 +831,83 @@ describe("useWalletConnect", () => {
     });
 
     expect(store.get(verifyContextByRequestAtom)).toEqual({});
+  });
+
+  describe("proposal_expire", () => {
+    const pendingProposal = {
+      id: 12,
+      proposer: {
+        metadata: {
+          name: "React App",
+          url: "https://react-app.walletconnect.com",
+        },
+      },
+    };
+
+    it("keeps walletKit listeners registered and uses the latest track after track changes", () => {
+      const { rerender } = mountHook();
+      const registrations = walletKitMock.on.mock.calls.length;
+      const latestTrackMock = vi.fn();
+      analyticsState.track = latestTrackMock;
+
+      rerender();
+      walletKitListeners.get("proposal_expire")?.({ id: 12 });
+
+      expect(walletKitMock.on).toHaveBeenCalledTimes(registrations);
+      expect(walletKitMock.off).not.toHaveBeenCalled();
+      expect(analyticsTrackMock).not.toHaveBeenCalled();
+      expect(latestTrackMock).toHaveBeenCalledWith("session_proposal_expired", {
+        proposal_id: 12,
+        dapp: undefined,
+        url: undefined,
+      });
+    });
+
+    it("tracks session_proposal_expired without dApp metadata when no pending proposals are cached", () => {
+      mountHook();
+
+      walletKitListeners.get("proposal_expire")?.({ id: 12 });
+
+      expect(analyticsTrackMock).toHaveBeenCalledWith(
+        "session_proposal_expired",
+        { proposal_id: 12, dapp: undefined, url: undefined },
+      );
+    });
+
+    it("tracks session_proposal_expired with the cached dApp metadata, and without it for an unknown id", async () => {
+      walletKitMock.engine.signClient.proposal.getAll.mockReturnValue([
+        pendingProposal,
+      ]);
+      mountHook();
+
+      walletKitListeners.get("session_proposal")?.({
+        id: 12,
+        params: { pairingTopic: "pairing-topic" },
+        verifyContext: {},
+      });
+      await waitFor(() => {
+        expect(navigateMock).toHaveBeenCalledWith(
+          expect.objectContaining({ to: "/proposal/$id" }),
+        );
+      });
+
+      walletKitListeners.get("proposal_expire")?.({ id: 12 });
+      walletKitListeners.get("proposal_expire")?.({ id: 99 });
+
+      expect(analyticsTrackMock.mock.calls).toEqual([
+        [
+          "session_proposal_expired",
+          {
+            proposal_id: 12,
+            dapp: "React App",
+            url: "https://react-app.walletconnect.com",
+          },
+        ],
+        [
+          "session_proposal_expired",
+          { proposal_id: 99, dapp: undefined, url: undefined },
+        ],
+      ]);
+    });
   });
 });

@@ -1,6 +1,7 @@
 import { SUPPORTED_NETWORK } from "@/data/network.config";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import {
+  DERIVED_APP_PSBT_MIN_VERSIONS,
   formatUrl,
   getColor,
   getCurrencyByChainId,
@@ -11,11 +12,15 @@ import {
   getTicker,
   isCosmosChain,
   isCosmosSupportEnabled,
+  isDerivedAppPsbtSupportEnabled,
   isEIP155Chain,
   isSolanaSupportEnabled,
+  isSuiChain,
+  isSuiSupportEnabled,
   isTezosChain,
   isTezosSupportEnabled,
   isXRPLSupportEnabled,
+  SUI_MIN_VERSIONS,
   truncate,
 } from "../helper.util";
 
@@ -252,6 +257,66 @@ describe("isSolanaSupportEnabled", () => {
   });
 });
 
+describe("isDerivedAppPsbtSupportEnabled", () => {
+  const shippedMinVersions = { ...DERIVED_APP_PSBT_MIN_VERSIONS };
+
+  afterEach(() => {
+    for (const name of Object.keys(DERIVED_APP_PSBT_MIN_VERSIONS)) {
+      delete DERIVED_APP_PSBT_MIN_VERSIONS[name];
+    }
+  });
+
+  it("should accept Ledger Wallet 4.30 pre-releases and reject 4.29", () => {
+    Object.assign(DERIVED_APP_PSBT_MIN_VERSIONS, shippedMinVersions);
+
+    for (const name of ["ledger-live-desktop", "ledger-live-mobile"]) {
+      expect(
+        isDerivedAppPsbtSupportEnabled(
+          createWalletInfo(name, "4.30.0-nightly.20261120020222"),
+        ),
+      ).toBe(true);
+      expect(
+        isDerivedAppPsbtSupportEnabled(createWalletInfo(name, "4.30.0")),
+      ).toBe(true);
+      expect(
+        isDerivedAppPsbtSupportEnabled(createWalletInfo(name, "4.29.0")),
+      ).toBe(false);
+    }
+  });
+
+  it("should return false for a wallet with no minimum version", () => {
+    expect(
+      isDerivedAppPsbtSupportEnabled(createWalletInfo("unknown-wallet", "9.0.0")),
+    ).toBe(false);
+  });
+
+  it("should return true from the minimum version of each wallet", () => {
+    DERIVED_APP_PSBT_MIN_VERSIONS["ledger-live-desktop"] = "4.28.0";
+    DERIVED_APP_PSBT_MIN_VERSIONS["ledger-live-mobile"] = "4.29.0";
+
+    expect(
+      isDerivedAppPsbtSupportEnabled(
+        createWalletInfo("ledger-live-desktop", "4.28.0"),
+      ),
+    ).toBe(true);
+    expect(
+      isDerivedAppPsbtSupportEnabled(
+        createWalletInfo("ledger-live-mobile", "4.29.1"),
+      ),
+    ).toBe(true);
+  });
+
+  it("should return false below the minimum version", () => {
+    DERIVED_APP_PSBT_MIN_VERSIONS["ledger-live-desktop"] = "4.28.0";
+
+    expect(
+      isDerivedAppPsbtSupportEnabled(
+        createWalletInfo("ledger-live-desktop", "4.27.1"),
+      ),
+    ).toBe(false);
+  });
+});
+
 describe("isXRPLSupportEnabled", () => {
   it("returns true when required capability is present", () => {
     const caps = ["account.request", "transaction.signRaw", "wallet.open"];
@@ -365,6 +430,73 @@ describe("isCosmosSupportEnabled", () => {
     expect(isCosmosSupportEnabled(["transaction.signRaw"])).toBe(false);
     expect(isCosmosSupportEnabled(["account.getPublicKey"])).toBe(false);
     expect(isCosmosSupportEnabled([])).toBe(false);
+  });
+});
+
+describe("isSuiChain", () => {
+  it("matches the registered Sui chain ids", () => {
+    expect(isSuiChain("sui:mainnet")).toBe(true);
+    expect(isSuiChain("sui:testnet")).toBe(true);
+  });
+
+  it("does not match unregistered Sui networks", () => {
+    expect(isSuiChain("sui:devnet")).toBe(false);
+    expect(isSuiChain("sui:localnet")).toBe(false);
+  });
+
+  it("does not match other namespaces", () => {
+    expect(isSuiChain("tezos:mainnet")).toBe(false);
+    expect(isSuiChain("eip155:1")).toBe(false);
+  });
+});
+
+describe("isSuiSupportEnabled", () => {
+  const desktopMin = SUI_MIN_VERSIONS["ledger-live-desktop"];
+  const mobileMin = SUI_MIN_VERSIONS["ledger-live-mobile"];
+
+  it("returns true from the minimum desktop and mobile versions", () => {
+    expect(
+      isSuiSupportEnabled(createWalletInfo("ledger-live-desktop", desktopMin)),
+    ).toBe(true);
+    expect(
+      isSuiSupportEnabled(createWalletInfo("ledger-live-mobile", mobileMin)),
+    ).toBe(true);
+  });
+
+  it("returns false below the minimum version", () => {
+    expect(
+      isSuiSupportEnabled(createWalletInfo("ledger-live-desktop", "4.27.1")),
+    ).toBe(false);
+    expect(
+      isSuiSupportEnabled(createWalletInfo("ledger-live-mobile", "4.26.1")),
+    ).toBe(false);
+  });
+
+  it("includes the release candidates of the first Sui release, not earlier ones", () => {
+    expect(
+      isSuiSupportEnabled(
+        createWalletInfo("ledger-live-desktop", "4.30.0-next.0"),
+      ),
+    ).toBe(true);
+    expect(
+      isSuiSupportEnabled(
+        createWalletInfo("ledger-live-mobile", "4.30.0-next.3"),
+      ),
+    ).toBe(true);
+    expect(
+      isSuiSupportEnabled(
+        createWalletInfo("ledger-live-desktop", "4.29.0-next.0"),
+      ),
+    ).toBe(false);
+  });
+
+  it("returns false for an unknown wallet or a missing version", () => {
+    expect(
+      isSuiSupportEnabled(createWalletInfo("other-wallet", "999.0.0")),
+    ).toBe(false);
+    expect(isSuiSupportEnabled(createWalletInfo("ledger-live-desktop"))).toBe(
+      false,
+    );
   });
 });
 
