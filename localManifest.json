@@ -72,7 +72,8 @@
     "transaction.signAndBroadcast",
     "wallet.userId",
     "wallet.info",
-    "wallet.capabilities"
+    "wallet.capabilities",
+    "custom.signature.cancel"
   ],
   "domains": ["http://", "https://"]
 }

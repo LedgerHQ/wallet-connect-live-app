@@ -224,6 +224,9 @@ describe("useWalletConnect", () => {
         auth: {
           requests: { keys: [] as number[] },
         },
+        engine: {
+          processSessionRequestQueue: vi.fn(),
+        },
       },
     },
   };
@@ -757,6 +760,195 @@ describe("useWalletConnect", () => {
         "https://react-app.walletconnect.com/",
       );
     });
+  });
+
+  it("handles a session request with a client that tags its sign requests with the session topic", async () => {
+    const sign = vi.fn().mockResolvedValue(Buffer.from(""));
+    store.set(walletAPIClientAtom as never, { transaction: { sign } });
+    mockedHandleEIP155Request.mockImplementation(
+      async (_request, _topic, _id, _chainId, _accounts, client) => {
+        await client.transaction.sign("eth-1", {} as never);
+      },
+    );
+
+    mountHook();
+
+    walletKitListeners.get("session_request")?.({
+      topic: "topic-1",
+      id: 10,
+      params: {
+        chainId: "eip155:1",
+        request: { method: "personal_sign", params: [] },
+      },
+      verifyContext: {},
+    });
+
+    await waitFor(() => {
+      expect(sign).toHaveBeenCalledWith("eth-1", {}, undefined, {
+        requestGroupId: "topic-1",
+      });
+    });
+  });
+
+  it("asks Ledger Wallet to cancel the pending sign requests of a deleted session", async () => {
+    const request = vi.fn().mockResolvedValue({ cancelled: 1 });
+    store.set(walletAPIClientAtom as never, { request });
+
+    mountHook();
+
+    walletKitListeners.get("session_delete")?.({ id: 1, topic: "topic-1" });
+
+    await waitFor(() => {
+      expect(request).toHaveBeenCalledWith("custom.signature.cancel", {
+        requestGroupId: "topic-1",
+      });
+    });
+  });
+
+  it("handles the queued request of another dApp once the deleted session's requests are cancelled", async () => {
+    let cancelled!: () => void;
+    const request = vi.fn(
+      () =>
+        new Promise((resolve) => {
+          cancelled = () => resolve({ cancelled: 1 });
+        }),
+    );
+    store.set(walletAPIClientAtom as never, { request });
+    const { processSessionRequestQueue } =
+      walletKitMock.engine.signClient.engine;
+
+    mountHook();
+
+    walletKitListeners.get("session_delete")?.({ id: 1, topic: "topic-1" });
+
+    await waitFor(() => expect(request).toHaveBeenCalled());
+    expect(processSessionRequestQueue).not.toHaveBeenCalled();
+
+    cancelled();
+
+    await waitFor(() => {
+      expect(processSessionRequestQueue).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it("handles the queued request of another dApp when Ledger Wallet cannot cancel", async () => {
+    const request = vi.fn().mockRejectedValue(new Error("permission denied"));
+    store.set(walletAPIClientAtom as never, { request });
+
+    mountHook();
+
+    walletKitListeners.get("session_delete")?.({ id: 1, topic: "topic-1" });
+
+    await waitFor(() => {
+      expect(
+        walletKitMock.engine.signClient.engine.processSessionRequestQueue,
+      ).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it("does not send the sign request of a session deleted during its preparation", async () => {
+    const sign = vi.fn().mockResolvedValue(Buffer.from(""));
+    const request = vi.fn().mockResolvedValue({ cancelled: 0 });
+    store.set(walletAPIClientAtom as never, { transaction: { sign }, request });
+    let prepared!: () => void;
+    const preparation = new Promise<void>((resolve) => {
+      prepared = resolve;
+    });
+    mockedHandleEIP155Request.mockImplementation(
+      async (_request, _topic, _id, _chainId, _accounts, client) => {
+        await preparation;
+        await client.transaction.sign("eth-1", {} as never);
+      },
+    );
+
+    mountHook();
+
+    walletKitListeners.get("session_request")?.({
+      topic: "topic-1",
+      id: 10,
+      params: {
+        chainId: "eip155:1",
+        request: { method: "personal_sign", params: [] },
+      },
+      verifyContext: {},
+    });
+    await waitFor(() => {
+      expect(mockedHandleEIP155Request).toHaveBeenCalled();
+    });
+
+    walletKitListeners.get("session_delete")?.({ id: 1, topic: "topic-1" });
+    prepared();
+
+    await waitFor(() => {
+      expect(request).toHaveBeenCalledWith("custom.signature.cancel", {
+        requestGroupId: "topic-1",
+      });
+    });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(sign).not.toHaveBeenCalled();
+    expect(enqueueSnackbar).not.toHaveBeenCalled();
+    expect(mockedRejectRequest).not.toHaveBeenCalled();
+    expect(window.open).not.toHaveBeenCalled();
+  });
+
+  it("stays silent when the reply of a signature completed after the session deletion fails", async () => {
+    let signed!: () => void;
+    const signature = new Promise<void>((resolve) => {
+      signed = resolve;
+    });
+    mockedHandleEIP155Request.mockImplementation(async () => {
+      await signature;
+      throw new Error("No matching key. session topic doesn't exist");
+    });
+
+    mountHook();
+
+    walletKitListeners.get("session_request")?.({
+      topic: "topic-1",
+      id: 10,
+      params: {
+        chainId: "eip155:1",
+        request: { method: "personal_sign", params: [] },
+      },
+      verifyContext: {},
+    });
+    await waitFor(() => {
+      expect(mockedHandleEIP155Request).toHaveBeenCalled();
+    });
+
+    walletKitListeners.get("session_delete")?.({ id: 1, topic: "topic-1" });
+    signed();
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(enqueueSnackbar).not.toHaveBeenCalled();
+    expect(mockedRejectRequest).not.toHaveBeenCalled();
+    expect(window.open).not.toHaveBeenCalled();
+  });
+
+  it("stays silent when Ledger Wallet cancelled the request of a disconnected dApp", async () => {
+    const cancelled = new Error("The Live App cancelled the sign request");
+    cancelled.name = "SignatureRequestCancelled";
+    mockedHandleEIP155Request.mockRejectedValue(cancelled);
+
+    mountHook();
+
+    walletKitListeners.get("session_request")?.({
+      topic: "topic-1",
+      id: 10,
+      params: {
+        chainId: "eip155:1",
+        request: { method: "personal_sign", params: [] },
+      },
+      verifyContext: {},
+    });
+
+    await waitFor(() => {
+      expect(mockedHandleEIP155Request).toHaveBeenCalled();
+    });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(enqueueSnackbar).not.toHaveBeenCalled();
+    expect(mockedRejectRequest).not.toHaveBeenCalled();
+    expect(window.open).not.toHaveBeenCalled();
   });
 
   it("does not open a Ledger Wallet deeplink provided as dApp redirect", async () => {

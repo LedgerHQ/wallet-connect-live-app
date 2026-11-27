@@ -41,6 +41,12 @@ import { useCallback, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { ZodError } from "zod";
 import { isWalletRequest } from "../utils/helper.util";
+import {
+  cancelSignatureRequests,
+  isSignatureRequestCancelledError,
+  withSignatureRequestGroup,
+} from "../utils/signatureRequestGroup";
+import { resumeSessionRequestQueue } from "../utils/sessionRequestQueue";
 import { handleBIP122Request } from "./requestHandlers/BIP122";
 import { handleCosmosRequest } from "./requestHandlers/Cosmos";
 import { handleEIP155Request } from "./requestHandlers/EIP155";
@@ -139,6 +145,8 @@ export default function useWalletConnect() {
 
   const accounts = useAccounts(client);
   const { track } = useAnalytics();
+  // Topics of the sessions the dApp deleted, so their pending requests stop signing.
+  const deletedTopicsRef = useRef(new Set<string>());
   const trackRef = useRef(track);
 
   useEffect(() => {
@@ -225,6 +233,15 @@ export default function useWalletConnect() {
         id,
       } = requestEvent;
 
+      // Ledger Wallet cancels the sign requests of this session if the dApp disconnects.
+      const isSessionDeleted = () => deletedTopicsRef.current.has(topic);
+      const requestClient = withSignatureRequestGroup(
+        client,
+        topic,
+        isSessionDeleted,
+      );
+      let isCancelled = false;
+
       void (async () => {
         try {
           if (isWalletRequest(request)) {
@@ -234,7 +251,7 @@ export default function useWalletConnect() {
               id,
               chainId,
               accounts.data,
-              client,
+              requestClient,
               walletKit,
               queryClient,
               walletInfo,
@@ -247,7 +264,7 @@ export default function useWalletConnect() {
               id,
               chainId,
               accounts.data,
-              client,
+              requestClient,
               walletKit,
             );
           } else if (isBIP122Chain(chainId, request)) {
@@ -259,7 +276,7 @@ export default function useWalletConnect() {
 
             await handleBIP122Request(request, topic, id, chainId, {
               accounts: accounts.data,
-              client,
+              client: requestClient,
               walletkit: walletKit,
               walletCapabilities,
               walletInfo,
@@ -275,7 +292,7 @@ export default function useWalletConnect() {
               id,
               chainId,
               accounts.data,
-              client,
+              requestClient,
               walletKit,
             );
           } else if (
@@ -288,7 +305,7 @@ export default function useWalletConnect() {
               id,
               chainId,
               accounts.data,
-              client,
+              requestClient,
               walletKit,
             );
           } else if (
@@ -309,7 +326,7 @@ export default function useWalletConnect() {
               accounts.data.filter((account) =>
                 sessionTezosAddresses.has(account.address),
               ),
-              client,
+              requestClient,
               walletKit,
             );
           } else if (
@@ -330,7 +347,7 @@ export default function useWalletConnect() {
               accounts.data.filter((account) =>
                 sessionCosmosAddresses.has(account.address),
               ),
-              client,
+              requestClient,
               walletKit,
             );
           } else if (
@@ -351,7 +368,7 @@ export default function useWalletConnect() {
               accounts.data.filter((account) =>
                 sessionSuiAddresses.has(account.address),
               ),
-              client,
+              requestClient,
               walletKit,
             );
           } else {
@@ -365,6 +382,13 @@ export default function useWalletConnect() {
             );
           }
         } catch (error) {
+          // The dApp disconnected: there is nobody left to answer or to redirect to. A
+          // signature completed just before (or despite) the cancellation fails on its reply.
+          if (isSignatureRequestCancelledError(error) || isSessionDeleted()) {
+            isCancelled = true;
+            return;
+          }
+
           if (error instanceof ZodError) {
             reportZodError({
               error,
@@ -393,7 +417,7 @@ export default function useWalletConnect() {
         }
       })().finally(() => {
         setLoading(false);
-        redirectToDapp(topic);
+        if (!isCancelled && !isSessionDeleted()) redirectToDapp(topic);
         void queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
       });
     },
@@ -410,9 +434,18 @@ export default function useWalletConnect() {
     ],
   );
 
-  const onSessionDeleted = useCallback(() => {
-    void queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
-  }, [queryClient]);
+  const onSessionDeleted = useCallback(
+    ({ topic }: SignClientTypes.EventArguments["session_delete"]) => {
+      deletedTopicsRef.current.add(topic);
+      // A sign request of the dApp may still wait for the user in Ledger Wallet. Once it is
+      // cancelled, the queued request of another dApp can be handled.
+      void cancelSignatureRequests(client, topic).finally(() =>
+        resumeSessionRequestQueue(walletKit),
+      );
+      void queryClient.invalidateQueries({ queryKey: sessionsQueryKey });
+    },
+    [client, queryClient, walletKit],
+  );
 
   const setOneClickAuthPayload = useSetAtom(oneClickAuthPayloadAtom);
   const onSessionAuthenticate = useCallback(
