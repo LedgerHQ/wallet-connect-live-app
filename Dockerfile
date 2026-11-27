@@ -29,10 +29,11 @@ RUN --mount=type=secret,id=sentry_auth_token,required=false \
     fi; \
     pnpm build
 
-# nginx-unprivileged runs as non-root (uid 101) and listens on 8080. Pin the
-# 1.31 mainline (the 1.29 line no longer receives fixes) by digest so rebuilds
-# are reproducible; bump both together.
-FROM jfrog.ledgerlabs.net/ossproxy-oci-proxy-dockerio/nginxinc/nginx-unprivileged:1.31.7-alpine@sha256:b5047b9b76845eac124358373c6852377c52e4b05834a47647e955dd91cb8f1e
+# nginx-unprivileged runs as non-root (uid 101) and listens on 8080. Pinned by
+# digest so rebuilds are reproducible. When bumping, take the digest of the
+# multi-arch index for the tag below and update this comment with it.
+# Tag: nginxinc/nginx-unprivileged:1.31.7-alpine
+FROM jfrog.ledgerlabs.net/ossproxy-oci-proxy-dockerio/nginxinc/nginx-unprivileged@sha256:b5047b9b76845eac124358373c6852377c52e4b05834a47647e955dd91cb8f1e
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist /usr/share/nginx/html
