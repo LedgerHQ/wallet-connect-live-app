@@ -214,6 +214,10 @@ const SOLANA_MIN_VERSIONS: Record<string, string> = {
 /** Check if Solana support should be enabled based on wallet version */
 export const isSolanaSupportEnabled = createSupportChecker(SOLANA_MIN_VERSIONS);
 
+const BIP122_SIGN_MESSAGE_PATH_MIN_VERSIONS: Record<string, string> = {};
+
+export const isBip122SignMessagePathSupported = createSupportChecker(BIP122_SIGN_MESSAGE_PATH_MIN_VERSIONS);
+
 /**
  * Minimum versions of Ledger Wallet that open the device app named in `bitcoin.signPsbt` options.
  * An older host ignores the option and signs with the Bitcoin app, so a PSBT meant for a derived

@@ -8,7 +8,7 @@ import {
   bip122SignMessageSchema,
   bip122SignPsbtSchema,
 } from "@/data/methods/BIP122.methods";
-import { fetchBip122Addresses } from "@/utils/bip122";
+import { fetchBip122Addresses, findBip122MessageSigner } from "@/utils/bip122";
 import { btcTransactionSchema, convertBtcToLiveTX } from "@/utils/converters";
 import { selectDeviceApp } from "@/utils/derivedApps";
 import { getAccountWithAddressAndChainId } from "@/utils/generic";
@@ -49,6 +49,7 @@ export async function handleBIP122Request(
     walletCapabilities?: string[];
     walletInfo?: WalletInfo["result"];
     sessionAddress?: string;
+    isSignMessagePathSupported?: boolean;
   },
 ) {
   const {
@@ -88,26 +89,30 @@ export async function handleBIP122Request(
           }
         }
       } else {
-        await rejectRequest(walletkit, topic, id, Errors.userDecline);
+        await rejectRequest(walletkit, topic, id, Errors.unsupportedAccounts, 5103);
       }
       break;
     }
     case BIP122_SIGNING_METHODS.BIP122_SIGN_MESSAGE: {
       const params = bip122SignMessageSchema.parse(request.params);
-      const accountSign = getAccountWithAddressAndChainId(
+      const signer = await findBip122MessageSigner(
         accounts,
+        client,
         params.address ?? params.account,
+        params.account,
         chainId,
+        context.isSignMessagePathSupported ?? false,
       );
-      if (accountSign) {
+      if (signer) {
         try {
           const message = params.message;
           const signedMessage = await client.message.sign(
-            accountSign.id,
+            signer.account.id,
             Buffer.from(message),
+            signer.path ? { path: signer.path } : undefined,
           );
           const result: BIP122_RESPONSES[typeof request.method] = {
-            address: accountSign.address,
+            address: signer.address,
             signature: formatMessage(signedMessage).replace("0x", ""),
           };
 
@@ -120,7 +125,7 @@ export async function handleBIP122Request(
           }
         }
       } else {
-        await rejectRequest(walletkit, topic, id, Errors.userDecline);
+        await rejectRequest(walletkit, topic, id, Errors.unsupportedAccounts, 5103);
       }
       break;
     }

@@ -7,6 +7,7 @@ export enum Errors {
   msgDecline = "Message signed declined",
   unsupportedChains = "unsupportedChains",
   unsupportedMethods = "unsupportedMethods",
+  unsupportedAccounts = "unsupportedAccounts",
   walletUpdateRequired = "Ledger Wallet update required to sign this PSBT",
 }
 
